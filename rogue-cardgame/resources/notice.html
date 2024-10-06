@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>正直、これ読む人いるの？(笑)</title><!--このタイトルはmusedushのロード画面のやつです (笑)なんて初めて使ったわ-->
+    <style>
+      .button{
+        display: block;
+        width: 200px;
+        height: 40px;
+        background-color: #eee;
+        border: 1px solid #000;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      #AppearArea{
+        display: none;
+        width: 100%;
+        height: 100%;
+        margin: 0 auto;
+      }
+      #notice{
+        overflow: auto;
+        border: 2px solid #000;
+        width: 90%; 
+        height: 500px;
+        margin: 0 auto;
+      }
+    </style>
+</head>
+<body>
+    <div id="ButtonArea">
+      <button class="button" onclick="setTimeout(`N('introduction.txt')`, 10)">"お知らせ"機能、登場！！え？見たことあるって？</button>
+    </div>
+    <div id="AppearArea"></div>
+    <script>
+     function N(s) {
+      document.getElementById('ButtonArea').style.display = 'none';
+      document.getElementById('AppearArea').style.display = 'block';
+      document.getElementById('AppearArea').innerHTML = `<iframe id="notice" src="notices/${s}"</iframe>`;
+
+      const handler = function() {
+          document.getElementById('notice').removeEventListener('click', handler); // 正しくリスナーを外す
+          document.getElementById('ButtonArea').style.display = 'block';
+          document.getElementById('AppearArea').style.display = 'none';
+      };
+
+      addEventListener('click', handler);
+    }
+
+      function B(){
+        off.addEventListener
+      }
+    </script>
+</body>
+</html>

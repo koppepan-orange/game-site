@@ -155,6 +155,7 @@ const cards = [
 const SortCardA = cards.filter(card => card.code === 'A').map(card => card.name);
 const SortCardM = cards.filter(card => card.code === 'M').map(card => card.name);
 
+//#region 敵の動きのまとめ
 let enemynames = {
     name:['古書館の魔術師', '船上のバニーチェイサー', ''],
     num: [0,1,2,]
@@ -197,6 +198,8 @@ let actpat1100 = [
         ['盾','ハートシーカー',0,0],
     ],
 ]
+//#endregion
+
 let havecardA = {
     name:['スラッシュ','スラッシュ', 'ソード', '博打', 'ラッシュソード', 'ソウルナイフ','ハートシーカー'],
     ct:[0,0,0,0,0,0,0],
@@ -206,6 +209,8 @@ let havecardM = {
     name:['盾', '回復'],
     ct:[0,0],
 }
+
+
 let CardActList = {
     card: [],
     turn: []
@@ -229,6 +234,8 @@ let ソードenemyeleatk = 0;
 let playereleshl = 0;
 let enemyeleshl = 0;
 
+//#region 扱いやすい子達
+function delay(ms) {return new Promise(resolve => setTimeout(resolve, ms));}
 function tekiou() {
     document.getElementById('PlayerHealth').textContent = playerhealth;
     document.getElementById('EnemyHealth').textContent = enemyhealth;
@@ -237,7 +244,22 @@ function tekiou() {
     document.getElementById('EnemyMaxHealth').textContent = enemymaxhealth;
     document.getElementById('EnemyShield').textContent = enemyshield;
 }
-function delay(ms) {return new Promise(resolve => setTimeout(resolve, ms));}
+//#endregion
+//#region Notice
+let noticenow = 0;
+function OpenNotice(){
+   if(noticenow == 0){
+      noticenow = 1;
+      document.getElementById('Notice-page').style.display = 'block';
+      document.getElementById('Notice-page').innerHTML = '<iframe src="resources/notice.html" width="100%" height="100%" frameborder="0"></iframe>';
+   }else{
+      noticenow = 0;
+      document.getElementById('Notice-page').style.display = 'none';
+      document.getElementById('Notice-page').innerHTML = '';
+   }
+}
+//#endregion
+//#region make bar, place notecard
 function BarCardCreate() {
     document.getElementById('PhaseBar').innerHTML = '';
     if(nextcardactpat == 0){
@@ -462,6 +484,8 @@ function changeBackgroundColor(color) {
 function getBackgroundColor(element) {
     return window.getComputedStyle(element).backgroundColor;
 }
+//#endregion
+//#region Phasereset
 function Phasereset() {
     BarCardCreate();
     document.getElementById('PhaseStart').style.display = 'none';
@@ -511,28 +535,31 @@ function Phasereset() {
         });
     });
 }
-
+//#endregion
 //#region エフェクトの動き
 const canvas = document.getElementById('ZentaiMiruo');
 const ctx = canvas.getContext('2d');
 const EffectImagesKorehaMemoDesu = [
     'thief',''
 ]
+
 function EffectAppear(side,name){
     const img = new Image();
     //img.src = name+'.png';
-    img.src = 'assets/icons/burn_1.png';
+    img.src = 'assets/cards/盾.png';
 
     let yPos ;
     let xPos;
     if(side == 'p'){
-        yPos = canvas.height - 100;
-        xPos = canvas.width - 100;
+        yPos = canvas.height - 20;
+        xPos = canvas.width - 20;
     }else{
-
+        yPos = 20;
+        xPos = 20;
     }
     let opacity = 1;
     function animate() {
+    console.log(img.src, xPos, yPos, 50, 50);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.globalAlpha = opacity;
       ctx.drawImage(img, xPos, yPos, 50, 50);
@@ -546,6 +573,8 @@ function EffectAppear(side,name){
   };
 
 
+//#endregion
+//#region PhaseStart
 async function Phasestart() {
     if(JustLook == 0) {
         JustLook = 1;
@@ -820,3 +849,4 @@ async function Phasestart() {
         NextPhase();
     }
 }
+//#endregion
