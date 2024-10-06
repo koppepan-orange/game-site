@@ -25,7 +25,7 @@ const cards = [
         code: 'A',
         rare: 'R',
         cool: 4,
-        explain: '基本3ダメージ、次のカードが攻撃カードの場合3回攻撃になる。'
+        explain: '基本3ダメージ、次のカードが自分の攻撃カードの場合3回攻撃になる。'
     },
     {
         name: 'ソウルナイフ',
@@ -74,7 +74,7 @@ const cards = [
         rare: 'SR',
         cool: 5,
         explain: '自身のシールドを全て消費し、<br>相手に消費前のシールドの1.2倍のダメージを与える。'
-    },//1.5倍に強化とか、強化版武器追加してもいいかも 学マスやるかぁ....?ww
+    },//1.5倍に強化とか、強化版武器追加してもいいかも
     {
         name: '鬼神乱舞',//アークナイツモンハンコラボ、キリンRヤトウの2ndスキルより
         nume: '4x6',//ちょっとやばいか...?ww
@@ -95,6 +95,14 @@ const cards = [
         explain: '軽く盾を構える。'
     },
     {
+        name: '回復',
+        nume: 4,
+        code: 'M',
+        rare: 'N',
+        cool: 2,
+        explain: '自身のHPを4回復する。'
+    },
+    {
         name: '攻撃力上昇',
         nume: 1,
         code: 'M',
@@ -111,7 +119,7 @@ const cards = [
         explain: '使用されたフェーズの配置されたカードを全て無効化する。<br>簡単に言えばスキップである'
     },
     {
-        name: 'デュアルコア',//ダブルエントリーシステム的なやつができたらシステム消しといて
+        name: 'デュアルコアシステム',//ダブルエントリーシステム的なやつができたらシステム消しといて
         nume: '',
         code: 'M',
         rare: 'SR',
@@ -160,8 +168,8 @@ let barcards = ['攻撃力上昇', 0, 0, 'ソード'];
 let actpat = [
     [
         ['攻撃力上昇', 0, 0, 'ソード'],
-        //[0, 'シーフマスク', 0, '博打'],
-        //[0,'盾',0,'デュアルカッター'],
+        [0, 'シーフマスク', 0, '博打'],
+        [0,'盾',0,'デュアルカッター'],
     ],
     [
         ['攻撃力上昇',0,'攻撃力上昇',0],
@@ -195,7 +203,7 @@ let havecardA = {
     ob:[]
 }
 let havecardM = {
-    name:['盾', '攻撃力上昇'],
+    name:['盾', '回復'],
     ct:[0,0],
 }
 let CardActList = {
@@ -451,11 +459,9 @@ function changeBackgroundColor(color) {
         card.style.backgroundColor = color;
     });
 }
-
 function getBackgroundColor(element) {
     return window.getComputedStyle(element).backgroundColor;
 }
-
 function Phasereset() {
     BarCardCreate();
     document.getElementById('PhaseStart').style.display = 'none';
@@ -505,6 +511,41 @@ function Phasereset() {
         });
     });
 }
+
+//#region エフェクトの動き
+const canvas = document.getElementById('ZentaiMiruo');
+const ctx = canvas.getContext('2d');
+const EffectImagesKorehaMemoDesu = [
+    'thief',''
+]
+function EffectAppear(side,name){
+    const img = new Image();
+    //img.src = name+'.png';
+    img.src = 'assets/icons/burn_1.png';
+
+    let yPos ;
+    let xPos;
+    if(side == 'p'){
+        yPos = canvas.height - 100;
+        xPos = canvas.width - 100;
+    }else{
+
+    }
+    let opacity = 1;
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.globalAlpha = opacity;
+      ctx.drawImage(img, xPos, yPos, 50, 50);
+
+      yPos -= 2;
+      opacity -= 0.02;
+
+      if (opacity > 0) {requestAnimationFrame(animate);}
+    }
+    animate();
+  };
+
+
 async function Phasestart() {
     if(JustLook == 0) {
         JustLook = 1;
@@ -634,9 +675,12 @@ async function Phasestart() {
                     shl = 4;
                     shl += eleshl;                    
                     break;
+                case '回復':
+                    repair = 4;
+                    break;
                 case '攻撃力上昇':
-                    if(nowturn == 'P') { playereleatk += 1; }
-                    if(nowturn == 'E') { enemyeleatk += 1; }
+                    if(nowturn == 'P'){playereleatk += 1;}
+                    if(nowturn == 'E'){enemyeleatk += 1;}
                     break;
                 case 'グリーン・トレイン':
                     //ないっすよ。だってこれ存在するだけで効果だし
