@@ -586,12 +586,14 @@ document.addEventListener('keydown', (event) => {
    switch(event.key) {
    case 'w':
    case 'ArrowUp': // 上
+      event.preventDefault();
       SELECTy -= 75;
       MAPy = Math.floor(SELECTy / 75);
       if(MAPy < 0){SELECTy = 0}else if(objectMap[MAPy][MAPx]){if(objectMap[MAPy][MAPx] == undefined||objectMap[MAPy][MAPx] == 18){SELECTy += 75}}
       break;
    case 'a':
    case 'ArrowLeft': // 左
+   event.preventDefault();
       SELECTx -= 75;
       MAPx = Math.floor(SELECTx / 75);
       if(MAPx < 0){SELECTx = 0}else if(objectMap[MAPy][MAPx]){if(objectMap[MAPy][MAPx] == undefined||objectMap[MAPy][MAPx] == 18){SELECTx += 75}}
@@ -599,6 +601,7 @@ document.addEventListener('keydown', (event) => {
       break;
    case 's':
    case 'ArrowDown': // 下
+   event.preventDefault();
       SELECTy += 75;
       MAPy = Math.floor(SELECTy / 75);
       if(MAPy > 7){SELECTy = 525}else if(objectMap[MAPy][MAPx]){if(objectMap[MAPy][MAPx] == undefined||objectMap[MAPy][MAPx] == 18){SELECTy -= 75}}
@@ -606,6 +609,7 @@ document.addEventListener('keydown', (event) => {
       break;
    case 'd':
    case 'ArrowRight': // 右
+   event.preventDefault();
       SELECTx += 75;
       MAPx = Math.floor(SELECTx / 75);
       if(MAPx > 7){SELECTx = 525}else if(objectMap[MAPy][MAPx]){if(objectMap[MAPy][MAPx] == undefined||objectMap[MAPy][MAPx] == 18){SELECTx -= 75}}
@@ -1215,6 +1219,8 @@ function tekiou(){
          break;
    }
 }
+function delay(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
+
 
 
 //#region Inventory
@@ -1234,7 +1240,6 @@ function inventoryClose(){
    document.getElementById('log').textContent = '';
 };
 //#endregion
-
 //#region Magics
 const Magics = ['heal','power','shell','poison','thunder','fire','healer than','luck','ell thunder','more power','more shell','deadly poison','giga thunder','giga fire','the healest','greatluck','Thoron','random',]
 const MagicInfo = {
@@ -1261,7 +1266,6 @@ function MagicChangeDecide(num){
    inventoryOpen();
 }
 //#endregion
-
 //#region Notice
 let noticenow = 0;
 function OpenNotice(){
@@ -1276,9 +1280,7 @@ function OpenNotice(){
    }
 }
 //#endregion
-
-//buffの動き
-//#region
+//#region buff
 function bufftekiou(){
    playerbuffapply = [];
    playerbuff.forEach(nanka => {//これをすると全部をやってくれるらしい？
@@ -1540,8 +1542,6 @@ function buffclear(array){
 }
 //#endregion
 
-function delay(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
-
 
 //#region ゲーム開始時の動き
 function GameStart(){
@@ -1603,7 +1603,7 @@ function begin(name){
          buttonsolid = '#ff7373';
          buttonback = '#fcffc0';
          playermaxhealth -= 50;
-         playerattack += 5;
+         playerattack -= 5;
          playermattack += 10;
          playermdefense += 20;
       break;
