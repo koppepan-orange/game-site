@@ -766,7 +766,7 @@ async function Phasestart() {
                     if(shl < 0){playershield += shl;}
                     for (let i = 0; i < atknum; i++) {
                         if(enemyhealth <= 0){break;}
-                        if(!enemyshield > 0) {
+                        if(enemyshield > 0){
                             x = enemyshield - atk;
                             if(x < 0) {
                                 enemyshield = 0;
@@ -774,7 +774,7 @@ async function Phasestart() {
                             } else {
                                 enemyshield -= atk;
                             }
-                        } else {
+                        }else{
                             if(enemyhealth <= atk){atk = enemyhealth;}
                             enemyhealth -= atk;
                         }
