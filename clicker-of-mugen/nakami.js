@@ -923,6 +923,7 @@ function NextStage(){
 
 //#endregion
 
+//#region 変数達
 let a,b,c,d,e,f,g,h,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z;//こいつらは計算用
 
 let fun = Math.floor(Math.random() * 100)+1;
@@ -1009,6 +1010,32 @@ let phase = 0;//何中か
 let afknow = 0;
 let dungeonnow = 0;
 let bossbattlenow = 0;
+
+let enemyname = 0;
+let enemynames = ["彷徨わない亡霊", "地上の月兎", "悠々自適なクラス委員", "大胆不敵な問題児", "兎角のシルバージャグラー", "デスブリンガー・ナース",//草原
+                  "ついに動いたサボテン","スフィンクスの残像","襲来セシ砂嵐","サソリ風ザリガニ","毒無しのガラガラヘビ","裏切りのアリジゴク",//昼砂漠
+                  "ピンクな先輩", "ブルーな後輩", "過激派のハッカー", "反旗を翻したアンドロイド", "腐敗した落武者", "アスピリン中毒者",//夜砂漠
+                "古書館の魔術師", "トラブルメーカーな天才少女","黒服","無邪気な夜の希望"];//学校(ここだけブルアカにしましょ)
+const enemynamenum = ['0.5','6.5','12.5','18,3'];
+let bossenemynames = ['purpleslime','steampumker','RailwayGun "Shemata"','joker']//RailwayGun "Shemata"...wwあ、列車砲シェマタね 対策委員会が壊そうとしてたやつ
+let enemyprefixe = 0;
+let enemyprefixes = ['激昂','冷静沈着な','ギャンブラーな','守りが固い','心眼持ちの'];
+let saydefeats = 0;
+let NStimeout = 0;
+let skillcooldown = 0;
+let playerEX = {
+   id:'50%heal',
+   name:'50%回復'
+}
+let playerNS = {
+   id:'5%heal',
+   name:'5%回復'
+};
+let playerPS = {
+   id:0,
+   name:0
+};
+//#endregion
 
 //全道具です
 //#region 
@@ -1118,32 +1145,7 @@ const tools = {
 }
 //#endregion
 
-let enemyname = 0;
-let enemynames = ["彷徨わない亡霊", "地上の月兎", "悠々自適なクラス委員", "大胆不敵な問題児", "兎角のシルバージャグラー", "デスブリンガー・ナース",//草原
-                  "ついに動いたサボテン","スフィンクスの残像","襲来セシ砂嵐","サソリ風ザリガニ","毒無しのガラガラヘビ","裏切りのアリジゴク",//昼砂漠
-                  "ピンクな先輩", "ブルーな後輩", "過激派のハッカー", "反旗を翻したアンドロイド", "腐敗した落武者", "アスピリン中毒者",//夜砂漠
-                "古書館の魔術師", "トラブルメーカーな天才少女","黒服","無邪気な夜の希望"];//学校(ここだけブルアカにしましょ)
-const enemynamenum = ['0.5','6.5','12.5','18,3'];
-let bossenemynames = ['purpleslime','steampumker','RailwayGun "Shemata"','joker']//RailwayGun "Shemata"...wwあ、列車砲シェマタね 対策委員会が壊そうとしてたやつ
-let enemyprefixe = 0;
-let enemyprefixes = ['激昂','冷静沈着な','ギャンブラーな','守りが固い','心眼持ちの'];
-let saydefeats = 0;
-let NStimeout = 0;
-let skillcooldown = 0;
-let playerEX = {
-   id:'50%heal',
-   name:'50%回復'
-}
-let playerNS = {
-   id:'5%heal',
-   name:'5%回復'
-};
-let playerPS = {
-   id:0,
-   name:0
-};
-
-//超シンプルで使いやすい子達
+//#region 超シンプルで使いやすい子達
 function tekiou(){
    document.getElementById('EnemyName').textContent = enemyname;
    document.getElementById('PlayerName').textContent = playername;
@@ -1259,6 +1261,9 @@ function save(){
    usersRef.update(newData)
 }
 
+function delay(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
+
+//#endregion
 
 //#region Inventory
 function inventoryOpen(){
@@ -1277,7 +1282,6 @@ function inventoryClose(){
    document.getElementById('log').textContent = '';
 };
 //#endregion
-
 //#region Magics
 const Magics = ['heal','power','shell','poison','thunder','fire','healer than','luck','ell thunder','more power','more shell','deadly poison','giga thunder','giga fire','the healest','greatluck','Thoron','random',]
 const MagicInfo = {
@@ -1304,7 +1308,6 @@ function MagicChangeDecide(num){
    inventoryOpen();
 }
 //#endregion
-
 //#region Notice
 let noticenow = 0;
 function OpenNotice(){
@@ -1319,7 +1322,6 @@ function OpenNotice(){
    }
 }
 //#endregion
-
 //#region Questの動き
 const quests = {
    main:[
@@ -1528,9 +1530,7 @@ function ClearedMainQuest(code){
    save();
 }
 //#endregion
-
-//buffの動き
-//#region
+//#region buffの動き
 function bufftekiou(){
    playerbuffapply = [];
    playerbuff.forEach(nanka => {//これをすると全部をやってくれるらしい？
@@ -1792,8 +1792,7 @@ function buffclear(array){
 }
 //#endregion
 
-function delay(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
-
+//#region ゲーム開始時ログインの動き、チャットのあれこれ - - - - - - - - - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -
 const firebaseConfig = {
    apiKey: "AIzaSyBN5V_E6PzwlJn7IwVsluKIWNIyathhxj0",
    authDomain: "koppepan-orange.firebaseapp.com",
@@ -1812,7 +1811,6 @@ let messagesRef = database.ref('forrpg/rooms/'+chatroom+'/messages');
 let usersRef;
 let userData;
 
-//ゲーム開始時ログインの動き、チャットのあれこれ - - - - - - - - - - -  - - -  - - -  - - -  - - -  - - -  - - -  - - -
 function GameStart(){
 
    document.getElementById('GameArea').innerHTML = `
@@ -2047,6 +2045,7 @@ function GameStart(){
   }
 
 }
+//#endregion
 
 //#region chatのやつ
 function selectRoom() {

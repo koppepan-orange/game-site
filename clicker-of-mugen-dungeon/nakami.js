@@ -1,7 +1,6 @@
 //内部へようこそ！！！
 
-//探索部分
-//#region
+//#region 探索部分
 document.getElementById('GameArea').style.display = 'block';
 document.getElementById('NowMap').style.display = 'none';
 const canvas = document.getElementById("NowMap");
@@ -721,16 +720,16 @@ document.addEventListener('keydown', (event) => {
 canvas.addEventListener('click', (event) => {
    if(AllowMove == 0){
       const rect = canvas.getBoundingClientRect();
+      console.log(rect)
       MAPx = event.clientX - rect.left;
       MAPy = event.clientY - rect.top;
-      
       MAPx = Math.floor(x/75);
       MAPy = Math.floor(y/75);
       SELECTx = MAPx*75;
       SELECTy = MAPy*75;
 
       // マップの値をチェック
-      if (MAPy >= 0 && MAPy < objectMap.length && MAPx >= 0 && MAPx < objectMap[MAPy].length) {NanigaOkoruKana(objectMap[MAPy][MAPx]);}
+      if(MAPy >= 0 && MAPy < objectMap.length && MAPx >= 0 && MAPx < objectMap[MAPy].length){NanigaOkoruKana(objectMap[MAPy][MAPx]);}
       ctx.clearRect(0, 0, 600, 600); 
       DrawBackground();
       ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
@@ -943,11 +942,9 @@ function NextStage(){
 
 //#endregion
 
+//#region 変数の宣言達
 let a,b,c,d,e,f,g,h,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z;//こいつらは計算用
-
 let fun = Math.floor(Math.random() * 100)+1;
-
-
 let playername = 'player';
 let sp = 1;
 let playerhealth = 0;
@@ -1003,17 +1000,37 @@ let enemydebuff = [];
 let enemydebufftime = [];
 let enemydebuffapply = [];
 
+let phase = 0;//何中か
 let turn = 0;//今誰のターンか
 let turncount = 0;//今のターン数
-
-let phase = 0;//何中か
-
-
-//0 = false,1 = true
 let bossbattlenow = 0;
 
-//全道具です
-//#region 
+let enemyname = 0;
+let enemynames = {
+   1.1:["彷徨わない亡霊", "地上の月兎", "悠々自適なクラス委員", "大胆不敵な問題児", "兎角のシルバージャグラー", "デスブリンガー・ナース",],
+   2.1:["ついに動いたサボテン","スフィンクスの残像","襲来セシ砂嵐","サソリ風ザリガニ","毒無しのガラガラヘビ","裏切りのアリジゴク","ピンクな先輩", "ブルーな後輩", "過激派のハッカー", "反旗を翻したアンドロイド", "腐敗した落武者", "アスピリン中毒者",],//砂漠
+   3.1:["古書館の魔術師", "トラブルメーカーな天才少女","黒服","無邪気な夜の希望"]//学校(ここだけブルアカにしましょ)
+               };
+let bossenemynames = ['purpleslime','steampumker','RailwayGun "Shemata"','joker']//RailwayGun "Shemata"...wwあ、列車砲シェマタね 対策委員会が壊そうとしてたやつ
+let enemyprefixe = 0;
+let enemyprefixes = ['激昂','冷静沈着な','ギャンブラーな','守りが固い','心眼持ちの'];
+
+let skillcooldown = 0;
+let playerEX = {
+   id:'50%heal',
+   name:'50%回復'
+}
+let playerNS = {
+   id:'5%heal',
+   name:'5%回復'
+};
+let playerPS = {
+   id:0,
+   name:0
+};
+//#endregion
+
+//#region 全道具です
 let Aspirin = {
    name:'アスピリン',
    id:'Aspirin',
@@ -1120,32 +1137,7 @@ const tools = {
 }
 //#endregion
 
-let enemyname = 0;
-let enemynames = {
-   1.1:["彷徨わない亡霊", "地上の月兎", "悠々自適なクラス委員", "大胆不敵な問題児", "兎角のシルバージャグラー", "デスブリンガー・ナース",],
-   2.1:["ついに動いたサボテン","スフィンクスの残像","襲来セシ砂嵐","サソリ風ザリガニ","毒無しのガラガラヘビ","裏切りのアリジゴク","ピンクな先輩", "ブルーな後輩", "過激派のハッカー", "反旗を翻したアンドロイド", "腐敗した落武者", "アスピリン中毒者",],//夜砂漠
-   3.1:["古書館の魔術師", "トラブルメーカーな天才少女","黒服","無邪気な夜の希望"]//学校(ここだけブルアカにしましょ)
-               };
-let bossenemynames = ['purpleslime','steampumker','RailwayGun "Shemata"','joker']//RailwayGun "Shemata"...wwあ、列車砲シェマタね 対策委員会が壊そうとしてたやつ
-let enemyprefixe = 0;
-let enemyprefixes = ['激昂','冷静沈着な','ギャンブラーな','守りが固い','心眼持ちの'];
-let saydefeats = 0;
-let NStimeout = 0;
-let skillcooldown = 0;
-let playerEX = {
-   id:'50%heal',
-   name:'50%回復'
-}
-let playerNS = {
-   id:'5%heal',
-   name:'5%回復'
-};
-let playerPS = {
-   id:0,
-   name:0
-};
-
-//超シンプルで使いやすい子達
+//#region 超シンプルで使いやすい子達
 function tekiou(){
    document.getElementById('EnemyName').textContent = enemyname;
    document.getElementById('PlayerName').textContent = playername;
@@ -1222,6 +1214,51 @@ function tekiou(){
 function delay(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 
 
+function DesideEnemyName(){
+   enemyprefixe = 0;
+   enemyname = enemynames[stage][Math.floor(Math.random() * enemynames[stage].length)];
+   if(Math.floor(Math.random() * 3) == 0){enemyprefixe = enemyprefixes[Math.floor(Math.random() * enemyprefixes.length)]};
+   if(enemyprefixe !== 0){enemyname = enemyprefixe + ' ' + enemyname}
+   else{enemyname = enemyname}; //敵に接頭辞を確率で付与します
+   
+   enemyattack = enemyatk;//敵の能力を決めます
+   enemydefense = enemydef;
+   enemymaxhealth = enemyhp; enemyhealth = enemymaxhealth;
+   enemycritlate = enemycrla;
+   enemycritdmg = enemycrdm;
+   enemycritresist = enemycrrs;
+   tekiou();
+   switch(enemyprefixe){//接頭辞ごとの能力
+      case '激昂':
+         enemyattack  = Math.floor(enemyatk*1.5);
+         enemydefense = Math.floor(enemydef*0.75);
+         break;
+      case '冷静沈着な':
+         enemydefense = Math.floor(enemydef*2);
+         enemyattack  = Math.floor(enemyattack*0.75);
+         break;
+      case 'ギャンブラーな':
+         enemycritlate = enemycrla + 0.3;
+         enemymaxhealth = Math.floor(enemyhp*0.5);
+      break;
+      case '守りが固い':
+         enemycritresist += 0.5;//会心半減ね
+         enemymaxhealth = Math.floor(enemyhp*1.25);
+         enemydefense = 0;
+         enemyattack = Math.floor(enemyatk*0.3);
+      break;
+      case '心眼持ちの':
+         enemycritlate = 1;//確定会心人間(抵抗無視の場合)
+         enemyattack = Math.floor(enemyatk*0.5);
+         enemymaxhealth = Math.floor(enemyhp*0.5);
+      break;
+   }
+   enemyhealth = enemymaxhealth;
+   return enemyname;//初めてちゃんとreturn使ったかも
+}
+
+async function errorcheck(){if(playerattack==Infinity||playerdefense==Infinity||playerhealth==Infinity||playermaxhealth==Infinity||playerlevel==Infinity||playerpower==Infinity||playermaxmp==Infinity||playershell==Infinity||isNaN(playerhealth)||isNaN(playermaxhealth)||isNaN(playerattack)||isNaN(playerdefense)||isNaN(playermaxmp)||isNaN(playerpower)||isNaN(playershell)||isNaN(playerlevel)||Potion.num==Infinity||euro==Infinity||Bomb.num==Infinity||Redcard.num==Infinity||isNaN(Potion.num)||isNaN(euro)||isNaN(Bomb.num)||isNaN(Redcard.num)){document.getElementById('log').textContent='error100が発生しました。';awaitdelay(1000);document.getElementById('log').textContent='リブートを開始します。';await delay(1000);open('about:blank','_self').close();}}//おっとこれは...?}
+//#endregion
 
 //#region Inventory
 function inventoryOpen(){
@@ -1542,7 +1579,6 @@ function buffclear(array){
 }
 //#endregion
 
-
 //#region ゲーム開始時の動き
 function GameStart(){
    document.getElementById('GameArea').style.display = 'block';
@@ -1637,7 +1673,6 @@ function begin(name){
    enemycrla = 0.03;enemycrdm = 1.5;enemycrrs = 0;
    
    document.getElementById('NowMap').style.display = 'block';
-   document.getElementById('HomeArea').style.display = 'none';
    document.getElementById('GameArea').innerHTML = '<span>turn:</span><span id="TurnCount">0</span><br><span id="EnemyFriendBack"></span><b id="EnemyName">enemy</b>   <i>Lv.</i><i id="EnemyLevel">1</i><br><span id="EnemyHealth">0</span>/<span id="EnemyMaxHealth">0</span><span id="EnemyFriendFront"></span><br><span id="EnemyBuff"></span> <span id="EnemyDebuff"></span><span id="PlayerFriendFront"></span><br><br><b id="PlayerName">player</b>   <i>Lv.</i><i id="PlayerLevel">1</i>  <span id="AdditionalPlayerPoint"></span><br><span id="PlayerHealth">0</span>/<span id="PlayerMaxHealth">0</span><br><span id="PlayerMP">0</span>/<span id="PlayerMaxMP">0</span><br><span id="PlayerBuff"></span> <span id="PlayerDebuff"></span><span id="PlayerFriendBack"></span><br><br><br><button class="button" id="select1" onclick="select1()">attack</button>  <button class="button" id="select2" onclick="select2()">magic</button>  <button class="button" id="select3" onclick="select3()">tools</button>  <button class="button" id="back" onclick="back()">pass</button><br><span id="Skillbutton"></span>'
    document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()">skill</button>';
    document.getElementById('ButtonStyle').textContent = `.button{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};cursor: pointer;}input[type="text"]:focus{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};}`;
@@ -1656,11 +1691,10 @@ function begin(name){
    DrawBackground();
    ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
 }
-
 //#endregion
 
-//非ダメ時モーション(?)
-//#region
+//ここからバトル内の様子
+//#region 非ダメ時モーション(?)
 async function playerdamaged(multiplier,code){
    if(code == 1){document.getElementById('log').textContent = enemyname+'の攻撃！'; await delay(1000)};
    w = 1;
@@ -1784,50 +1818,7 @@ async function enemydamaged(multiplier,code){//倍率を引数にしたらぜん
 };
 //#endregion
 
-function DesideEnemyName(){
-   enemyprefixe = 0;
-   enemyname = enemynames[stage][Math.floor(Math.random() * enemynames[stage].length)];
-   if(Math.floor(Math.random() * 3) == 0){enemyprefixe = enemyprefixes[Math.floor(Math.random() * enemyprefixes.length)]};
-   if(enemyprefixe !== 0){enemyname = enemyprefixe + ' ' + enemyname}
-   else{enemyname = enemyname}; //敵に接頭辞を確率で付与します
-   
-   enemyattack = enemyatk;//敵の能力を決めます
-   enemydefense = enemydef;
-   enemymaxhealth = enemyhp; enemyhealth = enemymaxhealth;
-   enemycritlate = enemycrla;
-   enemycritdmg = enemycrdm;
-   enemycritresist = enemycrrs;
-   tekiou();
-   switch(enemyprefixe){//接頭辞ごとの能力
-      case '激昂':
-         enemyattack  = Math.floor(enemyatk*1.5);
-         enemydefense = Math.floor(enemydef*0.75);
-         break;
-      case '冷静沈着な':
-         enemydefense = Math.floor(enemydef*2);
-         enemyattack  = Math.floor(enemyattack*0.75);
-         break;
-      case 'ギャンブラーな':
-         enemycritlate = enemycrla + 0.3;
-         enemymaxhealth = Math.floor(enemyhp*0.5);
-      break;
-      case '守りが固い':
-         enemycritresist += 0.5;//会心半減ね
-         enemymaxhealth = Math.floor(enemyhp*1.25);
-         enemydefense = 0;
-         enemyattack = Math.floor(enemyatk*0.3);
-      break;
-      case '心眼持ちの':
-         enemycritlate = 1;//確定会心人間(抵抗無視の場合)
-         enemyattack = Math.floor(enemyatk*0.5);
-         enemymaxhealth = Math.floor(enemyhp*0.5);
-      break;
-   }
-   enemyhealth = enemymaxhealth;
-   return enemyname;
-}
-async function errorcheck(){if(playerattack==Infinity||playerdefense==Infinity||playerhealth==Infinity||playermaxhealth==Infinity||playerlevel==Infinity||playerpower==Infinity||playermaxmp==Infinity||playershell==Infinity||isNaN(playerhealth)||isNaN(playermaxhealth)||isNaN(playerattack)||isNaN(playerdefense)||isNaN(playermaxmp)||isNaN(playerpower)||isNaN(playershell)||isNaN(playerlevel)||Potion.num==Infinity||euro==Infinity||Bomb.num==Infinity||Redcard.num==Infinity||isNaN(Potion.num)||isNaN(euro)||isNaN(Bomb.num)||isNaN(Redcard.num)){document.getElementById('log').textContent='error100が発生しました。';awaitdelay(1000);document.getElementById('log').textContent='リブートを開始します。';await delay(1000);open('about:blank','_self').close();}}//おっとこれは...?}
-
+//#region playerのturn
 function backtoplayerturn(){
    if(skillcooldown == 100){document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()">skill</button>';}else{document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';};
    if(playerEX.id == 'placeturret'){PlayerTurretattack = Math.round(playerattack * 0.5);};if (turn !== 3){turn = 1;};
@@ -1839,11 +1830,10 @@ function backtoplayerturn(){
    document.getElementById('back').textContent = 'pass';
    errorcheck();
 }
-async function playerturn() {
+async function playerturn(){
    turncount += 1; document.getElementById('TurnCount').textContent = turncount;
    
-   if(turn >= 2){
-   NStimeout = 0;
+   if(turncount >= 2){
    for (let i = 0; i < playerbufftime.length; i++) {
       playerbufftime[i] -= 1;
       if (playerbufftime[i] === 0) {
@@ -1879,16 +1869,16 @@ async function playerturn() {
    }
    bufftekiou();
    
-   NStimeout = 0;
-   if ((turncount % 3) == 0 && playerNS.id == 'throwslime'){
+   let NStimeout = 0;
+   if((turncount % 3) == 0 && playerNS.id == 'throwslime'){
       buffadd('enemydebuff','onslime','3');
       document.getElementById('log').textContent = enemyname + 'にスライムが覆い被さった!';
       NStimeout = 1;
-   } else if ((turncount % 4) == 0 && playerNS.id == 'throwwrench'){
+   }else if((turncount % 4) == 0 && playerNS.id == 'throwwrench'){
       buffadd('playerbuff','LetsThrow','3');
       document.getElementById('log').textContent = 'wrenchを投げる準備ができた!';
       NStimeout = 1;
-   } else if ((turncount % 3) == 0 && playerNS.id == 'gambler'){
+   }else if((turncount % 3) == 0 && playerNS.id == 'gambler'){
       buffadd('playerbuff','gambling','3');
       document.getElementById('log').textContent = 'さあ、ギャンブルの時間だ!!';
       NStimeout = 1;
@@ -1919,11 +1909,10 @@ async function playerturn() {
    }
    if(NStimeout == 1){await delay(1000);};
 
-
    if(playerdebuff.includes('onslime')){
       x = Math.floor(Math.random() * 3);
       if(x !== 0){buffremove('playerdebuff','onslime'); document.getElementById('log').textContent = 'なんとかスライムを取り払った!!'}
-      else {document.getElementById('log').textContent = 'スライムが邪魔して動けない!!'; await delay(1000); enemyorplayer(); return;}; 
+      else{document.getElementById('log').textContent = 'スライムが邪魔して動けない!!'; await delay(1000); enemyorplayer(); return;}; 
    }
 
    if(skillcooldown == 100){document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()">skill</button>';}else{document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';};
@@ -1936,9 +1925,9 @@ async function playerturn() {
    document.getElementById('back').textContent = 'runaway';
    errorcheck();
 };
+//#endregion
 
-// 選択ボタン
-//#region
+//#region 選択ボタン
 async function select1(){
    if (phase == 1) {
       document.getElementById('log').textContent = 'どうやって攻撃する？';
@@ -2067,9 +2056,7 @@ function disappear(){
 }
 //#endregion
 
-//playerの攻撃たち
-//playerの斬撃攻撃
-//#region
+//#region playerの斬撃
 async function slash() {
    await enemydamaged(1,1);
    if(enemyhealth == 0){killedenemy();return;}
@@ -2120,7 +2107,7 @@ async function slashoflight() {
 }
 //#endregion
 
-//playerの魔法
+//#region playerの魔法
 function magic(num) {
    let UseMagic
    switch(num){
@@ -2140,8 +2127,6 @@ function magic(num) {
    }
 }
 
-//魔法s
-//#region
 function Heal() {
    x = playerhealth
    playerhealth += Math.round(playermaxhealth * 0.2)
@@ -2274,8 +2259,7 @@ async function Random(){
 }
 //#endregion
 
-// playerの道具
-//#region
+//#region playerの道具
 function Aspirinact(){
    playerhealth += Math.round(playermaxhealth * 0.2);
    if(playerhealth > playermaxhealth){playerhealth = playermaxhealth};
@@ -2434,10 +2418,7 @@ function Blackcardact() {
 }
 //#endregion
 
-
-
-// skillの手続き
-//#region
+//#region playerのskill
 let Splithealth = 0;
 let Splitmaxhealth = 0;
 let PlayerTurret = 0;
@@ -2664,8 +2645,7 @@ async function Trickybomb(){
 }
 //#endregion
 
-
-// enemyturnまでの道のり
+//#region enemyのturnとか
 async function enemyorplayer(){
    if(PlayerTurret > 0){
       document.getElementById('log').textContent = 'turretの攻撃!';
@@ -2753,9 +2733,6 @@ async function enemyorplayer(){
    }
 }
 
-
-// enemyの手続き
-//#region
 async function enemyturn(){
    turn = 2;
    await playerdamaged(1,1)
@@ -2809,8 +2786,7 @@ async function enemycontidmg(){
 }
 //#endregion
 
-//勝利/負けの動き
-//#region
+//#region 勝利/負けの動き
 async function killedenemy() {
    turn = 0;
    document.getElementById('log').textContent = enemyname + 'を倒した!';
@@ -2898,6 +2874,7 @@ function EnemyAppear(){
 }
 
 async function defeat() {
+   let saydefeats;
    if(playerlevel < 3){saydefeats = ['あはは..負けちゃいましたね....防御力を上げると良いですよ!', 'あはは..負けちゃいましたね....double slashは運要素も少ないので強いですよ!', 'あはは..負けちゃいましたね....魔法にターン数制限はありません!いっぱい使っちゃいましょう!','あはは..負けちゃいましたね....mechanicは防御全振りで戦うと良いですよ!','あれ〜？負けちゃったんですか〜？？おにいさんよわいね〜？？'];}
    else{saydefeats = [playername + 'は力尽きた...残念でしたね！にはははは〜！','残念だったね!すごい惜しかったね!!', 'まけちゃったか..ねぇ、まだいけるよね?','あ、あれ..？もう負けちゃったんですか....？','ほら、負けを認めてください？'];}
    document.getElementById('log').textContent = saydefeats[Math.floor(Math.random() * saydefeats.length)];
@@ -2920,8 +2897,7 @@ async function defeat() {
 }
 //#endregion
 
-//bossの動き
-//#region
+//#region bossの動き
 function BossEnemyAppear(){
    bossbattlenow = 1;
    turn = 0;
@@ -3059,8 +3035,7 @@ function EnemyTurrettekiou(){
 }
 //#endregion
 
-//休憩所の動き
-//#region
+//#region 休憩所の動き
 let Camprestper
   async function Camprest(){
    playerhealth += playermaxhealth * Camprestper;
@@ -3372,8 +3347,7 @@ function Campselecttool(code){
 }
 // #endregion
 
-//skillshopですね
-//#region
+//#region skillshopですね
 const SHOPEXrandom = {
    name: ['GO!SPLIT!!', '雷ちゃん、召喚', 'トリッキーな変数', '私がかけた魔法だよ', 'Kyrie Eleison', '自走式閃光ドローン', '挑戦状を受け取ってください!!', '小心者の観測'],
    price: [95, 95, 95, 95, 110, 60, 90, 50],
@@ -3477,8 +3451,7 @@ const SHOPEXrandom = {
 // #endregion
 
 //こっからイベントとかそのへん
-//candystand
-//#region
+//#region candystand
 let candybar = [];
 async function Candytake(){
    //デバフによって初期からたくさんあるってのもありかも
@@ -3521,8 +3494,7 @@ async function Candytake(){
 }
 // #endregion
 
-//hopeful button
-//#region
+//#region hopeful button
 async function HopeButtonact(){
    AllowMove = 1;
    document.getElementById('log').textContent = 'ボタンを押した....';
@@ -3552,8 +3524,7 @@ async function HopeButtonact(){
 }
 // #endregion
 
-//chest
-//#region
+//#region chest
 async function OpenChest(code){
    AllowMove = 1;
    switch(code){
@@ -3606,8 +3577,7 @@ async function OpenChest(code){
 }
 // #endregion
 
-//Cookietake
-//#region
+//#region Cookietake
 async function Cookietake(){
    AllowMove = 1;
    document.getElementById('log').textContent = 'クッキーを食べてみた...';//これはお助け的イベントだから上昇量は少なめ
@@ -3653,8 +3623,7 @@ async function Cookietake(){
 }
 // #endregion
 
-//placebomb
-//#region
+//#region placebomb
 async function placebomb(){
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
@@ -3666,8 +3635,7 @@ async function placebomb(){
 }//出口を消した時どうする論争
 //#endregion
 
-//catus
-//#region
+//#region catus
 async function CatusAct(){
    if(playerhealth > 10){
       document.getElementById('log').textContent = 'いてっ';
@@ -3683,8 +3651,7 @@ async function CatusAct(){
 }
 //#endregion
 
-//scorpion
-//#region
+//#region scorpion
 async function ScorpionAct(code){
    document.getElementById('log').textContent = '刺された...';
    switch(code){
@@ -3700,8 +3667,7 @@ async function ScorpionAct(code){
 }
 //#endregion
 
-//wrwrdイベント(fun値50以下の際1/23の確率で出現)
-//#region
+//#region wrwrdイベント(fun値50以下の際1/23の確率で出現)
 function ZomuEvent(){//創生黎明の原野
    document.getElementById('log').textContent = 'かまってぇや、マジで';
    playername = 'zomusan'
@@ -3735,4 +3701,3 @@ function UtusenEvent(){
    AllowMove = 0;
 }
 // #endregion      
-
