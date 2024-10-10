@@ -1133,7 +1133,8 @@ const armors  = {
 }
 const tools = {
   name:['none','アスピリン','パブロン','トリプシン','ルル','ポーション','投げナイフ','トリッキーな変数','援護射撃','ボトルグレネード','爆弾','赤のスキップ','青のリバース','緑のドロアル','黒のドロスー'],
- price:[20,40,60,80,100,20,40,60,80,100,35,35,35,70]
+ price:[0,20,40,60,80,100,20,40,60,80,100,35,35,35,70],
+    id:['none',Aspirin.id,Pablon.id,Trypsin.id,Lulu.id,Potion.id,ThrowKnife.id,TrickyVariable.id,CoveringFire.id,BottleGrenade.id,Bomb.id,Redcard.id,Bluecard.id,Greencard.id,Blackcard.id]
 }
 //#endregion
 
@@ -1148,7 +1149,6 @@ function tekiou(){
    document.getElementById('PlayerMP').textContent = 'MP:'+playermp;
    document.getElementById('PlayerMaxMP').textContent = playermaxmp;
    
-
    //これアイコンにするのもありかも
    switch(playerEX.id){
    case '50%heal':
@@ -1211,6 +1211,10 @@ function tekiou(){
          break;
    }
 }
+
+function Etekiou(){
+   document.getElementsById('Euro').textContent = 'euro:'+euro+'€';
+}
 function delay(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 
 
@@ -1266,7 +1270,7 @@ function inventoryOpen(){
    localStorage.setItem('num', playerlevel);
    document.getElementById('InventoryArea').style.display = 'flex';
    document.getElementById('InventoryArea').innerHTML = `
-      <div id="Status">${playername}<br>Level: ${playerlevel}<br>EXP: ${playerexp}<br>Health: ${playerhealth}/${playermaxhealth}<br>MP: ${playermaxmp}<br>attack: ${playerattack}<br>defense: ${playerdefense}<br>crit-late: ${playercritlate}<br>crit-dmg: ${playercritdmg}</div>　
+      <div id="Status">${playername}<br>Level: ${playerlevel}<br>EXP: ${playerexp}/${playerlevel}<br>Health: ${playerhealth}/${playermaxhealth}<br>MP: ${playermaxmp}<br>attack: ${playerattack}<br>defense: ${playerdefense}<br>crit-late: ${playercritlate}<br>crit-dmg: ${playercritdmg}</div>　
       <div id="Sutefuri">magics<br>1:${magic1} <button class="button" onclick="MagicChange(1)">change</button><br>2:${magic2} <button class="button" onclick="MagicChange(2)">change</button><br>3:${magic3} <button class="button" onclick="MagicChange(3)">change</button><br><iframe src="resources/appearmagics.html" style="width: 90%; height: 100px;"></iframe><br><div id="MagicChangePlace"></div><br><br><span id="Appearsp">${sp} pt</span><br><button class="button" onclick="SuteFuri('atk')">attack</button><br><button class="button" onclick="SuteFuri('def')">defense</button><br><button class="button" onclick="SuteFuri('hp')">maxhealth</button><br><button class="button" onclick="SuteFuri('mp')">magicpt</button><br><button class="button" onclick="SuteFuri('crla')">clit-late</button><br><button class="button" onclick="SuteFuri('crdm')">clit-dmg</button></div>
    `;
 }
@@ -1673,7 +1677,7 @@ function begin(name){
    enemycrla = 0.03;enemycrdm = 1.5;enemycrrs = 0;
    
    document.getElementById('NowMap').style.display = 'block';
-   document.getElementById('GameArea').innerHTML = '<span>turn:</span><span id="TurnCount">0</span><br><span id="EnemyFriendBack"></span><b id="EnemyName">enemy</b>   <i>Lv.</i><i id="EnemyLevel">1</i><br><span id="EnemyHealth">0</span>/<span id="EnemyMaxHealth">0</span><span id="EnemyFriendFront"></span><br><span id="EnemyBuff"></span> <span id="EnemyDebuff"></span><span id="PlayerFriendFront"></span><br><br><b id="PlayerName">player</b>   <i>Lv.</i><i id="PlayerLevel">1</i>  <span id="AdditionalPlayerPoint"></span><br><span id="PlayerHealth">0</span>/<span id="PlayerMaxHealth">0</span><br><span id="PlayerMP">0</span>/<span id="PlayerMaxMP">0</span><br><span id="PlayerBuff"></span> <span id="PlayerDebuff"></span><span id="PlayerFriendBack"></span><br><br><br><button class="button" id="select1" onclick="select1()">attack</button>  <button class="button" id="select2" onclick="select2()">magic</button>  <button class="button" id="select3" onclick="select3()">tools</button>  <button class="button" id="back" onclick="back()">pass</button><br><span id="Skillbutton"></span>'
+   document.getElementById('GameArea').innerHTML = '<span>turn:</span><span id="TurnCount">0</span><br><span id="EnemyFriendBack"></span><b id="EnemyName">enemy</b>   <i>Lv.</i><i id="EnemyLevel">1</i><br><span id="EnemyHealth">0</span>/<span id="EnemyMaxHealth">0</span><span id="EnemyFriendFront"></span><br><span id="EnemyBuff"></span> <span id="EnemyDebuff"></span><span id="PlayerFriendFront"></span><br><br><b id="PlayerName">player</b>   <i>Lv.</i><i id="PlayerLevel">1</i>  <span id="AdditionalPlayerPoint"></span><br><span id="PlayerHealth">0</span>/<span id="PlayerMaxHealth">0</span><br><span id="PlayerMP">0</span>/<span id="PlayerMaxMP">0</span><br><span id="PlayerBuff"></span> <span id="PlayerDebuff"></span><span id="PlayerFriendBack"></span><br><br><br><button class="button" id="select1" onclick="select1()">attack</button>  <button class="button" id="select2" onclick="select2()">magic</button>  <button class="button" id="select3" onclick="select3()">tools</button>  <button class="button" id="back" onclick="back()">runaway</button><br><span id="Skillbutton"></span>'
    document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()">skill</button>';
    document.getElementById('ButtonStyle').textContent = `.button{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};cursor: pointer;}input[type="text"]:focus{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};}`;
    
@@ -1746,7 +1750,7 @@ async function enemydamaged(multiplier,code){//倍率を引数にしたらぜん
    
    x = 1;if(code == 3){x = 2};
    switch(playername){
-      case 'Wretch': skillcooldown += 10*x; break;
+      case 'wretch': skillcooldown += 10*x; break;
       case 'greenslime': skillcooldown += 5*x; break;
       case 'mechanic': skillcooldown += 15*x; break;
       case 'clown': skillcooldown += 20*x; break;
@@ -1765,6 +1769,7 @@ async function enemydamaged(multiplier,code){//倍率を引数にしたらぜん
       if(playerhealth > playermaxhealth){playerhealth = playermaxhealth};
       tekiou();
       document.getElementById('log').textContent = y+'のHPを回復した！';
+      await delay(1000);
    }
    if(equipweapon == 12 && code == 1 && enemyhealth > 0){//防御力下げるやつ(time on target)
       t = Math.floor(Math.random()*3)+1;
@@ -1777,9 +1782,21 @@ async function enemydamaged(multiplier,code){//倍率を引数にしたらぜん
       tekiou();
       buffadd('enemydebuff','shelldown1',4);
       document.getElementById('log').textContent = 'お口に合うと良いのですが..';
+      await delay(1000);
    }
 
    //追撃ゾーン
+   if(playerbuff.includes('weaknessgrasp') && enemyhealth > 0){
+      document.getElementById('log').textContent = 'わ、私のことはお気になさらずに...';
+      await delay(800);
+      x = Math.ceil(playerattack * playerpower * 0.3 - enemydefense);
+      if(x < 0){x = 0};if(x > enemyhealth){x = enemyhealth};
+      enemyhealth -= x;
+      tekiou();
+      if(x > 0){document.getElementById('log').textContent = enemyname+'に'+x+'のダメージを与えた!'}
+      await delay(1000);
+   }
+
    if(playerPS.id == 'enemy50%pursuit' && enemyhealth <= playermaxhealth / 2 && enemy50pursuitenelgy == 1 && enemyhealth > 0){
       enemy50pursuitenelgy = 0;
       z = Math.floor(Math.random() * 2);
@@ -1827,7 +1844,7 @@ function backtoplayerturn(){
    document.getElementById('select1').textContent = 'attack';
    document.getElementById('select2').textContent = 'magic';
    document.getElementById('select3').textContent = 'tools';
-   document.getElementById('back').textContent = 'pass';
+   document.getElementById('back').textContent = 'runaway';
    errorcheck();
 }
 async function playerturn(){
@@ -2336,13 +2353,13 @@ async function TrickyVariableact(){//ここの作り込みよ
    if(enemyhealth < x){x = enemyhealth};
    enemyhealth -= x
    tekiou();
-   document.getElementById('log').textContent = enemyname+'に'+x+'のダメージ！';
+   document.getElementById('log').textContent = '先生！！'+enemyname+'に'+x+'のダメージです！！';
    await delay(1000);
    if(enemyhealth <= 0){
-      document.getElementById('log').textContent = 'ちょろい、ちょろい。BANG！';
+      document.getElementById('log').textContent = 'ちょろいちょろい！BANG！！';
       window.setTimeout(killedenemy, 1000)
    }else{enemyorplayer();}
-}//ここの作り込みやば...ww まあ好きなキャラTop3の1人だからしゃーない にはははは〜！
+}
 async function BottleGrenadeact(){
    document.getElementById('log').textContent = 'これはちょっと、スパイシーなやつだよ';
    BottleGrenade.num -= 1;
@@ -2371,7 +2388,7 @@ async function CoveringFireact(){//これはノーマルスキル扱いってこ
    document.getElementById('log').textContent = enemyname+'に'+x+'のダメージ！';
    await delay(1000);
    if(enemyhealth <= 0){
-      document.getElementById('log').textContent = 'わ、私のことはお気になさらずに...';
+      document.getElementById('log').textContent = '私...ここにいても...いいのでしょうか...?';
       window.setTimeout(killedenemy, 1000)
    }else{enemyorplayer();}
 }
@@ -2531,7 +2548,7 @@ async function skillact() {
          skillcooldown = 0;
          document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>'
          document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';
-         phase = 1;document.getElementById('select1').textContent = 'attack';document.getElementById('select2').textContent = 'magic';document.getElementById('select3').textContent = 'tools';document.getElementById('back').textContent = 'pass';errorcheck();
+         phase = 1;document.getElementById('select1').textContent = 'attack';document.getElementById('select2').textContent = 'magic';document.getElementById('select3').textContent = 'tools';document.getElementById('back').textContent = 'runaway';errorcheck();
       }else if(playerEX.id == 'recievechallenge'){
          switch(Math.floor(Math.random()*3)+1){
             case 1:
@@ -2551,7 +2568,7 @@ async function skillact() {
          skillcooldown = 0;
          document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>'
          document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';
-         phase = 1;document.getElementById('select1').textContent = 'attack';document.getElementById('select2').textContent = 'magic';document.getElementById('select3').textContent = 'tools';document.getElementById('back').textContent = 'pass';errorcheck();
+         phase = 1;document.getElementById('select1').textContent = 'attack';document.getElementById('select2').textContent = 'magic';document.getElementById('select3').textContent = 'tools';document.getElementById('back').textContent = 'runaway';errorcheck();
       }else if(playerEX.id == 'timidpursuit'){
          switch(Math.floor(Math.random()*3)+1){
             case 1:
@@ -2658,7 +2675,7 @@ async function enemyorplayer(){
       }
    if(enemyhealth == 0){killedenemy();return;}
 
-   //こっからプレイヤーの毒とかの動き
+   //#region こっからプレイヤーの毒とかの動き
    if (playerdebuff.includes('poison')||playerdebuff.includes('deadlypoison')){
       if(playerdebuff.includes('deadlypoison')){
          x = playerhealth;
@@ -2696,41 +2713,44 @@ async function enemyorplayer(){
    };
    tekiou();
    if(playerhealth <= 0){defeat();return;}
+   //#endregion
 
    //こっから敵が動けるかどうかの動き
-   if(turn == 1){
-      y = 1;
-      if(playerbuff.includes('skip1')){y = 0;buffremove('playerbuff','skip1');}//skip1
-      if(playerbuff.includes('skip2')){y = 0;buffremove('playerbuff','skip2');buffadd('playerbuff','skip1',5)}//skip2
-      if(playerbuff.includes('skip3')){y = 0;buffremove('playerbuff','skip3');buffadd('playerbuff','skip2',5)}//skip3
-      //luck or greatluck
-      y = 1;
-      if(playerbuff.includes('luck')){y = Math.floor(Math.random() * 5);}//luck
-      if(playerbuff.includes('greakluck')){y = Math.floor(Math.random() * 3);}//greatluck
-      if(y == 0){
-         document.getElementById('log').textContent = 'Lucky♪';
-         await delay(1000); playerturn(); return;
-      }
-      //stan
-      y = 1;
-      if(enemydebuff.includes('stan1')){y = 0;buffremove('enemydebuff','stan1')}//stan1
-      if(enemydebuff.includes('stan2')){y = 0;buffremove('enemydebuff','stan2');buffadd('enemydebuff','stan1',5)}//stan2
-      if(enemydebuff.includes('stan3')){y = 0;buffremove('enemydebuff','stan3');buffadd('enemydebuff','stan2',5);}//stan3
-      if(y == 0){
-         document.getElementById('log').textContent = enemyname+'はスタンした！';
-         await delay(1000); playerturn(); return;
-      }
-      //freeze
-      if(enemydebuff.includes('freeze')){
-         if(!Math.floor(Math.random() * 3) !== 0){
-            document.getElementById('log').textContent = '氷が溶けた!'; buffremove('enemydebuff','freeze');
-         }else{
-            document.getElementById('log').textContent = enemyname + 'は凍っている...';
-            await delay(1000); playerturn(); return;
-         }   
-      }
-      if(bossbattlenow == 0){enemyturn();}else{bossenemyturn();}
+   y = 1;
+   if(playerbuff.includes('skip1')){y = 0;buffremove('playerbuff','skip1');}//skip1
+   if(playerbuff.includes('skip2')){y = 0;buffremove('playerbuff','skip2');buffadd('playerbuff','skip1',5)}//skip2
+   if(playerbuff.includes('skip3')){y = 0;buffremove('playerbuff','skip3');buffadd('playerbuff','skip2',5)}//skip3
+   if(y == 0){
+      document.getElementById('log').textContent = 'トラップカード発動、スキップ!!';
+      await delay(1000); playerturn(); return;
    }
+   //luck or greatluck
+   y = 1;
+   if(playerbuff.includes('luck')){y = Math.floor(Math.random() * 5);}//luck
+   if(playerbuff.includes('greakluck')){y = Math.floor(Math.random() * 3);}//greatluck
+   if(y == 0){
+      document.getElementById('log').textContent = 'Lucky♪';
+      await delay(1000); playerturn(); return;
+   }
+   //stan
+   y = 1;
+   if(enemydebuff.includes('stan1')){y = 0;buffremove('enemydebuff','stan1')}//stan1
+   if(enemydebuff.includes('stan2')){y = 0;buffremove('enemydebuff','stan2');buffadd('enemydebuff','stan1',5)}//stan2
+   if(enemydebuff.includes('stan3')){y = 0;buffremove('enemydebuff','stan3');buffadd('enemydebuff','stan2',5);}//stan3
+   if(y == 0){
+      document.getElementById('log').textContent = enemyname+'はスタンした！';
+      await delay(1000); playerturn(); return;
+   }
+   //freeze
+   if(enemydebuff.includes('freeze')){
+      if(!Math.floor(Math.random() * 3) !== 0){
+         document.getElementById('log').textContent = '氷が溶けた!'; buffremove('enemydebuff','freeze');
+      }else{
+         document.getElementById('log').textContent = enemyname + 'は凍っている...';
+         await delay(1000); playerturn(); return;
+      }   
+   }
+   if(bossbattlenow == 0){enemyturn();}else{bossenemyturn();}
 }
 
 async function enemyturn(){
@@ -2794,14 +2814,13 @@ async function killedenemy() {
    await delay(1000);
    z = Math.floor(Math.random() * 21) + 10;
    euro += z;document.getElementById('log').textContent =  z + '€を獲得した!';tekiou();
-   await delay(1000);
-   playerexp += enemylevel;
+   await delay(800);
+
    x = enemylevel;
-   if(bossbattlenow = 1){
-      playerexp += enemylevel;
-      x = enemylevel*2;
-      bossbattlenow = 0;
-   }
+   if(!enemyprefixe == 0){x *=1.5;}//この二人が共存することはないからね
+   if(bossbattlenow == 1){x *=2;bossbattlenow = 0;}
+   x = Math.ceil(x);if(x < 1){x = 1;}
+   playerexp += x;
    document.getElementById('log').textContent = x+'の経験値を奪った!';
    while(playerexp >= playerlevel){
       playerexp -= playerlevel;
@@ -2843,7 +2862,7 @@ async function nextenemy() {
 
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
-   objectMap[MAPy][MAPx] = 0;//戦利品的な何かにしてもいいかも..いやなし
+   objectMap[MAPy][MAPx] = 0;//戦利品的な何かにしてもいいかも..いやなし いやありでは？キャッシュ袋とか
    ctx.clearRect(0, 0, 600, 600); 
    DrawBackground();
    ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
@@ -3145,17 +3164,13 @@ function ShopBuyButton(){
       }
       break;
       case 3:
-      if(havearmors.includes(tools.name[num])){
-         document.getElementById('log').textContent = 'you already have a it!';
+      if(euro >= tools.price[num]){
+         euro -= tools.price[num];
+         eval(tools.id[num]).num++;
+         document.getElementById('log').textContent = tools.name[num]+'を購入しました!';
       }else{
-         if(euro >= tools.price[num]){
-            euro -= tools.price[num];
-            havearmors.push(tools.name[num]);
-            document.getElementById('log').textContent = tools.name[num]+'を購入しました!';
-         }else{
-            document.getElementById('log').textContent = 'not enough euro..';
-         };
-      }
+         document.getElementById('log').textContent = 'not enough euro..';
+      };
       break;
    }
 
@@ -3412,7 +3427,7 @@ const SHOPEXrandom = {
    `
    const cardsContainer = document.getElementById('skillshopcorner');
    cardsContainer.style.display = 'block';
-   cardsContainer.innerHTML = ''; // 前の内容をクリアする
+   cardsContainer.innerHTML = '';
    const selectedItems = skillshopshuffle(allItems).slice(0, 6);
    selectedItems.forEach(item => {
      const card = skillshopcreateCard(item);
@@ -3421,7 +3436,7 @@ const SHOPEXrandom = {
   }
 
   function SkillShopClose() {
-   document.getElementById('skillshopcorner').innerHTML = ''; // 前の内容をクリアする
+   document.getElementById('EventArea').innerHTML = '';
    document.getElementById('log').textContent = '';
    document.getElementById('NowMap').style.display = 'block';
    
@@ -3655,8 +3670,8 @@ async function CatusAct(){
 async function ScorpionAct(code){
    document.getElementById('log').textContent = '刺された...';
    switch(code){
-      case 1:buffadd('playerbuff','poison',3);break;
-      case 2:buffadd('playerbuff','deadlypoison',3);break;
+      case 1:buffadd('playerdebuff','poison',3);break;
+      case 2:buffadd('playerdebuff','deadlypoison',3);break;
    }
    playerattack += 10*code;
    MAPx = Math.floor(SELECTx / 75);
