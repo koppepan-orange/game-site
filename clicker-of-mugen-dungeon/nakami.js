@@ -710,7 +710,7 @@ document.addEventListener('keydown', (event) => {
    DrawBackground();
    ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
 
-   //ここに動いた時に記述を(爆弾とか)
+   //ここに動いた時の記述を(爆弾とか)
    if(moved == 1){
    if(objectMap.some(row => row.includes(15))){
       bombtimer--;
@@ -3880,6 +3880,22 @@ const questions = [
          true:2
          
       },
+      {
+         text:'know(三単現のすがた)はどちらですか？',
+         answer:2,
+         one:'knew',
+         two:'knows',
+         true:2
+      },
+      {
+         text:'let(過去形のすがた)はどれですか？',
+         answer:4,
+         one:'leted',
+         two:'let',
+         thr:'leten',
+         for:'letd',
+         true:2
+      }
    ],
    [//social studies
       {
@@ -3900,6 +3916,59 @@ const questions = [
          for:'タージ・マハル',
          true:1
       },
+      {
+         text:'持たず、作らず、？？？',
+         answer:4,
+         one:'陸奥宗光',
+         two:'持ち込ませず',
+         thr:'持ち込まず',
+         for:'孫正義',//softbank作った人
+         true:1,
+      },
+      {
+         text:'統治二論を出したのは？',
+         answer:4,
+         one:'ロック',
+         two:'ルソー',
+         thr:'モンテスキュー',
+         for:'始皇帝',//言わずもがな
+         true:1,
+      },
+      {
+         text:'人民主権を唱えたのは？',
+         answer:4,
+         one:'ロック',
+         two:'ルソー',
+         thr:'モンテスキュー',
+         for:'蒋介石',//中国の統一進めてた人
+         true:2,
+      },
+      {
+         text:'権力を3つに分けて国を収めるべきという考えを唱えた人は？',
+         answer:4,
+         one:'ロック',
+         two:'ルソー',
+         thr:'モンテスキュー',
+         for:'毛沢東',//共産党の指導者
+         true:3,
+      },
+      {
+         text:'初めて社会権を提唱した憲法の名前は？',
+         answer:4,
+         one:'ワイマール憲法',
+         two:'日本国憲法',//4にしたい
+         true:1,
+      },
+   ],
+   [//science
+      {
+         text:'水中から光が出る時、以下のうちどうなりますか？',
+         answer:2,
+         one:'入射角より屈折角の方が大きくなる',
+         two:'屈折角より入射角の方が大きくなる',
+         true:2
+      }
+
    ]
 ]
 const questionsubject = [0,1,2]
