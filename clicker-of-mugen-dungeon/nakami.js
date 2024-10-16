@@ -851,7 +851,7 @@ document.addEventListener('keydown', (event) => {
          [0, 0, 0, 0, 0, 0, 0, 26],
          [0, 27, 0, 0, 0, 0, 0, 26],
          [0, 0, 0, 0, 0, 0, 0, 0 ],
-         [0, 0, 0, 0, 0, 0, 0, 26],
+         [0, 28, 28, 28, 28, 28, 28, 26],
       ];
       backgroundMap = [
          ['f','f','f','f','f','f','f','f'],
@@ -956,6 +956,9 @@ function NanigaOkoruKana(code){
       break;
       case 27:
          QuestionAct();
+      break;
+      case 28:
+         BookShelfact();
       break;
    }
 }
@@ -3923,7 +3926,7 @@ const questions = [
          two:'持ち込ませず',
          thr:'持ち込まず',
          for:'孫正義',//softbank作った人
-         true:1,
+         true:2,
       },
       {
          text:'統治二論を出したのは？',
@@ -3957,6 +3960,8 @@ const questions = [
          answer:4,
          one:'ワイマール憲法',
          two:'日本国憲法',//4にしたい
+         thr:'ヤルタ憲法',
+         for:'サンフランシスコ憲法',
          true:1,
       },
    ],
@@ -3967,11 +3972,11 @@ const questions = [
          one:'入射角より屈折角の方が大きくなる',
          two:'屈折角より入射角の方が大きくなる',
          true:2
-      }
+      },
 
    ]
 ]
-const questionsubject = [0,1,2]
+const questionsubject = [0,1,2,3]
 let questionnowcount = 0;
 async function QuestionAct(){
    AllowMove = 1;
@@ -4107,6 +4112,71 @@ async function QuestionAct(){
       EnemyAppear(1);
    }
    
+}
+//#endregion
+
+//#region schoolbookshelf
+function BookShelfact(){
+   document.getElementById('NowMap').style.display = 'none'
+   document.getElementById('GameArea').style.display = 'none'
+   document.getElementById('EventArea').style.display = 'block'
+   document.getElementById('log').textContent = 'どの本をもらおうか..?';
+   document.getElementById('EventArea').innerHTML = `
+   <button class="bookshelf" onclick="BookShelftake(1)"><button class="bookshelf" onclick="BookShelftake(2)"><button class="bookshelf" onclick="BookShelftake(3)"><br>
+   <button class="bookshelf" onclick="BookShelftake(4)"><button class="bookshelf" onclick="BookShelftake(5)"><button class="bookshelf" onclick="BookShelftake(6)">
+   `
+}
+async function BookShelftake(code){
+   x = Math.floor(Math.random()*4)+1;
+   if(code == 6){x = 1}
+   switch(x){
+      case 1:
+         document.getElementById('log').textContent = 'これは世界一つまらない本だ....?';
+         await delay(1000);
+         document.getElementById('log').textContent = playername+'は眠ってしまった！そして体力が回復した！';
+         playerhealth += Math.floor(playermaxhealth*0.3);
+         if(playerhealth > playermaxhealth){playerhealth = playermaxhealth;};
+         await delay(1000);
+         document.getElementById('log').textContent = '起きた！！！';
+         await delay(1000);
+         break;
+      case 2:
+         document.getElementById('log').textContent = 'これは..なんだ....?ドグラ･マグラ....?';
+         await delay(1000);
+         document.getElementById('log').textContent = '....?どゆこと.......?';
+         buffadd('playerbuff','frenzy',3);//狂乱
+         await delay(1000);
+         break;
+      case 3:
+         document.getElementById('log').textContent = 'これは..なんだ....?マグナ･カルタ....?';
+         await delay(1000);
+         document.getElementById('log').textContent = 'なんか頭が良くなった気がする....!!';
+         playercritlate *= 100;playercritlate += 8;playercritlate *= 0.01;
+         await delay(1000);
+         break;
+      case 4:
+         document.getElementById('log').textContent = '..!!これはベノム2巻だ...!!!';
+         await delay(1000);
+         playerattack += 40;//一旦
+         await delay(1000);
+         break;
+      case 5:
+         break;
+      case 6:
+         break;
+   }
+   document.getElementById('log').textContent = '';
+   document.getElementById('EventArea').style.display = 'none';
+   document.getElementById('GameArea').style.display = 'none';
+   document.getElementById('NowMap').style.display = 'block';
+   AllowMove = 0;
+   MAPx = Math.floor(SELECTx / 75);
+   MAPy = Math.floor(SELECTy / 75);
+   objectMap[MAPy][MAPx] = 0;
+   ctx.clearRect(0, 0, 600, 600);
+   DrawBackground();
+   ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+
 }
 
 //#region wrwrdイベント(fun値50以下の際1/23の確率で出現)
