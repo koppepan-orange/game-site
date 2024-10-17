@@ -2806,8 +2806,8 @@ async function enemyorplayer(){
          if (playerhealth < 0){playerhealth = 0}
          y = x - playerhealth;
       }
-      await delay(1000);
       document.getElementById('log').textContent = playername + 'は毒で' + y + 'のダメージ!';
+      await delay(1000);
    };
    if(playerdebuff.includes('burn1')||playerdebuff.includes('burn2')||playerdebuff.includes('burn3')){
       if(playerdebuff.includes('burn3')){
@@ -2826,8 +2826,8 @@ async function enemyorplayer(){
          if (playerhealth < 0){playerhealth = 0}
          y = x - playerhealth;
       }
-      await delay(1000);
       document.getElementById('log').textContent = playername + 'は燃えて' + y + 'のダメージ!';
+      await delay(1000);
    };
    tekiou();
    if(playerhealth <= 0){defeat();return;}
@@ -4117,17 +4117,28 @@ async function QuestionAct(){
 
 //#region schoolbookshelf
 function BookShelfact(){
-   document.getElementById('NowMap').style.display = 'none'
    document.getElementById('GameArea').style.display = 'none'
-   document.getElementById('EventArea').style.display = 'block'
+   document.getElementById('EventArea').style = `
+   display: block;
+   position: absolute;
+   top: 35%;
+   left: 50%;
+   transform: translate(-50%, -50%);
+   margin: auto;
+   width: 500px;
+   height: 400px;
+   border-radius: 15px;
+   padding: 5px;
+   background-color: #cecece;
+   `;
    document.getElementById('log').textContent = 'どの本をもらおうか..?';
    document.getElementById('EventArea').innerHTML = `
-   <button class="bookshelf" onclick="BookShelftake(1)"><button class="bookshelf" onclick="BookShelftake(2)"><button class="bookshelf" onclick="BookShelftake(3)"><br>
-   <button class="bookshelf" onclick="BookShelftake(4)"><button class="bookshelf" onclick="BookShelftake(5)"><button class="bookshelf" onclick="BookShelftake(6)">
+   <button class="bookshelf" onclick="BookShelftake(1)" style="background-color:#ffb5b5;"><button class="bookshelf" onclick="BookShelftake(2)" style="background-color:#cab5ff;"><button class="bookshelf" onclick="BookShelftake(3)" style="background-color:#f5ccff;"></button><br>
+   <button class="bookshelf" onclick="BookShelftake(4)" style="background-color:#b5ffed;"><button class="bookshelf" onclick="BookShelftake(5)" style="background-color:#ccffce;"><button class="bookshelf" onclick="BookShelftake(6)" style="background-color:#fff1cc;"></button>
    `
 }
 async function BookShelftake(code){
-   x = Math.floor(Math.random()*4)+1;
+   x = Math.floor(Math.random()*5)+1;
    if(code == 6){x = 1}
    switch(x){
       case 1:
@@ -4157,16 +4168,29 @@ async function BookShelftake(code){
       case 4:
          document.getElementById('log').textContent = '..!!これはベノム2巻だ...!!!';
          await delay(1000);
-         playerattack += 40;//一旦
+         const RandomBuffdesuKoreha = ['powerup1','shellup1','luck'];
+         buffadd('playerbuff',RandomBuffdesuKoreha[Math.floor(Math.random() * RandomBuffdesuKoreha.length)],3);
+         if(Math.floor(Math.random()*20) == 0){
+            playerhealth += Math.floor(playermaxhealth*0.5);
+            if(playerhealth > playermaxhealth){playerhealth = playermaxhealth;}
+         }
          await delay(1000);
          break;
       case 5:
+         document.getElementById('log').textContent = 'これは..とても分厚い本だ....!!';
+         await delay(1000);
+         document.getElementById('log').textContent = 'ウェインガーディアムレヴィオサー...?';
+         playerattack += 15;
+         await delay(1000);
          break;
       case 6:
          break;
    }
    document.getElementById('log').textContent = '';
-   document.getElementById('EventArea').style.display = 'none';
+   document.getElementById('EventArea').style = `
+   display: none;
+   margin: 0 auto;
+   `;
    document.getElementById('GameArea').style.display = 'none';
    document.getElementById('NowMap').style.display = 'block';
    AllowMove = 0;
