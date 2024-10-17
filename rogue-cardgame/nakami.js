@@ -73,7 +73,7 @@ const cards = [
         code: 'A',
         rare: 'SR',
         cool: 5,
-        explain: '自身のシールドを全て消費し、<br>相手に消費前のシールドの1.2倍のダメージを与える。'
+        explain: '自身のシールドを全て消費し、<br>相手に消費前のシールドの1.5倍のダメージを与える。'
     },//1.5倍に強化とか、強化版武器追加してもいいかも
     {
         name: '鬼神乱舞',//アークナイツモンハンコラボ、キリンRヤトウの2ndスキルより
@@ -698,8 +698,8 @@ async function Phasestart() {
                     if(enemyhealth <= atk){atk = enemyhealth;}
                     break;
 
-                //こっからM
 
+                //こっからM
                 case '盾':
                     shl = 4;
                     shl += eleshl;                    
