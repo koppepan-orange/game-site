@@ -1124,7 +1124,8 @@ let enemydebuffapply = [];
 let phase = 0;//何中か
 let turn = 0;//今誰のターンか
 let turncount = 0;//今のターン数
-let bossbattlenow = 0;
+let bossbattle = 0;
+let eventbattle = 0;
 
 let enemyname = 0;
 let enemynames = {
@@ -1496,6 +1497,9 @@ function bufftekiou(){
          case 'LetsThrow':
             playerbuffapply.push('<img src="assets/buffs/wrench.png" width="18" height="18"> ');
             break;
+         case 'frenzy':
+            playerbuffapply.push('<img src="assets/buffs/frenzy.png" width="18" height="18"> ');
+            break;
       }
    });
    document.getElementById('PlayerBuff').innerHTML = playerbuffapply.join('');
@@ -1556,6 +1560,27 @@ function bufftekiou(){
          case 'onslime':
             playerdebuffapply.push('<img src="assets/buffs/onslime.png" width="18" height="18"> ');
             break;
+         case 'stan':
+            playerdebuffapply.push('<img src="assets/buffs/stan.png" width="18" height="18"> ');
+            break;
+         case 'skip':
+            playerdebuffapply.push('<img src="assets/buffs/skip.png" width="18" height="18"> ');
+            break;
+         case 'freeze':
+            playerdebuffapply.push('<img src="assets/buffs/freeze.png" width="18" height="18"> ');
+            break;
+         case 'deepfreeze':
+            playerdebuffapply.push('<img src="assets/buffs/freeze_deep.png" width="18" height="18"> ');
+            break;
+         case 'confusion':
+            playerdebuffapply.push('<img src="assets/buffs/confusion.png" width="18" height="18"> ');
+            break;
+         case 'weaknessgrasp':
+            playerdebuffapply.push('<img src="assets/buffs/weaknessgrasp.png" width="18" height="18"> ');
+            break;
+         case 'paralysis':
+            playerdebuffapply.push('<img src="assets/buffs/paralysis.png" width="18" height="18"> ');
+            break;
       }
    });
    document.getElementById('PlayerDebuff').innerHTML = playerdebuffapply.join('');
@@ -1597,6 +1622,18 @@ function bufftekiou(){
             break;
          case 'shellup6':
             enemybuffapply.push('<img src="assets/buffs/defense_up_6.png" width="18" height="18"> ');
+            break;
+         case 'spliting':
+            enemybuffapply.push('<img src="assets/buffs/spliting.png" width="18" height="18"> ');
+            break;
+         case 'wrench':
+            enemybuffapply.push('<img src="assets/buffs/wrench.png" width="18" height="18"> ');
+            break;
+         case 'gambling':
+            enemybuffapply.push('<img src="assets/buffs/gambling.png" width="18" height="18"> ');
+            break;
+         case 'frenzy':
+            enemybuffapply.push('<img src="assets/buffs/frenzy.png" width="18" height="18"> ');
             break;
       }
    });
@@ -1657,6 +1694,27 @@ function bufftekiou(){
             break;
          case 'onslime':
             enemydebuffapply.push('<img src="assets/buffs/onslime.png" width="18" height="18"> ');
+            break;
+         case 'freeze':
+            enemydebuffapply.push('<img src="assets/buffs/freeze.png" width="18" height="18"> ');
+            break;
+         case 'deepfreeze':
+            enemydebuffapply.push('<img src="assets/buffs/freeze_deep.png" width="18" height="18"> ');
+            break;
+         case 'skip':
+            enemydebuffapply.push('<img src="assets/buffs/skip.png" width="18" height="18"> ');
+            break;
+         case 'stan':
+            enemydebuffapply.push('<img src="assets/buffs/stan.png" width="18" height="18"> ');
+            break;
+         case 'confusion':
+            enemydebuffapply.push('<img src="assets/buffs/confusion.png" width="18" height="18"> ');
+            break;
+         case 'weaknessgrasp':
+            enemydebuffapply.push('<img src="assets/buffs/weaknessgrasp.png" width="18" height="18"> ');
+            break;
+         case 'paralysis':
+            enemydebuffapply.push('<img src="assets/buffs/paralysis.png" width="18" height="18"> ');
             break;
       }
    });
@@ -2165,17 +2223,33 @@ function select3(){
 //一個選択肢を戻るやつ
 async function back(){
    if(phase == 1){
-      disappear();
-      document.getElementById('GameArea').style.display = 'none';
-      document.getElementById('NowMap').style.display = 'block';
-      
-      ctx.clearRect(0, 0, 600, 600); 
-      DrawBackground();
-      ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
-      AllowMove = 0;
-      document.getElementById('log').textContent = 'うまく逃げ切れた！';
-      await delay(1000);
-      document.getElementById('log').textContent = '';
+      if(eventbattle == 0){
+         x = 0;
+         if(enemyprefixe == 0){x = 1}else{x = Math.floor(Math.random()*3)+1};//強敵の場合は1/3
+         if(x == 1){
+         disappear();
+         document.getElementById('GameArea').style.display = 'none';
+         document.getElementById('NowMap').style.display = 'block';
+         ctx.clearRect(0, 0, 600, 600); 
+         DrawBackground();
+         ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+         AllowMove = 0;
+         document.getElementById('log').textContent = 'うまく逃げ切れた！';//普通の敵||強敵
+         await delay(1000);
+         document.getElementById('log').textContent = '';
+         }else{
+         disappear();
+         document.getElementById('log').textContent = 'しかし回り込まれてしまった！';//強敵
+         await delay(1000);
+         document.getElementById('log').textContent = '';
+         enemyorplayer
+         }
+      }else{
+         document.getElementById('log').textContent = 'このバトルからは逃げられない！！';//イベント戦(召喚だったり奇襲だったりラジバンダr(()
+         await delay(1000);
+         document.getElementById('log').textContent = '';
+         backtoplayerturn();
+      }
    }else if(phase == 2){
       backtoplayerturn()
    }else if(phase == 3){
@@ -2519,7 +2593,7 @@ function Bombact(){
    window.setTimeout(killedenemy, 1000)
 }
 function Redcardact(){
-   buffadd('playerbuff','skip1',5);
+   buffadd('enemydebuff','skip',1);
    document.getElementById('log').textContent = 'カードを仕込みました!';
    Redcard.num -= 1;
    window.setTimeout(backtoplayerturn, 1000)
@@ -2662,7 +2736,7 @@ async function skillact() {
          document.getElementById('log').textContent = serif;
          await delay(1000);
          await enemydamaged(0.75,4);
-         buffadd('enemydebuff','stan1',4);
+         buffadd('enemydebuff','stan',1);
          skillcooldown = 0;
          document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>'
          document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';
@@ -2715,7 +2789,7 @@ async function skillact() {
             case 3:document.getElementById('log').textContent = '普通の爆弾だった..!';break;
             case 1:document.getElementById('log').textContent = '水爆弾だった！！';break;//強制終了です
             case 6:document.getElementById('log').textContent = 'Lucky♪マグマ爆弾だった!!';break;
-            case 0:document.getElementById('log').textContent = 'いけっ！ピカピカの実！';buffadd('enemydebuff','stan2',3);break;
+            case 0:document.getElementById('log').textContent = 'いけっ！ピカピカの実！';buffadd('enemydebuff','stan',2);break;
          }
          await delay(1000);
          await enemydamaged(x,4);
@@ -2835,9 +2909,13 @@ async function enemyorplayer(){
 
    //こっから敵が動けるかどうかの動き
    y = 1;
-   if(playerbuff.includes('skip1')){y = 0;buffremove('playerbuff','skip1');}//skip1
-   if(playerbuff.includes('skip2')){y = 0;buffremove('playerbuff','skip2');buffadd('playerbuff','skip1',5)}//skip2
-   if(playerbuff.includes('skip3')){y = 0;buffremove('playerbuff','skip3');buffadd('playerbuff','skip2',5)}//skip3
+   if(enemydebuff.includes('onslime')){y = 0;buffremove('enemydebuff','onslime')}//onslime
+   if(y == 0){
+      document.getElementById('log').textContent = enemyname+'はスライムが絡まり動けない!!';
+      await delay(1000); playerturn(); return;
+   }
+   y = 1;
+   if(enemydebuff.includes('skip')){y = 0;}//skip
    if(y == 0){
       document.getElementById('log').textContent = 'トラップカード発動、スキップ!!';
       await delay(1000); playerturn(); return;
@@ -2852,23 +2930,36 @@ async function enemyorplayer(){
    }
    //stan
    y = 1;
-   if(enemydebuff.includes('stan1')){y = 0;buffremove('enemydebuff','stan1')}//stan1
-   if(enemydebuff.includes('stan2')){y = 0;buffremove('enemydebuff','stan2');buffadd('enemydebuff','stan1',5)}//stan2
-   if(enemydebuff.includes('stan3')){y = 0;buffremove('enemydebuff','stan3');buffadd('enemydebuff','stan2',5);}//stan3
+   if(enemydebuff.includes('stan')){y = 0;}//stan
    if(y == 0){
       document.getElementById('log').textContent = enemyname+'はスタンした！';
       await delay(1000); playerturn(); return;
    }
+   //paralysis
+   y = 1;
+   if(enemydebuff.includes('paralysis')){y = Math.floor(Math.random() * 3);}//paralysis -ポケモンでは1/3で動けるのでね
+   if(y == 0 || y == 2){
+      document.getElementById('log').textContent = enemyname+'は麻痺して動けない!';
+      await delay(1000); playerturn(); return;
+   }
    //freeze
    if(enemydebuff.includes('freeze')){
-      if(!Math.floor(Math.random() * 3) !== 0){
+      if(Math.floor(Math.random() * 3) == 0){
          document.getElementById('log').textContent = '氷が溶けた!'; buffremove('enemydebuff','freeze');
       }else{
          document.getElementById('log').textContent = enemyname + 'は凍っている...';
          await delay(1000); playerturn(); return;
       }   
    }
-   if(bossbattlenow == 0){enemyturn();}else{bossenemyturn();}
+   if(enemydebuff.includes('deepfreeze')){
+      if(Math.floor(Math.random() * 6) == 0){
+         document.getElementById('log').textContent = '氷が溶けた!'; buffremove('enemydebuff','deepfreeze');
+      }else{
+         document.getElementById('log').textContent = enemyname + 'は深く凍っている...';
+         await delay(1000); playerturn(); return;
+      }
+   }
+   if(bossbattle == 0){enemyturn();}else{bossenemyturn();}
 }
 
 async function enemyturn(){
@@ -2936,7 +3027,7 @@ async function killedenemy() {
 
    x = enemylevel;
    if(!enemyprefixe == 0){x *=1.5;}//この二人が共存することはないからね
-   if(bossbattlenow == 1){x *=2;bossbattlenow = 0;}
+   if(bossbattle == 1){x *=2;bossbattle = 0;}
    x = Math.ceil(x);if(x < 1){x = 1;}
    playerexp += x;
    document.getElementById('log').textContent = x+'の経験値を奪った!';
@@ -2949,7 +3040,7 @@ async function killedenemy() {
    window.setTimeout(nextenemy, 1000)
    
 }
-async function nextenemy() {
+async function nextenemy(){//直接次の敵にするやつもいるから残しておくのだ
    buffclear('enemybuff');buffclear('enemydebuff');
    PlayerTurretbreak();
    z = Math.floor(Math.random() * 5)-2;// -2~2
@@ -2976,7 +3067,7 @@ async function nextenemy() {
    document.getElementById('log').textContent = '';
    document.getElementById('GameArea').style.display = 'none';
    document.getElementById('NowMap').style.display = 'block';
-   
+   eventbattle = 0;bossbattle = 0;
 
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
@@ -3017,7 +3108,7 @@ async function defeat() {
    document.getElementById('log').textContent = saydefeats[Math.floor(Math.random() * saydefeats.length)];
    await delay(2000);
    playerhealth = Math.floor(playermaxhealth*0.5);
-   bossbattlenow = 0;
+   bossbattle = 0;
    floor = 0;
    GoNextFloor();
    document.getElementById('GameArea').style.display = 'none';
@@ -3036,7 +3127,7 @@ async function defeat() {
 
 //#region bossの動き
 function BossEnemyAppear(){
-   bossbattlenow = 1;
+   bossbattle = 1;
    turn = 0;
    document.getElementById('PlayerName').textContent = playername;
    document.getElementById('select1').textContent = ' ';
@@ -3159,7 +3250,7 @@ async function bossenemyturn(){
          case 1:document.getElementById('log').textContent = '普通の爆弾だった!!';break;//これによる効果とかもあっていいかも
          case 2:document.getElementById('log').textContent = '爆弾は雷光弾だった!!!';break;
          case 3:document.getElementById('log').textContent = '爆弾は焼夷弾だった!';break;
-         case 0:document.getElementById('log').textContent = '爆弾は閃光弾だった!!';buffadd('playerdebuff','stan1',3);y = 0.5;break;
+         case 0:document.getElementById('log').textContent = '爆弾は閃光弾だった!!';buffadd('playerdebuff','stan',1);y = 0.5;break;
       }
       await delay(1000);
       await playerdamaged(x*y,0);
@@ -4109,6 +4200,7 @@ async function QuestionAct(){
       ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
       const TekitouDebuff = ['poison','burn1','powerdown1','shelldown1'];
       buffadd('playerdebuff',TekitouDebuff[Math.floor(Math.random() * TekitouDebuff.length)],3);
+      eventbattle = 1;
       EnemyAppear(1);
    }
    
@@ -4202,6 +4294,7 @@ async function BookShelftake(code){
    ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
 
 }
+//#endregion
 
 //#region wrwrdイベント(fun値50以下の際1/23の確率で出現)
 function ZomuEvent(){//創生黎明の原野
