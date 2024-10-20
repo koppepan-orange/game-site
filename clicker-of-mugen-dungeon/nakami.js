@@ -551,7 +551,7 @@ const Maps = {
          [0, 0, 0, 0, 0, 0, 0, 26],
          [0, 27, 0, 0, 0, 0, 0, 26],
          [0, 0, 0, 0, 0, 0, 0, 0 ],
-         [0, 0, 0, 0, 0, 0, 0, 26],
+         [28, 28, 28, 28, 28, 28, 29, 26],
       ],
       ]
    ],
@@ -851,7 +851,7 @@ document.addEventListener('keydown', (event) => {
          [0, 0, 0, 0, 0, 0, 0, 26],
          [0, 27, 0, 0, 0, 0, 0, 26],
          [0, 0, 0, 0, 0, 0, 0, 0 ],
-         [0, 28, 28, 28, 28, 28, 28, 26],
+         [28, 28, 28, 28, 28, 28, 29, 26],
       ];
       backgroundMap = [
          ['f','f','f','f','f','f','f','f'],
@@ -959,6 +959,9 @@ function NanigaOkoruKana(code){
       break;
       case 28:
          BookShelfact();
+      break;
+      case 29:
+         Lockeract();
       break;
    }
 }
@@ -4209,6 +4212,8 @@ async function QuestionAct(){
 
 //#region schoolbookshelf
 function BookShelfact(){
+   phase = 1;
+   AllowMove = 1;
    document.getElementById('GameArea').style.display = 'none'
    document.getElementById('EventArea').style = `
    display: block;
@@ -4230,6 +4235,8 @@ function BookShelfact(){
    `
 }
 async function BookShelftake(code){
+   if(phase == 1){
+   phase = 2;
    x = Math.floor(Math.random()*5)+1;
    if(code == 6){x = 1}
    switch(x){
@@ -4258,7 +4265,49 @@ async function BookShelftake(code){
          await delay(1000);
          break;
       case 4:
-         document.getElementById('log').textContent = '..!!これはベノム2巻だ...!!!';
+         //#region 抽選機
+         const data = {
+            'UR': 5,
+            'SSR': 15,
+            'SR': 25,
+            'R': 40,
+            'N': 10,
+         } //くじの仕組み
+         const rand = Math.floor(Math.random() * 100)
+         let result = 'error'
+         let rate = 0
+         for (const prop in data) {
+            rate += data[prop]
+            if (rand <= rate) {
+            result = prop
+            break
+            }
+         }
+         let URkeihin = ['HUNTERxHUNTER最終巻','ベノム5巻']
+         let SSRkeihin = ['魔界の主役は我々だ!19巻','時々ぼそっとロシア語で出れるアーリャさん8巻']
+         let SRkeihin = ['ベノム 2巻','アルカリレットウセイ','ベノム 求愛性少女症候群1巻']
+         let Rkeihin = ['から紅のラブレター','打ち上げ花火、下から見るか、横から見るか']
+         let Nkeihin = ['メンチカツの丸かじり','猫飯の丸かじり','団子の丸かじり']
+         switch(result) {
+        case 'UR':
+            x = URkeihin[Math.floor(Math.random() * URkeihin.length)]
+            break;
+        case 'SSR':
+            x = SSRkeihin[Math.floor(Math.random() * SSRkeihin.length)]
+            break;
+        case 'SR':
+            x = SRkeihin[Math.floor(Math.random() * SRkeihin.length)]
+            break;
+        case 'R':
+            x = Rkeihin[Math.floor(Math.random() * Rkeihin.length)]
+            break;
+        case 'N':
+            x = Nkeihin[Math.floor(Math.random() * Nkeihin.length)]
+            break;
+         }
+         //#endregion
+         
+         document.getElementById('log').textContent = '..!!これは'+x+'だ...!!!レアリティは'+result+'...!!';
          await delay(1000);
          const RandomBuffdesuKoreha = ['powerup1','shellup1','luck'];
          buffadd('playerbuff',RandomBuffdesuKoreha[Math.floor(Math.random() * RandomBuffdesuKoreha.length)],3);
@@ -4292,7 +4341,24 @@ async function BookShelftake(code){
    ctx.clearRect(0, 0, 600, 600);
    DrawBackground();
    ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+   }
+}
+//#endregion
 
+//#region schoollocker
+async function Lockeract(){
+   document.getElementById('log').textContent = 'ロッカーを開けた...';
+   if(Math.floor(Math.random()*2) == 0){
+      document.getElementById('log').textContent = 'なぜかお金が入っていた！もらっちゃおう！！';
+      await delay(1000);
+      euro += Math.floor(Math.random()*20)+20;
+      Etekiou();
+   }else{
+      document.getElementById('log').textContent = '...!?敵だ！！！！！';
+      await delay(1000);
+      eventbattle = 1;
+      EnemyAppear(1);
+   }
 }
 //#endregion
 
