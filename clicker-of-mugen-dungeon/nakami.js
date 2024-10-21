@@ -4283,10 +4283,10 @@ async function BookShelftake(code){
             break
             }
          }
-         let URkeihin = ['HUNTERxHUNTER最終巻','ベノム5巻']
+         let URkeihin = ['HUNTERxHUNTER39巻','ベノム5巻','魔界の主役は我々だ!20巻']
          let SSRkeihin = ['魔界の主役は我々だ!19巻','時々ぼそっとロシア語で出れるアーリャさん8巻']
          let SRkeihin = ['ベノム 2巻','アルカリレットウセイ','ベノム 求愛性少女症候群1巻']
-         let Rkeihin = ['から紅のラブレター','打ち上げ花火、下から見るか、横から見るか']
+         let Rkeihin = ['から紅のラブレター','打ち上げ花火、下から見るか、横から見るか','ドラえもん のび太の宝島']
          let Nkeihin = ['メンチカツの丸かじり','猫飯の丸かじり','団子の丸かじり']
          switch(result) {
         case 'UR':
