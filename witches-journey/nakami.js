@@ -14,6 +14,9 @@ let images = {//開始地点x,開始地点y,そこからの幅,そこからの�
         right2:[860,0,190,190],
     },
 };
+let angle = 0;//プレイヤーの向き(あっち=0,こっち=1}
+
+//帰ったら8x8にして動くようにしといて 800でいいかも いや全体なんだしもうちょいでもあり
 function delay(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 addEventListener('keydown', async(event) => {
     switch(event.key){
@@ -54,14 +57,11 @@ addEventListener('keydown', async(event) => {
         }
 
 });
-// スプライトシートからキャラクターを描画する関数
-function drawSprite(frameX, frameY, frameWidth, frameHeight, x, y ,mx ,my) {
-    console.log(spriteSheet.width, spriteSheet.height); 
+function drawSprite(frameX, frameY, frameWidth, frameHeight, x, y ,mx ,my){
+    //console.log(spriteSheet.width, spriteSheet.height); 
     ctx.clearRect(0, 0, canvas.width, canvas.height); 
     ctx.drawImage(spriteSheet, frameX, frameY, frameWidth, frameHeight, x, y, mx, my); 
 }
-
-// 画像がロードされたらスプライトのサイズを確認してから描画
 spriteSheet.onload = function(){
     drawSprite(...images.player.front,0,0,300,300);
 }
