@@ -35,7 +35,7 @@ addEventListener('keydown', async(event) => {
                 var kariy = Math.floor(ry-1);
                 for(ry = ry;ry > kariy;ry -= 0.1){
                     drawSprite(...images.player.back,rx*100,ry*100,100,100,0);
-                    await delay(10);
+                    await delay(20);
                 }
                 ry = kariy;
             }
@@ -50,7 +50,7 @@ addEventListener('keydown', async(event) => {
                 var karix = Math.floor(rx-1);
                 for(rx = rx;rx > karix;rx -= 0.1){
                     drawSprite(...images.player.left2,rx*100,ry*100,100,100,0);
-                    await delay(10);
+                    await delay(20);
                 }
                 rx = karix;
             }
@@ -71,7 +71,7 @@ addEventListener('keydown', async(event) => {
                 var kariy = Math.floor(ry+1);
                 for(ry = ry;ry < kariy;ry += 0.1){
                     drawSprite(...images.player.front,rx*100,ry*100,100,100,0);
-                    await delay(10);
+                    await delay(20);
                 }
                 ry = kariy;
             }
@@ -86,7 +86,7 @@ addEventListener('keydown', async(event) => {
                 var karix = Math.floor(rx+1);
                 for(rx = rx;rx < karix;rx += 0.1){
                     drawSprite(...images.player.right2,rx*100,ry*100,100,100,0);
-                    await delay(10);
+                    await delay(20);
                 }
             rx = karix;
             }
