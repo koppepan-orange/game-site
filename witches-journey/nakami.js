@@ -12,23 +12,47 @@ let images = {//開始地点x,開始地点y,そこからの幅,そこからの�
         left2:[690,0,190,190],
         right1:[520,0,190,190],
         right2:[860,0,190,190],
+        charge1:[540,200,190,190],
+        charge2:[720,200,190,190],
+        skill1:[1060,420,190,190],
+        skill2:[1060,230,190,190],
+        skill3:[1050,30,190,190],
+        skill4:[1010,600,190,190],
     },
 };
 let sheets = {
     player: playersheet,
     fire: firesheet,
 }
+let moving = 0;
 let rx = 0;
 let ry = 0;
 let angle = 1;//プレイヤーの向き(あっち=0,こっち=1}
+let charging = 0;
+let charged = 0;
+let chargednum = 0;
+let willfire = 0;
 
-//帰ったら8x8にして動くようにしといて 1000でいいかも いや全体なんだしもうちょいでもあり
+const keys = {
+    ArrowUp: false,
+    ArrowLeft: false,
+    ArrowDown: false,
+    ArrowRight: false,
+    z: false
+};
+window.addEventListener("keyup", (event) => {
+    if(keys.hasOwnProperty(event.key))keys[event.key] = false;
+});
+
 function delay(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 addEventListener('keydown', async(event) => {
+    if(keys.hasOwnProperty(event.key)) keys[event.key] = true;console.log(keys);
     switch(event.key){
         case 'ArrowUp':
         case 'w':
-            angle = 0;
+            if(moving == 1){return};
+            if(charging == 1){break};
+            moving = 1;angle = 0;
             drawSprite(...images.player.back,rx*100,ry*100,100,100,0);
             await delay(100);
             if(ry >= 1){
@@ -39,11 +63,15 @@ addEventListener('keydown', async(event) => {
                 }
                 ry = kariy;
             }
-            drawSprite(...images.player.back,rx*100,ry*100,100,100,0);
-            await delay(100);
+            if(angle == 0){drawSprite(...images.player.back,rx*100,ry*100,100,100,0);}else{drawSprite(...images.player.front,rx*100,ry*100,100,100,0);}
+            //await delay(50);
+            moving = 0;
             break;
         case 'ArrowLeft':
         case 'a':
+            if(moving == 1){return};
+            if(charging == 1){break};
+            moving = 1;
             drawSprite(...images.player.left1,rx*100,ry*100,100,100,0);
             await delay(100);
             if(rx >= 1){
@@ -54,17 +82,15 @@ addEventListener('keydown', async(event) => {
                 }
                 rx = karix;
             }
-            drawSprite(...images.player.left2,rx*100,ry*100,100,100,0);
-            await delay(100);
-            if(angle == 0){
-                drawSprite(...images.player.back,rx*100,ry*100,100,100,0);
-            }else{
-                drawSprite(...images.player.front,rx*100,ry*100,100,100,0);
-            }
+            if(angle == 0){drawSprite(...images.player.back,rx*100,ry*100,100,100,0);}else{drawSprite(...images.player.front,rx*100,ry*100,100,100,0);}
+            //await delay(50);
+            moving = 0;
             break;
         case 'ArrowDown':
         case 's':
-            angle = 1;
+            if(moving == 1){return};
+            if(charging == 1){break};
+            moving = 1;angle = 1;
             drawSprite(...images.player.front,rx*100,ry*100,100,100,0);
             await delay(100);
             if(ry <= 6){
@@ -75,11 +101,15 @@ addEventListener('keydown', async(event) => {
                 }
                 ry = kariy;
             }
-            drawSprite(...images.player.front,rx*100,ry*100,100,100,0);
-            await delay(100);
+            if(angle == 0){drawSprite(...images.player.back,rx*100,ry*100,100,100,0);}else{drawSprite(...images.player.front,rx*100,ry*100,100,100,0);}
+            //await delay(50);
+            moving = 0;
             break;
         case 'ArrowRight':
         case 'd':
+            if(moving == 1){return};
+            if(charging == 1){break};
+            moving = 1;
             drawSprite(...images.player.right1,rx*100,ry*100,100,100,0);
             await delay(100);
             if(rx <= 6){
@@ -88,19 +118,76 @@ addEventListener('keydown', async(event) => {
                     drawSprite(...images.player.right2,rx*100,ry*100,100,100,0);
                     await delay(20);
                 }
-            rx = karix;
+                rx = karix;
             }
-            //drawSprite(...images.player.right2,rx*100,ry*100,100,100,0);
-            //await delay(100);
-            if(angle == 0){
-                drawSprite(...images.player.back,rx*100,ry*100,100,100,0);
-            }else{
-                drawSprite(...images.player.front,rx*100,ry*100,100,100,0);
-            }
+            if(angle == 0){drawSprite(...images.player.back,rx*100,ry*100,100,100,0);}else{drawSprite(...images.player.front,rx*100,ry*100,100,100,0);}
+            //await delay(50);
+            moving = 0;
             break;
         }
 
 });
+addEventListener('keydown', async(event) => {
+    if(event.key == 'z'){
+        if(charging == 1){return};
+        willfire = 0;
+        if(event.key === "z" && (keys.ArrowUp || keys.ArrowLeft || keys.ArrowDown || keys.ArrowRight)){
+            switch(event.key){
+                case 'ArrowUp':willfire = 1;break;
+                case 'ArrowLeft':willfire = 2;break;
+                case 'ArrowDown':willfire = 3;break;
+                case 'ArrowRight':willfire = 4;break;
+            }
+        }
+        if(willfire == 0){willfire = 1;};
+        charging = 1;
+        chargednum = 0;
+        while(charging == 1){
+            if(chargednum == 0){
+                chargednum = 1;
+                drawSprite(...images.player.charge1,rx*100,ry*100,100,100,0);
+            }else{
+                chargednum = 0;
+                drawSprite(...images.player.charge2,rx*100,ry*100,100,100,0);
+            }
+            await delay(100);
+            charged += 0.5;
+
+            const onkeyup = (async(event) => {
+                if(event.key == 'z'){
+                    charging = 0;
+                    console.log('今発射しました。chargedは'+charged,'willfireは'+willfire);
+                    removeEventListener('keyup', onkeyup);
+                    if(charged >= 10){
+                        moving = 1;
+                        switch(willfire){
+                            case 1:drawSprite(...images.player.skill1,rx*100,ry*100,100,100,0);break;
+                            case 2:drawSprite(...images.player.skill2,rx*100,ry*100,100,100,0);break;
+                            case 3:drawSprite(...images.player.skill3,rx*100,ry*100,100,100,0);break;
+                            case 4:drawSprite(...images.player.skill4,rx*100,ry*100,100,100,0);break;
+                        }
+                        await delay(500);
+                        moving = 0;charged = 0;willfire = 0;
+                        if(angle == 0){drawSprite(...images.player.back,rx*100,ry*100,100,100,0);}else{drawSprite(...images.player.front,rx*100,ry*100,100,100,0);}
+                        return;
+                    }else{
+                        moving = 0;
+                        if(angle == 0){drawSprite(...images.player.back,rx*100,ry*100,100,100,0);}else{drawSprite(...images.player.front,rx*100,ry*100,100,100,0);}
+                        return;
+                    }
+                }
+                
+            })
+            addEventListener('keyup', onkeyup);
+        };
+        moving = 1;
+        charging = 1;
+        charging = 0;
+        moving = 0;
+
+    }
+    
+})
 function drawSprite(frameX, frameY, frameWidth, frameHeight, x, y ,mx ,my ,rotateangle){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.translate(x + mx/2, y + my/2);
