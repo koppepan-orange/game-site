@@ -60,12 +60,30 @@ const cards = [
         explain: '4ダメージで2回攻撃する。'
     },
     {
+        name: 'フィーバーカッター',
+        nume: '4+',
+        code: 'A',
+        rare: 'R',
+        cool: 3,
+        explain: '4+相手のデバフの持続時間の合計で攻撃する。'
+
+    },
+    {
         name: 'クアッドカッター',
         nume: '4x4',
         code: 'A',
         rare: 'SR',
         cool: 4,
-        explain: '基本4ダメージ、クール中カードが4枚以上なら5ダメージ。'
+        explain: '4ダメージで4回攻撃する。'
+    },
+    {
+        name: 'フィーバースラッシュ',
+        nume: '4+x2',
+        code: 'A',
+        rare: 'SR',
+        cool: 4,
+        explain: '4+相手のデバフの持続時間の合計で2回攻撃する。'
+        
     },
     {
         name: 'ハートシーカー',
@@ -73,8 +91,16 @@ const cards = [
         code: 'A',
         rare: 'SR',
         cool: 5,
-        explain: '自身のシールドを全て消費し、<br>相手に消費前のシールドの1.5倍のダメージを与える。'
+        explain: '自身のバリアを全て消費し、<br>相手に消費前のバリアの1.5倍のダメージを与える。'
     },//1.5倍に強化とか、強化版武器追加してもいいかも
+    {
+        name: 'ブラッドナイフ',//これ好き(元:学マス-はじける水しぶき)
+        nume: '16',
+        code: 'A',
+        rare: 'SR',
+        cool: 5,
+        explain: '自分のHPを7減らした後相手にダメージを与える。<br>自身にバリアがある場合、リカバリを2付与する'
+    },
     {
         name: '鬼神乱舞',//アークナイツモンハンコラボ、キリンRヤトウの2ndスキルより
         nume: '4x6',//ちょっとやばいか...?ww
@@ -82,6 +108,14 @@ const cards = [
         rare: 'SSR',
         cool: 6,
         explain: '4ダメージで6回攻撃する。<br>足掻こうが抗おうが無駄だ！'
+    },
+    {
+        name: 'フィーバーチェーンソー',//夢の塊 ...え名前としてありすぎない？？夢の塊
+        nume: '4+x4',
+        code: 'A',
+        rare: 'UR',
+        cool: 5,
+        explain: '4+相手のデバフの持続時間の合計で4回攻撃する。'
     },
 
     //こっからM
@@ -119,10 +153,18 @@ const cards = [
         explain: '使用されたフェーズの配置されたカードを全て無効化する。<br>簡単に言えばスキップである'
     },
     {
+        name: '硬化',
+        nume: '',
+        code: 'M',
+        rare: 'R',
+        cool: 5,
+        explain: '4硬化状態を得る'
+    },
+    {
         name: 'デュアルコアシステム',//ダブルエントリーシステム的なやつができたらシステム消しといて
         nume: '',
         code: 'M',
-        rare: 'SR',
+        rare: 'R',
         cool: 5,
         explain: '次のターン、相手のカードを後ろに配置する。'
     },
@@ -149,7 +191,7 @@ const cards = [
         code: 'M',
         rare: 'UR',//初URこれね？ww
         cool: 5,
-        explain: '次のターン、相手のカードを無くす。<br>敵が使うことはない。'//まあ..使えたらかなりきっついからね
+        explain: '次のターン、相手のカードを無くす。<br>敵が使うことはない。'//まあ..使えたらかなりきっついからね とはいいつつ一人くらいあってもいいかも
     }
 ];
 const SortCardA = cards.filter(card => card.code === 'A').map(card => card.name);
@@ -165,7 +207,11 @@ let enemyname = {
     num: 0
 
 };
-let barcards = ['攻撃力上昇', 0, 0, 'ソード'];
+let barcards = {
+    name:['攻撃力上昇', 0, 0, 'ソード'],
+    rare:['R',0,0,'N'],
+    num:[0,1,2,3]
+};
 let actpat = [
     [
         ['攻撃力上昇', 0, 0, 'ソード'],
@@ -199,7 +245,7 @@ let actpat1100 = [
     ],
 ]
 //#endregion
-
+//#region 変数s
 let havecardA = {
     name:['スラッシュ','スラッシュ', 'ソード', '博打', 'ラッシュソード', 'ソウルナイフ','ハートシーカー'],
     ct:[0,0,0,0,0,0,0],
@@ -210,12 +256,29 @@ let havecardM = {
     ct:[0,0],
 }
 
+havecardA.name = SortCardA;
+havecardA.ct = [];
+for(let i = 0; i < havecardA.name.length; i++){
+    havecardA.ct.push(0);
+}
+havecardM.name = SortCardM;
+havecardM.ct = [];
+for(let i = 0; i < havecardM.name.length; i++){
+    havecardM.ct.push(0);
+}
 
 let CardActList = {
     card: [],
     turn: []
 };
 let CardActNameList = [];
+
+let stagebar = [
+    [1,1,1,1,1,1,1,1,1,1],
+    [0,0,0,0,0,0,0,0,0,0]
+]
+
+
 
 let phasenum = 0;
 let nextcardactpat = 0;//dualとかoverdriveとか
@@ -233,7 +296,57 @@ let ソードplayereleatk = 0;
 let ソードenemyeleatk = 0;
 let playereleshl = 0;
 let enemyeleshl = 0;
-
+//#endregion
+//#region バフ/デバフのそれ
+let playerbuff = {
+    name:0,
+    time:0
+};
+let playerdebuff = {
+    name:0,
+    time:0
+}
+let enemybuff = {
+    name:0,
+    time:0
+}
+let enemydebuff = {
+    name:0,
+    time:0
+}
+function buffincrease(to,name,time){
+    if(eval(to).name != 0){
+        eval(to).time += time;
+    }else{
+        eval(to).name = name;
+        eval(to).time = time;
+    }
+    bufftekiou();
+}
+function buffdecrease(to,name,time){
+    eval(to).time -= time;
+    if(eval(to).time <= 0){eval(to).name = 0;}
+    bufftekiou();
+}
+function buffclear(){
+    playerbuff.name = 0;
+    playerbuff.time = 0;
+    playerdebuff.name = 0;
+    playerdebuff.time = 0;
+    enemybuff.name = 0;
+    enemybuff.time = 0;
+    enemydebuff.name = 0;
+    enemydebuff.time = 0;
+    bufftekiou();
+}
+function bufftekiou(){
+    document.getElementById('PlayerBuff').textContent = playerbuff.name;
+    document.getElementById('PlayerDebuff').textContent = playerdebuff.name;
+    document.getElementById('EnemyBuff').textContent = enemybuff.name;
+    document.getElementById('EnemyDebuff').textContent = enemydebuff.name;
+    // innerHTML = <img class="buff-img" src="assets/buffs/${playerbuff.name}.png"/> ${playerbuff.time}
+}
+//#endregion
 //#region 扱いやすい子達
 function delay(ms) {return new Promise(resolve => setTimeout(resolve, ms));}
 function tekiou() {
@@ -263,16 +376,16 @@ function OpenNotice(){
 function BarCardCreate() {
     document.getElementById('PhaseBar').innerHTML = '';
     if(nextcardactpat == 0){
-        barcards = actpat[enemyname.num][Math.floor(Math.random() * actpat[enemyname.num].length)];
-    }else if(nextcardactpat === '0000'){//初めて === 使ったわ 0と'0000'は一緒になっちゃうらしいからね
-        barcards = [0,0,0,0];//オーバードライブ専用やね
+        barcards.name = actpat[enemyname.num][Math.floor(Math.random() * actpat[enemyname.num].length)];
+    }else if(nextcardactpat === '0000'){//初めて === 使ったわ '0'と'0000'は一緒になっちゃうらしいからね
+        barcards.name = [0,0,0,0];//オーバードライブ専用やね
     }else if(nextcardactpat === '0011'){
-        barcards = actpat0011[enemyname.num][Math.floor(Math.random() * actpat0011[enemyname.num].length)];
+        barcards.name = actpat0011[enemyname.num][Math.floor(Math.random() * actpat0011[enemyname.num].length)];
     }else if(nextcardactpat === '1100'){
-        barcards = actpat1100[enemyname.num][Math.floor(Math.random() * actpat1100[enemyname.num].length)];
+        barcards.name = actpat1100[enemyname.num][Math.floor(Math.random() * actpat1100[enemyname.num].length)];
     }
     let i = 0
-    for (let nanka of barcards) {
+    for (let nanka of barcards.name) {
         i++
         const Zone = document.getElementById('PhaseBar');
         const messageElement = document.createElement('div');
@@ -599,6 +712,7 @@ async function Phasestart() {
         let eleshl = 0;
         let eleatk = 0;
         let ソードeleatk = 0;
+        let addbuff = [0,0,0]
 
         if(CardActNameList.includes('グリーン・トレイン')||CardActNameList.includes('ドクター・イエロー')){
             document.getElementById('log').innerHTML = '電車が通ってカードは全て無効化された！！';//ほんとはこれ下に置きたかったです...
@@ -658,18 +772,9 @@ async function Phasestart() {
                     if(enemyhealth <= atk){atk = enemyhealth;}
                     repair = atk;
                     break;
-                case 'ハートシーカー':
-                    atk = shield;
-                    shl = -atk;
-                    atk += eleatk;
-                    atk = Math.floor(atk * 1.5);//元ネタはハートの合図です 今思ったけど名前似てる...
-                    if(enemyhealth <= atk){atk = enemyhealth;}
-                    break;
                 case 'リーフソード':
                     atk = 5;
-                    if(document.querySelectorAll('.cooldown').length >= 5){
-                        atk = 10;
-                    }
+                    if(document.querySelectorAll('.cooldown').length >= 5){atk = 10;}
                     atk += eleatk;
                     if(enemyhealth <= atk){atk = enemyhealth;}
                     break;
@@ -685,16 +790,38 @@ async function Phasestart() {
                     atknum += 1;
                     if(enemyhealth <= atk){atk = enemyhealth;}
                     break;
+                case 'フィーバーカッター':
+                    atk = 4;
+                    atk += enemydebuff.time;
+                    if(enemyhealth <= atk){atk = enemyhealth;}
+                    break;
                 case 'クアッドカッター':
                     atk = 4;//ぶっ壊れになりそう..まあ名前かっこいいからいいよね！！
                     atk += eleatk;
                     atknum += 3;
                     if(enemyhealth <= atk){atk = enemyhealth;}
                     break;
+                case 'フィーバースラッシュ':
+                    atk = 4;
+                    atk += enemydebuff.time;
+                    atknum += 1;
+                    if(enemyhealth <= atk){atk = enemyhealth;}
+                case 'ハートシーカー':
+                    atk = shield;
+                    shl = -atk;
+                    atk += eleatk;
+                    atk = Math.floor(atk * 1.5);//元ネタはハートの合図です 今思ったけど名前似てる...
+                    if(enemyhealth <= atk){atk = enemyhealth;}
                 case '鬼神乱舞':
                     atk = 4,
                     atk += eleatk;
                     atknum += 5;//ちょっとやばいかもよ？？ww
+                    if(enemyhealth <= atk){atk = enemyhealth;}
+                    break;
+                case 'フィーバーチェーンソー':
+                    atk = 4;
+                    atk += enemydebuff.time;
+                    atknum += 3;
                     if(enemyhealth <= atk){atk = enemyhealth;}
                     break;
 
@@ -714,6 +841,9 @@ async function Phasestart() {
                 case 'グリーン・トレイン':
                     //ないっすよ。だってこれ存在するだけで効果だし
                     //逆に何を書けないいんですか？？
+                    break;
+                case '硬化':
+                    addbuff = ['playerbuff','硬化',4];
                     break;
                 case 'ドクター・イエロー':
                     repair = phasenum * 2;
@@ -784,6 +914,10 @@ async function Phasestart() {
                     playerhealth += repair;
                     if(shl > 0){playershield += shl;}
                     tekiou();
+                    if(!addbuff[0] == 0){
+                        await delay(1000);
+                        buffincrease(addbuff[0],addbuff[1],addbuff[2]);
+                    }
                     break;
                 case 'E':
                     enemyshield += shl;
@@ -804,6 +938,10 @@ async function Phasestart() {
                     }
                     enemyhealth += repair;
                     tekiou();
+                    if(!addbuff[0] == 0){
+                        await delay(1000);
+                        buffincrease(addbuff[0],addbuff[1],addbuff[2]);
+                    }
                     break;
             }
 
