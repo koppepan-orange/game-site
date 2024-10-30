@@ -41,24 +41,30 @@ body{
     display: block;
     position: absolute;
     width: 80%;
-    height: 1144px;
+    height: 565px;
+    top: 15px;
     left: 50%;
     right: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(255, 255, 255, 0);
+    margin: 0 auto;
+    transform: translateX(-50%);
+    background-color: rgba(255, 255, 255, 0.301);
     border: none;
-    opacity: 1;
+    opacity: 0.5;
+    pointer-events: none!important;
+    user-select: none!important;
     z-index: 23;
 }
 #GameArea{
+    display: none;
     position: relative; 
     width:80%;
+    height: 550px;
     margin: 0 auto;
     border: 2px solid #eee;
     background-color: rgb(255, 255, 255);
     opacity: 1;
     padding: 12px;
-    z-index: 999;
+
 }
 #PhaseBar {
     width: 60%;
@@ -81,11 +87,13 @@ body{
     border: 1px solid #000;
     padding: 5px;
     text-align: center;
+    z-index: 23;
 }
 .card-img {
     width: 75px;
     margin: 0 auto;
     display: block;
+    z-index: 23;
 }
 #NoteCardArea{
     width: 90%;
@@ -121,11 +129,13 @@ body{
     padding: 5px;
     text-align: center;
     font-size: 20px;
+    z-index: 23;
 }
 .notecard-img {
     width: 30px;
     margin: 0 auto;
     display: block;
+    z-index: 23;
 }
 .none{background-color: #ddd;}
 .G{background-color: #575757!important;}
@@ -183,11 +193,13 @@ body{
 .buff{
     width: 50%;
     padding: 3px;
+    z-index: 23;
 }
 .buff-img{
     width: 20px;
     margin: 0 auto;
     padding-top: 3px;
+    z-index: 23;
 }
 #PhaseUI{
     text-align: center;
@@ -209,6 +221,7 @@ body{
     right:25%;
     background-color:#777;
     border:2px solid #000;
+    z-index: 24;
 }
 .hidden {display: none !important;}
 .visible {display: block !important;}
@@ -217,4 +230,29 @@ body{
 }
 #PhaseStart{
     display:none;
+}
+#StageButton{
+    margin: 0 auto;
+    padding: 5px;
+    display: block;
+    overflow: auto;
+}
+.stagebar-big{
+    display: block;
+    width: 90%;
+    height: 50px;
+    margin: 0 auto;
+    border: 2px solid #737373;
+    background-color: #a0a0a0;
+    padding: 5px;
+    z-index: 23;
+}
+.stagebar-small{
+    display: block;
+    width: 40%;
+    height: 50px;
+    border: 2px solid #737373;
+    background-color: #a0a0a0;
+    padding: 5px;
+    z-index: 23;
 }

@@ -5,239 +5,22 @@ document.getElementById('GameArea').style.display = 'block';
 document.getElementById('NowMap').style.display = 'none';
 const canvas = document.getElementById("NowMap");
 const ctx = canvas.getContext("2d");
-const backgroundMaps = {
-   //草原
+const Maps = {
+   //#region 1面
+   //#region 草原
    1.1:[
    //こっから草原
    [
-      ['b','b','b','b','b','b','b','b'],
-      ['b','a','b','b','b','b','a','a'],
-      ['a','a','b','b','b','a','a','a'],
-      ['a','a','a','a','a','a','a','a'],
-      ['a','a','a','a','a','a','a','a'],
-      ['a','a','a','a','a','a','a','a'],
-      ['a','a','a','a','a','a','a','a'],
-      ['a','a','a','a','a','a','a','a'],
-   ],
-   [
-      ['a','a','a','a','a','a','a','a'],
-      ['a','b','b','a','a','a','a','a'],
-      ['a','b','b','a','a','a','a','a'],
-      ['a','a','b','a','a','a','a','a'],
-      ['a','a','a','a','a','a','a','a'],
-      ['a','a','a','a','b','b','b','a'],
-      ['a','a','a','b','b','b','b','a'],
-      ['a','a','a','b','b','b','b','b'],
-   ],
-   [
-      ['b','b','b','b','b','a','b','a'],
-      ['b','b','b','a','a','a','a','a'],
-      ['b','b','a','a','a','a','a','a'],
-      ['b','b','a','a','a','a','a','a'],
-      ['b','a','a','a','a','a','a','a'],
-      ['a','a','a','a','a','a','a','b'],
-      ['a','a','a','a','a','a','a','b'],
-      ['a','a','a','a','a','a','b','b'],
-   ],
-   [
-      ['a','a','a','a','a','b','b','b'],
-      ['a','b','b','a','a','b','b','b'],
-      ['a','b','a','a','a','a','b','b'],
-      ['a','b','a','a','a','a','a','a'],
-      ['a','a','a','a','a','a','a','a'],
-      ['a','a','b','b','b','b','b','a'],
-      ['a','b','b','b','b','b','b','a'],
-      ['a','a','a','b','b','b','b','b'],
-   ],
-   [
-      ['b','b','b','b','b','b','b','b'],
-      ['b','b','a','b','b','a','b','b'],
-      ['b','b','a','b','b','a','b','b'],
-      ['b','b','a','b','b','a','b','b'],
-      ['b','b','b','b','b','b','b','b'],
-      ['b','a','b','b','b','b','a','b'],
-      ['b','b','a','a','a','a','b','b'],
-      ['b','b','b','b','b','b','b','b'],
-   ],//fun23room
-   [
-      ['a','a','a','a','a','a','a','a'],
-      ['a','b','b','a','a','b','b','a'],
-      ['a','b','b','a','a','b','b','a'],
-      ['a','a','a','b','b','a','a','a'],
-      ['a','a','b','b','b','b','a','a'],
-      ['a','a','b','a','a','b','a','a'],
-      ['a','a','b','a','a','b','a','a'],
-      ['a','a','a','a','a','a','a','a'],
-   ],//zomusan room
-   [
-      ['c','c','c','c','c','c','c','c'],
-      ['c','d','c','c','c','c','c','c'],
-      ['c','d','d','c','c','c','c','c'],
-      ['c','c','c','c','c','c','c','c'],
-      ['c','c','c','c','c','c','c','a'],
-      ['c','a','a','a','a','a','c','a'],
-      ['a','a','a','a','a','a','a','a'],
-      ['a','a','a','a','a','a','a','a'],
-   ]//boss room
-   ],
-
-   //砂漠
-   2.1:[
-   //ここから昼砂漠
-   [
-      ['d','d','d','d','d','d','d','d'],
-      ['d','c','d','d','d','d','d','d'],
-      ['d','c','c','c','c','d','d','d'],
-      ['c','c','c','c','c','c','c','d'],
-      ['c','c','c','c','c','c','c','d'],
-      ['c','c','c','c','c','c','c','c'],
-      ['c','c','c','c','c','c','c','c'],
-      ['c','c','c','c','c','c','c','c'],
-   ],
-   [
-      ['d','d','c','c','c','c','c','c'],
-      ['d','d','c','c','c','c','c','d'],
-      ['d','d','d','c','c','c','c','d'],
-      ['d','d','d','c','c','c','c','d'],
-      ['d','d','c','c','c','c','c','c'],
-      ['d','d','c','c','c','c','c','c'],
-      ['d','d','d','c','c','c','c','c'],
-      ['d','d','d','d','c','c','c','c'],
-   ],
-   [
-      ['c','c','c','c','c','d','d','d'],
-      ['c','c','c','c','c','d','d','c'],
-      ['c','c','d','c','c','c','d','c'],
-      ['c','c','d','d','c','c','c','c'],
-      ['c','d','d','d','c','c','c','c'],
-      ['c','d','d','d','c','d','d','c'],
-      ['c','c','c','c','c','d','d','c'],
-      ['c','c','c','c','c','c','c','c'],
-   ],
-   [
-      ['c','c','c','d','d','d','c','d'],
-      ['c','c','c','d','d','d','c','c'],
-      ['c','c','d','d','d','d','c','c'],
-      ['c','c','d','d','d','c','c','c'],
-      ['c','d','d','d','c','c','c','c'],
-      ['d','d','d','d','c','c','c','c'],
-      ['d','d','d','c','c','c','c','c'],
-      ['d','c','c','c','c','c','c','c'],
-   ],
-   [
-      ['c','c','c','c','c','c','c','c'],
-      ['c','c','c','c','c','c','c','c'],
-      ['c','c','c','c','c','c','c','c'],
-      ['c','c','c','c','c','c','c','c'],
-      ['c','c','c','c','c','c','c','c'],
-      ['c','c','c','c','c','c','c','c'],
-      ['c','c','c','c','c','c','c','c'],
-      ['c','c','c','c','c','c','c','c'],
-   ],//fun68room
-   [
-      ['d','d','c','c','c','d','d','c'],
-      ['d','c','c','c','d','d','c','c'],
-      ['d','c','c','c','d','d','c','c'],
-      ['c','c','c','c','d','d','c','c'],
-      ['c','c','c','c','d','c','c','c'],
-      ['d','d','c','d','d','c','c','c'],
-      ['d','d','c','d','d','c','c','c'],
-      ['c','c','c','d','d','c','c','c'],
-   ],//bossroom
-
-   //ここから夜砂漠
-   [
-      ['e','e','e','e','e','d','d','d'],
-      ['e','e','e','e','e','e','d','d'],
-      ['e','e','e','e','e','e','d','d'],
-      ['d','d','e','e','e','e','e','d'],
-      ['d','d','d','e','e','e','e','e'],
-      ['d','d','d','e','e','e','e','e'],
-      ['e','e','e','e','e','e','e','d'],
-      ['e','e','e','e','e','d','d','e'],
-   ],
-   [
-      ['d','d','e','e','e','e','e','e'],
-      ['d','d','e','e','e','e','e','d'],
-      ['d','d','d','e','e','e','e','d'],
-      ['d','d','d','e','e','e','e','d'],
-      ['d','d','e','e','e','e','e','e'],
-      ['d','d','e','e','e','e','e','e'],
-      ['d','d','d','e','e','e','e','e'],
-      ['d','d','d','d','e','e','e','e'],
-   ],
-   [
-      ['e','e','e','e','e','d','d','d'],
-      ['e','e','e','e','e','d','d','e'],
-      ['e','e','d','e','e','e','d','e'],
-      ['e','e','d','d','e','e','e','e'],
-      ['e','d','d','d','e','e','e','e'],
-      ['e','d','d','d','e','d','d','e'],
-      ['e','e','e','e','e','d','d','e'],
-      ['e','e','e','e','e','e','e','e'],
-   ],
-   [
-      ['e','e','e','d','d','d','e','d'],
-      ['e','e','e','d','d','d','e','e'],
-      ['e','e','d','d','d','d','e','e'],
-      ['e','e','d','d','d','e','e','e'],
-      ['e','d','d','d','e','e','e','e'],
-      ['d','d','d','d','e','e','e','e'],
-      ['d','d','d','e','e','e','e','e'],
-      ['d','e','e','e','e','e','e','e'],
-   ],
-   [
-      ['e','e','e','d','d','d','e','d'],
-      ['e','e','e','d','d','d','e','e'],
-      ['e','e','d','d','d','d','e','e'],
-      ['e','e','d','d','d','e','e','e'],
-      ['e','d','d','d','e','e','e','e'],
-      ['d','d','d','d','e','e','e','e'],
-      ['d','d','d','e','e','e','e','e'],
-      ['d','e','e','e','e','e','e','e'],
-   ],//fun68
-   [
-      ['d','d','d','d','d','d','d','d'],
-      ['d','d','d','d','d','d','d','d'],
-      ['d','d','d','d','d','e','d','d'],
-      ['d','d','e','d','e','e','e','d'],
-      ['b', 0, 'd','e','e','d', 0 ,'b'],
-      ['b', 0, 'd','b','b','d', 0 ,'b'],
-      ['b','b','b','e','e','b','b','b'],
-      ['e','e','e','d','d','e','e','e'],
-   ],//utusen room
-   [
-      ['e','e','e','d','d','d','e','d'],
-      ['e','e','e','d','d','d','e','e'],
-      ['e','e','d','d','d','d','e','e'],
-      ['e','e','d','d','d','e','e','e'],
-      ['e','d','d','d','e','e','e','e'],
-      ['d','d','d','d','e','e','e','e'],
-      ['d','d','d','e','e','e','e','e'],
-      ['d','e','e','e','e','e','e','e'],
-   ]//bossroom
-   ],
-
-
-}
-let backgroundMap = [
-   ['a','b','c','d','e','a','a','a'],
-   ['a','a','a','a','a','a','a','a'],
-   ['a','a','a','a','a','a','a','a'],
-   ['a','a','a','a','a','a','a','a'],
-   ['a','a','a','a','a','a','a','a'],
-   ['a','a','a','a','a','a','a','a'],
-   ['a','a','a','a','a','a','a','a'],
-   ['a','a','a','a','a','a','a','a'],
-];
-const backgroundMapnum = {
-   1.1:['0.3'],
-   2.1:['7.3','14.3'],
-};
-
-const objectMaps = {
-   //草原
-   1.1:[
+      [
+         ['b','b','b','b','b','b','b','b'],
+         ['b','a','b','b','b','b','a','a'],
+         ['a','a','b','b','b','a','a','a'],
+         ['a','a','a','a','a','a','a','a'],
+         ['a','a','a','a','a','a','a','a'],
+         ['a','a','a','a','a','a','a','a'],
+         ['a','a','a','a','a','a','a','a'],
+         ['a','a','a','a','a','a','a','a'],
+      ],
       [
          [0, 0, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
@@ -247,6 +30,18 @@ const objectMaps = {
          [0, 1, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 0, 2, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
+      ],
+   ],
+   [
+      [
+         ['a','a','a','a','a','a','a','a'],
+         ['a','b','b','a','a','a','a','a'],
+         ['a','b','b','a','a','a','a','a'],
+         ['a','a','b','a','a','a','a','a'],
+         ['a','a','a','a','a','a','a','a'],
+         ['a','a','a','a','b','b','b','a'],
+         ['a','a','a','b','b','b','b','a'],
+         ['a','a','a','b','b','b','b','b'],
       ],
       [
          [0, 0, 0, 0, 0, 0, 0, 0],
@@ -258,6 +53,18 @@ const objectMaps = {
          [0, 0, 2, 0, 0, 0, 0, 0],
          [0, 6, 0, 0, 0, 0, 0, 0],
       ],
+   ],
+   [
+      [
+         ['b','b','b','b','b','a','b','a'],
+         ['b','b','b','a','a','a','a','a'],
+         ['b','b','a','a','a','a','a','a'],
+         ['b','b','a','a','a','a','a','a'],
+         ['b','a','a','a','a','a','a','a'],
+         ['a','a','a','a','a','a','a','b'],
+         ['a','a','a','a','a','a','a','b'],
+         ['a','a','a','a','a','a','b','b'],
+      ],
       [
          [0, 0, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 6, 0, 0, 0, 0],
@@ -267,6 +74,18 @@ const objectMaps = {
          [0, 0, 0, 2, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 2, 7, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
+      ],
+   ],
+   [
+      [
+         ['b','b','b','b','b','a','b','a'],
+         ['b','b','b','a','a','a','a','a'],
+         ['b','b','a','a','a','a','a','a'],
+         ['b','b','a','a','a','a','a','a'],
+         ['b','a','a','a','a','a','a','a'],
+         ['a','a','a','a','a','a','a','b'],
+         ['a','a','a','a','a','a','a','b'],
+         ['a','a','a','a','a','a','b','b'],
       ],
       [
          [0, 0, 0, 0, 0, 0, 0, 0],
@@ -278,6 +97,18 @@ const objectMaps = {
          [0, 0, 0, 2, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
       ],
+   ],
+   [
+      [
+         ['a','a','a','a','a','b','b','b'],
+         ['a','b','b','a','a','b','b','b'],
+         ['a','b','a','a','a','a','b','b'],
+         ['a','b','a','a','a','a','a','a'],
+         ['a','a','a','a','a','a','a','a'],
+         ['a','a','b','b','b','b','b','a'],
+         ['a','b','b','b','b','b','b','a'],
+         ['a','a','a','b','b','b','b','b'],
+      ],
       [
          [0, 0, 0, 0, 0, 0, 0, 0],
          [0, 1, 0, 0, 0, 8, 0, 0],
@@ -287,7 +118,19 @@ const objectMaps = {
          [0, 10, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 11, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
-      ],//こちら、「祝福」ですっ！(ノアさん風)
+      ],
+   ],
+   [
+      [
+         ['a','a','a','a','a','a','a','a'],
+         ['a','b','b','a','a','a','a','a'],
+         ['a','b','b','a','a','a','a','a'],
+         ['a','a','b','a','a','a','a','a'],
+         ['a','a','a','a','a','a','a','a'],
+         ['a','a','a','a','b','b','b','a'],
+         ['a','a','a','b','b','b','b','a'],
+         ['a','a','a','b','b','b','b','b'],
+      ],
       [
          [0, 0, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
@@ -298,6 +141,18 @@ const objectMaps = {
          [0, 0, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 0, 1, 0, 0, 0],
       ],
+   ],
+   [
+      [
+         ['b','b','b','b','b','b','b','b'],
+         ['b','b','a','b','b','a','b','b'],
+         ['b','b','a','b','b','a','b','b'],
+         ['b','b','a','b','b','a','b','b'],
+         ['b','b','b','b','b','b','b','b'],
+         ['b','a','b','b','b','b','a','b'],
+         ['b','b','a','a','a','a','b','b'],
+         ['b','b','b','b','b','b','b','b'],
+      ],
       [
          [0, 0, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
@@ -307,7 +162,19 @@ const objectMaps = {
          [0, 0, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
          [3, 0, 0, 0, 0, 0, 0, 1],   
-      ],//急にホラー感ねw まあ1/100x1/10の確率だから俺が言わない限り出会わないでしょう！
+      ],
+   ],//fun23room
+   [
+      [
+         ['a','a','a','a','a','a','a','a'],
+         ['a','b','b','a','a','b','b','a'],
+         ['a','b','b','a','a','b','b','a'],
+         ['a','a','a','b','b','a','a','a'],
+         ['a','a','b','b','b','b','a','a'],
+         ['a','a','b','a','a','b','a','a'],
+         ['a','a','b','a','a','b','a','a'],
+         ['a','a','a','a','a','a','a','a'],
+      ],
       [
          [0, 0, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
@@ -318,6 +185,18 @@ const objectMaps = {
          [0, 0, 0, 0, 0, 0, 0, 0],
          [3, 0, 0, 0, 0, 0, 0, 1],
       ],//ゾム部屋。是非ともこの部屋を引き当てて欲しいものですわ... と思ったら移動3回目くらいで出たらしい 豪運....
+   ],
+   [
+      [
+         ['a','a','a','a','a','b','b','b'],
+         ['a','a','a','a','a','b','b','b'],
+         ['b','b','a','a','a','b','a','b'],
+         ['b','b','b','a','a','a','a','a'],
+         ['b','b','b','a','a','a','a','a'],
+         ['b','b','b','a','a','a','a','a'],
+         ['a','a','a','a','a','a','a','a'],
+         ['a','a','a','a','a','a','a','a'],
+      ],
       [
          [0, 0, 0, 0, 0, 14, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
@@ -328,11 +207,26 @@ const objectMaps = {
          [0, 0, 0, 0, 0, 0, 0, 0],
          [0, 0, 3, 0, 0, 0, 0, 0],
       ],//ボス部屋
+   ]
    ],
-
-   //砂漠
+   //#endregion
+   //#endregion
+   //#region 2面
+   //#region 砂漠
    2.1:[
-      [//こっから昼砂漠
+   //ここから昼砂漠
+   [
+      [
+         ['d','d','d','d','d','d','d','d'],
+         ['d','c','d','d','d','d','d','d'],
+         ['d','c','c','c','c','d','d','d'],
+         ['c','c','c','c','c','c','c','d'],
+         ['c','c','c','c','c','c','c','d'],
+         ['c','c','c','c','c','c','c','c'],
+         ['c','c','c','c','c','c','c','c'],
+         ['c','c','c','c','c','c','c','c'],
+      ],
+      [
          [0, 0, 0, 17, 0, 0, 0, 0],
          [0, 0, 0, 2, 0, 0, 18, 0],
          [0, 20, 0, 0, 18, 0, 18, 0],
@@ -341,6 +235,18 @@ const objectMaps = {
          [0, 0, 0, 22, 0, 0, 0, 0],
          [0, 0, 2, 0, 0, 16, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
+      ],
+   ],
+   [
+      [
+      ['d','d','c','c','c','c','c','c'],
+      ['d','d','c','c','c','c','c','d'],
+      ['d','d','d','c','c','c','c','d'],
+      ['d','d','d','c','c','c','c','d'],
+      ['d','d','c','c','c','c','c','c'],
+      ['d','d','c','c','c','c','c','c'],
+      ['d','d','d','c','c','c','c','c'],
+      ['d','d','d','d','c','c','c','c'],
       ],
       [
          [0, 0, 0, 0, 0, 0, 0, 0],
@@ -352,6 +258,18 @@ const objectMaps = {
          [2, 0, 20, 0, 0, 2, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
       ],
+   ],
+   [
+      [
+         ['c','c','c','c','c','d','d','d'],
+         ['c','c','c','c','c','d','d','c'],
+         ['c','c','d','c','c','c','d','c'],
+         ['c','c','d','d','c','c','c','c'],
+         ['c','d','d','d','c','c','c','c'],
+         ['c','d','d','d','c','d','d','c'],
+         ['c','c','c','c','c','d','d','c'],
+         ['c','c','c','c','c','c','c','c'],
+      ],
       [
          [0, 0, 0, 0, 0, 18, 17, 17],
          [0, 0, 16, 0, 2, 18, 17, 17],
@@ -361,6 +279,18 @@ const objectMaps = {
          [0, 0, 16, 22, 20, 0, 0, 0],
          [0, 0, 2, 0, 0, 1, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
+      ],
+   ],
+   [
+      [
+         ['c','c','c','d','d','d','c','d'],
+         ['c','c','c','d','d','d','c','c'],
+         ['c','c','d','d','d','d','c','c'],
+         ['c','c','d','d','d','c','c','c'],
+         ['c','d','d','d','c','c','c','c'],
+         ['d','d','d','d','c','c','c','c'],
+         ['d','d','d','c','c','c','c','c'],
+         ['d','c','c','c','c','c','c','c'],
       ],
       [
          [0, 1, 0, 0, 0, 0, 0, 0],
@@ -372,6 +302,18 @@ const objectMaps = {
          [0, 0, 0, 20, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
       ],
+   ],
+   [
+      [
+         ['c','c','c','d','d','d','c','d'],
+         ['c','c','c','d','d','d','c','c'],
+         ['c','c','d','d','d','d','c','c'],
+         ['c','c','d','d','d','c','c','c'],
+         ['c','d','d','d','c','c','c','c'],
+         ['d','d','d','d','c','c','c','c'],
+         ['d','d','d','c','c','c','c','c'],
+         ['d','c','c','c','c','c','c','c'],
+      ],
       [
          [0, 0, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 1, 0],
@@ -382,6 +324,18 @@ const objectMaps = {
          [22, 5, 16, 0, 2, 0, 0, 0],
          [21, 22, 22, 0, 0, 0, 0, 0],
       ],
+   ],
+   [
+      [
+         ['c','c','c','c','c','c','c','c'],
+         ['c','c','c','c','c','c','c','c'],
+         ['c','c','c','c','c','c','c','c'],
+         ['c','c','c','c','c','c','c','c'],
+         ['c','c','c','c','c','c','c','c'],
+         ['c','c','c','c','c','c','c','c'],
+         ['c','c','c','c','c','c','c','c'],
+         ['c','c','c','c','c','c','c','c'],
+      ],//fun68room
       [
          [0, 0, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
@@ -390,8 +344,20 @@ const objectMaps = {
          [0, 0, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0],
-      ],//fun値68の部屋。...どしよここ
+         [0, 0, 0, 0, 0, 0, 0, 1],
+      ]
+   ],
+   [
+      [
+         ['d','d','c','c','c','d','d','c'],
+         ['d','c','c','c','d','d','c','c'],
+         ['d','c','c','c','d','d','c','c'],
+         ['c','c','c','c','d','d','c','c'],
+         ['c','c','c','c','d','c','c','c'],
+         ['d','d','c','d','d','c','c','c'],
+         ['d','d','c','d','d','c','c','c'],
+         ['c','c','c','d','d','c','c','c'],
+      ],
       [
          [0, 0, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
@@ -401,9 +367,23 @@ const objectMaps = {
          [0, 0, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 14, 0],
-      ],//ボス部屋
+      ]//bossroom
+   ],
+   
 
-      [//こっから夜砂漠
+   //ここから夜砂漠
+   [
+      [
+         ['e','e','e','e','e','d','d','d'],
+         ['e','e','e','e','e','e','d','d'],
+         ['e','e','e','e','e','e','d','d'],
+         ['d','d','e','e','e','e','e','d'],
+         ['d','d','d','e','e','e','e','e'],
+         ['d','d','d','e','e','e','e','e'],
+         ['e','e','e','e','e','e','e','d'],
+         ['e','e','e','e','e','d','d','e'],
+      ],
+      [
          [22, 22, 0, 17, 0, 0, 0, 0],
          [22, 22, 0, 2, 0, 0, 18, 0],
          [22, 20, 0, 0, 18, 0, 18, 0],
@@ -412,6 +392,18 @@ const objectMaps = {
          [2, 22, 22, 22, 0, 0, 0, 0],
          [0, 0, 2, 0, 0, 16, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
+      ],
+   ],
+   [
+      [
+         ['d','d','e','e','e','e','e','e'],
+         ['d','d','e','e','e','e','e','d'],
+         ['d','d','d','e','e','e','e','d'],
+         ['d','d','d','e','e','e','e','d'],
+         ['d','d','e','e','e','e','e','e'],
+         ['d','d','e','e','e','e','e','e'],
+         ['d','d','d','e','e','e','e','e'],
+         ['d','d','d','d','e','e','e','e'],
       ],
       [
          [0, 0, 0, 0, 0, 0, 22, 22],
@@ -423,6 +415,18 @@ const objectMaps = {
          [2, 0, 20, 22, 22, 2, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
       ],
+   ],
+   [
+      [
+         ['e','e','e','e','e','d','d','d'],
+         ['e','e','e','e','e','d','d','e'],
+         ['e','e','d','e','e','e','d','e'],
+         ['e','e','d','d','e','e','e','e'],
+         ['e','d','d','d','e','e','e','e'],
+         ['e','d','d','d','e','d','d','e'],
+         ['e','e','e','e','e','d','d','e'],
+         ['e','e','e','e','e','e','e','e'],
+      ],
       [
          [22, 22, 22, 22, 0, 18, 17, 17],
          [22, 22, 16, 22, 2, 18, 17, 17],
@@ -432,6 +436,18 @@ const objectMaps = {
          [22, 0, 16, 22, 20, 0, 0, 0],
          [22, 22, 2, 0, 0, 1, 0, 0],
          [22, 22, 0, 0, 0, 0, 0, 0],
+      ],
+   ],
+   [
+      [
+         ['e','e','e','d','d','d','e','d'],
+         ['e','e','e','d','d','d','e','e'],
+         ['e','e','d','d','d','d','e','e'],
+         ['e','e','d','d','d','e','e','e'],
+         ['e','d','d','d','e','e','e','e'],
+         ['d','d','d','d','e','e','e','e'],
+         ['d','d','d','e','e','e','e','e'],
+         ['d','e','e','e','e','e','e','e'],
       ],
       [
          [22, 1, 22, 22, 22, 0, 0, 0],
@@ -443,15 +459,17 @@ const objectMaps = {
          [0, 0, 0, 20, 0, 0, 22, 22],
          [0, 0, 0, 0, 0, 0, 0, 0],
       ],
+   ],
+   [
       [
-         [22, 22, 22, 22, 22, 22, 22, 0],
-         [22, 22, 22, 22, 22, 22, 1, 0],
-         [0, 20, 22, 22, 0, 2, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 2, 23, 0, 0, 0, 0],
-         [0, 0, 0, 22, 22, 0, 20, 0],
-         [22, 5, 16, 0, 2, 22, 0, 0],
-         [21, 22, 22, 22, 22, 22, 0, 0],
+         ['e','e','e','d','d','d','e','d'],
+         ['e','e','e','d','d','d','e','e'],
+         ['e','e','d','d','d','d','e','e'],
+         ['e','e','d','d','d','e','e','e'],
+         ['e','d','d','d','e','e','e','e'],
+         ['d','d','d','d','e','e','e','e'],
+         ['d','d','d','e','e','e','e','e'],
+         ['d','e','e','e','e','e','e','e'],
       ],
       [
          [0, 0, 0, 0, 0, 0, 0, 0],
@@ -463,6 +481,18 @@ const objectMaps = {
          [0, 0, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
       ],//fun68
+   ],
+   [
+      [
+         ['d','d','d','d','d','d','d','d'],
+         ['d','d','d','d','d','d','d','d'],
+         ['d','d','d','d','d','e','d','d'],
+         ['d','d','e','d','e','e','e','d'],
+         ['b', 0, 'd','e','e','d', 0 ,'b'],
+         ['b', 0, 'd','b','b','d', 0 ,'b'],
+         ['b','b','b','e','e','b','b','b'],
+         ['e','e','e','d','d','e','e','e'],
+      ],
       [
          [0, 0, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
@@ -473,6 +503,18 @@ const objectMaps = {
          [3, 0, 0, 0, 0, 0, 0, 1],
          [0, 0, 0, 0, 0, 0, 0, 0],
       ],//utusen
+   ],
+   [
+      [
+         ['e','e','e','d','d','d','e','d'],
+         ['e','e','e','d','d','d','e','e'],
+         ['e','e','d','d','d','d','e','e'],
+         ['e','e','d','d','d','e','e','e'],
+         ['e','d','d','d','e','e','e','e'],
+         ['d','d','d','d','e','e','e','e'],
+         ['d','d','d','e','e','e','e','e'],
+         ['d','e','e','e','e','e','e','e'],
+      ],
       [
          [0, 0, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0],
@@ -484,7 +526,57 @@ const objectMaps = {
          [0, 0, 0, 0, 0, 0, 0, 14],
       ]//boss
    ],
+   ],
+   //#endregion
+   //#endregion
+   //#region 3面
+   //#region 学校
+   3.1:[
+      [
+      [
+         ['f','f','f','f','f','f','f','f'],
+         ['f','f','f','f','f','f','f','f'],
+         ['f','f','f','f','f','f','f','f'],
+         ['f','g','f','g','f','g','f','f'],
+         ['f','f','f','f','f','f','f','f'],
+         ['f','g','f','g','f','g','f','f'],
+         ['f','f','f','f','f','f','f','f'],
+         ['f','f','f','f','f','f','f','f'],
+      ],
+      [
+         [0, 0, 0, 0, 0, 0, 0, 26],
+         [0, 0, 0, 0, 0, 0, 0, 25],
+         [0, 0, 0, 0, 0, 0, 0, 26],
+         [0, 0, 0, 0, 0, 27, 0, 26],
+         [0, 0, 0, 0, 0, 0, 0, 26],
+         [0, 27, 0, 0, 0, 0, 0, 26],
+         [0, 0, 0, 0, 0, 0, 0, 0 ],
+         [28, 28, 28, 28, 28, 28, 29, 26],
+      ],
+      ]
+   ],
+
+   //#endregion
+   //#endregion
+
 }
+const Mapnum = {
+   //1.1:['0.5'],
+   //2.1:['0.4','7.4'],
+   1.1:[0,1,2,3,4,5,0,1,2,3,4,5,0,1,2],
+   2.1:[0,1,2,3,4,0,1,2,7,8,9,10]
+};
+
+let backgroundMap = [
+   ['a','b','c','d','e','a','a','a']
+   ['a','a','a','a','a','a','a','a'],
+   ['a','a','a','a','a','a','a','a'],
+   ['a','a','a','a','a','a','a','a'],
+   ['a','a','a','a','a','a','a','a'],
+   ['a','a','a','a','a','a','a','a'],
+   ['a','a','a','a','a','a','a','a'],
+   ['a','a','a','a','a','a','a','a'],
+];
 let objectMap = [
    [0, 0, 0, 0, 0, 0, 0, 0],
    [0, 0, 0, 0, 0, 0, 0, 0],
@@ -495,18 +587,14 @@ let objectMap = [
    [0, 0, 0, 0, 0, 0, 0, 0],
    [0, 0, 0, 0, 0, 0, 0, 0]
 ];
-const objectMapnum = {
-   1.1:['0.5'],
-   2.1:['9.4','17.4'],
-};
 let stage = 1;
 let floor = 0;
 let step = 0;
 
 let imagesLoaded = 0;
-let totalImages = 34;//ここ変えるの忘れないでね
+let totalImages = 37;//ここ変えるの忘れないでね
 let images = {};
-let imageNames = ['a','b','c','d','e','f','g',0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26];
+let imageNames = ['a','b','c','d','e','f','g',0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29];
 
 imageNames.forEach(num => {
   let img = new Image();
@@ -581,14 +669,14 @@ document.addEventListener('keydown', (event) => {
       event.preventDefault();
       SELECTy -= 75;
       MAPy = Math.floor(SELECTy / 75);
-      if(MAPy < 0){SELECTy = 0}else if(objectMap[MAPy][MAPx]){if(objectMap[MAPy][MAPx] == undefined||objectMap[MAPy][MAPx] == 18){SELECTy += 75}}
+      if(MAPy < 0){SELECTy = 0}else if(objectMap[MAPy][MAPx]){if(objectMap[MAPy][MAPx] == undefined||objectMap[MAPy][MAPx] == 18||objectMap[MAPy][MAPx] == 26){SELECTy += 75}}
       break;
    case 'a':
    case 'ArrowLeft': // 左
    event.preventDefault();
       SELECTx -= 75;
       MAPx = Math.floor(SELECTx / 75);
-      if(MAPx < 0){SELECTx = 0}else if(objectMap[MAPy][MAPx]){if(objectMap[MAPy][MAPx] == undefined||objectMap[MAPy][MAPx] == 18){SELECTx += 75}}
+      if(MAPx < 0){SELECTx = 0}else if(objectMap[MAPy][MAPx]){if(objectMap[MAPy][MAPx] == undefined||objectMap[MAPy][MAPx] == 18||objectMap[MAPy][MAPx] == 26){SELECTx += 75}}
       moved = 1;
       break;
    case 's':
@@ -596,7 +684,7 @@ document.addEventListener('keydown', (event) => {
    event.preventDefault();
       SELECTy += 75;
       MAPy = Math.floor(SELECTy / 75);
-      if(MAPy > 7){SELECTy = 525}else if(objectMap[MAPy][MAPx]){if(objectMap[MAPy][MAPx] == undefined||objectMap[MAPy][MAPx] == 18){SELECTy -= 75}}
+      if(MAPy > 7){SELECTy = 525}else if(objectMap[MAPy][MAPx]){if(objectMap[MAPy][MAPx] == undefined||objectMap[MAPy][MAPx] == 18||objectMap[MAPy][MAPx] == 26){SELECTy -= 75}}
       moved = 1;
       break;
    case 'd':
@@ -604,7 +692,7 @@ document.addEventListener('keydown', (event) => {
    event.preventDefault();
       SELECTx += 75;
       MAPx = Math.floor(SELECTx / 75);
-      if(MAPx > 7){SELECTx = 525}else if(objectMap[MAPy][MAPx]){if(objectMap[MAPy][MAPx] == undefined||objectMap[MAPy][MAPx] == 18){SELECTx -= 75}}
+      if(MAPx > 7){SELECTx = 525}else if(objectMap[MAPy][MAPx]){if(objectMap[MAPy][MAPx] == undefined||objectMap[MAPy][MAPx] == 18||objectMap[MAPy][MAPx] == 26){SELECTx -= 75}}
       moved = 1;
       break;
    }
@@ -622,7 +710,7 @@ document.addEventListener('keydown', (event) => {
    DrawBackground();
    ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
 
-   //ここに動いた時に記述を(爆弾とか)
+   //ここに動いた時の記述を(爆弾とか)
    if(moved == 1){
    if(objectMap.some(row => row.includes(15))){
       bombtimer--;
@@ -841,6 +929,8 @@ function NanigaOkoruKana(code){
       case 17:
          if(!objectMap.some(row => row.includes(2))){OpenChest(2);}
       break;
+      case 18://これは岩です
+      break;
       case 19:
          ScorpionAct(1);
       break;
@@ -860,6 +950,18 @@ function NanigaOkoruKana(code){
          UtusenEvent();
       break;
       case 25:
+         GoNextFloor();
+      break;
+      case 26://これは壁です
+      break;
+      case 27:
+         QuestionAct();
+      break;
+      case 28:
+         BookShelfact();
+      break;
+      case 29:
+         Lockeract();
       break;
    }
 }
@@ -887,47 +989,49 @@ function SuteFuri(code){
 function GoNextFloor(){
    floor += 1;
    candybar = [];
-      MAPx = backgroundMapnum[stage][step-1].split('.');
-      MAPy = +MAPx[1]+1
-      MAPx = +MAPx[0]
-      backgroundMap = backgroundMaps[stage][Math.floor(Math.random() * MAPy)+MAPx];
-      MAPx = objectMapnum[stage][step-1].split('.');
-      MAPy = +MAPx[1]+1
-      MAPx = +MAPx[0]
-      objectMap = objectMaps[stage][Math.floor(Math.random() * MAPy)+MAPx];
-      objectMap = JSON.parse(JSON.stringify(objectMaps[stage][Math.floor(Math.random() * MAPy) + MAPx]));
+      //MAPx = Mapnum[stage][step-1].split('.');
+      //MAPy = +MAPx[1]+1//差異
+      //MAPx = +MAPx[0]//最低
+      //x = Math.floor(Math.random() * MAPy)+MAPx;
+      x = Mapnum[stage][floor-1];
+      if(stage == 2.1&&step == 2){x += 6};
+      backgroundMap = Maps[stage][x][0];
+      objectMap = Maps[stage][x][1];
+      objectMap = JSON.parse(JSON.stringify(Maps[stage][x][1]));
       if(stage == 1){
          if(fun == 23 && Math.floor(Math.random()*10)==0){
-            backgroundMap = backgroundMaps[stage][4];
-            objectMap = objectMaps[stage][6];
+            backgroundMap = Maps[stage][6][0];
+            objectMap = Maps[stage][6][1];
+            objectMap = JSON.parse(JSON.stringify(Maps[stage][6][1]));
          }else if(fun <= 50 && Math.floor(Math.random()*10)==0){
-            backgroundMap = backgroundMaps[stage][5];
-            objectMap = objectMaps[stage][7];
+            backgroundMap = Maps[stage][7][0];
+            objectMap = Maps[stage][7][1];
+            objectMap = JSON.parse(JSON.stringify(Maps[stage][7][1]));
          };
       }else if(stage == 2){
          if(fun == 68 && Math.floor(Math.random()*10)==0){
-            backgroundMap = backgroundMaps[stage][4];
-            objectMap = objectMaps[stage][5];
-            objectMap = JSON.parse(JSON.stringify(objectMaps[stage][Math.floor(Math.random() * MAPy) + MAPx]));
+            backgroundMap = Maps[stage][5][0];
+            objectMap = Maps[stage][5][1];
+            objectMap = JSON.parse(JSON.stringify(Maps[stage][5][1]));
          }else if(fun <= 50 && Math.floor(Math.random()*10)==0){
-            backgroundMap = backgroundMaps[stage][11];
-            objectMap = objectMaps[stage][13];
-            objectMap = JSON.parse(JSON.stringify(objectMaps[stage][Math.floor(Math.random() * MAPy) + MAPx]));
+            backgroundMap = Maps[stage][12][0];
+            objectMap = Maps[stage][12][1];
+            objectMap = JSON.parse(JSON.stringify(Maps[stage][13][1]));
          };
       }else if(stage == 3){
          if(fun == 68 && Math.floor(Math.random()*10)==0){
-            backgroundMap = backgroundMaps[stage][10];
-            objectMap = objectMaps[stage][12];
-            objectMap = JSON.parse(JSON.stringify(objectMaps[stage][Math.floor(Math.random() * MAPy) + MAPx]));
+            backgroundMap = Maps[stage][11][0];
+            objectMap = Maps[stage][11][1];
+            objectMap = JSON.parse(JSON.stringify(Maps[stage][12][1]));
          }else if(fun <= 50 && Math.floor(Math.random()*10)==0){
-            backgroundMap = backgroundMaps[stage][11];
-            objectMap = objectMaps[stage][13];
-            objectMap = JSON.parse(JSON.stringify(objectMaps[stage][Math.floor(Math.random() * MAPy) + MAPx]));
+            backgroundMap = Maps[stage][12][0];
+            objectMap = Maps[stage][12][1];
+            objectMap = JSON.parse(JSON.stringify(Maps[stage][13][1]));
          };
       }
-      if(stage == 1 && floor >= 10){SELECTx = 150;SELECTy = 525;backgroundMap = backgroundMaps[6];objectMap = objectMaps[8];}//創生黎明の原野
- else if(stage == 2 && floor >= 7 ){SELECTx = 150;SELECTy = 525;backgroundMap = backgroundMaps[5];objectMap = objectMaps[6];}//ガチェンレイゲスドゥールラート(昼)
- else if(stage == 3 && floor >= 3 ){SELECTx = 150;SELECTy = 525;backgroundMap = backgroundMaps[12];objectMap = objectMaps[14];}//ガチェンレイゲスドゥールラート(夜)
+      if(stage == 1.1 && step == 1 && floor >= 12){SELECTx = 150;SELECTy = 525;backgroundMap = Maps[stage][8][0];objectMap = Maps[stage][8][1];}//創生黎明の原野
+ else if(stage == 2.1 && step == 1 && floor >= 8 ){SELECTx = 150;SELECTy = 525;backgroundMap = Maps[stage][6][0];objectMap = Maps[stage][6][1];}//ガチェンレイゲスドゥールラート(昼)
+ else if(stage == 2.1 && step == 2 && floor >= 4 ){SELECTx = 150;SELECTy = 525;backgroundMap = Maps[stage][13][0];objectMap = Maps[stage][13][1];}//ガチェンレイゲスドゥールラート(夜)
 
    ctx.clearRect(0, 0, 600, 600);
    DrawBackground();
@@ -938,7 +1042,7 @@ function NextStage(){
    candybar = [];
    let NextStageIs = 0;
    switch(stage){
-      case '1.1':
+      case 1.1:
          NextStageIs = [2.1];
          stage = NextStageIs[Math.floor(Math.random()*NextStageIs.length)];
          step = 1;
@@ -1023,7 +1127,7 @@ let enemydebuffapply = [];
 let phase = 0;//何中か
 let turn = 0;//今誰のターンか
 let turncount = 0;//今のターン数
-let bossbattlenow = 0;
+let bossbattle = 0;
 let eventbattle = 0;
 
 let enemyname = 0;
@@ -1396,6 +1500,9 @@ function bufftekiou(){
          case 'LetsThrow':
             playerbuffapply.push('<img src="assets/buffs/wrench.png" width="18" height="18"> ');
             break;
+         case 'frenzy':
+            playerbuffapply.push('<img src="assets/buffs/frenzy.png" width="18" height="18"> ');
+            break;
       }
    });
    document.getElementById('PlayerBuff').innerHTML = playerbuffapply.join('');
@@ -1456,6 +1563,27 @@ function bufftekiou(){
          case 'onslime':
             playerdebuffapply.push('<img src="assets/buffs/onslime.png" width="18" height="18"> ');
             break;
+         case 'stan':
+            playerdebuffapply.push('<img src="assets/buffs/stan.png" width="18" height="18"> ');
+            break;
+         case 'skip':
+            playerdebuffapply.push('<img src="assets/buffs/skip.png" width="18" height="18"> ');
+            break;
+         case 'freeze':
+            playerdebuffapply.push('<img src="assets/buffs/freeze.png" width="18" height="18"> ');
+            break;
+         case 'deepfreeze':
+            playerdebuffapply.push('<img src="assets/buffs/freeze_deep.png" width="18" height="18"> ');
+            break;
+         case 'confusion':
+            playerdebuffapply.push('<img src="assets/buffs/confusion.png" width="18" height="18"> ');
+            break;
+         case 'weaknessgrasp':
+            playerdebuffapply.push('<img src="assets/buffs/weaknessgrasp.png" width="18" height="18"> ');
+            break;
+         case 'paralysis':
+            playerdebuffapply.push('<img src="assets/buffs/paralysis.png" width="18" height="18"> ');
+            break;
       }
    });
    document.getElementById('PlayerDebuff').innerHTML = playerdebuffapply.join('');
@@ -1497,6 +1625,18 @@ function bufftekiou(){
             break;
          case 'shellup6':
             enemybuffapply.push('<img src="assets/buffs/defense_up_6.png" width="18" height="18"> ');
+            break;
+         case 'spliting':
+            enemybuffapply.push('<img src="assets/buffs/spliting.png" width="18" height="18"> ');
+            break;
+         case 'wrench':
+            enemybuffapply.push('<img src="assets/buffs/wrench.png" width="18" height="18"> ');
+            break;
+         case 'gambling':
+            enemybuffapply.push('<img src="assets/buffs/gambling.png" width="18" height="18"> ');
+            break;
+         case 'frenzy':
+            enemybuffapply.push('<img src="assets/buffs/frenzy.png" width="18" height="18"> ');
             break;
       }
    });
@@ -1557,6 +1697,27 @@ function bufftekiou(){
             break;
          case 'onslime':
             enemydebuffapply.push('<img src="assets/buffs/onslime.png" width="18" height="18"> ');
+            break;
+         case 'freeze':
+            enemydebuffapply.push('<img src="assets/buffs/freeze.png" width="18" height="18"> ');
+            break;
+         case 'deepfreeze':
+            enemydebuffapply.push('<img src="assets/buffs/freeze_deep.png" width="18" height="18"> ');
+            break;
+         case 'skip':
+            enemydebuffapply.push('<img src="assets/buffs/skip.png" width="18" height="18"> ');
+            break;
+         case 'stan':
+            enemydebuffapply.push('<img src="assets/buffs/stan.png" width="18" height="18"> ');
+            break;
+         case 'confusion':
+            enemydebuffapply.push('<img src="assets/buffs/confusion.png" width="18" height="18"> ');
+            break;
+         case 'weaknessgrasp':
+            enemydebuffapply.push('<img src="assets/buffs/weaknessgrasp.png" width="18" height="18"> ');
+            break;
+         case 'paralysis':
+            enemydebuffapply.push('<img src="assets/buffs/paralysis.png" width="18" height="18"> ');
             break;
       }
    });
@@ -2435,7 +2596,7 @@ function Bombact(){
    window.setTimeout(killedenemy, 1000)
 }
 function Redcardact(){
-   buffadd('playerbuff','skip1',5);
+   buffadd('enemydebuff','skip',1);
    document.getElementById('log').textContent = 'カードを仕込みました!';
    Redcard.num -= 1;
    window.setTimeout(backtoplayerturn, 1000)
@@ -2578,7 +2739,7 @@ async function skillact() {
          document.getElementById('log').textContent = serif;
          await delay(1000);
          await enemydamaged(0.75,4);
-         buffadd('enemydebuff','stan1',4);
+         buffadd('enemydebuff','stan',1);
          skillcooldown = 0;
          document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>'
          document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';
@@ -2631,7 +2792,7 @@ async function skillact() {
             case 3:document.getElementById('log').textContent = '普通の爆弾だった..!';break;
             case 1:document.getElementById('log').textContent = '水爆弾だった！！';break;//強制終了です
             case 6:document.getElementById('log').textContent = 'Lucky♪マグマ爆弾だった!!';break;
-            case 0:document.getElementById('log').textContent = 'いけっ！ピカピカの実！';buffadd('enemydebuff','stan2',3);break;
+            case 0:document.getElementById('log').textContent = 'いけっ！ピカピカの実！';buffadd('enemydebuff','stan',2);break;
          }
          await delay(1000);
          await enemydamaged(x,4);
@@ -2722,8 +2883,8 @@ async function enemyorplayer(){
          if (playerhealth < 0){playerhealth = 0}
          y = x - playerhealth;
       }
-      await delay(1000);
       document.getElementById('log').textContent = playername + 'は毒で' + y + 'のダメージ!';
+      await delay(1000);
    };
    if(playerdebuff.includes('burn1')||playerdebuff.includes('burn2')||playerdebuff.includes('burn3')){
       if(playerdebuff.includes('burn3')){
@@ -2742,8 +2903,8 @@ async function enemyorplayer(){
          if (playerhealth < 0){playerhealth = 0}
          y = x - playerhealth;
       }
-      await delay(1000);
       document.getElementById('log').textContent = playername + 'は燃えて' + y + 'のダメージ!';
+      await delay(1000);
    };
    tekiou();
    if(playerhealth <= 0){defeat();return;}
@@ -2751,9 +2912,13 @@ async function enemyorplayer(){
 
    //こっから敵が動けるかどうかの動き
    y = 1;
-   if(playerbuff.includes('skip1')){y = 0;buffremove('playerbuff','skip1');}//skip1
-   if(playerbuff.includes('skip2')){y = 0;buffremove('playerbuff','skip2');buffadd('playerbuff','skip1',5)}//skip2
-   if(playerbuff.includes('skip3')){y = 0;buffremove('playerbuff','skip3');buffadd('playerbuff','skip2',5)}//skip3
+   if(enemydebuff.includes('onslime')){y = 0;buffremove('enemydebuff','onslime')}//onslime
+   if(y == 0){
+      document.getElementById('log').textContent = enemyname+'はスライムが絡まり動けない!!';
+      await delay(1000); playerturn(); return;
+   }
+   y = 1;
+   if(enemydebuff.includes('skip')){y = 0;}//skip
    if(y == 0){
       document.getElementById('log').textContent = 'トラップカード発動、スキップ!!';
       await delay(1000); playerturn(); return;
@@ -2768,23 +2933,36 @@ async function enemyorplayer(){
    }
    //stan
    y = 1;
-   if(enemydebuff.includes('stan1')){y = 0;buffremove('enemydebuff','stan1')}//stan1
-   if(enemydebuff.includes('stan2')){y = 0;buffremove('enemydebuff','stan2');buffadd('enemydebuff','stan1',5)}//stan2
-   if(enemydebuff.includes('stan3')){y = 0;buffremove('enemydebuff','stan3');buffadd('enemydebuff','stan2',5);}//stan3
+   if(enemydebuff.includes('stan')){y = 0;}//stan
    if(y == 0){
       document.getElementById('log').textContent = enemyname+'はスタンした！';
       await delay(1000); playerturn(); return;
    }
+   //paralysis
+   y = 1;
+   if(enemydebuff.includes('paralysis')){y = Math.floor(Math.random() * 3);}//paralysis -ポケモンでは1/3で動けるのでね
+   if(y == 0 || y == 2){
+      document.getElementById('log').textContent = enemyname+'は麻痺して動けない!';
+      await delay(1000); playerturn(); return;
+   }
    //freeze
    if(enemydebuff.includes('freeze')){
-      if(!Math.floor(Math.random() * 3) !== 0){
+      if(Math.floor(Math.random() * 3) == 0){
          document.getElementById('log').textContent = '氷が溶けた!'; buffremove('enemydebuff','freeze');
       }else{
          document.getElementById('log').textContent = enemyname + 'は凍っている...';
          await delay(1000); playerturn(); return;
       }   
    }
-   if(bossbattlenow == 0){enemyturn();}else{bossenemyturn();}
+   if(enemydebuff.includes('deepfreeze')){
+      if(Math.floor(Math.random() * 6) == 0){
+         document.getElementById('log').textContent = '氷が溶けた!'; buffremove('enemydebuff','deepfreeze');
+      }else{
+         document.getElementById('log').textContent = enemyname + 'は深く凍っている...';
+         await delay(1000); playerturn(); return;
+      }
+   }
+   if(bossbattle == 0){enemyturn();}else{bossenemyturn();}
 }
 
 async function enemyturn(){
@@ -2852,7 +3030,7 @@ async function killedenemy() {
 
    x = enemylevel;
    if(!enemyprefixe == 0){x *=1.5;}//この二人が共存することはないからね
-   if(bossbattlenow == 1){x *=2;bossbattlenow = 0;}
+   if(bossbattle == 1){x *=2;bossbattle = 0;}
    x = Math.ceil(x);if(x < 1){x = 1;}
    playerexp += x;
    document.getElementById('log').textContent = x+'の経験値を奪った!';
@@ -2865,7 +3043,7 @@ async function killedenemy() {
    window.setTimeout(nextenemy, 1000)
    
 }
-async function nextenemy() {
+async function nextenemy(){//直接次の敵にするやつもいるから残しておくのだ
    buffclear('enemybuff');buffclear('enemydebuff');
    PlayerTurretbreak();
    z = Math.floor(Math.random() * 5)-2;// -2~2
@@ -2892,7 +3070,7 @@ async function nextenemy() {
    document.getElementById('log').textContent = '';
    document.getElementById('GameArea').style.display = 'none';
    document.getElementById('NowMap').style.display = 'block';
-   
+   eventbattle = 0;bossbattle = 0;
 
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
@@ -2933,7 +3111,7 @@ async function defeat() {
    document.getElementById('log').textContent = saydefeats[Math.floor(Math.random() * saydefeats.length)];
    await delay(2000);
    playerhealth = Math.floor(playermaxhealth*0.5);
-   bossbattlenow = 0;
+   bossbattle = 0;
    floor = 0;
    GoNextFloor();
    document.getElementById('GameArea').style.display = 'none';
@@ -2952,7 +3130,7 @@ async function defeat() {
 
 //#region bossの動き
 function BossEnemyAppear(){
-   bossbattlenow = 1;
+   bossbattle = 1;
    turn = 0;
    document.getElementById('PlayerName').textContent = playername;
    document.getElementById('select1').textContent = ' ';
@@ -2970,9 +3148,10 @@ function BossEnemyAppear(){
    if(playerPS.id == 'enemy50%pursuit'){enemy50pursuitenelgy = 1;};
    enemyhealth = enemymaxhealth; document.getElementById('EnemyMaxHealth').textContent = enemymaxhealth; tekiou();
    if (enemylevel < 1){enemylevel = 1}
-   enemyname = bossenemynames[stage-1]; //敵の名前を決めます
-   switch(enemyname){//ボスごとのステータスを決めます
-      case 'purpleslime':
+   switch(stage){//ボスごとのステータスを決めます
+      case 1.1:
+         if(step == 1){
+         enemyname = 'purpleslime';
          enemymaxhealth = 300;
          enemyhealth = enemymaxhealth;
          enemyattack = 30;
@@ -2981,8 +3160,11 @@ function BossEnemyAppear(){
          enemycritlate = 0.01;
          enemycritdmg = 2;
          enemycritresist = 0.5;
+         }
       break;
-      case 'steampumker':
+      case 2.1:
+         if(step == 1){
+         enemyname = 'steampumker'
          enemymaxhealth = 250;
          enemyhealth = enemymaxhealth;
          enemyattack = 25;
@@ -2991,8 +3173,11 @@ function BossEnemyAppear(){
          enemycritlate = 0.05;
          enemycritdmg = 2;
          enemycritresist = 0;
+         }
       break;
-      case 'RailwayGun "Shemata"':
+      case 2.1:
+         if(step == 2){
+         enemyname = 'RailwayGun "Shemata"'
          enemymaxhealth = 400;
          enemyhealth = enemymaxhealth;
          enemyattack = 35;
@@ -3001,6 +3186,7 @@ function BossEnemyAppear(){
          enemycritlate = 0;
          enemycritdmg = 0;
          enemycritresist = 0;
+         }
       break;
 
    }
@@ -3053,8 +3239,9 @@ async function bossenemyturn(){
       //
       //
       //
-      playerhealth = 0;
+      playerhealth = 0;tekiou();
       document.getElementById('log').textContent = 'しーんだしんだ、シリウスブラ〜ック!';
+      await delay(1000);
       defeat();//いや雑にもほどがあるやろ
    }else if(enemyname == 'joker'){
       //1:爆弾を投げる。普通(x1),雷(x2),炎(x3),閃光弾(x0.5,スタン1)
@@ -3066,7 +3253,7 @@ async function bossenemyturn(){
          case 1:document.getElementById('log').textContent = '普通の爆弾だった!!';break;//これによる効果とかもあっていいかも
          case 2:document.getElementById('log').textContent = '爆弾は雷光弾だった!!!';break;
          case 3:document.getElementById('log').textContent = '爆弾は焼夷弾だった!';break;
-         case 0:document.getElementById('log').textContent = '爆弾は閃光弾だった!!';buffadd('playerdebuff','stan1',3);y = 0.5;break;
+         case 0:document.getElementById('log').textContent = '爆弾は閃光弾だった!!';buffadd('playerdebuff','stan',1);y = 0.5;break;
       }
       await delay(1000);
       await playerdamaged(x*y,0);
@@ -3542,6 +3729,7 @@ async function Candytake(){
    }
 }
 // #endregion
+
 //#region hopeful button
 async function HopeButtonact(){
    AllowMove = 1;
@@ -3571,6 +3759,7 @@ async function HopeButtonact(){
    AllowMove = 0;
 }
 // #endregion
+
 //#region chest
 async function OpenChest(code){
    AllowMove = 1;
@@ -3623,6 +3812,7 @@ async function OpenChest(code){
    AllowMove = 0;
 }
 // #endregion
+
 //#region Cookietake
 async function Cookietake(){
    AllowMove = 1;
@@ -3668,6 +3858,7 @@ async function Cookietake(){
    AllowMove = 0;
 }
 // #endregion
+
 //#region placebomb
 async function placebomb(){
    MAPx = Math.floor(SELECTx / 75);
@@ -3679,6 +3870,7 @@ async function placebomb(){
    document.getElementById('log').textContent = '爆弾を設置しました！';
 }//出口を消した時どうする論争
 //#endregion
+
 //#region catus
 async function CatusAct(){
    if(playerhealth > 10){
@@ -3694,6 +3886,7 @@ async function CatusAct(){
    document.getElementById('log').textContent = '';
 }
 //#endregion
+
 //#region scorpion
 async function ScorpionAct(code){
    document.getElementById('log').textContent = '刺された...';
@@ -3709,6 +3902,7 @@ async function ScorpionAct(code){
    document.getElementById('log').textContent = '';
 }
 //#endregion
+
 //#region schoolquestion
 const questions = [
    [//math
@@ -4015,6 +4209,7 @@ async function QuestionAct(){
    
 }
 //#endregion
+
 //#region schoolbookshelf
 function BookShelfact(){
    phase = 1;
@@ -4149,6 +4344,7 @@ async function BookShelftake(code){
    }
 }
 //#endregion
+
 //#region schoollocker
 async function Lockeract(){
    document.getElementById('log').textContent = 'ロッカーを開けた...';
@@ -4200,4 +4396,3 @@ function UtusenEvent(){
    AllowMove = 0;
 }
 // #endregion      
-

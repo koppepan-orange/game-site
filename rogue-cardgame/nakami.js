@@ -1,5 +1,134 @@
-let x, y, z;
-let JustLook = 0;
+//#region ステージ構成とか
+let stagebar = [
+    [1,1,1,1,1,1,1,1,1,1],
+    [0,0,0,0,0,0,0,0,0,0]
+]
+let floor = 0;
+function SetStageBar(){
+    const StageButton = document.getElementById('StageButton');
+    StageButton.innerHTML = '';
+    let high = stagebar[0][floor];
+    let low = stagebar[1][floor];
+    if(low == 0){
+        StageButton.style = `
+        margin: 0 auto;
+        padding: 5px;
+        display: block;
+        overflow: auto;
+        `
+        let text = '';
+        switch(high){
+            case 1:
+                text = '敵と交戦します';
+                break;
+            case 2:
+                text = '少し強い敵と交戦します';
+                break;
+            case 3:
+                text = '何か特別なことがあるかもしれない';
+                break;
+            case 4:
+                text = 'キャンプで一時休憩します';
+                break;
+            case 5:
+                text = 'ボスと対峙します';
+                break;
+        }
+        StageButton.innerHTML = `
+        <button class="button stagebar-big" onclick="LetsGoBattle(1,${high})">${text}</button>
+        `;
+    }else{
+        StageButton.style = `
+        margin: 0 auto;
+        padding: 5px;
+        display: flex;
+        overflow: auto;
+        justify-content: left;
+        align-items: left;
+        gap: 10px;
+        `
+        let text1 = '';
+        let text2 = '';
+        switch(high){
+            case 1:
+                text1 = '敵と交戦します';
+                break;
+            case 2:
+                text1 = '少し強い敵と交戦します';
+                break;
+            case 3:
+                text1 = '何か特別なことがあるかもしれない';
+                break;
+            case 4:
+                text1 = 'キャンプで一時休憩します';
+                break;
+            case 5:
+                text1 = 'ボスと対峙します';
+                break;
+        }
+        switch(low){
+            case 1:
+                text2 = '敵と交戦します';
+                break;
+            case 2:
+                text2 = '少し強い敵と交戦します';
+                break;
+            case 3:
+                text2 = '何か特別なことがあるかもしれない';
+                break;
+            case 4:
+                text2 = 'キャンプで一時休憩します';
+                break;
+            case 5:
+                text2 = 'ボスと対峙します';
+                break;
+        }
+        StageButton.innerHTML = `
+        <button class="button stagebar-small" onclick="LetsGoBattle(1,${high})">${text1}</button><button class="button stagebar-small" onclick="LetsGoBattle(2,${low})">${text2}</button>
+        `;
+    }
+}
+SetStageBar();
+function LetsGoBattle(num,code){
+    let irankamo = num;
+    irankamo += 1;//ちゃんと道順作るってなったら道程要員になりそう
+    switch(code){
+        case 1:
+            EnemyAppear(0);
+            break;
+        case 2:
+            EnemyAppear(1);
+            break;
+        case 3:
+            RandomEvent();
+            break;
+        case 4:
+            GoToCamp(0);
+            break;
+        case 5:
+            BossEnemyAppear();
+            break;
+    }
+    document.getElementById('StageButton').style.display = 'none';
+}
+async function EnemyAppear(num){
+    document.getElementById('GameArea').style.display = 'block';
+    EnemyNameDeside(num);
+    document.getElementById('log').textContent = enemyname.name+'が現れた！';
+    PlaceNoteCard();BarCardCreate();
+    await delay(1000);
+    JustLook = 0;
+}
+function EnemyNameDeside(num){
+    enemyname.num = enemynames.num[Math.floor(Math.random() * enemynames.name.length)];
+    enemyname.name = enemynames.name[enemyname.num];
+    if(num == 1){
+        //エリートの場合
+    }
+    return enemyname;
+}
+//#endregion
+//#region カード系統
 let A = 'A', M = 'M', N = 'N', R = 'R', SR = 'SR', SSR = 'SSR', UR = 'UR';
 const cards = [
     //こっからA
@@ -196,11 +325,11 @@ const cards = [
 ];
 const SortCardA = cards.filter(card => card.code === 'A').map(card => card.name);
 const SortCardM = cards.filter(card => card.code === 'M').map(card => card.name);
-
+//#endregion
 //#region 敵の動きのまとめ
 let enemynames = {
-    name:['古書館の魔術師', '船上のバニーチェイサー', ''],
-    num: [0,1,2,]
+    name:['古書館の魔術師', '船上のバニーチェイサー',],
+    num: [0,1,]
 };
 let enemyname = {
     name:'古書館の魔術師',
@@ -222,6 +351,9 @@ let actpat = [
         ['攻撃力上昇',0,'攻撃力上昇',0],
         [0,'盾','ソード',0],
         ['盾',0,0,'ハートシーカー'],
+    ],
+    [
+        ['攻撃力上昇',0,0,0],
     ],
 ];
 let actpat0011 = [
@@ -246,6 +378,8 @@ let actpat1100 = [
 ]
 //#endregion
 //#region 変数s
+let x, y, z; let JustLook = 0;
+
 let havecardA = {
     name:['スラッシュ','スラッシュ', 'ソード', '博打', 'ラッシュソード', 'ソウルナイフ','ハートシーカー'],
     ct:[0,0,0,0,0,0,0],
@@ -272,11 +406,6 @@ let CardActList = {
     turn: []
 };
 let CardActNameList = [];
-
-let stagebar = [
-    [1,1,1,1,1,1,1,1,1,1],
-    [0,0,0,0,0,0,0,0,0,0]
-]
 
 
 
@@ -314,7 +443,7 @@ let enemydebuff = {
     name:0,
     time:0
 }
-function buffincrease(to,name,time){
+function buffadd(to,name,time){
     if(eval(to).name != 0){
         eval(to).time += time;
     }else{
@@ -323,7 +452,13 @@ function buffincrease(to,name,time){
     }
     bufftekiou();
 }
-function buffdecrease(to,name,time){
+function buffincrease(to,time){
+    if(playerbuff.name == 0){return;}
+    eval(to).time += time;
+    bufftekiou();
+}
+function buffdecrease(to,time){
+    if(eval(to).name == 0){return;}
     eval(to).time -= time;
     if(eval(to).time <= 0){eval(to).name = 0;}
     bufftekiou();
