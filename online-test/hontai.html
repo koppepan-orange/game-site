@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online-Test</title>
+    <link rel="stylesheet" href="mitame.css">
+</head>
+<body>
+    <div id="LoginRoom">
+        <input type="text" id="Name"><br>
+        <button id="Login" onclick="Login()">Login</button><br>
+        <div id="Error"></div>
+    </div>
+    <div id="WaitRoom">
+        <span id="WaitPlayers">Now: 0</span><br>
+        <div id="WaitText">wait for other player....</div>
+    </div>
+    <div id="GameRoom">
+        <span id="OpponentName">Guest</span><br>
+        <button>石</button><button>鉄</button><button>紙</button>
+        <span id="Log"></span>
+    </div>
+    <script src="nakami.js"></script>
+</body>
+</html>

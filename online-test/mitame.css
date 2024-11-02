@@ -1,0 +1,8 @@
+#WaitRoom{
+    display: block;
+    border: 2px solid #000000;
+}
+#GameRoom{
+    display: none;
+    border: 2px solid #000000;
+}

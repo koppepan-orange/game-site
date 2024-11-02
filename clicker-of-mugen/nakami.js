@@ -4036,7 +4036,6 @@ let weaponpower = 0;
 let armorshell = 0;
 function ShopBuyButton(){
    const num = +document.getElementById('ShopInputText').value;
-
    switch(nowshop){
       case 1:
       if(haveweapons.includes(weapons.name[num])){
@@ -4078,17 +4077,13 @@ function ShopBuyButton(){
       }
       break;
       case 3:
-      if(havearmors.includes(tools.name[num])){
-         document.getElementById('log').textContent = 'you already have a it!';
+      if(euro >= tools.price[num]){
+         euro -= tools.price[num];
+         eval(tools.id[num]).num++;
+         document.getElementById('log').textContent = tools.name[num]+'を購入しました!';
       }else{
-         if(euro >= tools.price[num]){
-            euro -= tools.price[num];
-            havearmors.push(tools.name[num]);
-            document.getElementById('log').textContent = tools.name[num]+'を購入しました!';
-         }else{
-            document.getElementById('log').textContent = 'not enough euro..';
-         };
-      }
+         document.getElementById('log').textContent = 'not enough euro..';
+      };
       break;
    }
 
@@ -4099,7 +4094,7 @@ function ShopBuyButton(){
 }
 function CampBye(){
    document.getElementById('log').textContent = 'ついでに装備を変えていこうかな？';
-   document.getElementById('EventArea').innerHTML = '<button class="button"onclick="GoToEquip()">そうしよう！</button><br><button class="button"onclick="Campback()">いや、やめとこう</button>';
+   document.getElementById('EventArea').innerHTML = '<button class="button"onclick="GoToEquip()">そうしよう！</button><br><button class="button"onclick="Campback()">やめとこう！</button>';
 }
 function Campback(){
    document.getElementById('EventArea').innerHTML = '<button id="CampRest" onclick="Camprest()"></button><br><button id="CampTrade" onclick="Camptrade()"></button>'
@@ -4122,61 +4117,23 @@ function GoToEquipWeapon(){
    document.getElementById('EventArea').innerHTML = '<span id="AppearShops"></span><br><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopEquipButton()">Equip</button><br><br><button class="button" onclick="GoToEquip()">Back</button>';
    appearweapons = '';
    x = 0;
-   if(haveweapons.includes("木の棒")){x += 1;}
-   if(haveweapons.includes("木刀")){x += 10;}
-   if(haveweapons.includes("竹刀")){x += 100;}
-   if(haveweapons.includes("石ころ")){x += 1000;}
-   if(haveweapons.includes("大きな石")){x += 10000;}
-   if(haveweapons.includes("レンガ")){x += 100000;}
-   if(haveweapons.includes("薄めの紙")){x += 1000000;}
-   if(haveweapons.includes("カード")){x += 10000000;}
-   if(haveweapons.includes("はさみ")){x += 100000000;}
-   if(haveweapons.includes("ほんもののナイフ")){x += 1000000000;}
-   if(haveweapons.includes("ジェン・ソルテ")){x += 10000000000;}
-   if(haveweapons.includes("time on target")){x += 100000000000;}
-   if(haveweapons.includes("大博打")){x += 1000000000000;}
-   if(haveweapons.includes("天邪鬼")){x += 10000000000000;}
-   if(x >= 10000000000000){x -= 10000000000000; appearweapons = '14 天邪鬼'}
-   if(x >= 1000000000000){x -= 1000000000000; appearweapons = '13 大博打'+ '<br>' + appearweapons;}
-   if(x >= 100000000000){x -= 100000000000; appearweapons = '12 time on target'+ '<br>' + appearweapons;}
-   if(x >= 10000000000){x -= 10000000000; appearweapons = '11 ジェン・ソルテ'+ '<br>' + appearweapons;}
-   if(x >= 1000000000){x -= 1000000000; appearweapons = '10 ほんもののナイフ'+ '<br>' + appearweapons;}
-   if(x >= 100000000){x -= 100000000; appearweapons = '09 はさみ'+ '<br>' + appearweapons;}
-   if(x >= 10000000){x -= 10000000; appearweapons = '08 カード'+ '<br>' + appearweapons;}
-   if(x >= 1000000){x -= 1000000; appearweapons = '07 薄めの紙'+ '<br>' + appearweapons;}
-   if(x >= 100000){x -= 100000; appearweapons = '06 レンガ' + '<br>' + appearweapons;}
-   if(x >= 10000){x -= 10000; appearweapons = '05 大きな石' + '<br>' + appearweapons;}
-   if(x >= 1000){x -= 1000; appearweapons = '04 石ころ' + '<br>' + appearweapons;}
-   if(x >= 100){x -= 100; appearweapons = '03 竹刀' + '<br>' + appearweapons;}
-   if(x >= 10){x -= 10; appearweapons = '02 木刀' + '<br>' + appearweapons;}
-   if(x >= 1){x -= 1; appearweapons = '01 木の棒' + '<br>' + appearweapons;}
-   document.getElementById('AppearShops').innerHTML = appearweapons;
+   for(let i = 0; i < haveweapons.length; i++){
+      let ChildNText = document.createElement('span');
+      ChildNText.innerHTML = haveweapons[i]+ ` <button class="button" onclick="ShopEquipButton('weapon',${i})">Equip</button>` + '<br>';
+      document.getElementById('AppearShops').appendChild(ChildNText);
    }
+}
 function GoToEquipArmor(){
    nowshop = 5;
    document.getElementById('EventArea').innerHTML = '<span id="AppearShops"></span><br><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopEquipButton()">Equip</button><br><br><button class="button" onclick="GoToEquip()">Back</button>';
    appeararmors = '';
    x = 0;
-   if(havearmors.includes("マスク")){x += 1;}
-   if(havearmors.includes("薄い本")){x += 10;}
-   if(havearmors.includes("木の板")){x += 100;}
-   if(havearmors.includes("テッパン")){x += 1000;}
-   if(havearmors.includes("鍋の蓋")){x += 10000;}
-   if(havearmors.includes("厚めの本")){x += 100000;}
-   if(havearmors.includes("ドア")){x += 1000000;}
-   if(havearmors.includes("扇風機")){x += 10000000;}
-   if(havearmors.includes("ペロロ様人形")){x += 100000000;}
-   if(x >= 100000000){x -= 100000000; appeararmors = '11 ペロロ様人形';}
-   if(x >= 10000000){x -= 10000000; appeararmors = '10 扇風機'+ '<br>' + appeararmors;}
-   if(x >= 1000000){x -= 1000000; appeararmors = '07 ドア'+ '<br>' + appeararmors;}
-   if(x >= 100000){x -= 100000; appeararmors = '06 厚めの本'+ '<br>' + appeararmors;}
-   if(x >= 10000){x -= 10000; appeararmors = '05 鍋の蓋'+ '<br>' + appeararmors;}
-   if(x >= 1000){x -= 1000; appeararmors = '04 テッパン'+ '<br>' + appeararmors;}
-   if(x >= 100){x -= 100; appeararmors = '03 木の板'+ '<br>' + appeararmors;}
-   if(x >= 10){x -= 10; appeararmors = '02 薄い本'+ '<br>' + appeararmors;}
-   if(x >= 1){x -= 1; appeararmors = '01 マスク'+ '<br>' + appeararmors;}
-   document.getElementById('AppearShops').innerHTML = appeararmors;
+   for(let i = 0; i < havearmors.length; i++){
+      let ChildNText = document.createElement('span');
+      ChildNText.innerHTML = havearmors[i]+ ` <button class="button" onclick="ShopEquipButton('armor',${i})">Equip</button>` + '<br>';
+      document.getElementById('AppearShops').appendChild(ChildNText);
    }
+}
 function ShopEquipButton(){
    const Num = +document.getElementById('ShopInputText').value;
    switch(nowshop){
@@ -4195,7 +4152,6 @@ function ShopEquipButton(){
          }else{document.getElementById('log').textContent = 'you dont have it!'};
       break;
    }
-
    document.getElementById('ShopInputText').value = '';
 }
 function GoToEquipTool(){
