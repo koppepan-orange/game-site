@@ -8,9 +8,12 @@
 </head>
 <body>
     <div id="LoginRoom">
-        <input type="text" id="Name"><br>
-        <button id="Login" onclick="Login()">Login</button><br>
-        <div id="Error"></div>
+        <form class="login-form" id="login-form">
+           <input type="text" id="username" placeholder="ユーザー名" required>
+           <input type="password" id="password" placeholder="パスワード" required>
+           <button type="submit">ログイン</button>
+           <div id="login-error" style="color: red; display: none;">パスワードが間違っています。</div>
+        </form>
     </div>
     <div id="WaitRoom">
         <span id="WaitPlayers">Now: 0</span><br>
