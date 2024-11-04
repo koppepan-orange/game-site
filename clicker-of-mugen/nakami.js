@@ -1037,8 +1037,7 @@ let playerPS = {
 };
 //#endregion
 
-//全道具です
-//#region 
+//#region 全道具です 
 let Aspirin = {
    name:'アスピリン',
    id:'Aspirin',
@@ -1263,6 +1262,54 @@ function save(){
 
 function delay(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 
+function DesideEnemyName(){
+   enemyprefixe = 0;
+   let ENEMYarray = enemynamenum[stage-1].split('.');
+   let ENEMY1 = +ENEMYarray[1]+1
+   let ENEMY2 = +ENEMYarray[0]
+   enemyname = enemynames[Math.floor(Math.random() * ENEMY1)+ENEMY2]; // 敵の名前を決めます
+   y = Math.floor(Math.random() * 3); // 1/3
+   if(y == 0){enemyprefixe = enemyprefixes[Math.floor(Math.random() * enemyprefixes.length)]};
+   if(enemyprefixe !== 0){enemyname = enemyprefixe + ' ' + enemyname}
+   else {enemyname = enemyname}; //敵に接頭辞を確率で付与します
+   
+   enemyattack = enemyatk;//敵の能力を決めます
+   enemydefense = enemydef;
+   enemymaxhealth = enemyhp; enemyhealth = enemymaxhealth;
+   enemycritlate = enemycrla;
+   enemycritdmg = enemycrdm;
+   enemycritresist = enemycrrs;
+   tekiou();
+   switch(enemyprefixe){//接頭辞ごとの能力
+      case '激昂':
+         enemyattack  = Math.floor(enemyatk*1.5);
+         enemydefense = Math.floor(enemydef*0.75);
+         break;
+      case '冷静沈着な':
+         enemydefense = Math.floor(enemydef*2);
+         enemyattack  = Math.floor(enemyattack*0.75);
+         break;
+      case 'ギャンブラーな':
+         enemycritlate = enemycrla + 0.3;
+         enemymaxhealth = Math.floor(enemyhp*0.5);
+      break;
+      case '守りが固い':
+         enemycritresist += 0.5;//会心半減ね
+         enemymaxhealth = Math.floor(enemyhp*1.25);
+         enemydefense = 0;
+         enemyattack = Math.floor(enemyatk*0.3);
+      break;
+      case '心眼持ちの':
+         enemycritlate = 1;//確定会心人間(抵抗無視の場合)
+         enemyattack = Math.floor(enemyatk*0.5);
+         enemymaxhealth = Math.floor(enemyhp*0.5);
+      break;
+   }
+   enemyhealth = enemymaxhealth;
+   return enemyname;
+}
+
+async function errorcheck(){if(playerattack==Infinity||playerdefense==Infinity||playerhealth==Infinity||playermaxhealth==Infinity||playerlevel==Infinity||playerpower==Infinity||playermaxmp==Infinity||playershell==Infinity||isNaN(playerhealth)||isNaN(playermaxhealth)||isNaN(playerattack)||isNaN(playerdefense)||isNaN(playermaxmp)||isNaN(playerpower)||isNaN(playershell)||isNaN(playerlevel)||Potion.num==Infinity||euro==Infinity||Bomb.num==Infinity||Redcard.num==Infinity||isNaN(Potion.num)||isNaN(euro)||isNaN(Bomb.num)||isNaN(Redcard.num)){document.getElementById('log').textContent='error100が発生しました。';awaitdelay(1000);document.getElementById('log').textContent='リブートを開始します。';await delay(1000);open('about:blank','_self').close();}}//おっとこれは...?}
 //#endregion
 
 //#region Inventory
@@ -2207,7 +2254,6 @@ function makeRoom() {
        }
    });
 }
-//#endregion
 
 
 function checkLastLogin(lastact) {
@@ -2227,7 +2273,7 @@ window.addEventListener('beforeunload', () => {
    });
 });
 
-
+//#endregion
 
 //#region euroとrankの上のやつ
 function updateUI(){
@@ -2246,17 +2292,35 @@ function updateUI(){
 
 updateUI();
 //#endregion
-
 //#region profileのやつ
-function UpdateProfile(){
+async function UpdateProfile(){
+   await getUserData('about');
+   let about = data;
    document.getElementById('ProfileTab').innerHTML = `
-   <span style="font-size: 30px; border: 1px solid #000000">${username}</span>   Rank:${rank}<br>
+   <span style="font-size: 24px; border: 1px solid #000000">${username}</span>　Rank:${rank}<br><br>
+   <textarea id="about" placeholder="write about you" style="width: 255px; height: 124px;" oninput="InputAboutMe()">${about}</textarea>
    `
 }//自己紹介とかも入れたいよね
+function getUserData(name){
+   usersRef.get().then((snapshot) => {
+      if (snapshot.exists()) {
+         let data = eval('snapshot.val().'+name);
+      } else {
+         console.log("データが存在しません");
+      }
+  }).catch((error) => {
+      console.error("エラー:", error);
+  });
+  return data;
+}
+function InputAboutMe(){
+   const textarea = document.getElementById('about');
+   usersRef.update({
+      about: textarea.value
+   });
+}
 //#endregion
-
-//Homeの動き達
-//#region
+//#region Homeの動き達
 function OpenTab(code){
    document.getElementById('HomeTab').style.display = 'none';
    document.getElementById('InventoryTab').style.display = 'none';
@@ -2403,7 +2467,6 @@ function HomeGoDungeon(name){
          enemydef = 10; enemyshell = 1; enemymdef = 10;
          enemycrla = 0.03;enemycrdm = 1.5;enemycrrs = 0;
    }
-   //#endregion
    
    dungeonnow = 1;
    document.getElementById('NowMap').style.display = 'block';
@@ -2542,9 +2605,7 @@ function BankWithdraw(code){
 
 //#endregion
 
-
-//非ダメ時モーション(?)
-//#region
+//#region 非ダメ時モーション(?)
 async function playerdamaged(multiplier,code){
    if(code == 1){document.getElementById('log').textContent = enemyname+'の攻撃！'; await delay(1000)};
    w = 1;
@@ -2668,54 +2729,7 @@ async function enemydamaged(multiplier,code){//倍率を引数にしたらぜん
 };
 //#endregion
 
-function DesideEnemyName(){
-   enemyprefixe = 0;
-   let ENEMYarray = enemynamenum[stage-1].split('.');
-   let ENEMY1 = +ENEMYarray[1]+1
-   let ENEMY2 = +ENEMYarray[0]
-   enemyname = enemynames[Math.floor(Math.random() * ENEMY1)+ENEMY2]; // 敵の名前を決めます
-   y = Math.floor(Math.random() * 3); // 1/3
-   if(y == 0){enemyprefixe = enemyprefixes[Math.floor(Math.random() * enemyprefixes.length)]};
-   if(enemyprefixe !== 0){enemyname = enemyprefixe + ' ' + enemyname}
-   else {enemyname = enemyname}; //敵に接頭辞を確率で付与します
-   
-   enemyattack = enemyatk;//敵の能力を決めます
-   enemydefense = enemydef;
-   enemymaxhealth = enemyhp; enemyhealth = enemymaxhealth;
-   enemycritlate = enemycrla;
-   enemycritdmg = enemycrdm;
-   enemycritresist = enemycrrs;
-   tekiou();
-   switch(enemyprefixe){//接頭辞ごとの能力
-      case '激昂':
-         enemyattack  = Math.floor(enemyatk*1.5);
-         enemydefense = Math.floor(enemydef*0.75);
-         break;
-      case '冷静沈着な':
-         enemydefense = Math.floor(enemydef*2);
-         enemyattack  = Math.floor(enemyattack*0.75);
-         break;
-      case 'ギャンブラーな':
-         enemycritlate = enemycrla + 0.3;
-         enemymaxhealth = Math.floor(enemyhp*0.5);
-      break;
-      case '守りが固い':
-         enemycritresist += 0.5;//会心半減ね
-         enemymaxhealth = Math.floor(enemyhp*1.25);
-         enemydefense = 0;
-         enemyattack = Math.floor(enemyatk*0.3);
-      break;
-      case '心眼持ちの':
-         enemycritlate = 1;//確定会心人間(抵抗無視の場合)
-         enemyattack = Math.floor(enemyatk*0.5);
-         enemymaxhealth = Math.floor(enemyhp*0.5);
-      break;
-   }
-   enemyhealth = enemymaxhealth;
-   return enemyname;
-}
-async function errorcheck(){if(playerattack==Infinity||playerdefense==Infinity||playerhealth==Infinity||playermaxhealth==Infinity||playerlevel==Infinity||playerpower==Infinity||playermaxmp==Infinity||playershell==Infinity||isNaN(playerhealth)||isNaN(playermaxhealth)||isNaN(playerattack)||isNaN(playerdefense)||isNaN(playermaxmp)||isNaN(playerpower)||isNaN(playershell)||isNaN(playerlevel)||Potion.num==Infinity||euro==Infinity||Bomb.num==Infinity||Redcard.num==Infinity||isNaN(Potion.num)||isNaN(euro)||isNaN(Bomb.num)||isNaN(Redcard.num)){document.getElementById('log').textContent='error100が発生しました。';awaitdelay(1000);document.getElementById('log').textContent='リブートを開始します。';await delay(1000);open('about:blank','_self').close();}}//おっとこれは...?}
-
+//#region playerturn
 function backtoplayerturn(){
    if(skillcooldown == 100){document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()">skill</button>';}else{document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';};
    if(playerEX.id == 'placeturret'){PlayerTurretattack = Math.round(playerattack * 0.5);};if (turn !== 3){turn = 1;};
@@ -2824,9 +2838,8 @@ async function playerturn() {
    document.getElementById('back').textContent = 'runaway';
    errorcheck();
 };
-
-// 選択ボタン
-//#region
+//#endregion
+//#region playerの選択
 async function select1(){
    if (phase == 1) {
       document.getElementById('log').textContent = 'どうやって攻撃する？';
@@ -2954,10 +2967,7 @@ function disappear(){
    phase = 'null';
 }
 //#endregion
-
-//playerの攻撃たち
-//playerの斬撃攻撃
-//#region
+//#region playerの斬撃
 async function slash() {
    await enemydamaged(1,1);
    if(enemyhealth == 0){killedenemy();return;}
@@ -3007,8 +3017,7 @@ async function slashoflight() {
    enemyorplayer();
 }
 //#endregion
-
-//playerの魔法
+//#region playerの魔法
 function magic(num) {
    let UseMagic
    switch(num){
@@ -3161,9 +3170,8 @@ async function Random(){
    MagicInfo.onclick[x]();
 }
 //#endregion
-
-// playerの道具
-//#region
+//#endregion
+//#region playerの道具
 function Aspirinact(){
    playerhealth += Math.round(playermaxhealth * 0.2);
    if(playerhealth > playermaxhealth){playerhealth = playermaxhealth};
@@ -3321,11 +3329,7 @@ function Blackcardact() {
    window.setTimeout(backtoplayerturn, 1000)
 }
 //#endregion
-
-
-
-// skillの手続き
-//#region
+//#region playerのskill
 let Splithealth = 0;
 let Splitmaxhealth = 0;
 let PlayerTurret = 0;
@@ -3552,8 +3556,7 @@ async function Trickybomb(){
 }
 //#endregion
 
-
-// enemyturnまでの道のり
+//#region prev-enemyturn
 async function enemyorplayer(){
    if(PlayerTurret > 0){
       document.getElementById('log').textContent = 'turretの攻撃!';
@@ -3640,10 +3643,8 @@ async function enemyorplayer(){
       if(bossbattlenow == 0){enemyturn();}else{bossenemyturn();}
    }
 }
-
-
-// enemyの手続き
-//#region
+//#endregion
+//#region enemyturn
 async function enemyturn(){
    turn = 2;
    await playerdamaged(1,1)
@@ -3697,8 +3698,7 @@ async function enemycontidmg(){
 }
 //#endregion
 
-//勝利/負けの動き
-//#region
+//#region 勝利/負けの動き
 async function killedenemy() {
    turn = 0;
    document.getElementById('log').textContent = enemyname + 'を倒した!';
@@ -3828,8 +3828,7 @@ async function defeat() {
 }
 //#endregion
 
-//bossの動き
-//#region
+//#region　bossの動き
 function BossEnemyAppear(){
    bossbattlenow = 1;
    turn = 0;
@@ -3967,8 +3966,7 @@ function EnemyTurrettekiou(){
 }
 //#endregion
 
-//休憩所の動き
-//#region
+//#region 休憩所の動き
 let Camprestper
   async function Camprest(){
    playerhealth += playermaxhealth * Camprestper;
@@ -4236,8 +4234,7 @@ function Campselecttool(code){
 }
 // #endregion
 
-//skillshopですね
-//#region
+//#region skillshop
 const SHOPEXrandom = {
    name: ['GO!SPLIT!!', '雷ちゃん、召喚', 'トリッキーな変数', '私がかけた魔法だよ', 'Kyrie Eleison', '自走式閃光ドローン', '挑戦状を受け取ってください!!', '小心者の観測'],
    price: [95, 95, 95, 95, 110, 60, 90, 50],
@@ -4341,8 +4338,7 @@ const SHOPEXrandom = {
 // #endregion
 
 //こっからイベントとかそのへん
-//candystand
-//#region
+//#region candystand
 let candybar = [];
 async function Candytake(){
    //デバフによって初期からたくさんあるってのもありかも
@@ -4384,9 +4380,7 @@ async function Candytake(){
    }
 }
 // #endregion
-
-//hopeful button
-//#region
+//#region hopeful-button
 async function HopeButtonact(){
    AllowMove = 1;
    document.getElementById('log').textContent = 'ボタンを押した....';
@@ -4415,9 +4409,7 @@ async function HopeButtonact(){
    AllowMove = 0;
 }
 // #endregion
-
-//chest
-//#region
+//#region chest
 async function OpenChest(code){
    AllowMove = 1;
    switch(code){
@@ -4469,9 +4461,7 @@ async function OpenChest(code){
    AllowMove = 0;
 }
 // #endregion
-
-//Cookietake
-//#region
+//#region Cookietake
 async function Cookietake(){
    AllowMove = 1;
    document.getElementById('log').textContent = 'クッキーを食べてみた...';//これはお助け的イベントだから上昇量は少なめ
@@ -4516,9 +4506,7 @@ async function Cookietake(){
    AllowMove = 0;
 }
 // #endregion
-
-//placebomb
-//#region
+//#region placebomb
 async function placebomb(){
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
@@ -4529,9 +4517,7 @@ async function placebomb(){
    document.getElementById('log').textContent = '爆弾を設置しました！';
 }//出口を消した時どうする論争
 //#endregion
-
-//catus
-//#region
+//#region catus
 async function CatusAct(){
    if(playerhealth > 10){
       document.getElementById('log').textContent = 'いてっ';
@@ -4546,9 +4532,7 @@ async function CatusAct(){
    document.getElementById('log').textContent = '';
 }
 //#endregion
-
-//scorpion
-//#region
+//#region scorpion
 async function ScorpionAct(code){
    document.getElementById('log').textContent = '刺された...';
    switch(code){
@@ -4564,8 +4548,7 @@ async function ScorpionAct(code){
 }
 //#endregion
 
-//wrwrdイベント(fun値50以下の際1/23の確率で出現)
-//#region
+//#region wrwrdイベント(fun値50以下の際1/23の確率で出現)
 function ZomuEvent(){//創生黎明の原野
    document.getElementById('log').textContent = 'かまってぇや、マジで';
    playername = 'zomusan'
