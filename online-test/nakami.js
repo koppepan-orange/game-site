@@ -1,4 +1,18 @@
 // DOM要素
+
+const firebaseConfig = {
+    apiKey: "AIzaSyBN5V_E6PzwlJn7IwVsluKIWNIyathhxj0",
+    authDomain: "koppepan-orange.firebaseapp.com",
+    databaseURL: "https://koppepan-orange-default-rtdb.firebaseio.com",
+    projectId: "koppepan-orange",
+    storageBucket: "koppepan-orange.appspot.com",
+    messagingSenderId: "730150198097",
+    appId: "1:730150198097:web:076a074a3d406053155170",
+    measurementId: "G-MYKJWD203Z"
+ };
+ // Firebaseの初期化
+ firebase.initializeApp(firebaseConfig);
+ const database = firebase.database();
 const waitRoom = document.getElementById('WaitRoom');
 const gameRoom = document.getElementById('GameRoom');
 const waitText = document.getElementById('WaitText');
@@ -9,16 +23,6 @@ let gameRef = database.ref('forgame');
 let username = 'Guest';
 let userData = null;
 
-let currentGameRef = null;
-
-// 待機処理
-function waitForOpponent(){
-    waitRoom.style.display = 'block';
-    gameRoom.style.display = 'none';
-    waitText.textContent = 'wait for other player....';
-    opponentName.textContent = 'Guest';
-    log.textContent = '';
-};
 
 // ゲーム開始処理
 document.getElementById('login-form').addEventListener('submit', function(event){
@@ -33,15 +37,13 @@ document.getElementById('login-form').addEventListener('submit', function(event)
     // データベースでユーザーが存在するか確認
     usersRef.once('value').then(function(snapshot){
         if(snapshot.exists()){
-            usersRef.update({
-                WaitNow: '1'
-            });
 
             userData = snapshot.val();
-            if(userData.password === password){           
-
+            if(userData.password === password){
+                if(userData.WaitNow == '1'){open('about:blank','_self').close();}
                 document.getElementById('LoginRoom').innerHTML = 'Now loading..';
-                setTimeout(BacktoHome,1000);
+                setTimeout(LetsWait,1000);
+                document.getElementById('LoginRoom').style.display = 'none';
             }else{
                 // パスワードが間違っている
                 document.getElementById('LoginRoom').innerHTML = `
@@ -56,35 +58,50 @@ document.getElementById('login-form').addEventListener('submit', function(event)
             }
         }else{
             usersRef.update({
-                WaitNow: '1',
                 password: password,
             });
-            gameRef.transaction(function(gameData){
-                if(gameData === null){
-                    gameData = {
-                        players: {},
-                    }
-                }
-                return gameData;
-            }).then(function(){
-                gameRef.child('players').child(username).set({
-                    name: username,
-                    WaitNow: '1',
-                });
-                waitForOpponent();
-            }).catch(function(error){
-                console.log(error);
-            });
-            document.getElementById('LoginRoom').style.display = 'none';
-            document.getElementById('WaitRoom').style.display = 'block';
 
+            document.getElementById('LoginRoom').innerHTML = 'Now loading..';
+            setTimeout(LetsWait,1000);
+            document.getElementById('LoginRoom').style.display = 'none';
         }
     });
-
 });
 
+function LetsWait(){
+    usersRef.update({
+        WaitNow: '1',
+    });
+    gameRef.transaction(function(gameData){
+        if(gameData === null){
+            gameData = {
+                players: {},
+            }
+        }
+        return gameData;
+    }).then(function(){
+        gameRef.child('players').child(username).set({
+            name: username,
+            WaitNow: '1',
+        });
+        waitForOpponent();
+    }).catch(function(error){
+        console.log(error);
+    });
+    
+}
 window.addEventListener('beforeunload', () => {
-   usersRef.update({
-       WaitNow: '0',
-   });
+    usersRef.update({
+        WaitNow: '0',
+    });
 });
+
+// 待機処理
+function waitForOpponent(){
+    waitRoom.style.display = 'block';
+    gameRoom.style.display = 'none';
+    waitText.textContent = 'wait for other player....';
+    document.getElementById('WaitPlayers').textContent = 'Now: '+ Object.keys(gameRef.child('players').val()).length;
+    opponentName.textContent = 'Guest';
+    log.textContent = '';
+};
