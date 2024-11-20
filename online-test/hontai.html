@@ -7,6 +7,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
     <title>Online-Test</title>
+    
     <link rel="stylesheet" href="mitame.css">
 </head>
 <body>
@@ -24,7 +25,7 @@
     </div>
     <div id="GameRoom">
         <span id="OpponentName">Guest</span><br>
-        <button>石</button><button>鉄</button><button>紙</button>
+        <button onclick="Select('stone')">石</button><button onclick="Select('iron')">鉄</button><button onclick="Select('paper')">紙</button>
         <span id="Log"></span>
     </div>
     <script src="nakami.js"></script>

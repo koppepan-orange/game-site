@@ -1,5 +1,4 @@
 // DOM要素
-
 const firebaseConfig = {
     apiKey: "AIzaSyBN5V_E6PzwlJn7IwVsluKIWNIyathhxj0",
     authDomain: "koppepan-orange.firebaseapp.com",
@@ -40,12 +39,14 @@ document.getElementById('login-form').addEventListener('submit', function(event)
 
             userData = snapshot.val();
             if(userData.password === password){
-                if(userData.WaitNow == '1'){open('about:blank','_self').close();}
+                console.log('password==true')
+                if(userData.WaitNow == '1'){open('about:blank','_self').close();console.log('えらったらしい')}
                 document.getElementById('LoginRoom').innerHTML = 'Now loading..';
                 setTimeout(LetsWait,1000);
                 document.getElementById('LoginRoom').style.display = 'none';
             }else{
                 // パスワードが間違っている
+                console.log('password==false')
                 document.getElementById('LoginRoom').innerHTML = `
                 <form class="login-form" id="login-form">
                     <input type="text" id="username" placeholder="ユーザー名" required>
@@ -57,6 +58,7 @@ document.getElementById('login-form').addEventListener('submit', function(event)
                 loginError.style.display = 'block';
             }
         }else{
+            console.log('newuser')
             usersRef.update({
                 password: password,
             });
@@ -94,6 +96,29 @@ window.addEventListener('beforeunload', () => {
     usersRef.update({
         WaitNow: '0',
     });
+});
+gameRef.on("child_changed", (snapshot) => {
+    if(snapshot.key === 'players'){
+        document.getElementById('WaitPlayers').textContent = 'Now: '+ Object.keys(gameRef.child('players').val()).length;
+    }
+    if(Object.keys(gameRef.child('players').val()).length >= 2){
+        if(indexOf(Object.keys(gameRef.child('players').val()),username) >= 3){
+            gameRef.child('players').child(username).set({
+                name: username,
+                WaitNow: '1',
+            });
+        }else{
+            waitRoom.style.display = 'none';
+            gameRoom.style.display = 'block';
+            log.textContent = '';
+            opponentName.textContent = Object.keys(gameRef.child('players').val())[indexOf(Object.keys(gameRef.child('players').val()),username)];
+            gameRef.child('players').child(username).update({
+                WaitNow: '0',
+            });
+        }
+
+    }
+
 });
 
 // 待機処理
