@@ -7,14 +7,14 @@
         {
             "type": "chrome",
             "request": "launch",
-            "name": "Normal(rpg)",
-            "file": "/Users/koppepanorange/orange_bread/game-site/clicker-of-mugen/hontai.html"
+            "name": "clicker(rpg)",
+            "file": "/Users/koppepanorange/Dropbox/githubs/game-site/clicker-of-mugen/hontai.html"
         },
         {
             "type": "chrome",
             "request": "launch",
-            "name": "Dangeon(rpg)",
-            "file": "/Users/koppepanorange/orange_bread/game-site/clicker-of-mugen-dungeon/hontai.html"
-        }
+            "name": "clicker(dungeon)",
+            "file": "/Users/koppepanorange/Dropbox/githubs/game-site/clicker-of-mugen-dungeon/hontai.html"
+        },
     ]
 }

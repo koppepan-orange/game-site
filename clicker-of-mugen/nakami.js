@@ -960,6 +960,7 @@ let enemycrrs = 0;
 let sp = 1;//能力上昇(ダンジョン内有効)用
 let rp = 0;//スキルツリー(永続)用
 
+let acted = 0;
 let bar = {
    cam:['player','player','player','player','enemy','enemy','enemy','enemy'],
    num:[1,2,3,4,1,2,3,4]
@@ -1509,7 +1510,6 @@ let Slashs = {
             await humandamaged(cam,tcam,me,target,1,'sh',1);
             if(humans[tcam][target].health == 0){killedenemy(cam,tcam,me,target);return;}
          }
-         NextTurnis();
       }
    },
    'doubleslash':{
@@ -4268,7 +4268,7 @@ function disappear(){
 //#endregion
 //#region playerの斬撃
 async function Slash(num,me){
-   console.log('slash起きたよ');
+   console.log(`slash${num}起きたよ!${me}がやったってよ`);
    let UseSlash
    switch(num){
       case 1:UseSlash = humans.players[me].slash1; break;
@@ -4278,9 +4278,11 @@ async function Slash(num,me){
 
    if(humans.players[me].mp >= Slashs[UseSlash].mp){
       target = await LetsTargetSelect();
-      Slashs[UseSlash].process('players',target[1],me,target[0]);
+      console.log('ターゲットセレクト完了、殴るよ！！')
+      await Slashs[UseSlash].process('players',target[1],me,target[0]);
       humans.players[me].mp -= Slashs[UseSlash].mp;
       tekiou();
+      NextTurnis();
    }else{
       log.textContent = 'not enough mp...';
       window.setTimeout(backtoplayerturn, 1000)
@@ -4298,7 +4300,7 @@ async function Magic(num,me){
    
    if(humans.players[me].mp >= Magics[UseMagic].mp){
       target = await LetsTargetSelect();
-      Magics[UseMagic].process('players',target[1],me,target[0]);
+      await Magics[UseMagic].process('players',target[1],me,target[0]);
       humans.players[me].mp -= Magics[UseMagic].mp;
       tekiou();
    }else{
@@ -4354,11 +4356,8 @@ async function skillact() {
             } else {log.textContent = 'tairyoku ga sukunai desu...';}
          }
       }else if(humans.players[me].ex.id == 'placeturret'){
-         document.getElementById('PlayerFriendBack').innerHTML = '<br><br><b><font color="#DF0101">turret</font><span id="PlayerTurret"></span></b>';
-         PlayerTurret += 1;
-         PlayerTurrettekiou()
-         PlayerTurretattack = Math.round(playerattack * 0.5);
-         document.getElementById('Skillbutton').innerHTML = '';
+         PlayerTurretPlace();
+         PlayerTurrettekiou();
          log.textContent = playername+'はturretを設置した!';
          skillcooldown = 0;
          document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>'
@@ -4529,7 +4528,7 @@ function PlayerTurretPlace(me){
       <span>${humans.players.turret.health}</span>/<span>${humans.players.turret.maxhealth}</span><br>
    `
 }
-function PlayerTurrettekiou(){};
+function PlayerTurrettekiou(){tekiou();console.log('今はなきPlayerTurrettekiouが実行されたよ');};
 function PlayerTurretbreak(){
    humans.players.turret.num -= 1;
    if(humans.players.turret.num == 0){
@@ -4600,7 +4599,44 @@ async function endplayerturn(me,target){
 
    NextTurnis();
 }
-async function NextTurnis(){
+async function NextTurnis(cam,tcam,me,target){
+   phase = 0;
+   y = 1;//luck or luckgreat
+   if('luck' in humans.players[me].buffs){y = Math.floor(Math.random() * humans.players[me].buffs.luck.lv);}//luck
+   if(y == 0){
+      log.textContent = '当たりが出たらもう一本♪';
+      await delay(1000); backtoplayerturn(); return;
+   }
+   if(Turret[cam].num > 0){
+      log.textContent = 'turretの攻撃!';
+      await delay(1000);
+      x = Math.ceil(Turret[cam].attack * Turret[cam].num) - Math.ceil(humans[tcam][target].defense*humans[tcam][target].shell);
+      if(x < 0){x = 0};if(x > humans[tcam][target].health){x = humans[tcam][target].health};
+      humans[tcam][target].health -= x;tekiou();
+      log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';
+      await delay(1000);
+   }
+   if(human[tcam][target].health == 0){killedenemy(cam,tcam,me,target);return;}//このへんcamとtcamで整頓しといて どっちでも可にして
+
+   if ('poison' in humans.players[me].buffs){
+      x = playerhealth;
+      playerhealth -= Math.floor(playermaxhealth * humans.players[me].buffs.poison.lv);
+      if(playerhealth < 0){playerhealth = 0};
+      y = x - playerhealth;
+      log.textContent = playername + 'は毒で' + y + 'のダメージ!';
+      await delay(1000);
+   };
+   if('burn1' in humans.players[me].buffs){
+      x = playerhealth;
+      playerhealth -= humans.players[me].buffs.burn.lv;
+      if (playerhealth < 0){playerhealth = 0}
+      y = x - playerhealth;
+      log.textContent = playername + 'は燃えて' + y + 'のダメージ!';
+      await delay(1000);
+   };
+   tekiou();
+   if(humans.players[me].health <= 0){defeat();return;}
+
    acted += 1;
    if(acted < bar.num.length){
    }else{
