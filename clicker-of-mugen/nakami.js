@@ -927,10 +927,6 @@ let log = document.getElementById('log');
 
 let fun = Math.floor(Math.random() * 100)+1;
 
-//つぎはplayerのやつをs.~にして
-//その次はbuffaddの動き見直して
-//あとselectで選ぶようにして
-
 //保存されるデータs
 let username = 'user';
 let rank = 1;
@@ -1198,7 +1194,7 @@ let humans = {
          cam:'enemy',
          num:1,
          level:1,
-         name:'†古書館の魔術師†',
+         name:'古書館の魔術師',
          prefixe:'',
          ai:'supporter',
 
@@ -1228,6 +1224,19 @@ let humans = {
             num:0,
             power:0,
          },
+
+         ps:{
+            id:0,
+            name:'null'
+         },
+         ns:{
+            id:0,
+            name:'null'
+         },
+         ex:{
+            id:0,
+            name:'null'
+         }
       },
       2:{
          execute:0,
@@ -1264,6 +1273,19 @@ let humans = {
             num:0,
             power:0,
          },
+
+         ps:{
+            id:0,
+            name:'null'
+         },
+         ns:{
+            id:0,
+            name:'null'
+         },
+         ex:{
+            id:0,
+            name:'null'
+         }
       },
       3:{
          execute:0,
@@ -1300,6 +1322,19 @@ let humans = {
             num:0,
             power:0,
          },
+         
+         ps:{
+            id:0,
+            name:'null'
+         },
+         ns:{
+            id:0,
+            name:'null'
+         },
+         ex:{
+            id:0,
+            name:'null'
+         }
       },
       4:{
          execute:0,
@@ -1336,7 +1371,35 @@ let humans = {
             num:0,
             power:0,
          },
+         
+         ps:{
+            id:0,
+            name:'null'
+         },
+         ns:{
+            id:0,
+            name:'null'
+         },
+         ex:{
+            id:0,
+            name:'null'
+         }
       }
+   }
+}
+
+let Turret = {
+   'players':{
+      num:0,
+      attack:0,
+      health:0,
+      maxhealth:0,
+   },
+   'enemies':{
+      num:0,
+      attack:0,
+      health:0,
+      maxhealth:0,
    }
 }
 
@@ -1493,12 +1556,12 @@ let Debuffs = {
 
 let Slashs = {
    'slash':{
-      name:'slash',
+      id:'slash',
+      name:'シンプル斬り',
       mp:0,
       lv:1,
       tcam:'players',
       process:async function(cam,tcam,me,target){
-         log.textContent = `${humans[cam][me].name}は${humans[tcam][target].name}に斬りかかった！`;await delay(1000);
          await humandamaged(cam,tcam,me,target,1,'sh',1);
          if(humans[tcam][target].health == 0){killedenemy(cam,tcam,me,target);return;}
 
@@ -1513,7 +1576,8 @@ let Slashs = {
       }
    },
    'doubleslash':{
-      name:'double slash',
+      id:'double slash',
+      name:'つばめ返し',
       mp:0,
       lv:1,
       tcam:'players',
@@ -1533,7 +1597,8 @@ let Slashs = {
       }
    },
    'slashoflight':{
-      name:'slash of light',
+      id:'slash of light',
+      name:'一閃',//魔神斬り も作りたいね 霹靂一閃も
       mp:0,
       lv:1,
       tcam:'players',
@@ -1570,7 +1635,7 @@ let Magics = {
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
          humans[tcam][target].health += x;
          log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000);
-         NextTurnis(cam,me);
+         NextTurnis(cam,tcam,me,target);
       }
    },
    'power':{
@@ -1579,8 +1644,8 @@ let Magics = {
       lv:1,
       process:async function(cam,tcam,me,target){
          log.textContent = humans[cam][me].name + 'はpowerを唱えた!';await delay(1000);
-         buffadd('humans'+[tcam]+[target]+'.buffs','powerup',3,1);
-         NextTurnis(cam,me);
+         buffadd(tcam,target,'powerup',3,1);
+         NextTurnis(cam,tcam,me,target);
       }
    },
    'shell':{
@@ -1589,8 +1654,8 @@ let Magics = {
       lv:1,
       process:async function(cam,tcam,me,target){
          log.textContent = humans[cam][me].name + 'はshellを唱えた!';await delay(1000);
-         buffadd('humans.'+[tcam]+[target]+'.buffs','shellup',3,1);
-         NextTurnis(cam,me);
+         buffadd(tcam,target,'shellup',3,1);
+         NextTurnis(cam,tcam,me,target);
       }
    },
    'poison':{
@@ -1599,8 +1664,8 @@ let Magics = {
       lv:3,
       process:async function(cam,tcam,me,target){
          log.textContent = humans[cam][me].name + 'はpoisonを唱えた!';await delay(1000);
-         buffadd(`humans[${tcam}][${target}].buffs`,'poison',4,1);
-         NextTurnis(cam,me);
+         buffadd(tcam,target,'poison',4,1);
+         NextTurnis(cam,tcam,me,target);
       }
    },
    'thunder':{
@@ -1610,7 +1675,7 @@ let Magics = {
       process:async function(cam,tcam,me,target){
          log.textContent = humans[cam][me].name + 'はthunderを唱えた!!';await delay(1000);
          await humandamaged(cam,tcam,me,target,0.7,'mg',4);//雷
-         NextTurnis(cam,me)
+         NextTurnis(cam,tcam,me,target)
       }
    },
    'fire':{
@@ -1620,8 +1685,8 @@ let Magics = {
       process:async function(cam,tcam,me,target){
          log.textContent = `${humans[cam].name}はfireを唱えた！`;await delay(1000);
          await humandamaged(cam,tcam,me,target,1.1,'mg',2);//火
-         buffadd(`humans[${tcam}][${target}].buffs`,'burn',2,1);
-         NextTurnis(cam,me)
+         buffadd(tcam,target,'burn',2,1);
+         NextTurnis(cam,tcam,me,target)
       }
    },
    'healerthan':{
@@ -1634,7 +1699,7 @@ let Magics = {
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
          humans[tcam][target].health += x;
          log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000);
-         NextTurnis(cam,me)
+         NextTurnis(cam,tcam,me,target)
       }
    },
    'luck':{
@@ -1642,9 +1707,9 @@ let Magics = {
       mp:4,
       lv:7,
       process:async function(cam,tcam,me,target){
-         buffadd(`humans[${tcam}][${target}].buffs`,'luck',4,1);
+         buffadd(tcam,target,'luck',4,1);
          log.textContent = humans[cam][me].name + 'はluckを唱えた!';await delay(1000);
-         NextTurnis(cam,me)
+         NextTurnis(cam,tcam,me,target)
       }
    },
    'ellthunder':{
@@ -1654,7 +1719,7 @@ let Magics = {
       process:async function(cam,tcam,me,target){
          log.textContent = humans[cam][me].name + 'はellthunderを唱えた!';await delay(1000);
          humandamaged(cam,tcam,me,target,1.2,'mg',4);//雷
-         NextTurnis(cam,me)
+         NextTurnis(cam,tcam,me,target)
       }
    },
    'morepower':{
@@ -1662,9 +1727,9 @@ let Magics = {
       mp:8,
       lv:9,
       process:async function(cam,tcam,me,target){
-         buffadd(`humans.[${tcam}][${target}].buffs`,'powerup',3,2)
+         buffadd(tcam,target,'powerup',3,2)
          log.textContent = humans[cam][me].name + 'はmore powerを唱えた!';await delay(1000);
-         NextTurnis(cam,me)
+         NextTurnis(cam,tcam,me,target)
       }
    },
    'moreshell':{
@@ -1672,9 +1737,9 @@ let Magics = {
       mp:8,
       lv:9,
       process:async function(cam,tcam,me,target){
-         buffadd(`humans.[${tcam}][${target}].buffs`,'shellup',3,2)
+         buffadd(tcam,target,'shellup',3,2)
          log.textContent = humans[cam][me].name + 'はmore shellを唱えた!';await delay(1000);
-         NextTurnis(cam,me)
+         NextTurnis(cam,tcam,me,target)
       }
    },
    'deadlypoison':{
@@ -1682,9 +1747,9 @@ let Magics = {
       mp:12,
       lv:10,
       process:async function(cam,tcam,me,target){
-         buffadd(`humans.[${tcam}][${target}].buffs`,'poison',5,2);
+         buffadd(tcam,target,'poison',5,2);
          log.textContent = humans[cam][me].name + 'はdeadly poisonを唱えた!';await delay(1000);
-         NextTurnis(cam,me)
+         NextTurnis(cam,tcam,me,target)
       }
    },
    'gigafire':{
@@ -1694,8 +1759,8 @@ let Magics = {
       process:async function(cam,tcam,me,target){
          log.textContent = humans[cam][me].name + 'はgiga fireを唱えた!';await delay(1000);
          await humandamaged(cam,tcam,me,target,2.3,'mg',2);//火
-         buffadd(`humans[${tcam}][${target}].buffs`,'burn',2,2);
-         NextTurnis(cam,me)
+         buffadd(tcam,target,'burn',2,2);
+         NextTurnis(cam,tcam,me,target)
       }
    },
    'the healest':{
@@ -1708,7 +1773,7 @@ let Magics = {
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
          humans[tcam][target].health += x;
          log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000)
-         NextTurnis(cam,me)
+         NextTurnis(cam,tcam,me,target)
       }
    },
    'luckgreat':{
@@ -1716,9 +1781,9 @@ let Magics = {
       mp:12,
       lv:14,
       process:async function(cam,tcam,me,target){
-         buffadd(`humans[${tcam}][${target}].buffs`,'luck',5,2);
+         buffadd(tcam,target,'luck',5,2);
          log.textContent = humans[cam][me].name + 'はluckgreatを唱えた!';await delay(1000);
-         NextTurnis(cam,me)
+         NextTurnis(cam,tcam,me,target)
       }
    },
    'merazoma':{
@@ -1729,8 +1794,8 @@ let Magics = {
          log.textContent = humans[cam][me].name + 'はメラゾーマを唱えた!';
          await delay(1000);
          await humandamaged(cam,tcam,me,target,3.5,'mg',4);//雷
-         buffadd(`humans[${tcam}][${target}].buffs`,'burn',3,2);
-         NextTurnis(cam,me)
+         buffadd(tcam,target,'burn',3,2);
+         NextTurnis(cam,tcam,me,target)
       }
    },
    'thoron':{
@@ -1740,7 +1805,7 @@ let Magics = {
       process:async function(cam,tcam,me,target){
          log.textContent = 'トロン！！！';await delay(1000);//byルフレ
          await humandamaged(cam,tcam,me,target,6,'mg',4);//雷
-         NextTurnis(cam,me)
+         NextTurnis(cam,tcam,me,target)
       }
    },
    'random':{
@@ -1769,7 +1834,7 @@ let Tools = {
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
          humans[tcam][target].health += x;
          log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000);
-         NextTurnis(cam,me);
+         NextTurnis(cam,tcam,me,target);
       }
    },
    'pablon':{
@@ -1781,7 +1846,7 @@ let Tools = {
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
          humans[tcam][target].health += x;
          log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000);
-         NextTurnis(cam,me);
+         NextTurnis(cam,tcam,me,target);
       }
    },
    'trypsin':{
@@ -1793,7 +1858,7 @@ let Tools = {
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
          humans[tcam][target].health += x;
          log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000);
-         NextTurnis(cam,me);
+         NextTurnis(cam,tcam,me,target);
       }
    },
    'lulu':{
@@ -1805,7 +1870,7 @@ let Tools = {
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
          humans[tcam][target].health += x;
          log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000);
-         NextTurnis(cam,me);
+         NextTurnis(cam,tcam,me,target);
       }
    },
    'potion':{
@@ -1817,7 +1882,7 @@ let Tools = {
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
          humans[tcam][target].health += x;
          log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000);
-         NextTurnis(cam,me);
+         NextTurnis(cam,tcam,me,target);
       }
    },
    'throwknife':{
@@ -1830,7 +1895,7 @@ let Tools = {
          humans[tcam][target].health -= x
          log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';tekiou();await delay(1000);
          if(humans.enemies[target].health <= 0){killedenemy(cam,tcam,me,target);return;}
-         NextTurnis(cam,me);
+         NextTurnis(cam,tcam,me,target);
       }
    },
    'trickyvariables':{
@@ -1853,7 +1918,7 @@ let Tools = {
          humans[tcam][target].health -= x;
          log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';tekiou();await delay(1000);
          if(humans[tcam][target].health <= 0){log.textContent = 'ちょろい、ちょろい。BANG！';killedenemy(cam,tcam,me,target);return;}
-         NextTurnis(cam,me);
+         NextTurnis(cam,tcam,me,target);
       }
    },
    'bottlegrenade':{
@@ -1864,10 +1929,10 @@ let Tools = {
          x = Math.ceil(humans[tcam][target].health*0.45);
          if(humans[tcam][target].health < x){x = humans[tcam][target].health};
          humans[tcam][target].health -= x;
-         buffadd(`humans[${tcam}][${target}].buffs`,'burn',3,1);
+         buffadd(tcam,target,'burn',3,1);
          log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';tekiou();await delay(1000);
          if(humans[tcam][target].health <= 0){log.textContent = 'レッドウィンターの問題児にしては上出来じゃない？';killedenemy(cam,tcam,me,target);return;}
-         NextTurnis(cam,me);
+         NextTurnis(cam,tcam,me,target);
       }
    },
    'coveringfire':{
@@ -1880,7 +1945,7 @@ let Tools = {
          humans[tcam][target].health -= x
          log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';tekiou();await delay(1000);
          if(humans[tcam][target].health <= 0){log.textContent = 'わ、私のことはお気になさらずに...';killedenemy(cam,tcam,me,target);return;}
-         NextTurnis(cam,me);
+         NextTurnis(cam,tcam,me,target);
       }
    },
    'bomb':{
@@ -1896,7 +1961,7 @@ let Tools = {
       name:'redcard',
       num:0,
       process:async function(cam,tcam,me,target){
-         buffadd(target,`humans[${tcam}]${[target]}.buffs`,'skip',1,1);
+         buffadd(tcam,target,'skip',1,1);
          log.textContent = 'カードを仕込みました!';
          backtoplayerturn(cam,me)
       }
@@ -1923,8 +1988,8 @@ let Tools = {
          x = Greenrandombuffs[Math.floor(Math.random() * Greenrandombuffs.length)];
          y = Greenrandombuffs[Math.floor(Math.random() * Greenrandombuffs.length)];
          while (y == x) {y = Greenrandombuffs[Math.floor(Math.random() * Greenrandombuffs.length)];}
-         buffadd(target,`humans[${tcam}][${target}].buffs`,x,3,1);
-         buffadd(target,`humans[${tcam}][${target}].buffs`,y,3,1);
+         buffadd(tcam,target,x,3,1);
+         buffadd(tcam,target,y,3,1);
          log.textContent = humans[tcam][target].name+'にバフを二個つけました！！';await delay(1000);
          backtoplayerturn(cam,me);
       }
@@ -1933,10 +1998,10 @@ let Tools = {
       name:'blackcard',
       num:0,
       process:async function(cam,tcam,me,target){
-         buffadd(target,`humans[${tcam}][${target}].buffs`,'poison',3,1);
-         buffadd(target,`humans[${tcam}][${target}].buffs`,'burn1',3,1);
-         buffadd(target,`humans[${tcam}][${target}].buffs`,'powerdown1',3,1);
-         buffadd(target,`humans[${tcam}][${target}].buffs`,'shelldown1',3,1);
+         buffadd(tcam,target,'poison',3,1);
+         buffadd(tcam,target,'burn1',3,1);
+         buffadd(tcam,target,'powerdown1',3,1);
+         buffadd(tcam,target,'shelldown1',3,1);
          log.textContent = humans[tcam][target].name+'にバフを四個つけました！！';await delay(1000);
          backtoplayerturn(cam,me);
       }
@@ -1990,7 +2055,7 @@ let Enemies = {
             process:async function(cam, me){
                log.textContent = `${humans[cam][me].name}は粘液を絡ませてきた！`;await delay(1000);//いやこれはこれでやばいか...?いや全然捉えようによってはやばいわ
                let selected = ShallTargetSelect(me,'phph',0);
-               buffadd(`humans[${selected[1]}][${selected[0]}].buffs`,'stickyslime',2,1);
+               buffadd(selected[1],selected[0],'stickyslime',2,1);
             }
          }
       }
@@ -2054,7 +2119,7 @@ let Enemies = {
             process:async function(cam, me){
                log.textContent = `${humans[cam][me].name}は姿を消..あれどこ行った？`;await delay(1000);
                let selected = ShallTargetSelect(me,'ec',0);//私は気づいた。これcamとmeでよくね？　まあ左右対策か
-               buffadd(`humans[${selected[1]}][${selected[0]}].buffs`,'disappear',2,1);
+               buffadd(selected[1],selected[0],'disappear',2,1);
             }
          },
          2:{
@@ -2075,7 +2140,7 @@ let Enemies = {
                log.textContent = `${humans[cam][me].name}はローキックしてきた！`;await delay(1000);
                let selected = ShallTargetSelect(me,'phpl',0);
                await humandamaged(cam,selected[1],me,selected[0],x,'sh',1);
-               buffadd(`humans[${selected[1]}][${selected[0]}].buffs`,'speeddown',2,1);
+               buffadd(selected[1],selected[0],'speeddown',2,1);
             }
          }
       }
@@ -2098,7 +2163,7 @@ let Enemies = {
             process:async function(cam, me){
                log.textContent = `${humans[cam][me].name}は痺れ粉を振りかけてきた！`;await delay(1000);
                let selected = ShallTargetSelect(me,'patkh',0);
-               buffadd(`humans[${selected[1]}][${selected[0]}].buffs`,'palsy',2,1);
+               buffadd(selected[1],selected[0],'palsy',2,1);
             }
          },
          2:{
@@ -2107,7 +2172,7 @@ let Enemies = {
             process:async function(cam, me){
                log.textContent = `${humans[cam][me].name}は毒の粉を振りかけてきた！`;await delay(1000);
                let selected = ShallTargetSelect(me,'phph',0);
-               buffadd(`humans[${selected[1]}][${selected[0]}].buffs`,'poison',2,1);
+               buffadd(selected[1],selected[0],'poison',2,1);
             }
          },
          3:{
@@ -2116,7 +2181,152 @@ let Enemies = {
             process:async function(cam, me){
                log.textContent = `${humans[cam][me].name}は眠り粉を振りかけてきた！`;await delay(1000);
                let selected = ShallTargetSelect(me,'patkh',0);
-               buffadd(`humans[${selected[1]}][${selected[0]}].buffs`,'sleep',1,1);
+               buffadd(selected[1],selected[0],'sleep',1,1);
+            }
+         }
+      }
+   },
+
+
+
+
+
+
+   '古書館の魔術師':{//ウイさん　コッペパンの"めっちゃ好きなキャラ"。ヒナタさんと仲がいい。
+      name:'古書館の魔術師',
+      hp:'-10',
+      atk:'-15',
+      def:'+5',
+      matk:'+0',
+      mdef:'+20',
+      crla:'+0.05',
+      crdm:'+0',
+      crrs:'+0.1',
+      speed:'40',
+      acts:{
+         1:{
+            name:'攻撃！',//これはpazzlineね
+            num:1,
+            process:async function(cam, me){  
+               log.textContent = `${humans[cam][me].name}はピストルカービンで撃った！`;await delay(1000);//ウイさんの武器やね デ・リーズル カービン
+               let selected = ShallTargetSelect(me,'phpl',0);
+               await humandamaged(cam,selected[0],me,selected[1],1,'sh',1);
+            }
+         },
+         2:{
+            name:'古書の専門家',
+            num:2,
+            process:async function(cam, me){
+               log.textContent = `${humans[cam][me].name}は古書の専門家だ！！`;await delay(1000);//いやごめん、は？ (ウイさんのEX「古書の専門家」より)
+               let selected = ShallTargetSelect(me,'eatkh',0);//enemy atk high
+               await Magics.power.process(cam,selected[0],me,selected[1]);
+            }
+         },
+         3:{
+            name:'伝達されていく知識',
+            num:3,
+            process:async function(cam, me){
+               log.textContent = `${humans[cam][me].name}は知識を伝達した！`;await delay(1000);//ウイさんのNS「伝達されていく知識」..いやそのまますぎるか...?
+               let selected = ShallTargetSelect(me,'ec',1);//自分付近
+               await Magics.boost.process(cam,selected[0],me,selected[1]);
+            }
+         }
+      }
+   },
+   '読書マニアな司書':{ //シミコさん
+      name:'読書マニアな司書',
+      hp:'+10',
+      atk:'+10',
+      def:'-10',
+      matk:'+0',
+      mdef:'+0',
+      crla:'+0.3',
+      crdm:'+0.5',
+      crrs:'+0',
+      speed:'75',
+      acts:{
+         1:{
+            name:'体当たり',
+            num:1,
+            process:async function(cam, me){
+            }
+         },
+         2:{
+            name:'体当たり',
+            num:2,
+            process:async function(cam, me){
+            }
+         },
+         3:{
+            name:'体当たり',
+            num:3,
+            process:async function(cam, me){
+            }
+         }
+      }
+   },
+   '忍び寄るナース':{ //セリナさん
+      name:'忍び寄るナース',
+      hp:'+10',
+      atk:'+0',
+      def:'+10',
+      matk:'+0',
+      mdef:'+0',
+      crla:'+0',
+      crdm:'+0',
+      crrs:'+0',
+      speed:'50',
+      acts:{
+         1:{
+            name:'体当たり',
+            num:1,
+            process:async function(cam, me){
+            }
+         },
+         2:{
+            name:'体当たり',
+            num:2,
+            provess:async function(cam, me){
+               
+            }
+         },
+         3:{
+            name:'体当たり',
+            num:3,
+            process:async function(cam, me){
+               
+            }
+         }
+      }
+   },
+   '「救護」のプロ':{ //ミネさん
+      name:'「救護」のプロ',
+      hp:'+10',
+      atk:'+0',
+      def:'+10',
+      matk:'+0',
+      mdef:'+0',
+      crla:'+0',
+      crdm:'+0',
+      crrs:'+0',
+      speed:'50',
+      acts:{
+         1:{
+            name:'体当たり',
+            num:1,
+            process:async function(cam, me){
+            }
+         },
+         2:{
+            name:'体当たり',
+            num:2,
+            process:async function(cam, me){
+            }
+         },
+         3:{
+            name:'体当たり',
+            num:3,
+            process:async function(cam, me){
             }
          }
       }
@@ -2232,14 +2442,15 @@ const tools = {
 
 //#region 超シンプルで使いやすい子達
 function tekiou(){
-   let awase = 0;
+   let apply = 0;
    if(humans.players[1].execute == 1){
-      awase = buffcheck('humans.players[1].buffs','humans.players[1].buffs');
+      apply = buffcheck('players',1);
       document.getElementById('player1').innerHTML = `
       <b>${humans.players[1].name}</b>　<i>Lv.${humans.players[1].level}</i><br>
       <span id="PlayerHealth">${humans.players[1].health}</span>/<span>${humans.players[1].maxhealth}</span><br>
       <span id="PlayerMP">${humans.players[1].mp}</span>/<span id="PlayerMaxMP">${humans.players[1].maxmp}</span><br>
-      <span id="PlayerBuff">${awase[0].join('')}</span> <span id="PlayerDebuff">${awase[1].join('')}</span>`;
+      <span id="PlayerBuff">${apply.buff.join('')}</span> <span id="PlayerDebuff">${apply.debuff.join('')}</span>`;
+
       humans.players[1].power = 1;humans.players[1].shell = 1;let karix = 0;
       if('powerup' in humans.players[1].buffs){karix = humans.players[1].buffs.powerup.lv};
       if('powerdown' in humans.players[1].buffs){karix -= humans.players[1].buffs.powerdown.lv};
@@ -2249,12 +2460,13 @@ function tekiou(){
       if(karix > 0){humans.players[1].shell = Buffs.shellup.lv[karix]};if(karix < 0){humans.players[1].shell = Debuffs.shelldown.lv[karix*-1]}
    }
    if(humans.players[2].execute == 1){
-      awase = buffcheck('humans.players[2].buffs','humans.players[2].buffs');
+      apply = buffcheck('players',2);
       document.getElementById('player2').innerHTML = `
       <b>${humans.players[2].name}</b>　<i>Lv.${humans.players[2].level}</i><br>
       <span id="PlayerHealth">${humans.players[2].health}</span>/<span>${humans.players[2].maxhealth}</span><br>
       <span id="PlayerMP">${humans.players[2].mp}</span>/<span id="PlayerMaxMP">${humans.players[2].maxmp}</span><br>
-      <span id="PlayerBuff">${awase[0].join('')}</span> <span id="PlayerDebuff">${awase[1].join('')}</span>`;
+      <span id="PlayerBuff">${apply.buff.join('')}</span> <span id="PlayerDebuff">${apply.debuff.join('')}</span>`;
+
       humans.players[2].power = 1;humans.players[2].shell = 1;let karix = 0;
       if('powerup' in humans.players[2].buffs){karix = humans.players[2].buffs.powerup.lv};
       if('powerdown' in humans.players[2].buffs){karix -= humans.players[2].buffs.powerdown.lv};
@@ -2264,12 +2476,13 @@ function tekiou(){
       if(karix > 0){humans.players[2].shell = Buffs.shellup.lv[karix]};if(karix < 0){humans.players[2].shell = Debuffs.shelldown.lv[karix*-1]}
    }
    if(humans.players[3].execute == 1){
-      awase = buffcheck('humans.players[3].buffs','humans.players[3].buffs');
+      apply = buffcheck('players',3);
       document.getElementById('player3').innerHTML = `
       <b>${humans.players[3].name}</b>　<i>Lv.${humans.players[3].level}</i><br>
       <span id="PlayerHealth">${humans.players[3].health}</span>/<span>${humans.players[3].maxhealth}</span><br>
       <span id="PlayerMP">${humans.players[3].mp}</span>/<span id="PlayerMaxMP">${humans.players[3].maxmp}</span><br>
-      <span id="PlayerBuff">${awase[0].join('')}</span> <span id="PlayerDebuff">${awase[1].join('')}</span>`;
+      <span id="PlayerBuff">${apply.buff.join('')}</span> <span id="PlayerDebuff">${apply.debuff.join('')}</span>`;
+
       humans.players[3].power = 1;humans.players[3].shell = 1;let karix = 0;
       if('powerup' in humans.players[3].buffs){karix = humans.players[3].buffs.powerup.lv};
       if('powerdown' in humans.players[3].buffs){karix -= humans.players[3].buffs.powerdown.lv};
@@ -2279,12 +2492,13 @@ function tekiou(){
       if(karix > 0){humans.players[3].shell = Buffs.shellup.lv[karix]};if(karix < 0){humans.players[3].shell = Debuffs.shelldown.lv[karix*-1]}
    }
    if(humans.players[4].execute == 1){
-      awase = buffcheck('humans.players[4].buffs','humans.players[4].buffs');
+      apply = buffcheck('players',4);
       document.getElementById('player4').innerHTML = `
       <b>${humans.players[4].name}</b>　<i>Lv.${humans.players[4].level}</i><br>
       <span id="PlayerHealth">${humans.players[4].health}</span>/<span>${humans.players[4].maxhealth}</span><br>
       <span id="PlayerMP">${humans.players[4].mp}</span>/<span id="PlayerMaxMP">${humans.players[4].maxmp}</span><br>
-      <span id="PlayerBuff">${awase[0].join('')}</span> <span id="PlayerDebuff">${awase[1].join('')}</span>`;
+      <span id="PlayerBuff">${apply.buff.join('')}</span> <span id="PlayerDebuff">${apply.debuff.join('')}</span>`;
+
       humans.players[4].power = 1;humans.players[4].shell = 1;let karix = 0;
       if('powerup' in humans.players[4].buffs){karix = humans.players[4].buffs.powerup.lv};
       if('powerdown' in humans.players[4].buffs){karix -= humans.players[4].buffs.powerdown.lv};
@@ -2295,11 +2509,13 @@ function tekiou(){
    }
 
    if(humans.enemies[1].execute == 1){
-      awase = buffcheck('humans.enemies[1].buffs','humans.enemies[1].buffs');
-      document.getElementById('enemy1').innerHTML = `<b id="EnemyName">${humans.enemies[1].name}</b>　<i id="EnemyLevel">Lv.${humans.enemies[1].level}</i><br>
+      apply = buffcheck('enemies',1);
+      document.getElementById('enemy1').innerHTML = `
+      <b id="EnemyName">${humans.enemies[1].prefixe}${humans.enemies[1].name}</b>　<i id="EnemyLevel">Lv.${humans.enemies[1].level}</i><br>
       <span id="EnemyHealth">${humans.enemies[1].health}</span>/<span id="EnemyMaxHealth">${humans.enemies[1].maxhealth}</span><br>
       <span id="EnemyMP">${humans.enemies[1].mp}</span>/<span id="EnemyMaxMP">${humans.enemies[1].maxmp}</span><br>
-      <span id="EnemyBuff">${awase[0].join('')}</span> <span id="EnemyDebuff">${awase[1].join('')}</span>`;
+      <span id="EnemyBuff">${apply.buff.join('')}</span> <span id="EnemyDebuff">${apply.debuff.join('')}</span>`;
+
       humans.enemies[1].power = 1;humans.enemies[1].shell = 1;let karix = 0;
       if('powerup' in humans.enemies[1].buffs){karix = humans.enemies[1].buffs.powerup.lv};
       if('powerdown' in humans.enemies[1].buffs){karix -= humans.enemies[1].buffs.powerdown.lv};
@@ -2309,12 +2525,13 @@ function tekiou(){
       if(karix > 0){humans.enemies[1].shell = Buffs.shellup.lv[karix]};if(karix < 0){humans.enemies[1].shell = Debuffs.shelldown.lv[karix*-1]}
    }
    if(humans.enemies[2].execute == 1){
-      awase = buffcheck('humans.enemies[2].buffs','humans.enemies[2].buffs');
+      apply = buffcheck('enemies',2);
       document.getElementById('enemy2').innerHTML = `
-      <b id="EnemyName">${humans.enemies[2].name}</b>　<i id="EnemyLevel">Lv.${humans.enemies[2].level}</i><br>
+      <b id="EnemyName">${humans.enemies[2].prefixe}${humans.enemies[2].name}</b>　<i id="EnemyLevel">Lv.${humans.enemies[2].level}</i><br>
       <span id="EnemyHealth">${humans.enemies[2].health}</span>/<span id="EnemyMaxHealth">${humans.enemies[2].maxhealth}</span><br>
       <span id="EnemyMP">${humans.enemies[2].mp}</span>/<span id="EnemyMaxMP">${humans.enemies[2].maxmp}</span><br>
-      <span id="EnemyBuff">${awase[0].join('')}</span> <span id="EnemyDebuff">${awase[1].join('')}</span>`;
+      <span id="EnemyBuff">${apply.buff.join('')}</span> <span id="EnemyDebuff">${apply.debuff.join('')}</span>`;
+
       humans.enemies[2].power = 1;humans.enemies[2].shell = 1;let karix = 0;
       if('powerup' in humans.enemies[2].buffs){karix = humans.enemies[2].buffs.powerup.lv};
       if('powerdown' in humans.enemies[2].buffs){karix -= humans.enemies[2].buffs.powerdown.lv};
@@ -2324,12 +2541,13 @@ function tekiou(){
       if(karix > 0){humans.enemies[2].shell = Buffs.shellup.lv[karix]};if(karix < 0){humans.enemies[2].shell = Debuffs.shelldown.lv[karix*-1]}
    }
    if(humans.enemies[3].execute == 1){
-      awase = buffcheck('humans.enemies[3].buffs','humans.enemies[3].buffs');
+      apply = buffcheck('enemies',3);
       document.getElementById('enemy3').innerHTML = `
-      <b id="EnemyName">${humans.enemies[3].name}</b>　<i id="EnemyLevel">Lv.${humans.enemies[3].level}</i><br>
+      <b id="EnemyName">${humans.enemies[3].prefixe} ${humans.enemies[3].name}</b>　<i id="EnemyLevel">Lv.${humans.enemies[3].level}</i><br>
       <span id="EnemyHealth">${humans.enemies[3].health}</span>/<span id="EnemyMaxHealth">${humans.enemies[3].maxhealth}</span><br>
       <span id="EnemyMP">${humans.enemies[3].mp}</span>/<span id="EnemyMaxMP">${humans.enemies[3].maxmp}</span><br>
-      <span id="EnemyBuff">${awase[0].join('')}</span> <span id="EnemyDebuff">${awase[1].join('')}</span>`;
+      <span id="EnemyBuff">${apply.buff.join('')}</span> <span id="EnemyDebuff">${apply.debuff.join('')}</span>`;
+
       humans.enemies[3].power = 1;humans.enemies[3].shell = 1;let karix = 0;
       if('powerup' in humans.enemies[3].buffs){karix = humans.enemies[3].buffs.powerup.lv};
       if('powerdown' in humans.enemies[3].buffs){karix -= humans.enemies[3].buffs.powerdown.lv};
@@ -2339,12 +2557,13 @@ function tekiou(){
       if(karix > 0){humans.enemies[3].shell = Buffs.shellup.lv[karix]};if(karix < 0){humans.enemies[3].shell = Debuffs.shelldown.lv[karix*-1]}
    }
    if(humans.enemies[4].execute == 1){
-      awase = buffcheck('humans.enemies[4].buffs','humans.enemies[4].buffs');
+      apply = buffcheck('enemies',4);
       document.getElementById('enemy4').innerHTML = `
-      <b id="EnemyName">${humans.enemies[4].name}</b>　<i id="EnemyLevel">Lv.${humans.enemies[4].level}</i><br>
+      <b id="EnemyName">${humans.enemies[4].prefixe} ${humans.enemies[4].name}</b>　<i id="EnemyLevel">Lv.${humans.enemies[4].level}</i><br>
       <span id="EnemyHealth">${humans.enemies[4].health}</span>/<span id="EnemyMaxHealth">${humans.enemies[4].maxhealth}</span><br>
       <span id="EnemyMP">${humans.enemies[4].mp}</span>/<span id="EnemyMaxMP">${humans.enemies[4].maxmp}</span><br>
-      <span id="EnemyBuff">${awase[0].join('')}</span> <span id="EnemyDebuff">${awase[1].join('')}</span>`;
+      <span id="EnemyBuff">${apply.buff.join('')}</span> <span id="EnemyDebuff">${apply.debuff.join('')}</span>`;
+
       humans.enemies[4].power = 1;humans.enemies[4].shell = 1;let karix = 0;
       if('powerup' in humans.enemies[4].buffs){karix = humans.enemies[4].buffs.powerup.lv};
       if('powerdown' in humans.enemies[4].buffs){karix -= humans.enemies[4].buffs.powerdown.lv};
@@ -2364,26 +2583,15 @@ function tekiou(){
 
 
 
-   function buffcheck(target1,target2){
-      let apply = [];
-      eval(target1).forEach(nanka => {apply.push(`<img src="assets/buffs/${nanka}.png" width="18" height="18"> `)});
-
-      // Object.keys()を使ってforEachで繰り返す
-      let t1 = eval(target1)
-      Object.keys(t1).forEach(key => {
-         let name = t1[key].name;
-         apply.push(`<img src="assets/buffs/${name}.png" width="18" height="18">`);
-      });
-      let b = apply;
-      apply = []
-      let t2 = eval(target2)
-      Object.keys(t2).forEach(key => {
-         let name = t2[key].name;
-         apply.push(`<img src="assets/buffs/${name}.png" width="18" height="18">`);
-      });
-      let db = apply;
-      let awase = [b,db];
-      return awase
+   function buffcheck(cam,me){
+      let apply = {
+         buff: [],
+         debuff: []
+      }
+      humans[cam][me].buffs.filter(a => a.type == 'buff').forEach(bu => {apply.buff.push(`<img src="assets/buffs/${bu}.png" width="18" height="18"> `)});
+      humans[cam][me].buffs.filter(b => b.type == 'debuff').forEach(db => {apply.debuff.push(`<img src="assets/buffs/${db}.png" width="18" height="18"> `)});
+      console.log(apply)
+      return apply
    }
 
    save();
@@ -2413,7 +2621,9 @@ function save(){
 }
 
 function load(){
-   usersRef.once('value').then(snapshot => {userData = snapshot.val()}) //database.ref('users/'+username+'/forrpg')
+   return usersRef.once('value').then(snapshot => {
+      return snapshot.val();
+   });
 }
 
 function delay(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
@@ -2441,43 +2651,43 @@ async function NicoNicoText(mes){
 }
 
 function DesideEnemyName(target){
-   humans.enemies[target].prefixe = 0;
+   humans.enemies[target].prefixe = '';
    let ENEMYarray = enemynamenum[stage-1].split('.');
    let ENEMY1 = +ENEMYarray[1]+1
    let ENEMY2 = +ENEMYarray[0]
    humans.enemies[target].name = enemynames[Math.floor(Math.random() * ENEMY1)+ENEMY2]; // 敵の名前を決めます
-   if(Math.floor(Math.random() * 5) == 0){humans.enemies[target].prefixe = enemyprefixes[Math.floor(Math.random() * enemyprefixes.length)]};
+   if(Math.floor(Math.random() * 5) == 0){humans.enemies[target].prefixe = `${enemyprefixes[Math.floor(Math.random() * enemyprefixes.length)]} `};
    
    humans.enemies[target].attack = enemyatk;//敵の能力を決めます
    humans.enemies[target].defense = enemydef;
-   humans.enemies[target].maxhealth = enemyhp; humans.enemies[target].health = humans.enemies[target].health;
+   humans.enemies[target].maxhealth = enemyhp; humans.enemies[target].health = humans.enemies[target].maxhealth;
    humans.enemies[target].critlate = enemycrla;
    humans.enemies[target].critdmg = enemycrdm;
    humans.enemies[target].critresist = enemycrrs;
    switch(humans.enemies[target].prefixe){//接頭辞ごとの能力
-      case '激昂':
+      case '激昂 ':
          humans.enemies[target].attack  = Math.floor(enemyatk*1.5);
          humans.enemies[target].defense = Math.floor(enemydef*0.75);
          humans.enemies[target].critlate = 0.05
          break;
-      case '冷静沈着な':
+      case '冷静沈着な ':
          humans.enemies[target].defense = Math.floor(enemydef*2);
          humans.enemies[target].attack  = Math.floor(enemyatk*0.75);
          break;
-      case 'ギャンブラーな':
+      case 'ギャンブラーな ':
          humans.enemies[target].critlate = enemycrla + 0.3;
          humans.enemies[target].maxhealth = Math.floor(enemyhp*0.5);
       break;
-      case '守りが固い':
+      case '守りが固い ':
          humans.enemies[target].critresist += 0.5;//会心半減ね
          humans.enemies[target].health = Math.floor(enemyhp*1.25);
          humans.enemies[target].defense = Math.floor(enemydef*1.5);
          humans.enemies[target].attack = Math.floor(enemyatk*0.3);
       break;
-      case '心眼持ちの':
+      case '心眼持ちの ':
          humans.enemies[target].critlate = 1;//確定会心人間(抵抗無視の場合)
          humans.enemies[target].critdmg = 1.2;//さすがに弱め
-         humans.enemies[target].attack = Math.floor(enemyatk*0.3);
+         humans.enemies[target].attack = Math.floor(enemyatk*0.3);//つまり..防御無視害悪敵だわこれ やば
          humans.enemies[target].maxhealth = Math.floor(enemyhp*0.5);
       break;
    }
@@ -2487,6 +2697,8 @@ function DesideEnemyName(target){
 
 //async function errorcheck(){if(playerattack==Infinity||playerdefense==Infinity||playerhealth==Infinity||playermaxhealth==Infinity||playerlevel==Infinity||playerpower==Infinity||playermaxmp==Infinity||playershell==Infinity||isNaN(playerhealth)||isNaN(playermaxhealth)||isNaN(playerattack)||isNaN(playerdefense)||isNaN(playermaxmp)||isNaN(playerpower)||isNaN(playershell)||isNaN(playerlevel)||Potion.num==Infinity||euro==Infinity||Bomb.num==Infinity||Redcard.num==Infinity||isNaN(Potion.num)||isNaN(euro)||isNaN(Bomb.num)||isNaN(Redcard.num)){log.textContent='error100が発生しました。';awaitdelay(1000);log.textContent='リブートを開始します。';await delay(1000);open('about:blank','_self').close();}}//おっとこれは...?}
 //#endregion
+
+//なんかNextTurnisとかいろいろ修正しといて。tcamがないところとかよろっぷ
 
 //#region Inventory
 let InventoryPage = 1;
@@ -2769,23 +2981,21 @@ function bufftekiou(){
 };
 
 
-function buffadd(array,buff,time,lv){//誰のバフ/デバフか,バフ/デバフの名前,効果時間,効果レベル
-   console.log(array,buff,time,lv??0);
-   let bx = eval(array);
-   let btime = time??1;
-   if(bx[buff]&&bx[buff].lv == lv){btime += bx[buff].time;};//効果量が同じなら足す形に
-   bx[buff] = {
-      type: Buffs.includes(buff) ? 'buff' : Debuffs.includes(buff) ? 'debuff' : 'unknown',
+function buffadd(tcam,target,buff,time,lv){//誰のバフ/デバフか,バフ/デバフの名前,効果時間,効果レベル
+   console.log(tcam,target,buff,time,lv??0);
+   let Time = time??1;
+   if(humans[tcam][target].buffs[buff]?.lv??0 == lv){Time += humans[tcam][target].buffs[buff].time;};//効果量が同じなら足す形に
+   humans[tcam][target].buffs[buff] = {
+      type: Buffs[buff] ? 'buff' : Debuffs[buff] ? 'debuff' : 'unknown',
       name: buff,
-      time: btime,
-      lv: lv, 
-   }
+      time: Time,
+      lv: lv??1, 
+   }  
    tekiou();
 }
-function buffremove(array,buff){
+function buffremove(tcam,target,buff){
    //誰のバフ/デバフか,バフ/デバフの名前
-   let bx = eval(array);
-   delete bx[buff];
+   delete humans[tcam][target].buffs[buff];
    tekiou();
 }
 function buffclear(array){
@@ -2814,10 +3024,9 @@ let messagesRef = database.ref('forrpg/rooms/'+chatroom+'/messages');
 let usersRef;
 let userData;
 
-function GameStart(){
-
+async function GameStart(){
    document.getElementById('GameArea').innerHTML = `
-   <div class="login-container">
+   <div id="login-container" class="login-container">
       <form class="login-form" id="login-form">
          <input type="text" id="username" placeholder="ユーザー名" required>
          <input type="password" id="password" placeholder="パスワード" required>
@@ -2825,222 +3034,293 @@ function GameStart(){
          <div id="login-error" style="color: red; display: none;">パスワードが間違っています。</div>
       </form>
    </div>
-   `
-   
+   `;
    document.getElementById('GameArea').style.display = 'block';
 
+   function setLocalStorage(name, value) {
+      localStorage.setItem(name, value || ""); // 値が空なら空文字を入れる
+   }
 
-   document.getElementById('login-form').addEventListener('submit', function(event){
+   function getLocalStorage(name) {
+      return localStorage.getItem(name); // 値をそのまま返す、ない場合はnull
+   }
+
+   username = getLocalStorage("username"); // ログイン時
+   if(username){
+      console.log("自動ログインしました");
+      usersRef = database.ref('users/'+username+'/forrpg');
+      document.getElementById('login-container').style.display = 'none';
+      log.textContent = 'wait for now...'
+      login()
+   }else{
+      console.log("ログインしてください");
+      
+      document.getElementById('login-form').addEventListener('submit',async function(event){
+         const loginForm = document.getElementById('login-form');
+         const loginError = document.getElementById('login-error');
+         const chatContainer = document.getElementById('chat-container');
+   
+         event.preventDefault();
+         username = document.getElementById('username').value;
+         var password = document.getElementById('password').value;
+         usersRef = database.ref('users/'+username+'/forrpg');
+   
+         // データベースでユーザーが存在するか確認
+         usersRef.once('value').then(async function(snapshot){
+            if(snapshot.exists()){
+               userData = snapshot.val();
+               if(userData.password === password){
+                  login();
+                  setLocalStorage("username", username); // ログイン成功時
+               } else {
+                  // パスワードが間違っている
+                  document.getElementById('GameArea').innerHTML = `
+                  <div class="login-container">
+                     <form class="login-form" id="login-form">
+                        <input type="text" id="username" placeholder="ユーザー名" required>
+                        <input type="password" id="password" placeholder="パスワード" required>
+                        <button type="submit">ログイン</button>
+                        <div id="login-error" style="color: red; display: none;">パスワードが間違っています。</div>
+                     </form>
+                  </div>
+                  `
+                  loginError.style.display = 'block';
+               }
+            }else{
+               usersRef.update({
+                  status: 'online',
+                  password: password,
+               });
+               setLocalStorage("username", username); // ログイン成功時
+               loginForm.style.display = 'none';
+               document.getElementById('ChatTab').style.display = 'block';
+               chatContainer.style.display = 'flex';
+               startChat();
+               document.getElementById('room-select').style.display = 'block';
+               document.getElementById('ChatTab').style.display = 'none';
+               document.getElementById('GameArea').innerHTML = `
+                  <span>turn:</span><span id="TurnCount">0</span><br>
+                  <div id="enemies">
+                  <div id="enemy1" class="enemy">
+                     <b class="EnemyName">古書館の魔術師</b>   <i class="EnemyLevel">Lv.24</i><br>
+                     <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
+                     <span class="EnemyMP">20</span>/<span class="EnemyMaxMP">20</span><br>
+                     <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
+                  </div>
+                  <div id="enemy2" class="enemy">
+                     <b class="EnemyName">読書マニアな司書</b>   <i class="EnemyLevel">Lv.22</i><br>
+                     <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
+                     <span class="Ene myMP">20</span>/<span class="EnemyMaxMP">20</span><br>
+                     <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
+                  </div>  
+                  <div id="enemy3" class="enemy">
+                     <b class="EnemyName">忍び寄るナース</b>   <i class="EnemyLevel">Lv.23</i><br>
+                     <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
+                     <span class="EnemyMP">20</span>/<span class="EnemyMaxMP">20</span><br>
+                     <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
+                  </div>
+                  <div id="enemy4" class="enemy">
+                     <b class="EnemyName">「救護」のプロ</b>   <i class="EnemyLevel">Lv.24</i><br>
+                     <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
+                     <span class="EnemyMP">20</span>/<span class="EnemyMaxMP">20</span><br>
+                     <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
+                  </div>
+                  </div>
+                  <br><br>
+
+                  <div id="players">
+                  <div id="player1" class="player">
+                     <b class="PlayerName">mechanic</b>   <i class="PlayerLevel">Lv.23</i><br>
+                     <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
+                     <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
+                     <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
+                  </div>
+                  <div id="player2" class="player">
+                     <b class="PlayerName">friend1</b>   <i class="PlayerLevel">Lv.23</i><br>
+                     <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
+                     <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
+                     <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
+                  </div>
+                  <div id="player3" class="player">
+                     <b class="PlayerName">friend2</b>   <i class="PlayerLevel">Lv.23</i><br>
+                     <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
+                     <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
+                     <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
+                  </div>
+                  <div id="player4" class="player">
+                     <b class="PlayerName">friend3</b>   <i class="PlayerLevel">Lv.23</i><br>
+                     <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
+                     <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
+                     <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
+                  </div>
+                  </div><br><br><br>
+                  <button class="button" id="select1" onclick="select1()">attack</button>  <button class="button" id="select2" onclick="select2()">magic</button>  <button class="button" id="select3" onclick="select3()">tools</button>  <button class="button" id="back" onclick="back()">pass</button><br>
+                  <span id="Skillbutton"><button class="button" id="Skill1" onclick="Skill1()">skill</button></span>
+               `;
+               document.getElementById('GameArea').style.display = 'none';
+               
+   
+               AllowMove = 1;
+   
+               euro = 0;
+               bankeuro = 0;
+               rank = 1;
+               rpt = 0;
+               rp = 0;
+               clearedmainquest = 0;
+               playeratk = 20;
+               playerdef = 0;
+               playermatk = 10;
+               playermdef = 0;
+               playerhp = 100;
+               playermagicpoint = 50;
+               playercrla = 0.03;
+               playercrdm = 1.5;
+               playercrrs = 0;
+               Potion.num = 2; Bomb.num = 2; Redcard.num = 2;
+   
+               BacktoHome();
+   
+               clearedmainquest = 0;
+               quest.main = quests.main[0];
+               quest.daily = [];
+               for(i = 0;i < 5;i++){
+                  let newquest = quests.daily[Math.floor(Math.random() * quests.daily.length)];
+                  newquest.id = i+1;
+                  quest.daily.push(newquest);
+               }
+            }
+         });
+         
+      });
+   }
+
+   async function login(){
       const loginForm = document.getElementById('login-form');
       const loginError = document.getElementById('login-error');
       const chatContainer = document.getElementById('chat-container');
 
-      event.preventDefault();
-      username = document.getElementById('username').value;
-      var password = document.getElementById('password').value;
-      usersRef = database.ref('users/'+username+'/forrpg');
+      usersRef.update({
+         status: 'online'
+      });
+      menuToggle.style.display = 'block';   
+      document.getElementById('login-container').style.display = 'none';
+      document.getElementById('ChatTab').style.display = 'block';
+      chatContainer.style.display = 'flex';
+      startChat();
+      document.getElementById('room-select').style.display = 'block';
+      document.getElementById('ChatTab').style.display = 'none';
 
-      // データベースでユーザーが存在するか確認
-      usersRef.once('value').then(function(snapshot){
-         if(snapshot.exists()){
-            usersRef.update({
-               status: 'online'
-            });
+      AllowMove = 1;
+      document.getElementById('GameArea').style.display = 'none';
+      document.getElementById('GameArea').innerHTML = `
+      <div id="enemies">
+      <div id="enemy1" class="enemy">
+         <b class="EnemyName">古書館の魔術師</b>   <i class="EnemyLevel">Lv.24</i><br>
+         <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
+         <span class="EnemyMP">20</span>/<span class="EnemyMaxMP">20</span><br>
+         <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
+      </div>
+      <div id="enemy2" class="enemy">
+         <b class="EnemyName">読書マニアな司書</b>   <i class="EnemyLevel">Lv.22</i><br>
+         <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
+         <span class="Ene myMP">20</span>/<span class="EnemyMaxMP">20</span><br>
+         <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
+      </div>  
+      <div id="enemy3" class="enemy">
+         <b class="EnemyName">忍び寄るナース</b>   <i class="EnemyLevel">Lv.23</i><br>
+         <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
+         <span class="EnemyMP">20</span>/<span class="EnemyMaxMP">20</span><br>
+         <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
+      </div>
+      <div id="enemy4" class="enemy">
+         <b class="EnemyName">「救護」のプロ</b>   <i class="EnemyLevel">Lv.24</i><br>
+         <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
+         <span class="EnemyMP">20</span>/<span class="EnemyMaxMP">20</span><br>
+         <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
+      </div>
+      </div>
+      <br><br>
 
-            userData = snapshot.val();
-            if(userData.password === password){
-               document.getElementById('login-form').style.display = 'none';
-               document.getElementById('ChatTab').style.display = 'block';
-               chatContainer.style.display = 'flex';
-               startChat(); // チャット画面の初期化
-               document.getElementById('room-select').style.display = 'block';
-               document.getElementById('ChatTab').style.display = 'none';
+      <div id="players">
+      <div id="player1" class="player">
+         <b class="PlayerName">mechanic</b>   <i class="PlayerLevel">Lv.23</i><br>
+         <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
+         <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
+         <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
+      </div>
+      <div id="player2" class="player">
+         <b class="PlayerName">friend1</b>   <i class="PlayerLevel">Lv.23</i><br>
+         <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
+         <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
+         <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
+      </div>
+      <div id="player3" class="player">
+         <b class="PlayerName">friend2</b>   <i class="PlayerLevel">Lv.23</i><br>
+         <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
+         <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
+         <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
+      </div>
+      <div id="player4" class="player">
+         <b class="PlayerName">friend3</b>   <i class="PlayerLevel">Lv.23</i><br>
+         <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
+         <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
+         <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
+      </div>
+      </div><br><br><br>
+      <button class="button" id="select1" onclick="select1()">attack</button>  <button class="button" id="select2" onclick="select2()">magic</button>  <button class="button" id="select3" onclick="select3()">tools</button>  <button class="button" id="back" onclick="back()">pass</button><br>
+      <span id="Skillbutton"><button class="button" id="Skill1" onclick="Skill1()">skill</button></span>
+      `
+      document.getElementById('EventArea').style.display = 'none';
+      document.getElementById('NowMap').style.display = 'none';
 
-               AllowMove = 1;
-               document.getElementById('GameArea').innerHTML = `
-               <span>turn:</span><span id="TurnCount">0</span><br>
-               <div id="enemies">
-               <div id="enemy1" class="enemy">
-                  <b id="EnemyName">†古書館の魔術師†</b>   <i id="EnemyLevel">Lv.24</i><br>
-                  <span id="EnemyHealth">100</span>/<span id="EnemyMaxHealth">100</span><br>
-                  <span id="EnemyMP">20</span>/<span id="EnemyMaxMP">20</span><br>
-                  <span id="EnemyBuff"></span> <span id="EnemyDebuff"></span>
-               </div>
-               <div id="enemy2" class="enemy">
-                  <b id="EnemyName">読書マニアな司書</b>   <i id="EnemyLevel">Lv.22</i><br>
-                  <span id="EnemyHealth">100</span>/<span id="EnemyMaxHealth">100</span><br>
-                  <span id="Ene myMP">20</span>/<span id="EnemyMaxMP">20</span><br>
-                  <span id="EnemyBuff"></span> <span id="EnemyDebuff"></span>
-               </div>  
-               <div id="enemy3" class="enemy">
-                  <b id="EnemyName">忍び寄るナース</b>   <i id="EnemyLevel">Lv.23</i><br>
-                  <span id="EnemyHealth">100</span>/<span id="EnemyMaxHealth">100</span><br>
-                  <span id="EnemyMP">20</span>/<span id="EnemyMaxMP">20</span><br>
-                  <span id="EnemyBuff"></span> <span id="EnemyDebuff"></span>
-               </div>
-               <div id="enemy4" class="enemy">
-                  <b id="EnemyName">「救護」のプロ</b>   <i id="EnemyLevel">Lv.24</i><br>
-                  <span id="EnemyHealth">100</span>/<span id="EnemyMaxHealth">100</span><br>
-                  <span id="EnemyMP">20</span>/<span id="EnemyMaxMP">20</span><br>
-                  <span id="EnemyBuff"></span> <span id="EnemyDebuff"></span>
-               </div>
-               </div>
-               <br><br>
+      // データを取得する関数)
+      userData = await load();
+      euro = userData.euro??0;
+      bankeuro = userData.bankeuro??0;
+      rank = userData.rank??1;
+      rpt = userData.rpt??0;
+      rp = userData.rp??0;
+      clearedmainquest = userData.clearedmainquest??0;
+      cleareddailyquest = userData.cleareddailyquest??0;
+      playerhp = userData.hp??100;
+      playeratk = userData.atk??20;
+      playerdef = userData.def??0;
+      playermatk = userData.matk??10;
+      playermdef = userData.mdef??0;
+      playermagicpoint = userData.mp??50;
+      playercrla = userData.crla??0.03;
+      playercrdm = userData.crdm??1.5;
+      playercrrs = userData.crrs??0;
+      maxrpt = rank*100;
+      
+      setTimeout(BacktoHome,1000);
 
-               <div id="players">
-               <div id="player1" class="player">
-                  <b>mechanic</b>   <i>Lv.23</i><br>
-                  <span id="PlayerHealth">100</span>/<span>100</span><br>
-                  <span id="PlayerMP">0</span>/<span id="PlayerMaxMP">0</span><br>
-                  <span id="PlayerBuff"></span> <span id="PlayerDebuff"></span>
-               </div>
-               <div id="player2" class="player">
-                  <b>friend1</b>   <i>Lv.23</i><br>
-                  <span id="PlayerHealth">100</span>/<span>100</span><br>
-                  <span id="PlayerMP">0</span>/<span id="PlayerMaxMP">0</span><br>
-                  <span id="PlayerBuff"></span> <span id="PlayerDebuff"></span>
-               </div>
-               <div id="player3" class="player">
-                  <b>friend2</b>   <i>Lv.23</i><br>
-                  <span id="PlayerHealth">100</span>/<span>100</span><br>
-                  <span id="PlayerMP">0</span>/<span id="PlayerMaxMP">0</span><br>
-                  <span id="PlayerBuff"></span> <span id="PlayerDebuff"></span>
-               </div>
-               <div id="player4" class="player">
-                  <b>friend3</b>   <i>Lv.23</i><br>
-                  <span id="PlayerHealth">100</span>/<span>100</span><br>
-                  <span id="PlayerMP">0</span>/<span id="PlayerMaxMP">0</span><br>
-                  <span id="PlayerBuff"></span> <span id="PlayerDebuff"></span>
-               </div>
-               </div><br><br><br>
-               <button class="button" id="select1" onclick="select1()">attack</button>  <button class="button" id="select2" onclick="select2()">magic</button>  <button class="button" id="select3" onclick="select3()">tools</button>  <button class="button" id="back" onclick="back()">pass</button><br>
-               <span id="Skillbutton"><button class="button" id="Skill1" onclick="Skill1()">skill</button></span>
-               `
-               document.getElementById('GameArea').style.display = 'none';
-               document.getElementById('EventArea').style.display = 'none';
-               document.getElementById('NowMap').style.display = 'none';
-
-               // データを取得する関数)
-               load();
-               euro = userData.euro??0;
-               bankeuro = userData.bankeuro??0;
-               rank = userData.rank??1;
-               rpt = userData.rpt??0;
-               rp = userData.rp??0;
-               clearedmainquest = userData.clearedmainquest??0;
-               cleareddailyquest = userData.cleareddailyquest??0;
-               playerhp = userData.hp??100;
-               playeratk = userData.atk??20;
-               playerdef = userData.def??0;
-               playermatk = userData.matk??10;
-               playermdef = userData.mdef??0;
-               playermagicpoint = userData.mp??50;
-               playercrla = userData.crla??0.03;
-               playercrdm = userData.crdm??1.5;
-               playercrrs = userData.crrs??0;
-               maxrpt = rank*100;
-               
-               log.textContent = 'Now loading..';
-               setTimeout(BacktoHome,1000);
-
-               // ここでlastactをチェックする処理を追加
-               load();
-               usersRef.once('value').then(snapshot => {
-                  
-                  if(userData && checkLastLogin(userData.lastact)){
-                        cleareddailyquest = 0;
-                        quest.daily = [];
-                        for(i = 0;i < 5;i++){
-                           let newquest = quests.daily[Math.floor(Math.random() * quests.daily.length)];
-                           newquest.id = i+1;
-                           quest.daily.push(newquest);
-                        }
-                  }else{
-                     const namba = 5- cleareddailyquest
-                     quest.daily = [];
-                     for(i = 0;i < namba;i++){
-                        let newquest = quests.daily[Math.floor(Math.random() * quests.daily.length)];
-                        newquest.id = i+1;
-                        quest.daily.push(newquest);
-                     }
-                  }
-               });
-
-            } else {
-               // パスワードが間違っている
-               document.getElementById('GameArea').innerHTML = `
-               <div class="login-container">
-                  <form class="login-form" id="login-form">
-                     <input type="text" id="username" placeholder="ユーザー名" required>
-                     <input type="password" id="password" placeholder="パスワード" required>
-                     <button type="submit">ログイン</button>
-                     <div id="login-error" style="color: red; display: none;">パスワードが間違っています。</div>
-                  </form>
-               </div>
-               `
-               loginError.style.display = 'block';
-            }
+      // ここでlastactをチェックする処理を追加
+      load();
+      usersRef.once('value').then(snapshot => {
+         
+         if(userData && checkLastLogin(userData.lastact)){
+               cleareddailyquest = 0;
+               quest.daily = [];
+               for(i = 0;i < 5;i++){
+                  let newquest = quests.daily[Math.floor(Math.random() * quests.daily.length)];
+                  newquest.id = i+1;
+                  quest.daily.push(newquest);
+               }
          }else{
-            usersRef.update({
-               status: 'online',
-               password: password,
-            });
-            loginForm.style.display = 'none';
-            document.getElementById('ChatTab').style.display = 'block';
-            chatContainer.style.display = 'flex';
-            startChat();
-            document.getElementById('room-select').style.display = 'block';
-            switch(username){
-               case 'test':
-                  document.getElementById('room-select').appendChild(new Option("デバッグ用","debug"));
-                  break;
-               case 'koppepan_orange':
-                  document.getElementById('room-select').appendChild(new Option("koppepan","koppepan"));
-                  break;
-               case 'forest_inlet':
-                  document.getElementById('room-select').appendChild(new Option("forest","forest"));
-                  break;
-               case 'luna':
-                  document.getElementById('room-select').appendChild(new Option("luna","luna"));
-                  break;
-            }
-            document.getElementById('ChatTab').style.display = 'none';
-            document.getElementById('GameArea').style.display = 'block';
-            
-
-            AllowMove = 1;
-
-            euro = 0;
-            bankeuro = 0;
-            rank = 1;
-            rpt = 0;
-            rp = 0;
-            clearedmainquest = 0;
-            playeratk = 20;
-            playerdef = 0;
-            playermatk = 10;
-            playermdef = 0;
-            playerhp = 100;
-            playermagicpoint = 50;
-            playercrla = 0.03;
-            playercrdm = 1.5;
-            playercrrs = 0;
-            Potion.num = 2; Bomb.num = 2; Redcard.num = 2;
-
-            BacktoHome();
-
-            clearedmainquest = 0;
-            quest.main = quests.main[0];
+            const namba = 5- cleareddailyquest
             quest.daily = [];
-            for(i = 0;i < 5;i++){
+            for(i = 0;i < namba;i++){
                let newquest = quests.daily[Math.floor(Math.random() * quests.daily.length)];
                newquest.id = i+1;
                quest.daily.push(newquest);
             }
          }
       });
-      
-   });
+   }
+
+   
 
    //こっからchat
    document.getElementById('message-input').addEventListener('keypress', function(e) {
@@ -3386,7 +3666,7 @@ function HomeLetsDungeon(code){
    document.getElementById('GameArea').style.display = 'block';
    document.getElementById('GameArea').innerHTML = `
    <button class="button" onclick="HomeGoDungeon('greenslime');">greenslime</button><button class="button" onclick="HomeGoDungeon('mechanic');">mechanic</button><button class="button" onclick="HomeGoDungeon('clown');">clown</button><button class="button" onclick="HomeGoDungeon('herta');">herta</button><br>
-   <button class="button">something</button><br>
+   <button class="button" onclick="HomeGoDungeon('magodiaqua');">Mago Di Aqua</button><br>
    <button class="button" onclick="HomeGoDungeon('wretch');">wretch〜持たざる者〜</button>
    `;
 }
@@ -3402,7 +3682,7 @@ function HomeGoDungeon(name){
          buttonsolid = '#000000'
          buttonback = '#999999'
       break;
-      case 'green_slime'://greenslime
+      case 'greenslime'://greenslime
          humans.players[1].name = 'greenslime';
          humans.players[1].ex.id = 'none';
          humans.players[1].ns.id = 'none';
@@ -3425,7 +3705,7 @@ function HomeGoDungeon(name){
          humans.players[1].mdefense += 20;
       break;
       case 'clown'://clown //ごめん好きこいつ...ww 終末もそのうち作るよ
-         humans.players[1].name = '週末の道化師';//サンデーパパ、つってねぇ？！
+         humans.players[1].name = '週末の道化師';
          humans.players[1].ex.id = 'trickyvariables';
          humans.players[1].ns.id = 'gambler';
          humans.players[1].ps.id = 'highsol';
@@ -3445,6 +3725,19 @@ function HomeGoDungeon(name){
          humans.players[1].maxmp -= 40;
          humans.players[1].critlate += 0.04;
          enemy50pursuitenelgy = 1;
+      break;
+      case 'magodiaqua'://MagoDiAqua
+         humans.players[1].name = 'Luna Di Mare';
+         humans.players[1].ex.id = 'none';
+         humans.players[1].ns.id = 'none';
+         humans.players[1].ps.id = 'none';
+         buttonsolid = '#4473ad'
+         buttonback = '#AFC4DE'
+         humans.players[1].maxhealth -= 50;
+         humans.players[1].attack -= 10;
+         humans.players[1].mattack += 20;
+         humans.players[1].mdefense += 10;
+         humans.players[1].maxmp += 50;
       break;
    }
    humans.players[1].health = humans.players[1].maxhealth;
@@ -3715,7 +4008,7 @@ function BankWithdraw(code){
 
 //#region 非ダメ時モーション(?)
 async function humandamaged(cam,tcam,me,target,multiplier,kind,code){//矛先の陣営、攻撃タイプ(物理||魔法)、自分、矛先、倍率、コード(PS用)
-   console.log(humans[cam][me].name+'->'+humans[tcam][target].name+[cam,tcam,me,target,multiplier,kind,code])
+   console.log(humans[cam][me].name+'->'+humans[tcam][target].name+'   引数は'+[cam,tcam,me,target,multiplier,kind,code]+'だってよ')
    switch(kind){
       case 'sh':
          //codeは基本0。sは1、dsは2、solは3、スキルなら's'、アイテムなら'i'(ない)
@@ -3734,7 +4027,7 @@ async function humandamaged(cam,tcam,me,target,multiplier,kind,code){//矛先の
          if(equipweapon == 7){humans[cam][me].critlate -= 0.5}
          
          if('improve' in humans[cam][me].buffs){x *= 1.4;};
-         if('LetsThrow' in humans[cam][me].buffs){x *= 2; buffremove('humans[cam][me].buffs','LetsThrow');};
+         if('LetsThrow' in humans[cam][me].buffs){x *= 2; buffremove(cam,me,'LetsThrow');};
          if('gambling' in humans[cam][me].buffs){z = clowngambling[Math.floor(Math.random() * clowngambling.length)]; x *= z; buffremove('humans[cam][me].buffs','gambling'); log.textContent = 'ダメージは' + z + '倍になった!!'; await delay(1000);};
          x = Math.ceil(x);
          if(x < 0){x = 0}; if(x > humans[tcam][target].health){x = humans[tcam][target].health};
@@ -3782,7 +4075,7 @@ async function humandamaged(cam,tcam,me,target,multiplier,kind,code){//矛先の
             if(x < 0){x = 0};if(x > humans[tcam][target].health){x = humans[tcam][target].health};
             humans[tcam][target].health -= x;
             tekiou();
-            buffadd(target,'humans[tcam][target].buffs','shelldown',4,1);
+            buffadd(tcam,target,4,1);
             log.textContent = 'お口に合うと良いのですが..';
             await delay(1000);
          }
@@ -3829,148 +4122,6 @@ async function humandamaged(cam,tcam,me,target,multiplier,kind,code){//矛先の
          await delay(1000);
          break;
    }
-
-
-
-   switch(tcam){
-      case 'players':
-         console.log('enemy:'+humans.enemies[me].name+'->'+humans.players[target].name+[tcam,kind,me,target,multiplier,code])
-         x = (humans.enemies[me].attack * humans.enemies[me].power * multiplier);
-         x -= (humans.players[target].defense * humans.players[target].shell);
-         if(x < 0){x = 0};
-         if((Math.floor(Math.random()+ humans.enemies[me].critlate)-humans.players[target].critresist) >= 1){x += (humans.players[target].defense);x *= humans.enemies[me].critdmg;log.textContent = '痛恨の一撃！';await delay(1000);};
-         x = Math.ceil(x);
-         if(x > humans.players[target].maxhealth){x = humans.players[target].maxhealth};
-         if(x < 0){x = 0;};
-         if('onslime' in humans.enemies[me].buffs){x = 0;};
-         if('spliting' in humans.players[target].buffs){Splithealth -= x; if(Splithealth < 0){Splithealth = 0}; Splittekiou(); Splithealth = Math.floor(Splithealth); if(Splithealth == 0){Splitbreak(); await delay(1000)};}
-         else{
-            y = humans.players[target].health;
-            humans.players[target].health -= x; tekiou();
-            if(humans.players[target].health <= 0){humans.players[target].health = 1;defeat();return;}
-         };
-         console.log(`damage:${y}->${humans.players[target].health}(${x})`);
-         if(x == 0){log.textContent = 'miss! ' + humans.players[target].name + 'にダメージを与えられない!';}
-         else{log.textContent = humans.players[target].name + 'に' + x + 'のダメージ!';};
-         if('onslime' in humans.enemies[me].buffs){await delay(1000);buffremove('humans.enemies[target].buffs','onslime');log.textContent = humans.enemies[target].name + 'からスライムが剥がれた!';};
-         break;
-
-      case 'enemies':
-         console.log('player:'+humans.players[me].name+'->'+humans.enemies[target].name+[tcam,kind,me,target,multiplier,code])
-         switch(kind){
-            case 'sh':
-               //codeは基本0。sは1、dsは2、solは3、スキルなら's'、アイテムなら'i'(ない)
-               x = weaponpower;
-               if(equipweapon == 8){x = Math.floor(Math.random() * 13)+1};
-               if(equipweapon == 13){x = Math.floor(Math.random() * 1000)+1};//えぐ...
-               x = (humans.players[me].attack * humans.players[me].power * multiplier + x);
-               if(code == 3 && humans.players[me].ps.id == 'highsol'){x *= 3};
-               if(code == 3 && humans.players[me].ps.id == 'solx5but'){x *= 5};
-               x -= (humans.enemies[target].defense * humans.enemies[target].shell);
-            
-               if(equipweapon == 7){humans.players[me].critlate += 0.5}
-               if(equipweapon == 14){t=humans.players[me].critlate;humans.players[me].critlate = 0.7;w=humans.players[me].critdmg;humans.players[me].critdmg = 0.05}//ん？なんか会心多くね？を言わせてやりたいぜ..ww(50%増やしてるからかなりぶっ壊れ)
-               if((Math.floor(Math.random()+ humans.players[me].critlate)-humans.enemies[target].critresist) >= 1){x += (humans.enemies[target].defense); x *= humans.players[me].critdmg; log.textContent = '会心の一撃！'; await delay(1000);};
-               if(equipweapon == 14){humans.players[me].critlate = t;humans.players[me].critdmg = w;}
-               if(equipweapon == 7){humans.players[me].critlate -= 0.5}
-               
-               if('improve' in humans.players[me].buffs){x *= 1.4;};
-               if('LetsThrow' in humans.players[me].buffs){x *= 2; buffremove('humans.players[me].buffs','LetsThrow');};
-               if('gambling' in humans.players[me].buffs){z = clowngambling[Math.floor(Math.random() * clowngambling.length)]; x *= z; buffremove('humans.players[me].buffs','gambling'); log.textContent = 'ダメージは' + z + '倍になった!!'; await delay(1000);};
-               x = Math.ceil(x);
-               if(x < 0){x = 0}; if(x > humans.enemies[target].health){x = humans.enemies[target].health};
-               y = humans.enemies[target].health;
-               humans.enemies[target].health -= x;
-               console.log(`damage:${y}->${humans.enemies[target].health}(${x})`);
-               
-               if(humans.enemies[target].health < 0){humans.enemies[target].health = 0};
-               tekiou();
-               log.textContent = humans.enemies[target].name + 'に' + x + 'のダメージ！';
-               if(code == 3 && humans.players[me].ps.id == 'solplaceturret'){PlayerTurretPlace(me);}
-               
-               x = 1;if(code == 3){x = 2};
-               switch(humans.players[me].name){
-                  case 'Wretch': skillcooldown += 10*x; break;
-                  case 'greenslime': skillcooldown += 5*x; break;
-                  case 'mechanic': skillcooldown += 15*x; break;
-                  case 'clown': skillcooldown += 20*x; break;
-                  case 'herta': skillcooldown += 10*x; break;
-               }
-               if(skillcooldown > 100){skillcooldown = 100};
-               if(skillcooldown == 100){document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()">skill</button>';}
-               else{document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';};//新！クールダウン！！
-               await delay(1000);
-
-               //特殊武器ゾーン
-               if(equipweapon == 11){//体力を吸収するやつ。(ジェン・ソルテ)
-                  log.textContent = humans.players[me].name+'は'+humans.enemies[target].name+'の体力を吸収した！';
-                  await delay(500);
-                  y = Math.ceil(x * 0.25);
-                  humans.players[me].health += y;
-                  if(humans.players[me].health > humans.players[me].maxhealth){humans.players[me].health = humans.players[me].maxhealth};
-                  tekiou();
-                  log.textContent = y+'のHPを回復した！';
-                  await delay(1000);
-               }
-               if(equipweapon == 12 && code == 1 && humans.enemies[target].health > 0){//防御力下げるやつ(time on target)
-                  t = Math.floor(Math.random()*3)+1;
-                  switch(t){case 1:t='トリニティの砲撃術は優秀ですから。';break; case 2:t='お客様のお見送りも、丁寧に。'; break; case 3:t='砲手、支援を。';break;}
-                  log.textContent = t;
-                  await delay(1000);
-                  x = Math.ceil(humans.players[me].attack * humans.players[me].power * 1.1 + weaponpower - humans.enemies[target].defense);
-                  if(x < 0){x = 0};if(x > humans.enemies[target].health){x = humans.enemies[target].health};
-                  humans.enemies[target].health -= x;
-                  tekiou();
-                  buffadd(target,'humans.enemies[target].buffs','shelldown',4,1);
-                  log.textContent = 'お口に合うと良いのですが..';
-                  await delay(1000);
-               }
-            
-               //追撃ゾーン
-               if(humans.players[me].ps.id == 'enemy50%pursuit' && humans.enemies[target].health <= humans.enemies[target].maxhealth / 2 && enemy50pursuitenelgy == 1 && humans.enemies[target].health > 0){
-                  enemy50pursuitenelgy = 0;
-                  z = Math.floor(Math.random() * 2);
-                  if(z == 0){log.textContent = 'くるくる～――っと';}else{log.textContent = 'くるりん～っと';}
-                  await delay(1000);
-                  x = (humans.players[me].attack * humans.players[me].power * 0.7 + weaponpower); x -= (humans.enemies[target].defense);
-                  if((Math.floor(Math.random()+ humans.players[me].critlate)) == 1){x += (humans.enemies[target].defense); x *= 3; log.textContent = '会心の一撃！'; await delay(1000);};
-                  if('improve' in humans.players[me].buffs){x *= 1.4;};
-                  x = Math.ceil(x);
-                  if('LetsThrow' in humans.players[me].buffs){x *= 2; buffremove('humans.players[me].buffs','LetsThrow');};
-                  if(x < 0){x = 0}; if(x > humans.enemies[target].health){x = humans.enemies[target].health};
-                  humans.enemies[target].health -= x;
-                  if(humans.enemies[target].health < 0){humans.enemies[target].health = 0};
-                  tekiou();
-                  log.textContent = humans.enemies[target].name + 'に' + x + 'のダメージ!';
-                  skillcooldown += 10;
-                  if(skillcooldown > 100){skillcooldown = 100};if(skillcooldown == 100){document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()">skill</button>';}else{document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';};
-               }else if(humans.players[me].name == 'herta' && humans.enemies[target].health <= humans.enemies[target].maxhealth / 2 && humans.players[me].level >= 10 && humans.enemies[target].health > 0){//1凸効果「弱みは付け込み」
-                  x = (humans.players[me].attack * humans.players[me].power * 0.4 + weaponpower) - (humans.enemies[target].defense);
-                  if((Math.floor(Math.random()+ humans.players[me].critlate - 0.05)) == 1){x += (humans.enemies[target].defense); x *= humans.players[me].critdmg; log.textContent = '会心の一撃！'; await delay(1000);};
-                  if('improve' in humans.players[me].buffs){x *= 1.4;};
-                  x = Math.ceil(x);
-                  if('LetsThrow' in humans.players[me].buffs){x *= 2; buffremove('humans.players[me].buffs','LetsThrow');};
-                  if(x < 0){x = 0}; if(x > humans.enemies[target].health){x = humans.enemies[target].health};humans.enemies[target].health -= x;if(humans.enemies[target].health < 0){humans.enemies[target].health = 0};
-                  tekiou();
-                  log.textContent = humans.enemies[target].name + 'に' + x + 'のダメージ!';
-                  skillcooldown += 5;
-                  if(skillcooldown > 100){skillcooldown = 100};if(skillcooldown == 100){document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()">skill</button>';}else{document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';};
-               }
-               break;
-            case 'mg':
-               //codeは基本0。sは1、dsは2、solは3、スキルなら's'、アイテムなら'i'(ない)
-               x = (humans.players[me].mattack * humans.players[me].mpower * multiplier);
-               x -= (humans.enemies[target].mdefense * humans.enemies[target].shell);
-               x = Math.ceil(x);if(x < 0){x = 0};if(x > humans.enemies[target].health){x = humans.enemies[target].health};
-               humans.enemies[target].health -= x;
-               tekiou();
-               log.textContent = humans.enemies[target].name + 'に' + x + 'のダメージ!';
-               await delay(1000);
-               break;
-         }
-         break;
-   }
-   
 };
 //#endregion
 
@@ -4002,20 +4153,20 @@ async function playerturn(cam,me){
 
    nstimeout = 0;
    if ((turncount % 3) == 0 && humans.players[me].ns.id == 'throwslime'){
-      buffadd('humans.enemies[target].buffs','onslime',3,1);
+      buffadd('enemies',target,'onslime',3,1);
       log.textContent = humans.enemies[me].name + 'にスライムが覆い被さった!';
       nstimeout = 1;
    } else if ((turncount % 4) == 0 && humans.players[me].ns.id == 'throwwrench'){
-      buffadd('humans.players[me].buffs','LetsThrow',3,1);
+      buffadd('players',me,'LetsThrow',3,1);
       log.textContent = 'wrenchを投げる準備ができた!';
       nstimeout = 1;
    } else if ((turncount % 3) == 0 && humans.players[me].ns.id == 'gambler'){
-      buffadd('humans.players[me].buffs','gambling',1,1);
+      buffadd('players',me,'gambling',1,1);
       log.textContent = 'さあ、ギャンブルの時間だ!!';
       nstimeout = 1;
    }else if(turncount == 6 && humans.players[me].ns.id == 'improve'){
       if('improve' in humans.players[me].buffs == false){
-         buffadd('humans.players[me].buffs','improve',4,1);
+         buffadd('players',me,'improve',4,1);
          log.textContent = 'パーツアップグレード。';
          nstimeout = 1;
       }
@@ -4028,7 +4179,7 @@ async function playerturn(cam,me){
       if(x > 0){log.textContent = '5%のHPを回復した!!'; nstimeout = 1;}
    }else if((turncount % 4) == 0 && humans.players[me].ns.id == 'hitelec'){
       disappear();
-      buffadd('humans.players[me].buffs','powerup',2,2);
+      buffadd('players',me,'powerup',2,2);
       log.textContent = 'エレキギターで殴るぞ..ごめんここのセリフどしよ'
       let target = await LetsTargetSelect();
       await humandamaged(cam,target[1],me,target[0],2,'sh',4);
@@ -4095,7 +4246,8 @@ async function select2(me){
       phase = 3;
    } else if (phase == 2) {
       disappear()
-      if(humans.players[me].slash2 !== 0){
+      if(humans.players[me].slash2.id !== 0){
+         log.textContent = `${humans.players[me].name}は${humans.players[me].slash2.name}をした！`;
          Slash(2,me)
       }else{
          log.textContent = 'you dont have slash...';
@@ -4279,10 +4431,11 @@ async function Slash(num,me){
    if(humans.players[me].mp >= Slashs[UseSlash].mp){
       target = await LetsTargetSelect();
       console.log('ターゲットセレクト完了、殴るよ！！')
+      log.textContent = `${humans.players[me].name}の${Slashs[UseSlash].name}！`;await delay(1000);
       await Slashs[UseSlash].process('players',target[1],me,target[0]);
       humans.players[me].mp -= Slashs[UseSlash].mp;
       tekiou();
-      NextTurnis();
+      NextTurnis('players',target[1],me,target[0]);
    }else{
       log.textContent = 'not enough mp...';
       window.setTimeout(backtoplayerturn, 1000)
@@ -4337,14 +4490,14 @@ let PlayerTurret = 0;
 let PlayerTurretattack = 0;
 let clowngambling = ['0','0','2','2','2','4'];
 let hertaexvoice = ['こんな大きなダイアモンド見たことないでしょ？あげるね～','あなた…それじゃあダメだよ','ちょっとは静かになさい！','私が誰だか知ってるの？']
-async function skillact() {
+async function skillact(cam,me) {
    let serif = 'errored';
    if(phase == 1){
    if(skillcooldown == 100){
       if(humans.players[me].ex.id == '50%split'){
          if('spliting' in humans.players[me].buffs == false){
             if(playerhealth > Math.floor(playermaxhealth * 0.5)){
-            buffadd('humans.players[me].buffs','spliting',7);//廃止予定
+            buffadd(cam,me,'spliting',7);//廃止予定
             x = Math.floor(playermaxhealth * 0.5);
             playerhealth -= x;
             document.getElementById('PlayerFriendFront').innerHTML = '<br><br><b><font color="#2EFE2E">'+playername+'のコピー</font></b>  <br><span id="SplitHealth">0</span>/<span id="SplitMaxHealth">0</span>';
@@ -4376,11 +4529,11 @@ async function skillact() {
          await delay(1000);
          let target = await LetsTargetSelect();
          humandamaged(cam,target[1],me,target[0],2,'mg',4);//雷
-         buffadd('humans.enemies[target].buffs','freeze',4,1);
+         buffadd(tcam,target,'freeze',4,1);
          skillcooldown = 0;
          document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>'
          document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';
-         NextTurnis(me)
+         NextTurnis(cam,target[1],me,target[0]);
       }else if(humans.players[me].ex.id == '50%heal'){
          phase = 0;disappear();skillcooldown = 0;
          let target = await LetsTargetSelect();
@@ -4422,7 +4575,7 @@ async function skillact() {
          }//ミヤコさん
          log.textContent = serif;
          await humandamaged(cam,target[1],me,target[0],0.75,'sh',4);
-         buffadd(`humans[${target[1]}][${target[0]}].buffs`,'stan',1,1);
+         buffadd(target[1],target[0],'stan',1,1);
          skillcooldown = 0;
          document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>'
          document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';
@@ -4435,15 +4588,15 @@ async function skillact() {
                serif = '宇沢レイサにお任せください！！';
                break;
             case 2:
-               serif = '外れ〜〜〜';
+               serif = '外れ〜〜〜ww';
                break;
             case 3:
-               serif = '外れ〜〜〜';
+               serif = '外れ〜〜〜ww()';
                break;
          }//宇沢レイサ
-         log,textContent = serif;
+         log.textContent = serif;
          await humandamaged(cam,target[1],me,target[0],0.5,'sh',1)
-         buffadd(`humans[${target[1]}][${target[0]}].buffs`,'shelldown',2,2);
+         buffadd(target[1],target[0],'shelldown',2,2);
          skillcooldown = 0;
          document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>'
          document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';
@@ -4462,7 +4615,7 @@ async function skillact() {
                break;
          }
          log.textContent = serif;
-         buffadd(`humans[${target[1]}][${target[0]}.buffs`,'weaknessgrasp',2,1);//弱点把握状態 名前どーにかしよっか
+         buffadd(target[1],target[0],'weaknessgrasp',2,1);//弱点把握状態 名前どーにかしよっか
          skillcooldown = 0;
          document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>'
          document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';
@@ -4479,11 +4632,11 @@ async function skillact() {
             case 3:log.textContent = '普通の爆弾だった..!';break;
             case 1:log.textContent = '水爆弾だった！！';break;//強制終了です
             case 6:log.textContent = 'Lucky♪マグマ爆弾だった!!';break;
-            case 0:log.textContent = 'いけっ！ピカピカの実！';buffadd('humans.enemies[target[0]].buffs','stan',2,2);break;
+            case 0:log.textContent = 'いけっ！ピカピカの実！';buffadd(target[1],target[0],'stan',2,2);break;
          }
          await humandamaged(cam,target[1],me,target[0],x,'sh',4);
-         if(humans[target[1]][target[0]].health == 0){killedenemy(cam,tcam,me,target);}
-         else{phase = 1; endplayerturn(me,target[0])};
+         if(humans[target[1]][target[0]].health == 0){killedenemy(cam,target[1],me,target[0]);}
+         else{phase = 1; NextTurnis(cam,target[1],me,target[0]);};
          skillcooldown = 0;
          document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>'
          document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';
@@ -4497,7 +4650,7 @@ function Splittekiou(){
    document.getElementById('SplitMaxHealth').textContent = Splitmaxhealth;
    }
 function Splitbreak(){
-   buffremove('humans.players[me].buffs','spliting')
+   buffremove(cam,me,'spliting')
    x = Math.floor(Splitmaxhealth * 0.7);
    playerhealth += x;
    if (playerhealth > playermaxhealth){playerhealth = playermaxhealth;}
@@ -4513,9 +4666,15 @@ function PlayerTurretPlace(me){
    if(!document.getElementById('PlayerTurret')){
       let div = document.createElement('div');
       div.id = 'PlayerTurret';
-      div.class = 'player'
+      div.className = 'turret'
       document.getElementById('players').appendChild(div);
    }
+   Turret['players'] = {
+      num:Turret['players'].num??0 + 1,
+      attack:(Turret['players'].num??0+1)*5,
+      health:Turret['players'].num??0+1*15,
+      maxhealth:Turret['players'].num??0+1*15,
+   },
    humans.players.turret = {//atkは攻撃毎に
       execute: 1,
       num: 0,
@@ -4546,103 +4705,80 @@ async function Trickybomb(){
       case 0:x=0;log.textContent = 'しかし不発弾だった!!';break;//これによる効果とかもあっていいかも
       case 5:x=5;log.textContent = 'Lucky! 爆弾は焼夷弾だった!!!';break;
       case 4:x=4;log.textContent = '爆弾は花火だった!';break;
-      case 3:x=3;log.textContent = '爆弾は毒ガス入りだった!!';buffadd('humans.enemies[target].buffs','poison',3,1);break; //毒ガス入りだった場合
-      case 2:x=2;log.textContent = '爆弾はスライム入りだった!!';buffadd('humans.enemies[target].buffs','onslime',2,1);break;//スライム入りだった場合
+      case 3:x=3;log.textContent = '爆弾は毒ガス入りだった!!';buffadd(tcam,target,'poison',3,1);break; //毒ガス入りだった場合
+      case 2:x=2;log.textContent = '爆弾はスライム入りだった!!';buffadd(tcam,target,'onslime',2,1);break;//スライム入りだった場合
       case 1:x=1;log.textContent = '爆発した..だがただの特殊な薬品だった!!';break;
    }
    await delay(1000);
    await humandamaged(cam,tcam,me,target,x,'sh',4);
    if(humans.enemies[target].health == 0){killedenemy(cam,tcam,me,target);}
-   else{phase = 1; endplayerturn(me,target)};
+   else{phase = 1; NextTurnis(cam,tcam,me,target);};
 }
 //#endregion
 
 //#region prev-enemyturn
-async function endplayerturn(me,target){
-   phase = 0;
-   y = 1;//luck or luckgreat
-   if('luck' in humans.players[me].buffs){y = Math.floor(Math.random() * humans.players[me].buffs.luck.lv);}//luck
-   if(y == 0){
-      log.textContent = '当たりが出たらもう一本♪';
-      await delay(1000); backtoplayerturn(); return;
-   }
-
-   if(PlayerTurret > 0){
-      log.textContent = 'turretの攻撃!';
-      await delay(1000);
-      x = Math.ceil(PlayerTurretattack * PlayerTurret) - Math.ceil(humans.enemies[target].defense*humans.enemies[target].shell);
-      if(x < 0){x = 0};if(x > humans.enemies[target].health){x = humans.enemies[target].health};
-      humans.enemies[target].health -= x;tekiou();
-      log.textContent = humans.enemies[target].name+'に'+x+'のダメージ！';
-      await delay(1000);
-   }
-   if(humans.enemies[target].health == 0){killedenemy(cam,tcam,me,target);return;}
-
-   if ('poison' in humans.players[me].buffs){
-      x = playerhealth;
-      playerhealth -= Math.floor(playermaxhealth * humans.players[me].buffs.poison.lv);
-      if(playerhealth < 0){playerhealth = 0};
-      y = x - playerhealth;
-      log.textContent = playername + 'は毒で' + y + 'のダメージ!';
-      await delay(1000);
-   };
-   if('burn1' in humans.players[me].buffs){
-      x = playerhealth;
-      playerhealth -= humans.players[me].buffs.burn.lv;
-      if (playerhealth < 0){playerhealth = 0}
-      y = x - playerhealth;
-      log.textContent = playername + 'は燃えて' + y + 'のダメージ!';
-      await delay(1000);
-   };
-   tekiou();
-   if(humans.players[me].health <= 0){defeat();return;}
-
-   NextTurnis();
-}
 async function NextTurnis(cam,tcam,me,target){
    phase = 0;
-   y = 1;//luck or luckgreat
-   if('luck' in humans.players[me].buffs){y = Math.floor(Math.random() * humans.players[me].buffs.luck.lv);}//luck
+
+   if(!cam == 0){
+   y = 1;//luck
+   if('luck' in humans[cam][me].buffs){y = Math.floor(Math.random() * humans[cam][me].buffs.luck.lv);}//luck
    if(y == 0){
       log.textContent = '当たりが出たらもう一本♪';
       await delay(1000); backtoplayerturn(); return;
    }
-   if(Turret[cam].num > 0){
-      log.textContent = 'turretの攻撃!';
-      await delay(1000);
-      x = Math.ceil(Turret[cam].attack * Turret[cam].num) - Math.ceil(humans[tcam][target].defense*humans[tcam][target].shell);
-      if(x < 0){x = 0};if(x > humans[tcam][target].health){x = humans[tcam][target].health};
-      humans[tcam][target].health -= x;tekiou();
-      log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';
-      await delay(1000);
-   }
-   if(human[tcam][target].health == 0){killedenemy(cam,tcam,me,target);return;}//このへんcamとtcamで整頓しといて どっちでも可にして
 
-   if ('poison' in humans.players[me].buffs){
-      x = playerhealth;
-      playerhealth -= Math.floor(playermaxhealth * humans.players[me].buffs.poison.lv);
-      if(playerhealth < 0){playerhealth = 0};
-      y = x - playerhealth;
-      log.textContent = playername + 'は毒で' + y + 'のダメージ!';
+   if(humans[tcam][target].health == 0){killedenemy(cam,tcam,me,target);return;}//このへんcamとtcamで整頓しといて どっちでも可にして
+
+   if ('poison' in humans[cam][me].buffs){
+      x = humans[cam][me].health;
+      humans[cam][me].health -= Math.floor(humans[cam][me].maxhealth * humans[cam][me].buffs.poison.lv);
+      if(humans[cam][me].health < 0){humans[cam][me].health = 0};
+      y = x - humans[cam][me].health;
+      log.textContent = humans[cam][me].name + 'は毒で' + y + 'のダメージ!';
       await delay(1000);
    };
-   if('burn1' in humans.players[me].buffs){
-      x = playerhealth;
-      playerhealth -= humans.players[me].buffs.burn.lv;
-      if (playerhealth < 0){playerhealth = 0}
-      y = x - playerhealth;
-      log.textContent = playername + 'は燃えて' + y + 'のダメージ!';
+   if('burn1' in humans[cam][me].buffs){
+      x = humans[cam][me].health;
+      humans[cam][me].health -= humans[cam][me].buffs.burn.lv;
+      if(humans[cam][me].health < 0){humans[cam][me].health = 0}
+      y = x - humans[cam][me].health;
+      log.textContent = humans[cam][me].name + 'は燃えて' + y + 'のダメージ!';
       await delay(1000);
    };
    tekiou();
-   if(humans.players[me].health <= 0){defeat();return;}
+   if(humans[cam][me].health <= 0){defeat();return;}
+   }
 
    acted += 1;
    if(acted < bar.num.length){
    }else{
+      if(Turret.players.num > 0){
+         log.textContent = '我らのturretの攻撃!';
+         await delay(1000);
+         let selected = ShallTargetSelect(1,`ehpl`,0);
+         let tcams = selected[1];let targets = selected[0];
+         x = Math.ceil(Turret[cam].attack * Turret[cam].num) - Math.ceil(humans[tcams][targets].defense*humans[tcams][targets].shell);
+         if(x < 0){x = 0};if(x > humans[tcams][targets].health){x = humans[tcams][targets].health};
+         humans[tcams][targets].health -= x;tekiou();
+         log.textContent = `${humans[tcam][targets].name}に${x}のダメージ！`;
+         await delay(1000);
+      }
+      if(Turret.enemies.num > 0){
+         log.textContent = '敵のturretの攻撃!';
+         await delay(1000);
+         let selected = ShallTargetSelect(0,`phpl`,0);
+         let tcams = selected[1];let targets = selected[0];
+         x = Math.ceil(Turret[tcams].attack * Turret[tcams].num) - Math.ceil(humans[tcams][targets].defense*humans[tcams][targets].shell);
+         if(x < 0){x = 0};if(x > humans[tcams][targets].health){x = humans[tcams][targets].health};
+         humans[tcams][targets].health -= x;tekiou();
+         log.textContent = `${humans[tcams][targets].name}に${x}のダメージ！`;
+         await delay(1000);
+      }
+
       turncount += 1;
       const combined = [...Object.values(humans.players), ...Object.values(humans.enemies)].filter(c => c.execute === 1 && c.health > 0)// オブジェクトをリストに変換して合体
-      .sort((a, b) => {// 降順でソート、speedが同じならcamが'p'のものを優先
+      .sort((a, b) => {// 降順でソート
          if(b.speed === a.speed){
             if(a.cam === b.cam){
                return a.num - b.num;  // 同じcamならnumの小さい方が優先
@@ -4651,16 +4787,16 @@ async function NextTurnis(cam,tcam,me,target){
          }
          return b.speed - a.speed;  // 速度の高い順に並べる
       });
-      console.log(combined);
       bar = {
          cam: combined.map(c => c.cam),
          num: combined.map(c => c.num)
       };
+      console.log(bar)
       acted = 0;
+      console.log(`〜〜〜〜〜〜${turncount}ターン目〜〜〜〜〜〜`); //あとはskill系とmagicもて加えてって。slashとslsもみといて
    } 
 
    nowturn = bar.num[acted];
-   let cam = 0;
    switch(bar.cam[acted]){
       case 'player':
          cam = 'players';
@@ -4678,22 +4814,22 @@ async function NextTurnis(cam,tcam,me,target){
          log.textContent = 'なんとかスライムを取り払った!!';
       }else{
          log.textContent = 'スライムが邪魔して動けない!!';//今思ったけどこれやばいのでは...?
-         await delay(1000);NextTurnis();return;}; 
+         await delay(1000);NextTurnis(0);return;}; 
    }
    if('skip' in humans[cam][nowturn].buffs){
       log.textContent = 'はい'+humans[cam][me].name+'、お前スキップ〜〜';
-      await delay(1000); NextTurnis(); return;
+      await delay(1000); NextTurnis(cam,0,me,0); return;
    }
    if('stan' in humans[cam][nowturn].buffs){
       log.textContent = humans[cam][me].name+'はスタンした！';
-      await delay(1000); NextTurnis(); return;　
+      await delay(1000); NextTurnis(cam,0,me,0); return;　
    }
    if('freeze' in humans[cam][nowturn].buffs){
       if(!Math.floor(Math.random() * Debuffs.freeze.lv[humans[cam][nowturn].buffs.freeze.lv]) !== 0){
          log.textContent = '氷が溶けた!'; buffremove(`humans[${cam}][${nowturn}].buffs`,'freeze');
       }else{
          log.textContent = humans[cam][nowturn].name + 'は凍っている...';
-         await delay(1000); NextTurnis(); return;
+         await delay(1000); NextTurnis(cam,0,me,0); return;
       }   
    }
 
@@ -4709,7 +4845,6 @@ async function NextTurnis(cam,tcam,me,target){
 //#endregion
 //#region enemyturn
 async function enemyturn(cam,me){
-   console.log(`〜〜〜〜〜〜enemyturn${humans.enemies[me].name}〜〜〜〜〜〜`);
    console.log('attack:'+humans.enemies[me].attack+'power:'+humans.enemies[me].power);
    x = Object.values(humans.enemies).filter(x => x.execute == 1&& x.health > 0).map(x => x.num);
    for(i = 0; i < x.length; i++){
@@ -4722,29 +4857,6 @@ async function enemyturn(cam,me){
       }
    }
    tekiou();
-
-   //こっから敵が動けるかどうかの動き
-   y = 1;//skip
-   if('skip' in humans.enemies[me].buffs){y = 0;}//skip1
-   if(y == 0){
-      log.textContent = 'はい'+humans.enemies[me].name+'、お前スキップ〜〜';
-      await delay(1000); NextTurnis(); return;
-   }
-   y = 1;//stan
-   if('stan' in humans.enemies[me].buffs){y = 0;}//stan
-   if(y == 0){
-      log.textContent = humans.enemies[me].name+'はスタンした！';
-      await delay(1000); NextTurnis(); return;　
-   }
-   //freeze
-   if('freeze' in humans.enemies[me].buffs){
-      if(!Math.floor(Math.random() * 3) !== 0){
-         log.textContent = '氷が溶けた!'; buffremove('humans.enemies[target].buffs','freeze');
-      }else{
-         log.textContent = humans.enemies[me].name + 'は凍っている...';
-         await delay(1000); NextTurnis(); return;
-      }   
-   }
    
    let name = humans.enemies[me].name
    log.textContent = name+'のターン！';await delay(1000);
@@ -4797,8 +4909,7 @@ async function enemyturn(cam,me){
    if(humans.enemies[me].health <= 0){humans.enemies[me].health = 0}
    if(humans.enemies[me].health == 0){window.setTimeout(killedenemy, 1000)}
    else{
-      await delay(1000);
-      NextTurnis();
+      NextTurnis(cam,selected[1],me,selected[0]);
    }
 }
 function ShallTargetSelect(me,code,both){//これは敵しか使わないターゲットセレクト。だから陣営とかは考えんでいいよ
@@ -4832,20 +4943,16 @@ function ShallTargetSelect(me,code,both){//これは敵しか使わないター�
          }
          break;
       case 'phpl':
-         console.log(ret);
          x = playerstatus.health[0];
          if(both == 0){
             ret.push(x);
-            console.log(x,ret);
          }else{
             let b = []
             if(playerstatus.num.includes(x-1)){b.push(x-1)};
             b.push(x);
             if(playerstatus.num.includes(x+1)){b.push(x+1)};
             ret.push(b)
-            console.log(ret);
          }
-         console.log(ret);
          break;
       case 'phph':
          x = playerstatus.health[playerstatus.length - 1];
@@ -5109,7 +5216,7 @@ async function killedenemy(cam,tcam,me,target) {
    }
 
    await delay(1000);
-   buffclear('humans.enemies[target].buffs');buffclear('humans.enemies[target].buffs');
+   buffclear(tcam,target);buffclear(tcam,target);
    PlayerTurretbreak();
    z = Math.floor(Math.random() * 5)-2;// -2~2
    enemylevel += z;
@@ -5183,7 +5290,7 @@ async function EnemyAppear(){
       cam:[],
       num:[]
    }
-   NextTurnis();
+   NextTurnis(0);
 }
 
 async function defeat(){
@@ -5274,7 +5381,7 @@ async function bossenemyturn(){
       //2:攻撃(シンプル)
       //3:相手を毒に(2ターン)
       //if(max0.3>)[確定]防御力down1(討伐まで有効)
-      if(humans.enemies[me].health <= humans.enemies[me].health * 0.3){buffadd('humans.players[me].buffs','shelldown',1,1);}
+      if(humans.enemies[me].health <= humans.enemies[me].health * 0.3){buffadd(cam,me,'shelldown',1,1);}
       switch(Math.floor(Math.random()*4)+1){
          case 1:
          case 2:
@@ -5283,7 +5390,7 @@ async function bossenemyturn(){
             break;
          case 3:
             log.textContent = humans.enemies[me].name + 'は大きく息を吐いた！';
-            buffadd('humans.players[me].buffs','poison',2,1);
+            buffadd(cam,me,'poison',2,1);
             break;
       }
    }else if(humans.enemies[me].name == 'steampumker'){
@@ -5322,7 +5429,7 @@ async function bossenemyturn(){
          case 1:log.textContent = '普通の爆弾だった!!';break;//これによる効果とかもあっていいかも
          case 2:log.textContent = '爆弾は雷光弾だった!!!';break;
          case 3:log.textContent = '爆弾は焼夷弾だった!';break;
-         case 0:log.textContent = '爆弾は閃光弾だった!!';buffadd('humans.players[me].buffs','stan',1,1);y = 0.5;break;
+         case 0:log.textContent = '爆弾は閃光弾だった!!';buffadd(cam,me,'stan',1,1);y = 0.5;break;
       }
       await delay(1000);
       await humandamaged('players',me,targetselect,x*y,0);
@@ -5332,7 +5439,7 @@ async function bossenemyturn(){
    if(humans.enemies[me].health == 0){window.setTimeout(killedenemy, 1000)}
    else {
       await delay(1000);
-      NextTurnis();
+      NextTurnis(cam,tcam,me,target);
    }
 }
 //こっから変数とか関数とか
@@ -5716,7 +5823,6 @@ const SHOPexrandom = {
 //#region candystand
 let candybar = [];
 async function Candytake(){
-   //デバフによって初期からたくさんあるってのもありかも
    //log.textContent = 'あめを食べた..';
    //await delay(1000);
    let candynum = Math.floor(Math.random() * 20) + 1;
@@ -5724,50 +5830,50 @@ async function Candytake(){
    candybar.push(candynum);
    switch(Math.floor(Math.random()*3)+1){
       case 1:
-         playerattack += Math.floor(Math.random() * 3) + 2;if(playerattack < 1){playerattack = 1};
+         humans.players[1].attack += Math.floor(Math.random() * 3) + 2;
          log.textContent = '攻撃力が上がった！';
          break;
       case 2:
-         playerdefense += Math.floor(Math.random() * 3) + 1;if(playerdefense < 0){playerdefense = 0};
+         humans.players[1].defense += Math.floor(Math.random() * 3) + 1;if(humans.players[1].defense < 0){humans.players[1].defense = 0};
          log.textContent = '防御力が上がった！';
          break;
       case 3:
-         playermaxhealth += Math.floor(Math.random() * 5) + 5;if(playermaxhealth < 1){playermaxhealth = 1};
+         humans.players[1].maxhealth += Math.floor(Math.random() * 5) + 5;
          log.textContent = '体力が増えた！';
          break;
    };
    }else{
       switch(Math.floor(Math.random()*3)+1){
          case 1:
-            playerattack -= Math.floor(Math.random() * 13) + 5;if(playerattack < 1){playerattack = 1};
+            humans.players[1].attack -= Math.floor(Math.random() * 13) + 5;if(humans.players[1].attack < 1){humans.players[1].attack = 1};
             log.textContent = '攻撃力が下がった！';
             break;
          case 2:
-            playerdefense -= Math.floor(Math.random() * 10) + 3;if(playerdefense < 0){playerdefense = 0};
+            humans.players[1].defense -= Math.floor(Math.random() * 10) + 3;if(humans.players[1].defense < 0){humans.players[1].defense = 0};
             log.textContent = '防御力が下がった！';
             break;
          case 3:
-            playermaxhealth -= Math.floor(Math.random() * 21) + 10;if(playermaxhealth < 1){playermaxhealth = 1};
-            if(playerhealth > playermaxhealth){playerhealth = playermaxhealth};
+            humans.players[1].maxhealth -= Math.floor(Math.random() * 21) + 10;if(humans.players[1].maxhealth < 1){humans.players[1].maxhealth = 1};
+            if(humans.players[1].health > humans.players[1].maxhealth){humans.players[1].health = humans.players[1].maxhealth};
             log.textContent = '体力が減った！';
             break;
       };
    }
 }
 // #endregion
-//#region hopeful-button
+//#region hopeful-button  廃止予定
 async function HopeButtonact(){
    AllowMove = 1;
    log.textContent = 'ボタンを押した....';
    await delay(1000);
    if(Math.floor(Math.random() * 2) == 0){
       log.textContent = 'な、中から四葉のクローバーが...!!';
-      buffclear('humans.players[me].buffs');
-      buffadd('playerbuff','luck',2,1);
+      buffclear(cam,me);
+      buffadd('players',1,'luck',2,1);
    } else {
       log.textContent = 'ボタンが溶けて手がやられた！';
-      buffadd('humans.players[me].buffs','shelldown',3,1);
-      buffadd('humans.players[me].buffs','powerdown',3,2);
+      buffadd(cam,me,'shelldown',3,1);
+      buffadd(cam,me,'powerdown',3,2);
    }
    await delay(1000);
    log.textContent = '';
@@ -5842,24 +5948,24 @@ async function Cookietake(){
    await delay(1000);
    switch(Math.floor(Math.random()*3)+1){
       case 1:
-         playerattack += 3;
+         humans.players[1].attack += 5 ;
          x = '熱い！焼きたてだぜ！！';
          break;
       case 2:
-         playerdefense += 3;
+         humans.players[1].defense += 5;
          x = '硬い！凍ってたかもしんねぇ！！';
          break;
       case 3:
-         playermaxhealth += 10;
-         playerhealth = playermaxhealth;
-         x = 'うまい！！';//体力増える..の味が思いつかなすぎた これはしゃーない
+         humans.players[1].maxhealth += 20;
+         humans.players[1].health = humans.players[1].maxhealth;
+         x = 'うまい！！';//体力増える..の味が思いつかなすぎた これはしゃーない 煉獄さん
          break;
       case 4:
-         playermaxmp += 3;
+         humans.players[1].maxmp += 10;
          x = '甘い！砂糖マシマシだー！！';
          break;
       case 5:
-         playercritdmg += 0.2;//当たり枠(会心ダメージ増加はぶっ壊れてる..たぶん)
+         humans.players[1].critdmg += 0.1;//当たり枠(会心ダメージ増加はぶっ壊れてる..たぶん)
          x = 'はっ..!?これは....ジャム入りだ.....!!!!';//ちなみにコッペくんはジャムが上に乗ったタルト生地のクッキーが好物です マカロンと張るくらい好き
          break;
    }
@@ -5893,9 +5999,9 @@ async function placebomb(){
 //#endregion
 //#region catus
 async function CatusAct(){
-   if(playerhealth > 10){
+   if(humans.players[1].health > 10){
       log.textContent = 'いてっ';
-      playerhealth -= 10;playerattack += 5;if(stage == 3){playerhealth -= 10;playerattack += 5;}
+      humans.players[1].health -= 10;humans.players[1].attack += 5;if(stage == 3){humans.players[1].health -= 10;humans.players[1].attack += 5;}
       MAPx = Math.floor(SELECTx / 75);
       MAPy = Math.floor(SELECTy / 75);
       objectMap[MAPy][MAPx] = 0;
@@ -5906,7 +6012,7 @@ async function CatusAct(){
    log.textContent = '';
 }
 //#endregion
-//#region scorpion
+//#region scorpion 廃止予定
 async function ScorpionAct(code){
    log.textContent = '刺された...';
    switch(code){

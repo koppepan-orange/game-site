@@ -16,6 +16,49 @@ body {
   height: 950px;
   margin: 0 auto;
 }
+
+/*sideMenu*/
+#sideMenu {
+  position: fixed;
+  top: 0;
+  left: -250px;
+  width: 250px;
+  height: 100%;
+  color: #333344;
+  background-color: #cecece;
+  transition: left 0.3s;
+}
+#sideMenu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+#sideMenu ul li {
+  padding: 3px;
+}
+#sideMenu ul li a {
+  color: #000000;
+  text-decoration: none;
+}
+#sideMenu button {
+  background: none;
+  border: none;
+  color: #000000;
+  font: hangyaku;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 0;
+}
+#menuToggle {
+  display: none;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  color: #000000;
+  border: none;
+  font-size: 26px;
+  cursor: pointer;
+}
 /*notice*/
 #Notice-button {
   position: fixed;
@@ -229,6 +272,13 @@ body {
   display: none;
 }
 
+/* バトル中のそれ */
+.EnemyName{
+  max-width: 80px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 /* こっからクエスト */
 #quest-list{
   width: 62%;
@@ -374,6 +424,18 @@ body {
 }
 .player{
   display: none;
+  width: auto;
+  height: 100px;
+  padding: 5px;
+  border: 1px solid #222;
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 5px 0;
+  text-align: left;
+}
+
+.turret{
+  display: block;
   width: auto;
   height: 100px;
   padding: 5px;
