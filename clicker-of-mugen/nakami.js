@@ -2766,6 +2766,16 @@ function OpenNotice(){
       document.getElementById('Notice-page').innerHTML = '';
    }
 }
+
+const menuToggle = document.getElementById('menuToggle');
+const sideMenu = document.getElementById('sideMenu');
+menuToggle.addEventListener('click', () => {
+   if(sideMenu.style.left === '0px'){
+         sideMenu.style.left = '-250px';
+   }else{
+         sideMenu.style.left = '0px';
+   }
+});
 //#endregion
 //#region Questの動き
 const quests = {
@@ -4486,55 +4496,70 @@ async function Tool(num,me){
 //#region playerのskill
 let Splithealth = 0;
 let Splitmaxhealth = 0;
-let PlayerTurret = 0;
-let PlayerTurretattack = 0;
+//let PlayerTurret = 0;
+//let PlayerTurretattack = 0;
 let clowngambling = ['0','0','2','2','2','4'];
 let hertaexvoice = ['こんな大きなダイアモンド見たことないでしょ？あげるね～','あなた…それじゃあダメだよ','ちょっとは静かになさい！','私が誰だか知ってるの？']
-async function skillact(cam,me) {
+
+// スキル予約関数
+let skillQueue = [];
+function skillReserve(cam,me){
+   x = humans[cam][me].ex.id;
+   skillQueue.push({cam,me,x});
+   console.log(`スキル予約済み: ${cam} ${num} -> ${skill}  現在キュー: ${skillQueue}`);
+}
+async function skillAct(cam,me,skill){
    let serif = 'errored';
-   if(phase == 1){
-   if(skillcooldown == 100){
-      if(humans.players[me].ex.id == '50%split'){
+   switch(skill){
+      case '50%split':{
          if('spliting' in humans.players[me].buffs == false){
             if(playerhealth > Math.floor(playermaxhealth * 0.5)){
             buffadd(cam,me,'spliting',7);//廃止予定
             x = Math.floor(playermaxhealth * 0.5);
             playerhealth -= x;
-            document.getElementById('PlayerFriendFront').innerHTML = '<br><br><b><font color="#2EFE2E">'+playername+'のコピー</font></b>  <br><span id="SplitHealth">0</span>/<span id="SplitMaxHealth">0</span>';
+            document.getElementById('PlayerFriendFront').innerHTML = '<br><br><b><font color="#2EFE2E">'+humans[cam][me].name+'のコピー</font></b>  <br><span id="SplitHealth">0</span>/<span id="SplitMaxHealth">0</span>';
             Splitmaxhealth = x;
             Splithealth = x;
             Splittekiou()
-            log.textContent = playername+'は分裂した!!';
+            log.textContent = humans[cam][me].name+'は分裂した!!';
             tekiou()
-            } else {log.textContent = 'tairyoku ga sukunai desu...';}
+            }else{log.textContent = 'tairyoku ga sukunai desu...';}
          }
-      }else if(humans.players[me].ex.id == 'placeturret'){
+         break;
+      };
+      case 'placeturret':{
          PlayerTurretPlace();
-         PlayerTurrettekiou();
-         log.textContent = playername+'はturretを設置した!';
-         skillcooldown = 0;
-         document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>'
-         document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';
-      }else if(humans.players[me].ex.id == 'trickyvariables'){
+         log.textContent = humans[cam][me].name+'はturretを設置した!';
+         skillReset();
+         break;
+      };
+      case 'trickyvariables':{
          phase = 0; disappear();
-         log.textContent = playername+'は爆弾を投げた...';
-         document.getElementById('Skillbutton').innerHTML = '';
-         window.setTimeout(Trickybomb, 1000)
-         skillcooldown = 0;
-         document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>'
-         document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';
-      }else if(humans.players[me].ex.id == 'bigdiamond'){
-         phase = 0; disappear(); skillcooldown = 0;
-         log.textContent = hertaexvoice[Math.floor(Math.random() * hertaexvoice.length)];//そのうち消える
+         log.textContent = humans[cam][me].name+'は爆弾を投げた...';
+         switch(Math.floor(Math.random() * 6)){
+            case 0:x=0;log.textContent = 'しかし不発弾だった!!';break;//これによる効果とかもあっていいかも
+            case 5:x=5;log.textContent = 'Lucky! 爆弾は焼夷弾だった!!!';break;
+            case 4:x=4;log.textContent = '爆弾は花火だった!';break;
+            case 3:x=3;log.textContent = '爆弾は毒ガス入りだった!!';buffadd(tcam,target,'poison',3,1);break; //毒ガス入りだった場合
+            case 2:x=2;log.textContent = '爆弾はスライム入りだった!!';buffadd(tcam,target,'onslime',2,1);break;//スライム入りだった場合
+            case 1:x=1;log.textContent = '爆発した..だがただの特殊な薬品だった!!';break;
+         }
          await delay(1000);
-         let target = await LetsTargetSelect();
-         humandamaged(cam,target[1],me,target[0],2,'mg',4);//雷
-         buffadd(tcam,target,'freeze',4,1);
-         skillcooldown = 0;
-         document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>'
-         document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';
-         NextTurnis(cam,target[1],me,target[0]);
-      }else if(humans.players[me].ex.id == '50%heal'){
+         await humandamaged(cam,tcam,me,target,x,'sh',4);
+         if(humans.enemies[target].health == 0){killedenemy(cam,tcam,me,target);}
+         else{phase = 1; NextTurnis(cam,tcam,me,target);};
+         skillReset();
+         break;
+      };
+      case 'bigdiamond':{
+         phase = 0; disappear();
+         log.textContent = humans[cam][me].name+'は爆弾を投げた...';
+         document.getElementById('Skillbutton').innerHTML = '';
+         window.setTimeout(BigDiamond, 1000)
+         skillReset();
+         break;
+      };
+      case '50%heal':{
          phase = 0;disappear();skillcooldown = 0;
          let target = await LetsTargetSelect();
          x = humans[target[1]][target[0]].health;
@@ -4542,9 +4567,10 @@ async function skillact(cam,me) {
          if (humans[target[1]][target[0]].health > humans[target[1]][target[0]].maxhealth){humans[target[1]][target[0]].health = humans[target[1]][target[0]].maxhealth;}
          x = humans[target[1]][target[0]].health - x;
          log.textContent = '体力が' + x + '回復した!';
-         document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>'
-         document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';
-      }else if(humans.players[me].ex.id == 'kyrieeleison'){
+         skillReset();
+         break;
+      };
+      case 'kyrieeleison':{
          phase = 0; disappear();
          let target = await LetsTargetSelect();
          switch(Math.floor(Math.random()*3)+1){
@@ -4556,10 +4582,10 @@ async function skillact(cam,me) {
          x = 2;
          if(humans[target[1]][target[0]].health >= humans[target[1]][target[0]].health * 0.7){x = 4};
          await humandamaged(cam,target[1],me,target[0],x,'sh',4);
-         skillcooldown = 0;
-         document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>'
-         document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';
-      }else if(humans.players[me].ex.id == 'standrone'){
+         skillReset();
+         break;
+      };
+      case 'standrone':{
          phase = 0; disappear();
          let target = await LetsTargetSelect();
          switch(Math.floor(Math.random()*3)+1){
@@ -4576,11 +4602,10 @@ async function skillact(cam,me) {
          log.textContent = serif;
          await humandamaged(cam,target[1],me,target[0],0.75,'sh',4);
          buffadd(target[1],target[0],'stan',1,1);
-         skillcooldown = 0;
-         document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>'
-         document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';
-         phase = 1;backtoplayerturn();
-      }else if(humans.players[me].ex.id == 'recievechallenge'){
+         skillReset();
+         break;
+      };
+      case 'recievechallenge':{
          phase = 0; disappear();
          let target = await LetsTargetSelect();
          switch(Math.floor(Math.random()*3)+1){
@@ -4597,11 +4622,10 @@ async function skillact(cam,me) {
          log.textContent = serif;
          await humandamaged(cam,target[1],me,target[0],0.5,'sh',1)
          buffadd(target[1],target[0],'shelldown',2,2);
-         skillcooldown = 0;
-         document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>'
-         document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';
-         phase = 1;backtoplayerturn();
-      }else if(humans.players[me].ex.id == 'timidpursuit'){
+         skillReset();
+         break;
+      };
+      case 'timidpursuit':{
          phase = 0; disappear();
          switch(Math.floor(Math.random()*3)+1){
             case 1:
@@ -4615,12 +4639,11 @@ async function skillact(cam,me) {
                break;
          }
          log.textContent = serif;
-         buffadd(target[1],target[0],'weaknessgrasp',2,1);//弱点把握状態 名前どーにかしよっか
-         skillcooldown = 0;
-         document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>'
-         document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';
-         phase = 1;backtoplayerturn();
-      }else if(humans.players[me].ex.id == 'bombe'){
+         buffadd(target[1],target[0],'weaknessgrasp',2,1);//弱点把握状態
+         skillReset();
+         break;
+      };
+      case 'bombe':{
          phase = 0; disappear();
          await LetsTargetSelect();
          log.textContent = humans.players[me].name+'は爆弾を投げた...';
@@ -4637,13 +4660,15 @@ async function skillact(cam,me) {
          await humandamaged(cam,target[1],me,target[0],x,'sh',4);
          if(humans[target[1]][target[0]].health == 0){killedenemy(cam,target[1],me,target[0]);}
          else{phase = 1; NextTurnis(cam,target[1],me,target[0]);};
-         skillcooldown = 0;
-         document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>'
-         document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';
-         //if(x == 1){next-enemy();}
-      }
-   }else {log.textContent = 'skill is not ready...';}
+         skillReset();
+         break;
+      };
    }
+}
+function skillReset(cam,me){
+   humans[cam][me].cooldown = 0;
+   document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>';
+   document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';
 }
 function Splittekiou(){
    document.getElementById('SplitHealth').textContent = Splithealth;
@@ -4662,7 +4687,7 @@ function Splitbreak(){
    document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>'
    document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';
 }
-function PlayerTurretPlace(me){
+function PlayerTurretPlace(){
    if(!document.getElementById('PlayerTurret')){
       let div = document.createElement('div');
       div.id = 'PlayerTurret';
@@ -4671,48 +4696,27 @@ function PlayerTurretPlace(me){
    }
    Turret['players'] = {
       num:Turret['players'].num??0 + 1,
-      attack:(Turret['players'].num??0+1)*5,
-      health:Turret['players'].num??0+1*15,
-      maxhealth:Turret['players'].num??0+1*15,
+      attack:(Turret['players'].num??0+1) * 5,
+      health:(Turret['players'].num??0+1) * 15,
+      maxhealth:(Turret['players'].num??0+1) * 15,
    },
-   humans.players.turret = {//atkは攻撃毎に
-      execute: 1,
-      num: 0,
-      health: humans.players.turret?.health??0 + Math.floor(humans.players[me].maxhealth*0.3),
-      maxhealth: humans.players.turret?.maxhealth??0 + Math.floor(humans.players[me].maxhealth*0.3),
-   }
-   humans.players.turret.num += 1;
    document.getElementById('PlayerTurret').innerHTML = `
-      <b>turret</b>x${humans.players.turret.num}<br>
-      <span>${humans.players.turret.health}</span>/<span>${humans.players.turret.maxhealth}</span><br>
+      <b>turret</b>x${Turret['players'].num}<br>
+      <span>${Turret['players'].health}</span>/<span>${Turret['players'].maxhealth}</span><br>
    `
 }
 function PlayerTurrettekiou(){tekiou();console.log('今はなきPlayerTurrettekiouが実行されたよ');};
 function PlayerTurretbreak(){
-   humans.players.turret.num -= 1;
-   if(humans.players.turret.num == 0){
-      humans.players.turret = {};
+   Turret['players'].num -= 1;
+   if(Turret['players'].num <= 0){
+      Turret['players'] = {};
       document.getElementById('PlayerTurret').remove();
    }else{
       document.getElementById('PlayerTurret').innerHTML = `
-         <b>turret</b>x${humans.players.turret.num}<br>
-         <span>${humans.players.turret.health}</span>/<span>${humans.players.turret.maxhealth}</span><br>
+         <b>turret</b>x${Turret['players'].num}<br>
+         <span>${Turret['players'].health}</span>/<span>${Turret['players'].maxhealth}</span><br>
       `;
    }
-}
-async function Trickybomb(){
-   switch(Math.floor(Math.random() * 6)){
-      case 0:x=0;log.textContent = 'しかし不発弾だった!!';break;//これによる効果とかもあっていいかも
-      case 5:x=5;log.textContent = 'Lucky! 爆弾は焼夷弾だった!!!';break;
-      case 4:x=4;log.textContent = '爆弾は花火だった!';break;
-      case 3:x=3;log.textContent = '爆弾は毒ガス入りだった!!';buffadd(tcam,target,'poison',3,1);break; //毒ガス入りだった場合
-      case 2:x=2;log.textContent = '爆弾はスライム入りだった!!';buffadd(tcam,target,'onslime',2,1);break;//スライム入りだった場合
-      case 1:x=1;log.textContent = '爆発した..だがただの特殊な薬品だった!!';break;
-   }
-   await delay(1000);
-   await humandamaged(cam,tcam,me,target,x,'sh',4);
-   if(humans.enemies[target].health == 0){killedenemy(cam,tcam,me,target);}
-   else{phase = 1; NextTurnis(cam,tcam,me,target);};
 }
 //#endregion
 
@@ -4720,6 +4724,7 @@ async function Trickybomb(){
 async function NextTurnis(cam,tcam,me,target){
    phase = 0;
 
+   //アンコールの動き
    if(!cam == 0){
    y = 1;//luck
    if('luck' in humans[cam][me].buffs){y = Math.floor(Math.random() * humans[cam][me].buffs.luck.lv);}//luck
@@ -4728,8 +4733,8 @@ async function NextTurnis(cam,tcam,me,target){
       await delay(1000); backtoplayerturn(); return;
    }
 
-   if(humans[tcam][target].health == 0){killedenemy(cam,tcam,me,target);return;}//このへんcamとtcamで整頓しといて どっちでも可にして
 
+   //継続ダメージの動き
    if ('poison' in humans[cam][me].buffs){
       x = humans[cam][me].health;
       humans[cam][me].health -= Math.floor(humans[cam][me].maxhealth * humans[cam][me].buffs.poison.lv);
@@ -4750,6 +4755,14 @@ async function NextTurnis(cam,tcam,me,target){
    if(humans[cam][me].health <= 0){defeat();return;}
    }
 
+   //強制スキルの動き
+   while(skillQueue.length > 0){
+      const {cam,me,skill} = skillQueue.shift(); // 先頭を消してその消したやつを処理する的な機構"shift()"
+      console.log(`${cam}${me} のスキル:${skill}を発動!`);
+      await skillAct(cam,me,skill);
+   }
+
+   //こっから次のターン行く動き　ここでこの人のターンは終わるって感じだね
    acted += 1;
    if(acted < bar.num.length){
    }else{
@@ -4793,7 +4806,8 @@ async function NextTurnis(cam,tcam,me,target){
       };
       console.log(bar)
       acted = 0;
-      console.log(`〜〜〜〜〜〜${turncount}ターン目〜〜〜〜〜〜`); //あとはskill系とmagicもて加えてって。slashとslsもみといて
+      console.log(`〜〜〜〜〜〜${turncount}ターン目〜〜〜〜〜〜`); //あとはskill系とmagicもて加えてって
+                                                               //今skill系着工中 todolistをみんな見れる形にするみたいにしたいね
    } 
 
    nowturn = bar.num[acted];

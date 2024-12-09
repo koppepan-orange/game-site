@@ -13,19 +13,21 @@
 </head>
 <body>
 <div id="All">
-<button id="Notice-button" onclick="OpenNotice()"><img id="Notice-button-img" src="assets/icons/notice.png"></button><div id="Notice-page"></div>
-<!--サイドメニュー..-->
+<div id="Notice-page"></div>
+<!--サイドメニュー-->
 <div class="menuToggle" id="menuToggle">☰</div>
 <nav id="sideMenu">
   <hr noshade="true">
   <ul>
-      <li><button onclick="GoTo('nanj')">NanJ</button></li>
+      <li><button onclick="OpenNotice()">お知らせ</button></li>
+      <li><button>チュートリアル</button></li><!-- onclick="Tutorial()" -->
+      <li><button>設定</button></li><!-- onclick="Setting()" -->
   </ul>
   <hr noshade="true">
   <ul>
-    <li><a href="https://koppepan-orange.github.io/test_site/home.html">to home</a></li>
-    <li><a href="https://koppepan-orange.github.io/test_site/memo.html">to memo</a></li>
-    <li><a href="https://koppepan-orange.github.io/test_site/chat.html">to chat</a></li>
+    <li><a href="https://koppepan-orange.github.io/test-site/home.html">to home</a></li>
+    <li><a href="https://koppepan-orange.github.io/test-site/memo.html">to memo</a></li>
+    <li><a href="https://koppepan-orange.github.io/test-site/chat.html">to chat</a></li>
   </ul>
   <hr noshade="true">
   <button id="logout-button" onclick="logout()">Logout</button>
@@ -46,25 +48,25 @@
       <span>turn:</span><span id="TurnCount">0</span><br>
       <div id="enemies">
         <div id="enemy1" class="enemy">
-          <b class="EnemyName">古書館の魔術師</b>   <i class="EnemyLevel">Lv.24</i><br>
+          <b class="EnemyName">enemy1</b>   <i class="EnemyLevel">Lv.1</i><br>
           <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
           <span class="EnemyMP">20</span>/<span class="EnemyMaxMP">20</span><br>
           <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
         </div>
         <div id="enemy2" class="enemy">
-          <b class="EnemyName">読書マニアな司書</b>   <i class="EnemyLevel">Lv.22</i><br>
+          <b class="EnemyName">enemy2</b>   <i class="EnemyLevel">Lv.1</i><br>
           <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
           <span class="Ene myMP">20</span>/<span class="EnemyMaxMP">20</span><br>
           <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
         </div>  
         <div id="enemy3" class="enemy">
-          <b class="EnemyName">忍び寄るナース</b>   <i class="EnemyLevel">Lv.23</i><br>
+          <b class="EnemyName">enemy3</b>   <i class="EnemyLevel">Lv.1</i><br>
           <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
           <span class="EnemyMP">20</span>/<span class="EnemyMaxMP">20</span><br>
           <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
         </div>
         <div id="enemy4" class="enemy">
-          <b class="EnemyName">「救護」のプロ</b>   <i class="EnemyLevel">Lv.24</i><br>
+          <b class="EnemyName">enemy4</b>   <i class="EnemyLevel">Lv.1</i><br>
           <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
           <span class="EnemyMP">20</span>/<span class="EnemyMaxMP">20</span><br>
           <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
@@ -74,25 +76,25 @@
 
       <div id="players">
         <div id="player1" class="player">
-          <b class="PlayerName">mechanic</b>   <i class="PlayerLevel">Lv.23</i><br>
+          <b class="PlayerName">player</b>   <i class="PlayerLevel">Lv.1</i><br>
           <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
           <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
           <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
         </div>
         <div id="player2" class="player">
-          <b class="PlayerName">friend1</b>   <i class="PlayerLevel">Lv.23</i><br>
+          <b class="PlayerName">friend1</b>   <i class="PlayerLevel">Lv.1</i><br>
           <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
           <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
           <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
         </div>
         <div id="player3" class="player">
-          <b class="PlayerName">friend2</b>   <i class="PlayerLevel">Lv.23</i><br>
+          <b class="PlayerName">friend2</b>   <i class="PlayerLevel">Lv.1</i><br>
           <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
           <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
           <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
         </div>
         <div id="player4" class="player">
-          <b class="PlayerName">friend3</b>   <i class="PlayerLevel">Lv.23</i><br>
+          <b class="PlayerName">friend3</b>   <i class="PlayerLevel">Lv.1</i><br>
           <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
           <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
           <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
