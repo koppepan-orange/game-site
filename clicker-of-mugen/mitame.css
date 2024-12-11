@@ -5,9 +5,9 @@
   /* margin: 0 auto; */
   padding: 2px;
   box-sizing: border-box;
+  text-align: center;
 }
 body {  
-  text-align: center;
   color:#000000;
   background-color: #eeeeee;
 }
@@ -143,12 +143,12 @@ body {
 #HomeTab{
   display: block;
 }
-#GameArea, #HomeArea, #EventArea, #NowMap {
+#BattleArea, #HomeArea, #EventArea, #NowMap {
   display: none;
   margin: 0 auto;
 }
 #HomeArea{
-  text-align: left!important;
+  text-align: left;
   margin: 0 auto;
 }
 .HomeButton {
@@ -385,7 +385,7 @@ body {
   padding: 10px;
   box-sizing: border-box;
 }
-.enemy{
+.enemies{
   display: none;
   width: auto;
   height: 100px;
@@ -407,7 +407,7 @@ body {
   padding: 10px;
   box-sizing: border-box;
 }
-.player{
+.players{
   display: none;
   width: auto;
   height: 100px;
@@ -419,7 +419,7 @@ body {
   text-align: left;
 }
 
-.turret{
+.turrets{
   display: block;
   width: auto;
   height: 100px;

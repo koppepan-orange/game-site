@@ -1,6 +1,6 @@
 //内部へようこそ！！！
 //#region 探索部分
-document.getElementById('GameArea').style.display = 'block';
+document.getElementById('BattleArea').style.display = 'block';
 document.getElementById('NowMap').style.display = 'none';
 const canvas = document.getElementById("NowMap");
 const ctx = canvas.getContext("2d");
@@ -966,7 +966,7 @@ let numberofenemy = 2;
 let humans = {
    players:{
       1:{
-         execute:1,
+         status:1,//0 = none, 1 = alive, 2 = dead
          cam:'player',
          num:1,
          name:'player',
@@ -1026,7 +1026,7 @@ let humans = {
          },
       },
       2:{
-         execute:0,
+         status:0,
          cam:'player',
          num:2,
          name:'friend1',
@@ -1080,7 +1080,7 @@ let humans = {
          },
       },
       3:{
-         execute:0,
+         status:0,
          cam:'player',
          num:3,
          name:'friend2',
@@ -1134,7 +1134,7 @@ let humans = {
          },
       },
       4:{
-         execute:0,
+         status:0,
          cam:'player',
          num:4,
          name:'friend3',
@@ -1190,7 +1190,7 @@ let humans = {
    },
    enemies:{
       1:{
-         execute:0,//存在の有無
+         status:0,//存在の有無
          cam:'enemy',
          num:1,
          level:1,
@@ -1239,7 +1239,7 @@ let humans = {
          }
       },
       2:{
-         execute:0,
+         status:0,
          cam:'enemy',
          num:2,
          level:1,
@@ -1288,7 +1288,7 @@ let humans = {
          }
       },
       3:{
-         execute:0,
+         status:0,
          cam:'enemy',
          num:3,
          level:1,
@@ -1337,7 +1337,7 @@ let humans = {
          }
       },
       4:{
-         execute:0,
+         status:0,
          cam:'enemy',
          num:4,
          level:1,
@@ -2126,7 +2126,7 @@ let Enemies = {
             name:'衝突',
             num:2,
             process:async function(cam, me){
-               if(humans[cam][me].buffs in 'disappear'){x = 2;buffremove(`humans[${cam}][${me}].buffs`,'disappear');}else{x = 1};
+               if(buffhas(cam,me,'disappear')){x = 2;buffremove(cam,me,'disappear');}else{x = 1};
                log.textContent = `${humans[cam][me].name}は突進してきた！`;await delay(1000);
                let selected = ShallTargetSelect(me,'pr',0);
                await humandamaged(cam,selected[1],me,selected[0],x,'sh',1);
@@ -2136,7 +2136,7 @@ let Enemies = {
             name:'ローキック',//ロストワンの号哭の号哭使いたいけど意味が泣くことらしい
             num:3,
             process:async function(cam, me){
-               if(humans[cam][me].buffs in 'disappear'){x = 1.5;buffremove(`humans[${cam}][${me}].buffs`,'disappear')}else{x = 0.75};
+               if(buffhas(cam,me,'disappear')){x = 1.5;buffremove(cam,me,'disappear')}else{x = 0.75};
                log.textContent = `${humans[cam][me].name}はローキックしてきた！`;await delay(1000);
                let selected = ShallTargetSelect(me,'phpl',0);
                await humandamaged(cam,selected[1],me,selected[0],x,'sh',1);
@@ -2442,144 +2442,43 @@ const tools = {
 
 //#region 超シンプルで使いやすい子達
 function tekiou(){
-   let apply = 0;
-   if(humans.players[1].execute == 1){
-      apply = buffcheck('players',1);
-      document.getElementById('player1').innerHTML = `
-      <b>${humans.players[1].name}</b>　<i>Lv.${humans.players[1].level}</i><br>
-      <span id="PlayerHealth">${humans.players[1].health}</span>/<span>${humans.players[1].maxhealth}</span><br>
-      <span id="PlayerMP">${humans.players[1].mp}</span>/<span id="PlayerMaxMP">${humans.players[1].maxmp}</span><br>
-      <span id="PlayerBuff">${apply.buff.join('')}</span> <span id="PlayerDebuff">${apply.debuff.join('')}</span>`;
+   Object.keys(humans).forEach(cam => {
+      Object.keys(humans[cam]).forEach(me => {
+         if(humans[cam][me].status == 1||humans[cam][me].status == 2){
+            let apply = buffcheck(cam,me);
+            document.getElementById(`${cam}${me}`).innerHTML = `
+            <b>${humans[cam][me].name}</b>　<i>Lv.${humans[cam][me].level}</i><br>
+            <span id="PlayerHealth">${humans[cam][me].health}</span>/<span>${humans[cam][me].maxhealth}</span><br>
+            <span id="PlayerMP">${humans[cam][me].mp}</span>/<span id="PlayerMaxMP">${humans[cam][me].maxmp}</span><br>
+            <span id="PlayerBuff">${apply.buff.join('')}</span> <span id="PlayerDebuff">${apply.debuff.join('')}</span>`;
 
-      humans.players[1].power = 1;humans.players[1].shell = 1;let karix = 0;
-      if('powerup' in humans.players[1].buffs){karix = humans.players[1].buffs.powerup.lv};
-      if('powerdown' in humans.players[1].buffs){karix -= humans.players[1].buffs.powerdown.lv};
-      if(karix > 0){humans.players[1].power = Buffs.powerup.lv[karix]};if(karix < 0){humans.players[1].power = Debuffs.powerdown.lv[karix*-1]}
-      if('shellup' in humans.players[1].buffs){karix = humans.players[1].buffs.shellup.lv};
-      if('shelldown' in humans.players[1].buffs){karix -= humans.players[1].buffs.shelldown.lv};
-      if(karix > 0){humans.players[1].shell = Buffs.shellup.lv[karix]};if(karix < 0){humans.players[1].shell = Debuffs.shelldown.lv[karix*-1]}
-   }
-   if(humans.players[2].execute == 1){
-      apply = buffcheck('players',2);
-      document.getElementById('player2').innerHTML = `
-      <b>${humans.players[2].name}</b>　<i>Lv.${humans.players[2].level}</i><br>
-      <span id="PlayerHealth">${humans.players[2].health}</span>/<span>${humans.players[2].maxhealth}</span><br>
-      <span id="PlayerMP">${humans.players[2].mp}</span>/<span id="PlayerMaxMP">${humans.players[2].maxmp}</span><br>
-      <span id="PlayerBuff">${apply.buff.join('')}</span> <span id="PlayerDebuff">${apply.debuff.join('')}</span>`;
+            humans[cam][me].power = 1;humans[cam][me].shell = 1;
+            let karix = 0;
 
-      humans.players[2].power = 1;humans.players[2].shell = 1;let karix = 0;
-      if('powerup' in humans.players[2].buffs){karix = humans.players[2].buffs.powerup.lv};
-      if('powerdown' in humans.players[2].buffs){karix -= humans.players[2].buffs.powerdown.lv};
-      if(karix > 0){humans.players[2].power = Buffs.powerup.lv[karix]};if(karix < 0){humans.players[2].power = Debuffs.powerdown.lv[karix*-1]}
-      if('shellup' in humans.players[2].buffs){karix = humans.players[2].buffs.shellup.lv};
-      if('shelldown' in humans.players[2].buffs){karix -= humans.players[2].buffs.shelldown.lv};
-      if(karix > 0){humans.players[2].shell = Buffs.shellup.lv[karix]};if(karix < 0){humans.players[2].shell = Debuffs.shelldown.lv[karix*-1]}
-   }
-   if(humans.players[3].execute == 1){
-      apply = buffcheck('players',3);
-      document.getElementById('player3').innerHTML = `
-      <b>${humans.players[3].name}</b>　<i>Lv.${humans.players[3].level}</i><br>
-      <span id="PlayerHealth">${humans.players[3].health}</span>/<span>${humans.players[3].maxhealth}</span><br>
-      <span id="PlayerMP">${humans.players[3].mp}</span>/<span id="PlayerMaxMP">${humans.players[3].maxmp}</span><br>
-      <span id="PlayerBuff">${apply.buff.join('')}</span> <span id="PlayerDebuff">${apply.debuff.join('')}</span>`;
+            if(buffhas(cam,me,'powerup')){karix = buffhas(cam,me,'powerup').lv};
+            if(buffhas(cam,me,'powerdown')){karix -= buffhas(cam,me,'powerdown').lv};
+            if(karix > 0){humans[cam][me].power = Buffs.powerup.lv[karix]};if(karix < 0){humans[cam][me].power = Debuffs.powerdown.lv[karix*-me]}
+            
+            if(buffhas(cam,me,'shellup')){karix = buffhas(cam,me,'shellup').lv};
+            if(buffhas(cam,me,'shelldown')){karix -= buffhas(cam,me,'shelldown').lv};
+            if(karix > 0){humans[cam][me].shell = Buffs.shellup.lv[karix]};if(karix < 0){humans[cam][me].shell = Debuffs.shelldown.lv[karix*-1]}
 
-      humans.players[3].power = 1;humans.players[3].shell = 1;let karix = 0;
-      if('powerup' in humans.players[3].buffs){karix = humans.players[3].buffs.powerup.lv};
-      if('powerdown' in humans.players[3].buffs){karix -= humans.players[3].buffs.powerdown.lv};
-      if(karix > 0){humans.players[3].power = Buffs.powerup.lv[karix]};if(karix < 0){humans.players[3].power = Debuffs.powerdown.lv[karix*-1]}
-      if('shellup' in humans.players[3].buffs){karix = humans.players[3].buffs.shellup.lv};
-      if('shelldown' in humans.players[3].buffs){karix -= humans.players[3].buffs.shelldown.lv};
-      if(karix > 0){humans.players[3].shell = Buffs.shellup.lv[karix]};if(karix < 0){humans.players[3].shell = Debuffs.shelldown.lv[karix*-1]}
-   }
-   if(humans.players[4].execute == 1){
-      apply = buffcheck('players',4);
-      document.getElementById('player4').innerHTML = `
-      <b>${humans.players[4].name}</b>　<i>Lv.${humans.players[4].level}</i><br>
-      <span id="PlayerHealth">${humans.players[4].health}</span>/<span>${humans.players[4].maxhealth}</span><br>
-      <span id="PlayerMP">${humans.players[4].mp}</span>/<span id="PlayerMaxMP">${humans.players[4].maxmp}</span><br>
-      <span id="PlayerBuff">${apply.buff.join('')}</span> <span id="PlayerDebuff">${apply.debuff.join('')}</span>`;
+            if(humans[cam][me].status == 2){
+               document.getElementById(`${cam}${me}`).style.backgroundColor = '#cecece';
+            }
+         }
+      })
+   })
 
-      humans.players[4].power = 1;humans.players[4].shell = 1;let karix = 0;
-      if('powerup' in humans.players[4].buffs){karix = humans.players[4].buffs.powerup.lv};
-      if('powerdown' in humans.players[4].buffs){karix -= humans.players[4].buffs.powerdown.lv};
-      if(karix > 0){humans.players[4].power = Buffs.powerup.lv[karix]};if(karix < 0){humans.players[4].power = Debuffs.powerdown.lv[karix*-1]}
-      if('shellup' in humans.players[4].buffs){karix = humans.players[4].buffs.shellup.lv};
-      if('shelldown' in humans.players[4].buffs){karix -= humans.players[4].buffs.shelldown.lv};
-      if(karix > 0){humans.players[4].shell = Buffs.shellup.lv[karix]};if(karix < 0){humans.players[4].shell = Debuffs.shelldown.lv[karix*-1]}
-   }
 
-   if(humans.enemies[1].execute == 1){
-      apply = buffcheck('enemies',1);
-      document.getElementById('enemy1').innerHTML = `
-      <b id="EnemyName">${humans.enemies[1].prefixe}${humans.enemies[1].name}</b>　<i id="EnemyLevel">Lv.${humans.enemies[1].level}</i><br>
-      <span id="EnemyHealth">${humans.enemies[1].health}</span>/<span id="EnemyMaxHealth">${humans.enemies[1].maxhealth}</span><br>
-      <span id="EnemyMP">${humans.enemies[1].mp}</span>/<span id="EnemyMaxMP">${humans.enemies[1].maxmp}</span><br>
-      <span id="EnemyBuff">${apply.buff.join('')}</span> <span id="EnemyDebuff">${apply.debuff.join('')}</span>`;
-
-      humans.enemies[1].power = 1;humans.enemies[1].shell = 1;let karix = 0;
-      if('powerup' in humans.enemies[1].buffs){karix = humans.enemies[1].buffs.powerup.lv};
-      if('powerdown' in humans.enemies[1].buffs){karix -= humans.enemies[1].buffs.powerdown.lv};
-      if(karix > 0){humans.enemies[1].power = Buffs.powerup.lv[karix]};if(karix < 0){humans.enemies[1].power = Debuffs.powerdown.lv[karix*-1]}
-      if('shellup' in humans.enemies[1].buffs){karix = humans.enemies[1].buffs.shellup.lv};
-      if('shelldown' in humans.enemies[1].buffs){karix -= humans.enemies[1].buffs.shelldown.lv};
-      if(karix > 0){humans.enemies[1].shell = Buffs.shellup.lv[karix]};if(karix < 0){humans.enemies[1].shell = Debuffs.shelldown.lv[karix*-1]}
-   }
-   if(humans.enemies[2].execute == 1){
-      apply = buffcheck('enemies',2);
-      document.getElementById('enemy2').innerHTML = `
-      <b id="EnemyName">${humans.enemies[2].prefixe}${humans.enemies[2].name}</b>　<i id="EnemyLevel">Lv.${humans.enemies[2].level}</i><br>
-      <span id="EnemyHealth">${humans.enemies[2].health}</span>/<span id="EnemyMaxHealth">${humans.enemies[2].maxhealth}</span><br>
-      <span id="EnemyMP">${humans.enemies[2].mp}</span>/<span id="EnemyMaxMP">${humans.enemies[2].maxmp}</span><br>
-      <span id="EnemyBuff">${apply.buff.join('')}</span> <span id="EnemyDebuff">${apply.debuff.join('')}</span>`;
-
-      humans.enemies[2].power = 1;humans.enemies[2].shell = 1;let karix = 0;
-      if('powerup' in humans.enemies[2].buffs){karix = humans.enemies[2].buffs.powerup.lv};
-      if('powerdown' in humans.enemies[2].buffs){karix -= humans.enemies[2].buffs.powerdown.lv};
-      if(karix > 0){humans.enemies[2].power = Buffs.powerup.lv[karix]};if(karix < 0){humans.enemies[2].power = Debuffs.powerdown.lv[karix*-1]}
-      if('shellup' in humans.enemies[2].buffs){karix = humans.enemies[2].buffs.shellup.lv};
-      if('shelldown' in humans.enemies[2].buffs){karix -= humans.enemies[2].buffs.shelldown.lv};
-      if(karix > 0){humans.enemies[2].shell = Buffs.shellup.lv[karix]};if(karix < 0){humans.enemies[2].shell = Debuffs.shelldown.lv[karix*-1]}
-   }
-   if(humans.enemies[3].execute == 1){
-      apply = buffcheck('enemies',3);
-      document.getElementById('enemy3').innerHTML = `
-      <b id="EnemyName">${humans.enemies[3].prefixe} ${humans.enemies[3].name}</b>　<i id="EnemyLevel">Lv.${humans.enemies[3].level}</i><br>
-      <span id="EnemyHealth">${humans.enemies[3].health}</span>/<span id="EnemyMaxHealth">${humans.enemies[3].maxhealth}</span><br>
-      <span id="EnemyMP">${humans.enemies[3].mp}</span>/<span id="EnemyMaxMP">${humans.enemies[3].maxmp}</span><br>
-      <span id="EnemyBuff">${apply.buff.join('')}</span> <span id="EnemyDebuff">${apply.debuff.join('')}</span>`;
-
-      humans.enemies[3].power = 1;humans.enemies[3].shell = 1;let karix = 0;
-      if('powerup' in humans.enemies[3].buffs){karix = humans.enemies[3].buffs.powerup.lv};
-      if('powerdown' in humans.enemies[3].buffs){karix -= humans.enemies[3].buffs.powerdown.lv};
-      if(karix > 0){humans.enemies[3].power = Buffs.powerup.lv[karix]};if(karix < 0){humans.enemies[3].power = Debuffs.powerdown.lv[karix*-1]}
-      if('shellup' in humans.enemies[3].buffs){karix = humans.enemies[3].buffs.shellup.lv};
-      if('shelldown' in humans.enemies[3].buffs){karix -= humans.enemies[3].buffs.shelldown.lv};
-      if(karix > 0){humans.enemies[3].shell = Buffs.shellup.lv[karix]};if(karix < 0){humans.enemies[3].shell = Debuffs.shelldown.lv[karix*-1]}
-   }
-   if(humans.enemies[4].execute == 1){
-      apply = buffcheck('enemies',4);
-      document.getElementById('enemy4').innerHTML = `
-      <b id="EnemyName">${humans.enemies[4].prefixe} ${humans.enemies[4].name}</b>　<i id="EnemyLevel">Lv.${humans.enemies[4].level}</i><br>
-      <span id="EnemyHealth">${humans.enemies[4].health}</span>/<span id="EnemyMaxHealth">${humans.enemies[4].maxhealth}</span><br>
-      <span id="EnemyMP">${humans.enemies[4].mp}</span>/<span id="EnemyMaxMP">${humans.enemies[4].maxmp}</span><br>
-      <span id="EnemyBuff">${apply.buff.join('')}</span> <span id="EnemyDebuff">${apply.debuff.join('')}</span>`;
-
-      humans.enemies[4].power = 1;humans.enemies[4].shell = 1;let karix = 0;
-      if('powerup' in humans.enemies[4].buffs){karix = humans.enemies[4].buffs.powerup.lv};
-      if('powerdown' in humans.enemies[4].buffs){karix -= humans.enemies[4].buffs.powerdown.lv};
-      if(karix > 0){humans.enemies[4].power = Buffs.powerup.lv[karix]};if(karix < 0){humans.enemies[4].power = Debuffs.powerdown.lv[karix*-1]}
-      if('shellup' in humans.enemies[4].buffs){karix = humans.enemies[4].buffs.shellup.lv};
-      if('shelldown' in humans.enemies[4].buffs){karix -= humans.enemies[4].buffs.shelldown.lv};
-      if(karix > 0){humans.enemies[4].shell = Buffs.shellup.lv[karix]};if(karix < 0){humans.enemies[4].shell = Debuffs.shelldown.lv[karix*-1]}   
-   }
-
-   if(humans.turret?.execute??0 == 1){
-      document.getElementById('PlayerTurret').innerHTML = `
-      <b>friend3</b>x${humans.players.turret.num}<br>
-      <span>${humans.players.turret.health}</span>/<span>${humans.players.turret.maxhealth}</span><br>
-      `;
-   }
-   
+   Object.keys(Turret).forEach(cam => {
+      if(Turret[cam].num > 0){
+         document.getElementById(`${cam}Turret`).innerHTML = `
+         <b>Turret</b>x${Turret[cam].num}<br>
+         <span>${Turret[cam].health}</span>/<span>${Turret[cam].maxhealth}</span><br>
+         `;
+      }
+   })
 
 
 
@@ -2588,9 +2487,8 @@ function tekiou(){
          buff: [],
          debuff: []
       }
-      humans[cam][me].buffs.filter(a => a.type == 'buff').forEach(bu => {apply.buff.push(`<img src="assets/buffs/${bu}.png" width="18" height="18"> `)});
-      humans[cam][me].buffs.filter(b => b.type == 'debuff').forEach(db => {apply.debuff.push(`<img src="assets/buffs/${db}.png" width="18" height="18"> `)});
-      console.log(apply)
+      humans[cam][me].buffs.filter(a => a.type == 'buff').forEach(bu => {apply.buff.push(`<img src="assets/buffs/${bu.name}.png" width="18" height="18"> `)});
+      humans[cam][me].buffs.filter(b => b.type == 'debuff').forEach(db => {apply.debuff.push(`<img src="assets/buffs/${db.name}.png" width="18" height="18"> `)});
       return apply
    }
 
@@ -2987,31 +2885,42 @@ function ClearedMainQuest(code){
 //#endregion
 //#region buffの動き
 function bufftekiou(){
-   //今は無き、やで
+   console.log('今は無きbufftekiouが実行されたで')
 };
 
 
 function buffadd(tcam,target,buff,time,lv){//誰のバフ/デバフか,バフ/デバフの名前,効果時間,効果レベル
-   console.log(tcam,target,buff,time,lv??0);
-   let Time = time??1;
-   if(humans[tcam][target].buffs[buff]?.lv??0 == lv){Time += humans[tcam][target].buffs[buff].time;};//効果量が同じなら足す形に
-   humans[tcam][target].buffs[buff] = {
-      type: Buffs[buff] ? 'buff' : Debuffs[buff] ? 'debuff' : 'unknown',
-      name: buff,
-      time: Time,
-      lv: lv??1, 
-   }  
+   console.log(tcam, target, buff, time, lv ?? 0);
+   let Time = time ?? 1;
+   // 同じ効果量のバフがある場合、時間を足す
+   //let existingBuff = humans[tcam][target].buffs.find(b => b.name === buff && b.lv === lv);
+   if (humans[tcam][target].buffs.find(b => b.name === buff && b.lv === lv)) {
+      humans[tcam][target].buffs.find(b => b.name === buff && b.lv === lv).time += Time;
+   } else {
+      // 新しいバフを追加
+      humans[tcam][target].buffs.push({
+         type: Buffs[buff] ? 'buff' : Debuffs[buff] ? 'debuff' : 'unknown',
+         name: buff,
+         time: Time,
+         lv: lv ?? 1,
+      });
+   }
    tekiou();
 }
 function buffremove(tcam,target,buff){
    //誰のバフ/デバフか,バフ/デバフの名前
-   delete humans[tcam][target].buffs[buff];
+   let index = humans[tcam][target].buffs.findIndex(b => b.name === buff);
+   if(index !== -1){
+      humans[tcam][target].buffs.splice(index, 1);
+   }
    tekiou();
 }
-function buffclear(array){
-   let bx = eval(array + 'time');
-   bx = {};
+function buffclear(tcam,target){
+   humans[tcam][target].buffs = [];
    tekiou()
+}
+function buffhas(tcam,target,buff){
+   return humans[tcam][target].buffs.find(b => b.name === buff);
 }
 //#endregion
 
@@ -3035,7 +2944,7 @@ let usersRef;
 let userData;
 
 async function GameStart(){
-   document.getElementById('GameArea').innerHTML = `
+   document.getElementById('HomeArea').innerHTML = `
    <div id="login-container" class="login-container">
       <form class="login-form" id="login-form">
          <input type="text" id="username" placeholder="ユーザー名" required>
@@ -3045,7 +2954,7 @@ async function GameStart(){
       </form>
    </div>
    `;
-   document.getElementById('GameArea').style.display = 'block';
+   document.getElementById('HomeArea').style.display = 'block';
 
    function setLocalStorage(name, value) {
       localStorage.setItem(name, value || ""); // 値が空なら空文字を入れる
@@ -3084,7 +2993,7 @@ async function GameStart(){
                   setLocalStorage("username", username); // ログイン成功時
                } else {
                   // パスワードが間違っている
-                  document.getElementById('GameArea').innerHTML = `
+                  document.getElementById('HomeArea').innerHTML = `
                   <div class="login-container">
                      <form class="login-form" id="login-form">
                         <input type="text" id="username" placeholder="ユーザー名" required>
@@ -3097,6 +3006,7 @@ async function GameStart(){
                   loginError.style.display = 'block';
                }
             }else{
+               document.getElementById('HomeArea').style.display = 'none';
                usersRef.update({
                   status: 'online',
                   password: password,
@@ -3108,66 +3018,7 @@ async function GameStart(){
                startChat();
                document.getElementById('room-select').style.display = 'block';
                document.getElementById('ChatTab').style.display = 'none';
-               document.getElementById('GameArea').innerHTML = `
-                  <span>turn:</span><span id="TurnCount">0</span><br>
-                  <div id="enemies">
-                  <div id="enemy1" class="enemy">
-                     <b class="EnemyName">古書館の魔術師</b>   <i class="EnemyLevel">Lv.24</i><br>
-                     <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
-                     <span class="EnemyMP">20</span>/<span class="EnemyMaxMP">20</span><br>
-                     <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
-                  </div>
-                  <div id="enemy2" class="enemy">
-                     <b class="EnemyName">読書マニアな司書</b>   <i class="EnemyLevel">Lv.22</i><br>
-                     <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
-                     <span class="Ene myMP">20</span>/<span class="EnemyMaxMP">20</span><br>
-                     <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
-                  </div>  
-                  <div id="enemy3" class="enemy">
-                     <b class="EnemyName">忍び寄るナース</b>   <i class="EnemyLevel">Lv.23</i><br>
-                     <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
-                     <span class="EnemyMP">20</span>/<span class="EnemyMaxMP">20</span><br>
-                     <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
-                  </div>
-                  <div id="enemy4" class="enemy">
-                     <b class="EnemyName">「救護」のプロ</b>   <i class="EnemyLevel">Lv.24</i><br>
-                     <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
-                     <span class="EnemyMP">20</span>/<span class="EnemyMaxMP">20</span><br>
-                     <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
-                  </div>
-                  </div>
-                  <br><br>
-
-                  <div id="players">
-                  <div id="player1" class="player">
-                     <b class="PlayerName">mechanic</b>   <i class="PlayerLevel">Lv.23</i><br>
-                     <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
-                     <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
-                     <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
-                  </div>
-                  <div id="player2" class="player">
-                     <b class="PlayerName">friend1</b>   <i class="PlayerLevel">Lv.23</i><br>
-                     <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
-                     <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
-                     <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
-                  </div>
-                  <div id="player3" class="player">
-                     <b class="PlayerName">friend2</b>   <i class="PlayerLevel">Lv.23</i><br>
-                     <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
-                     <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
-                     <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
-                  </div>
-                  <div id="player4" class="player">
-                     <b class="PlayerName">friend3</b>   <i class="PlayerLevel">Lv.23</i><br>
-                     <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
-                     <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
-                     <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
-                  </div>
-                  </div><br><br><br>
-                  <button class="button" id="select1" onclick="select1()">attack</button>  <button class="button" id="select2" onclick="select2()">magic</button>  <button class="button" id="select3" onclick="select3()">tools</button>  <button class="button" id="back" onclick="back()">pass</button><br>
-                  <span id="Skillbutton"><button class="button" id="Skill1" onclick="Skill1()">skill</button></span>
-               `;
-               document.getElementById('GameArea').style.display = 'none';
+               document.getElementById('BattleArea').style.display = 'none';
                
    
                AllowMove = 1;
@@ -3222,65 +3073,7 @@ async function GameStart(){
       document.getElementById('ChatTab').style.display = 'none';
 
       AllowMove = 1;
-      document.getElementById('GameArea').style.display = 'none';
-      document.getElementById('GameArea').innerHTML = `
-      <div id="enemies">
-      <div id="enemy1" class="enemy">
-         <b class="EnemyName">古書館の魔術師</b>   <i class="EnemyLevel">Lv.24</i><br>
-         <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
-         <span class="EnemyMP">20</span>/<span class="EnemyMaxMP">20</span><br>
-         <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
-      </div>
-      <div id="enemy2" class="enemy">
-         <b class="EnemyName">読書マニアな司書</b>   <i class="EnemyLevel">Lv.22</i><br>
-         <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
-         <span class="Ene myMP">20</span>/<span class="EnemyMaxMP">20</span><br>
-         <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
-      </div>  
-      <div id="enemy3" class="enemy">
-         <b class="EnemyName">忍び寄るナース</b>   <i class="EnemyLevel">Lv.23</i><br>
-         <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
-         <span class="EnemyMP">20</span>/<span class="EnemyMaxMP">20</span><br>
-         <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
-      </div>
-      <div id="enemy4" class="enemy">
-         <b class="EnemyName">「救護」のプロ</b>   <i class="EnemyLevel">Lv.24</i><br>
-         <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
-         <span class="EnemyMP">20</span>/<span class="EnemyMaxMP">20</span><br>
-         <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
-      </div>
-      </div>
-      <br><br>
-
-      <div id="players">
-      <div id="player1" class="player">
-         <b class="PlayerName">mechanic</b>   <i class="PlayerLevel">Lv.23</i><br>
-         <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
-         <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
-         <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
-      </div>
-      <div id="player2" class="player">
-         <b class="PlayerName">friend1</b>   <i class="PlayerLevel">Lv.23</i><br>
-         <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
-         <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
-         <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
-      </div>
-      <div id="player3" class="player">
-         <b class="PlayerName">friend2</b>   <i class="PlayerLevel">Lv.23</i><br>
-         <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
-         <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
-         <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
-      </div>
-      <div id="player4" class="player">
-         <b class="PlayerName">friend3</b>   <i class="PlayerLevel">Lv.23</i><br>
-         <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
-         <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
-         <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
-      </div>
-      </div><br><br><br>
-      <button class="button" id="select1" onclick="select1()">attack</button>  <button class="button" id="select2" onclick="select2()">magic</button>  <button class="button" id="select3" onclick="select3()">tools</button>  <button class="button" id="back" onclick="back()">pass</button><br>
-      <span id="Skillbutton"><button class="button" id="Skill1" onclick="Skill1()">skill</button></span>
-      `
+      document.getElementById('BattleArea').style.display = 'none';
       document.getElementById('EventArea').style.display = 'none';
       document.getElementById('NowMap').style.display = 'none';
 
@@ -3580,25 +3373,12 @@ function Charge(e,m){
 //#endregion
 //#region profileのやつ
 async function UpdateProfile(){
-   await getUserData('about');
-   let about = data;
+   let about = userData.about??'入力してね';
    document.getElementById('ProfileTab').innerHTML = `
    <span style="font-size: 24px; border: 1px solid #000000">${username}</span>　Rank:${rank}<br><br>
    <textarea id="about" placeholder="write about you" style="width: 255px; height: 124px;" oninput="InputAboutMe()">${about}</textarea>
    `
 }//自己紹介とかも入れたいよね
-function getUserData(name){
-   usersRef.get().then((snapshot) => {
-      if (snapshot.exists()) {
-         let data = eval('snapshot.val().'+name);
-      } else {
-         console.log("データが存在しません");
-      }
-  }).catch((error) => {
-      console.error("エラー:", error);
-  });
-  return data;
-}
 function InputAboutMe(){
    const textarea = document.getElementById('about');
    usersRef.update({
@@ -3672,16 +3452,19 @@ function HomeLetsDungeon(code){
    humans.players[1].mp = humans.players[1].maxmp
    humans.players[1].power = 1;humans.players[1].shell = 1;
    
-   document.getElementById('HomeArea').style.display = 'none';
-   document.getElementById('GameArea').style.display = 'block';
-   document.getElementById('GameArea').innerHTML = `
+   document.getElementById('HomeArea').style.display = 'block';
+   document.getElementById('HomeArea').style.textAlign = 'center';
+   document.getElementById('BattleArea').style.display = 'none';
+   document.getElementById('HomeArea').innerHTML = `
    <button class="button" onclick="HomeGoDungeon('greenslime');">greenslime</button><button class="button" onclick="HomeGoDungeon('mechanic');">mechanic</button><button class="button" onclick="HomeGoDungeon('clown');">clown</button><button class="button" onclick="HomeGoDungeon('herta');">herta</button><br>
    <button class="button" onclick="HomeGoDungeon('magodiaqua');">Mago Di Aqua</button><br>
    <button class="button" onclick="HomeGoDungeon('wretch');">wretch〜持たざる者〜</button>
    `;
 }
 function HomeGoDungeon(name){
-   document.getElementById('GameArea').style.display = 'none';
+   document.getElementById('HomeArea').style.textAlign = 'left';
+   document.getElementById('HomeArea').style.display = 'none';
+   document.getElementById('BattleArea').style.display = 'none';
    humans.players[1].name = name;
    switch(humans.players[1].name){//これはキャラ固有のやつやね
       case 'wretch'://wretch〜持たざる者〜
@@ -3774,63 +3557,7 @@ function HomeGoDungeon(name){
    dungeonnow = 1;
    document.getElementById('NowMap').style.display = 'block';
    document.getElementById('HomeArea').style.display = 'none';
-   document.getElementById('GameArea').innerHTML = `<span>turn:</span><span id="TurnCount">0</span><br>
-      <div id="enemies">
-        <div id="enemy1" class="enemy">
-          <b id="EnemyName">†古書館の魔術師†</b>   <i id="EnemyLevel">Lv.24</i><br>
-          <span id="EnemyHealth">100</span>/<span id="EnemyMaxHealth">100</span><br>
-          <span id="EnemyMP">20</span>/<span id="EnemyMaxMP">20</span><br>
-          <span id="EnemyBuff"></span> <span id="EnemyDebuff"></span>
-        </div>
-        <div id="enemy2" class="enemy">
-          <b id="EnemyName">読書マニアな司書</b>   <i id="EnemyLevel">Lv.22</i><br>
-          <span id="EnemyHealth">100</span>/<span id="EnemyMaxHealth">100</span><br>
-          <span id="Ene myMP">20</span>/<span id="EnemyMaxMP">20</span><br>
-          <span id="EnemyBuff"></span> <span id="EnemyDebuff"></span>
-        </div>  
-        <div id="enemy3" class="enemy">
-          <b id="EnemyName">忍び寄るナース</b>   <i id="EnemyLevel">Lv.23</i><br>
-          <span id="EnemyHealth">100</span>/<span id="EnemyMaxHealth">100</span><br>
-          <span id="EnemyMP">20</span>/<span id="EnemyMaxMP">20</span><br>
-          <span id="EnemyBuff"></span> <span id="EnemyDebuff"></span>
-        </div>
-        <div id="enemy4" class="enemy">
-          <b id="EnemyName">「救護」のプロ</b>   <i id="EnemyLevel">Lv.24</i><br>
-          <span id="EnemyHealth">100</span>/<span id="EnemyMaxHealth">100</span><br>
-          <span id="EnemyMP">20</span>/<span id="EnemyMaxMP">20</span><br>
-          <span id="EnemyBuff"></span> <span id="EnemyDebuff"></span>
-        </div>
-      </div>
-      <br><br>
-
-      <div id="players">
-        <div id="player1" class="player">
-          <b>mechanic</b>   <i>Lv.23</i><br>
-          <span id="PlayerHealth">100</span>/<span>100</span><br>
-          <span id="PlayerMP">0</span>/<span id="PlayerMaxMP">0</span><br>
-          <span id="PlayerBuff"></span> <span id="PlayerDebuff"></span>
-        </div>
-        <div id="player2" class="player">
-          <b>friend1</b>   <i>Lv.1</i><br>
-          <span id="PlayerHealth">100</span>/<span>100</span><br>
-          <span id="PlayerMP">0</span>/<span id="PlayerMaxMP">0</span><br>
-          <span id="PlayerBuff"></span> <span id="PlayerDebuff"></span>
-        </div>
-        <div id="player3" class="player">
-          <b>friend2</b>   <i>Lv.1</i><br>
-          <span id="PlayerHealth">100</span>/<span>100</span><br>
-          <span id="PlayerMP">0</span>/<span id="PlayerMaxMP">0</span><br>
-          <span id="PlayerBuff"></span> <span id="PlayerDebuff"></span>
-        </div>
-        <div id="player4" class="player">
-          <b>friend3</b>   <i>Lv.1</i><br>
-          <span id="PlayerHealth">100</span>/<span>100</span><br>
-          <span id="PlayerMP">0</span>/<span id="PlayerMaxMP">0</span><br>
-          <span id="PlayerBuff"></span> <span id="PlayerDebuff"></span>
-        </div>
-      </div><br><br><br>
-      <div id="sbuttons"><button class="button" id="select1" onclick="select1()">attack</button>  <button class="button" id="select2" onclick="select2()">magic</button>  <button class="button" id="select3" onclick="select3()">tools</button>  <button class="button" id="back" onclick="back()">runaway</button></div><br>
-      <span id="Skillbutton"><button class="button" id="Skill1" onclick="Skill1()">skill</button></span>`;
+   document.getElementById('BattleArea').style.display = 'none';
    document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()">skill</button>';
    document.getElementById('ButtonStyle').textContent = `.button{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};cursor: pointer;}input[type="text"]:focus{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};}`;
    GoNextFloor();
@@ -3845,7 +3572,7 @@ function ExitDungeon(code){
    euro += 50*code;
    dungeonnow = 0;
    document.getElementById('NowMap').style.display = 'none';
-   document.getElementById('GameArea').style.display = 'none';
+   document.getElementById('BattleArea').style.display = 'none';
    BacktoHome();
 }
 //#endregion
@@ -4036,9 +3763,9 @@ async function humandamaged(cam,tcam,me,target,multiplier,kind,code){//矛先の
          if(equipweapon == 14){humans[cam][me].critlate = t;humans[cam][me].critdmg = w;}
          if(equipweapon == 7){humans[cam][me].critlate -= 0.5}
          
-         if('improve' in humans[cam][me].buffs){x *= 1.4;};
-         if('LetsThrow' in humans[cam][me].buffs){x *= 2; buffremove(cam,me,'LetsThrow');};
-         if('gambling' in humans[cam][me].buffs){z = clowngambling[Math.floor(Math.random() * clowngambling.length)]; x *= z; buffremove('humans[cam][me].buffs','gambling'); log.textContent = 'ダメージは' + z + '倍になった!!'; await delay(1000);};
+         if(buffhas(cam,me,'improve')){x *= 1.4;};
+         if(buffhas(cam,me,'LetsThrow')){x *= 2; buffremove(cam,me,'LetsThrow');};
+         if(buffhas(cam,me,'gambling')){z = clowngambling[Math.floor(Math.random() * clowngambling.length)]; x *= z; buffremove(cam,me,'gambling'); log.textContent = 'ダメージは' + z + '倍になった!!'; await delay(1000);};
          x = Math.ceil(x);
          if(x < 0){x = 0}; if(x > humans[tcam][target].health){x = humans[tcam][target].health};
          y = humans[tcam][target].health;
@@ -4098,9 +3825,9 @@ async function humandamaged(cam,tcam,me,target,multiplier,kind,code){//矛先の
             await delay(1000);
             x = (humans[cam][me].attack * humans[cam][me].power * 0.7 + weaponpower); x -= (humans[tcam][target].defense);
             if((Math.floor(Math.random()+ humans[cam][me].critlate)) == 1){x += (humans[tcam][target].defense); x *= 3; log.textContent = '会心の一撃！'; await delay(1000);};
-            if('improve' in humans[cam][me].buffs){x *= 1.4;};
+            if(buffhas(cam,me,'improve')){x *= 1.4;};
             x = Math.ceil(x);
-            if('LetsThrow' in humans[cam][me].buffs){x *= 2; buffremove('humans[cam][me].buffs','LetsThrow');};
+            if(buffhas(cam,me,'LetsThrow')){x *= 2; buffremove(cam,me,'LetsThrow');};
             if(x < 0){x = 0}; if(x > humans[tcam][target].health){x = humans[tcam][target].health};
             humans[tcam][target].health -= x;
             if(humans[tcam][target].health < 0){humans[tcam][target].health = 0};
@@ -4111,9 +3838,9 @@ async function humandamaged(cam,tcam,me,target,multiplier,kind,code){//矛先の
          }else if(humans[cam][me].name == 'herta' && humans[tcam][target].health <= humans[tcam][target].maxhealth / 2 && humans[cam][me].level >= 10 && humans[tcam][target].health > 0){//1凸効果「弱みは付け込み」
             x = (humans[cam][me].attack * humans[cam][me].power * 0.4 + weaponpower) - (humans[tcam][target].defense);
             if((Math.floor(Math.random()+ humans[cam][me].critlate - 0.05)) == 1){x += (humans[tcam][target].defense); x *= humans[cam][me].critdmg; log.textContent = '会心の一撃！'; await delay(1000);};
-            if('improve' in humans[cam][me].buffs){x *= 1.4;};
+            if(buffhas(cam,me,'improve')){x *= 1.4;};
             x = Math.ceil(x);
-            if('LetsThrow' in humans[cam][me].buffs){x *= 2; buffremove('humans[cam][me].buffs','LetsThrow');};
+            if(buffhas(cam,me,'LetsThrow')){x *= 2; buffremove(cam,me,'LetsThrow');};
             if(x < 0){x = 0}; if(x > humans[tcam][target].health){x = humans[tcam][target].health};humans[tcam][target].health -= x;if(humans[tcam][target].health < 0){humans[tcam][target].health = 0};
             tekiou();
             log.textContent = humans[tcam][target].name + 'に' + x + 'のダメージ!';
@@ -4149,7 +3876,7 @@ function backtoplayerturn(){
 }
 async function playerturn(cam,me){
    nstimeout = 0;
-   x = Object.values(humans.players).filter(x => x.execute == 1&& x.health > 0).map(x => x.num);
+   x = Object.values(humans.players).filter(x => x.status == 1&& x.health > 0).map(x => x.num);
    for(i = 0; i < x.length; i++){
       let n = x[i]
       for(const key in humans.players[n].buffs){
@@ -4175,7 +3902,7 @@ async function playerturn(cam,me){
       log.textContent = 'さあ、ギャンブルの時間だ!!';
       nstimeout = 1;
    }else if(turncount == 6 && humans.players[me].ns.id == 'improve'){
-      if('improve' in humans.players[me].buffs == false){
+      if(buffhas(cam,me,'improve') == false){
          buffadd('players',me,'improve',4,1);
          log.textContent = 'パーツアップグレード。';
          nstimeout = 1;
@@ -4324,14 +4051,14 @@ function LetsTargetSelect(){
       let color = 'background-color:#fff450';
       let pcolor = 'background-color:#ffffff';
 
-      let pla1 = document.getElementById('player1');
-      let pla2 = document.getElementById('player2');
-      let pla3 = document.getElementById('player3');
-      let pla4 = document.getElementById('player4');
-      let ene1 = document.getElementById('enemy1');
-      let ene2 = document.getElementById('enemy2');
-      let ene3 = document.getElementById('enemy3');
-      let ene4 = document.getElementById('enemy4');
+      let pla1 = document.getElementById('players1');
+      let pla2 = document.getElementById('players2');
+      let pla3 = document.getElementById('players3');
+      let pla4 = document.getElementById('players4');
+      let ene1 = document.getElementById('enemies1');
+      let ene2 = document.getElementById('enemies2');
+      let ene3 = document.getElementById('enemies3');
+      let ene4 = document.getElementById('enemies4');
       
       const resetStyles = () => {
          pla1.style.backgroundColor = pcolor;
@@ -4346,14 +4073,14 @@ function LetsTargetSelect(){
 
       let zigo = function(){
          resetStyles();
-         if(humans.players[1].execute == 1){pla1.removeEventListener('click', handleClick);}
-         if(humans.players[2].execute == 1){pla2.removeEventListener('click', handleClick);}
-         if(humans.players[3].execute == 1){pla3.removeEventListener('click', handleClick);}
-         if(humans.players[4].execute == 1){pla4.removeEventListener('click', handleClick);}
-         if(humans.enemies[1].execute == 1){ene1.removeEventListener('click', handleClick);}
-         if(humans.enemies[2].execute == 1){ene2.removeEventListener('click', handleClick);}
-         if(humans.enemies[3].execute == 1){ene3.removeEventListener('click', handleClick);}
-         if(humans.enemies[4].execute == 1){ene4.removeEventListener('click', handleClick);}
+         if(humans.players[1].status == 1){pla1.removeEventListener('click', handleClick);}
+         if(humans.players[2].status == 1){pla2.removeEventListener('click', handleClick);}
+         if(humans.players[3].status == 1){pla3.removeEventListener('click', handleClick);}
+         if(humans.players[4].status == 1){pla4.removeEventListener('click', handleClick);}
+         if(humans.enemies[1].status == 1){ene1.removeEventListener('click', handleClick);}
+         if(humans.enemies[2].status == 1){ene2.removeEventListener('click', handleClick);}
+         if(humans.enemies[3].status == 1){ene3.removeEventListener('click', handleClick);}
+         if(humans.enemies[4].status == 1){ene4.removeEventListener('click', handleClick);}
          resolve(target);
       }
       let target = []
@@ -4361,36 +4088,36 @@ function LetsTargetSelect(){
          target.push(num);target.push(cam);
          zigo();
       }
-      if(humans.players[1].execute == 1){
+      if(humans.players[1].status == 1){
          pla1.style.backgroundColor = color;
          pla1.addEventListener('click', () => handleClick(1, 'players'));
       }
-      if (humans.players[2].execute == 1) {
+      if (humans.players[2].status == 1) {
          pla2.style.backgroundColor = color;
          pla2.addEventListener('click', () => handleClick(2, 'players'));
       }
-      if (humans.players[3].execute == 1) {
+      if (humans.players[3].status == 1) {
          pla3.style.backgroundColor = color;
          pla3.addEventListener('click', () => handleClick(3, 'players'));
       }
-      if (humans.players[4].execute == 1) {
+      if (humans.players[4].status == 1) {
          pla4.style.backgroundColor = color;
          pla4.addEventListener('click', () => handleClick(4, 'players'));
       }
 
-      if (humans.enemies[1].execute == 1) {
+      if (humans.enemies[1].status == 1) {
          ene1.style.backgroundColor = color;
          ene1.addEventListener('click', () => handleClick(1, 'enemies'));
       }
-      if (humans.enemies[2].execute == 1) {
+      if (humans.enemies[2].status == 1) {
          ene2.style.backgroundColor = color;
          ene2.addEventListener('click', () => handleClick(2, 'enemies'));
       }
-      if (humans.enemies[3].execute == 1) {
+      if (humans.enemies[3].status == 1) {
          ene3.style.backgroundColor = color;
          ene3.addEventListener('click', () => handleClick(3, 'enemies'));
       }
-      if (humans.enemies[4].execute == 1) {
+      if (humans.enemies[4].status == 1) {
          ene4.style.backgroundColor = color;
          ene4.addEventListener('click', () => handleClick(4, 'enemies'));
       }
@@ -4401,7 +4128,7 @@ function LetsTargetSelect(){
 async function back(me){
    if(phase == 1){
       disappear();
-      document.getElementById('GameArea').style.display = 'none';
+      document.getElementById('BattleArea').style.display = 'none';
       document.getElementById('NowMap').style.display = 'block';
       
       ctx.clearRect(0, 0, 600, 600); 
@@ -4512,7 +4239,7 @@ async function skillAct(cam,me,skill){
    let serif = 'errored';
    switch(skill){
       case '50%split':{
-         if('spliting' in humans.players[me].buffs == false){
+         if(buffhas(cam,me,'spliting') == false){
             if(playerhealth > Math.floor(playermaxhealth * 0.5)){
             buffadd(cam,me,'spliting',7);//廃止予定
             x = Math.floor(playermaxhealth * 0.5);
@@ -4710,7 +4437,7 @@ function PlayerTurretbreak(){
    Turret['players'].num -= 1;
    if(Turret['players'].num <= 0){
       Turret['players'] = {};
-      document.getElementById('PlayerTurret').remove();
+      document.getElementById('PlayersTurret').remove();
    }else{
       document.getElementById('PlayerTurret').innerHTML = `
          <b>turret</b>x${Turret['players'].num}<br>
@@ -4727,7 +4454,7 @@ async function NextTurnis(cam,tcam,me,target){
    //アンコールの動き
    if(!cam == 0){
    y = 1;//luck
-   if('luck' in humans[cam][me].buffs){y = Math.floor(Math.random() * humans[cam][me].buffs.luck.lv);}//luck
+   if(buffhas(cam,me,'luck')){y = Math.floor(Math.random() * humans[cam][me].buffs.luck.lv);}//luck
    if(y == 0){
       log.textContent = '当たりが出たらもう一本♪';
       await delay(1000); backtoplayerturn(); return;
@@ -4735,7 +4462,7 @@ async function NextTurnis(cam,tcam,me,target){
 
 
    //継続ダメージの動き
-   if ('poison' in humans[cam][me].buffs){
+   if (buffhas(cam,me,'poison')){
       x = humans[cam][me].health;
       humans[cam][me].health -= Math.floor(humans[cam][me].maxhealth * humans[cam][me].buffs.poison.lv);
       if(humans[cam][me].health < 0){humans[cam][me].health = 0};
@@ -4743,7 +4470,7 @@ async function NextTurnis(cam,tcam,me,target){
       log.textContent = humans[cam][me].name + 'は毒で' + y + 'のダメージ!';
       await delay(1000);
    };
-   if('burn1' in humans[cam][me].buffs){
+   if(buffhas(cam,me,'burn')){
       x = humans[cam][me].health;
       humans[cam][me].health -= humans[cam][me].buffs.burn.lv;
       if(humans[cam][me].health < 0){humans[cam][me].health = 0}
@@ -4790,7 +4517,7 @@ async function NextTurnis(cam,tcam,me,target){
       }
 
       turncount += 1;
-      const combined = [...Object.values(humans.players), ...Object.values(humans.enemies)].filter(c => c.execute === 1 && c.health > 0)// オブジェクトをリストに変換して合体
+      const combined = [...Object.values(humans.players), ...Object.values(humans.enemies)].filter(c => c.status === 1 && c.health > 0)// オブジェクトをリストに変換して合体
       .sort((a, b) => {// 降順でソート
          if(b.speed === a.speed){
             if(a.cam === b.cam){
@@ -4822,25 +4549,25 @@ async function NextTurnis(cam,tcam,me,target){
 
    console.log('現在、'+cam+'の'+nowturn+'さんのターンですわ〜');
 
-   if('onslime' in humans[cam][nowturn].buffs){
+   if(buffhas(cam,nowturn,'onslime')){
       if(Math.floor(Math.random() * Debuffs.onslime.lv[humans[cam][nowturn].buffs.onslime.lv]) !== 0){
-         buffremove(`humans[${cam}][${nowturn}].buffs`,'onslime');
+         buffremove(cam,nowturn,'onslime');
          log.textContent = 'なんとかスライムを取り払った!!';
       }else{
          log.textContent = 'スライムが邪魔して動けない!!';//今思ったけどこれやばいのでは...?
          await delay(1000);NextTurnis(0);return;}; 
    }
-   if('skip' in humans[cam][nowturn].buffs){
+   if(buffhas(cam,nowturn,'skip')){
       log.textContent = 'はい'+humans[cam][me].name+'、お前スキップ〜〜';
       await delay(1000); NextTurnis(cam,0,me,0); return;
    }
-   if('stan' in humans[cam][nowturn].buffs){
+   if(buffhas(cam,nowturn,'stan')){
       log.textContent = humans[cam][me].name+'はスタンした！';
       await delay(1000); NextTurnis(cam,0,me,0); return;　
    }
-   if('freeze' in humans[cam][nowturn].buffs){
+   if(buffhas(cam,nowturn,'freeze')){
       if(!Math.floor(Math.random() * Debuffs.freeze.lv[humans[cam][nowturn].buffs.freeze.lv]) !== 0){
-         log.textContent = '氷が溶けた!'; buffremove(`humans[${cam}][${nowturn}].buffs`,'freeze');
+         log.textContent = '氷が溶けた!'; buffremove(cam,nowturn,'freeze');
       }else{
          log.textContent = humans[cam][nowturn].name + 'は凍っている...';
          await delay(1000); NextTurnis(cam,0,me,0); return;
@@ -4860,7 +4587,7 @@ async function NextTurnis(cam,tcam,me,target){
 //#region enemyturn
 async function enemyturn(cam,me){
    console.log('attack:'+humans.enemies[me].attack+'power:'+humans.enemies[me].power);
-   x = Object.values(humans.enemies).filter(x => x.execute == 1&& x.health > 0).map(x => x.num);
+   x = Object.values(humans.enemies).filter(x => x.status == 1&& x.health > 0).map(x => x.num);
    for(i = 0; i < x.length; i++){
       let n = x[i]
       for(const key in humans.enemies[n].buffs){
@@ -4919,27 +4646,25 @@ async function enemyturn(cam,me){
          break;
    }
    */
-   await enemycontidmg(me);
-   if(humans.enemies[me].health <= 0){humans.enemies[me].health = 0}
-   if(humans.enemies[me].health == 0){window.setTimeout(killedenemy, 1000)}
+   if(humans.enemies[me].health <= 0){;window.setTimeout(killedenemy, 1000)}
    else{
       NextTurnis(cam,selected[1],me,selected[0]);
    }
 }
 function ShallTargetSelect(me,code,both){//これは敵しか使わないターゲットセレクト。だから陣営とかは考えんでいいよ
    //標的陣営、起動者、コード(e = enemy, p = player | m = most highest, l = most lowest,| atk = 攻撃力, def = 防御力, hp = 体力 || r = random)、両隣にも被害を与えるか0,1
-   //,b => b.health//playerのhealth達を、executeが1のやつだけ、小さい順(昇順)に並べてる。
+   //,b => b.health//playerのhealth達を、statusが1のやつだけ、小さい順(昇順)に並べてる。
    const playerstatus = {
-      num:Object.values(humans.players).filter(c => c.execute == 1 && c.health > 0).sort((p1, p2) => p1.num - p2.num).map(a => a.num),
-   health:Object.values(humans.players).filter(c => c.execute == 1 && c.health > 0).sort((p1, p2) => p1.health - p2.health).map(a => a.num),
-      atk:Object.values(humans.players).filter(c => c.execute == 1 && c.health > 0).sort((p1, p2) => p1.attack - p2.attack).map(a => a.num),
-      def:Object.values(humans.players).filter(c => c.execute == 1 && c.health > 0).sort((p1, p2) => p1.defense - p2.defense).map(a => a.num),
+      num:Object.values(humans.players).filter(c => c.status == 1 && c.health > 0).sort((p1, p2) => p1.num - p2.num).map(a => a.num),
+   health:Object.values(humans.players).filter(c => c.status == 1 && c.health > 0).sort((p1, p2) => p1.health - p2.health).map(a => a.num),
+      atk:Object.values(humans.players).filter(c => c.status == 1 && c.health > 0).sort((p1, p2) => p1.attack - p2.attack).map(a => a.num),
+      def:Object.values(humans.players).filter(c => c.status == 1 && c.health > 0).sort((p1, p2) => p1.defense - p2.defense).map(a => a.num),
    }
    const enemystatus = {
-      num:Object.values(humans.enemies).filter(c => c.execute == 1 && c.health > 0).sort((e1, e2) => e1.num - e2.num).map(a => a.num),
-   health:Object.values(humans.enemies).filter(c => c.execute == 1 && c.health > 0).sort((e1, e2) => e1.health - e2.health).map(a => a.num),
-      atk:Object.values(humans.enemies).filter(c => c.execute == 1 && c.health > 0).sort((e1, e2) => e1.attack - e2.attack).map(a => a.num),
-      def:Object.values(humans.enemies).filter(c => c.execute == 1 && c.health > 0).sort((e1, e2) => e1.defense - e2.defense).map(a => a.num),
+      num:Object.values(humans.enemies).filter(c => c.status == 1 && c.health > 0).sort((e1, e2) => e1.num - e2.num).map(a => a.num),
+   health:Object.values(humans.enemies).filter(c => c.status == 1 && c.health > 0).sort((e1, e2) => e1.health - e2.health).map(a => a.num),
+      atk:Object.values(humans.enemies).filter(c => c.status == 1 && c.health > 0).sort((e1, e2) => e1.attack - e2.attack).map(a => a.num),
+      def:Object.values(humans.enemies).filter(c => c.status == 1 && c.health > 0).sort((e1, e2) => e1.defense - e2.defense).map(a => a.num),
    }
    let ret = [];
    switch(code){
@@ -5165,33 +4890,26 @@ function ShallTargetSelect(me,code,both){//これは敵しか使わないター�
    console.log(ret)
    return ret;
 }
-async function enemycontidmg(me){
-   if ('poison' in humans.enemies[me].buffs){
-      x = humans.enemies[me].health;
-      humans.enemies[me].health -= Math.floor(humans.enemies[me].health * humans.enemies[me].buffs.poison.lv);
-      if(humans.enemies[me].health < 0){humans.enemies[me].health = 0};
-      y = x - humans.enemies[me].health;
-      await delay(1000);
-      log.textContent = humans.enemies[me].name + 'は毒で' + y + 'のダメージ!';
-   };
-   if('burn' in humans.enemies[me].buffs){
-      x = humans.enemies[me].health;
-      humans.enemies[me].health -= humans.enemies[me].buffs.burn.lv;
-      if (humans.enemies[me].health < 0){humans.enemies[me].health = 0}
-      y = x - humans.enemies[me].health;
-      await delay(1000);
-      log.textContent = humans.enemies[me].name + 'は燃えて' + y + 'のダメージ!';
-   };
-   tekiou();
-}
 //#endregion
 
 //#region 勝利/負けの動き
-async function killedenemy(cam,tcam,me,target) {
-   log.textContent = humans.enemies[target].name + 'を倒した!';
+async function killedenemy(cam,tcam,me,target){//殺った側cam,meと殺された側tcam,target
+   //log.textContent = humans.enemies[target].name + 'を倒した!';
 
+   //さあ、ここを作っていきましょうか killedenemy呼び出し階層全チェックよろ
+
+   humans[tcam][target].health = 0;
+   buffclear(tcam,target);
+   humans[tcam][target].status = 2;
+   tekiou();
+
+   let karix = bar.cam.map((Cam, Num) => Cam === 'p' && bar.num[Num] === 2 ? Num : -1).filter(Num => Num !== -1);
+   bar.cam.splice(karix,1);bar.num.splice(karix,1);
+
+
+   /*
    //クエストの動
-   if(quest.main.type == 'k.' || quest.main.type == '1.k.'&&stage == 1 || quest.main.type == '2.k.'&&stage == 2){
+   if(quest.main.type == 'k.' || quest.main.type == '1.k.'&&stage == 1 || quest.main.type == '2.k.'&&stage == 2){//Quests={main:{},daily:[{},{}]};..みたいにしといて
       quest.main.num += 1;
       if(quest.main.num >= quest.main.nom){
          quest.main.num = quest.main.nom;
@@ -5207,69 +4925,101 @@ async function killedenemy(cam,tcam,me,target) {
          }
       }
    }
-   
-   await delay(1000);
-   z = Math.floor(Math.random() * 21) + 10;
-   euro += z;log.textContent =  z + '€を獲得した!';tekiou();
-   await delay(1000);
-   playerexp += enemylevel;
-   rpt += humans.enemies[1].level+eneies[2].level+humans.enemies[3].level+humans.enemies[4].level;
-   x = enemylevel;
-   if(bossbattlenow = 1){
-      playerexp += enemylevel;
-      rpt += enemylevel*2;
-      x = enemylevel*2;
-      bossbattlenow = 0;
-   }
-   log.textContent = x+'の経験値を奪った!';
-   while(playerexp >= playerlevel){
-      playerexp -= playerlevel;
-      playerlevel += 1;
-      sp += 1;
-      document.getElementById('PlayerLevel').textContent = playerlevel;
-   }
+   */
 
-   await delay(1000);
-   buffclear(tcam,target);buffclear(tcam,target);
-   PlayerTurretbreak();
-   z = Math.floor(Math.random() * 5)-2;// -2~2
-   enemylevel += z;
-   if(enemylevel < 1){enemylevel = 1;}
-   if(!z <= 0){
-      for(i = 0; i < z; i++){
-      y = Math.floor(Math.random() * 3) + 1;
-      switch(y){
-         case 1: enemyhp  += 20;break;
-         case 2: enemyatk += 5; break;
-         case 3: enemydef += 5; break;
-      }}
-   }else if(z < 0){
-      for(i = 0; i < -z; i++){
-      y = Math.floor(Math.random() * 3) + 1;
-      switch(y){
-         case 1: enemyhp  -= 20;break;
-         case 2: enemyatk -= 5; break;
-         case 3: enemydef -= 5; break;
-      }}
-   }
-   document.getElementById('EnemyLevel').textContent = enemylevel;
-   log.textContent = '';
-   document.getElementById('GameArea').style.display = 'none';
-   document.getElementById('NowMap').style.display = 'block';
-   
+   karix = false;
+   karix = [1, 2, 3, 4].every(id => {
+      let enemy = humans.enemies[id];
+      return enemy.execute == 0 || enemy.execute == 2;
+   });
+   if(karix){
+      //敵全滅
+      karix = (Math.floor(Math.random() *11)+5)*numberofenemy;
+      euro += karix;
+      karix = [1, 2, 3, 4].reduce((sum, id) => {
+         let enemy = humans.enemies[id];
+         return sum + (enemy.level||0);
+      }, 0);
+      rpt += karix;
+      updateUI();
+      log.textContent = '敵を倒した！！';await delay(1000)
+      log.textContent = x+'の経験値を奪った!';
+      Object.keys(humans.players.map(a => a.execute == 1/*|| a.execute == 2*/).forEach(nanka => {
+         nanka.exp += karix;
+         while(nanka.exp >= nanka.level){
+            nanka.exp -= nanka.level;
+            nanka.rlevel += 1;
+            nanka.sp += 1;
+         }
+         tekiou();
+      }));
+      await delay(1000);
 
-   MAPx = Math.floor(SELECTx / 75);
-   MAPy = Math.floor(SELECTy / 75);
-   objectMap[MAPy][MAPx] = 0;//戦利品的な何かにしてもいいかも..いやなし
-   ctx.clearRect(0, 0, 600, 600); 
-   DrawBackground();
-   ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
-   AllowMove = 0;
+      z = Math.floor(Math.random() * 7)-2;// -2~4
+      if(!z <= 0){
+         for(i = 0; i < z; i++){
+         y = Math.floor(Math.random() * 3) + 1;
+         switch(y){
+            case 1: enemyhp  += 20;break;
+            case 2: enemyatk += 5; break;
+            case 3: enemydef += 5; break;
+         }}
+      }else if(z < 0){
+         for(i = 0; i < -z; i++){
+         y = Math.floor(Math.random() * 3) + 1;
+         switch(y){
+            case 1: enemyhp  -= 20;break;
+            case 2: enemyatk -= 5; break;
+            case 3: enemydef -= 5; break;
+         }}
+      }
+      log.textContent = '';
+      document.getElementById('BattleArea').style.display = 'none';
+      document.getElementById('NowMap').style.display = 'block';
+      
+
+      MAPx = Math.floor(SELECTx / 75);
+      MAPy = Math.floor(SELECTy / 75);
+      objectMap[MAPy][MAPx] = 0;//戦利品的な何かにしてもいいかも..いやなし
+      ctx.clearRect(0, 0, 600, 600); 
+      DrawBackground();
+      ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+      AllowMove = 0;
+   }
+   //PlayerTurretbreak();
+
+   /*
+   Object.keys(humans.enemies.map(a => a.execute == 1/*|| a.execute == 2).forEach(nanka => {
+      z = Math.floor(Math.random() * 5)-2;// -2~2
+      nanka.level += z;
+      if(nanka.level < 1){nanka.level = 1;}
+      if(!z <= 0){
+         for(i = 0; i < z; i++){
+         y = Math.floor(Math.random() * 3) + 1;
+         switch(y){
+            case 1: enemyhp  += 20;break;
+            case 2: enemyatk += 5; break;
+            case 3: enemydef += 5; break;
+         }}
+      }else if(z < 0){
+         for(i = 0; i < -z; i++){
+         y = Math.floor(Math.random() * 3) + 1;
+         switch(y){
+            case 1: enemyhp  -= 20;break;
+            case 2: enemyatk -= 5; break;
+            case 3: enemydef -= 5; break;
+         }}
+      }
+      document.getElementById('EnemyLevel').textContent = enemylevel;
+   }));
+   */
+   
+   
 }   
 async function EnemyAppear(){
    AllowMove = 1;
    document.getElementById('NowMap').style.display = 'none';
-   document.getElementById('GameArea').style.display = 'block';
+   document.getElementById('BattleArea').style.display = 'block';
    document.getElementById('select1').textContent = ' ';
    document.getElementById('select2').textContent = ' ';
    document.getElementById('select3').textContent = ' ';
@@ -5281,8 +5031,8 @@ async function EnemyAppear(){
    x = numberofplayer+1;
    for(i = 1; i < x; i++){
       let num = i-1;
-      document.getElementById(`player${i}`).style.display = 'block';
-      humans.players[i].execute = 1;
+      document.getElementById(`players${i}`).style.display = 'block';
+      humans.players[i].status = 1;
       tekiou();
    }
    x = [1,1,1,1,2,2,3]
@@ -5290,8 +5040,8 @@ async function EnemyAppear(){
    let nanika = numberofenemy+1;
    for(i = 1; i < nanika; i++){
       let num = i-1;
-      document.getElementById(`enemy${i}`).style.display = 'block';
-      humans.enemies[i].execute = 1;
+      document.getElementById(`enemies${i}`).style.display = 'block';
+      humans.enemies[i].status = 1;
       humans.enemies[i].name = DesideEnemyName(i);
       tekiou();
    }
@@ -5316,7 +5066,7 @@ async function defeat(){
    bossbattlenow = 0;
    floor = 0;
    GoNextFloor();
-   document.getElementById('GameArea').style.display = 'none';
+   document.getElementById('BattleArea').style.display = 'none';
    document.getElementById('NowMap').style.display = 'block';
    
 
@@ -5334,7 +5084,7 @@ async function defeat(){
 function BossEnemyAppear(){
    AllowMove = 1;
    document.getElementById('NowMap').style.display = 'none';
-   document.getElementById('GameArea').style.display = 'block';
+   document.getElementById('BattleArea').style.display = 'block';
    bossbattlenow = 1;
    document.getElementById('select1').textContent = ' ';
    document.getElementById('select2').textContent = ' ';
@@ -5475,7 +5225,7 @@ let Camprestper
    await delay(1000);
    document.getElementById('EventArea').innerHTML = '';
    log.textContent = '';
-   document.getElementById('GameArea').style.display = 'none';
+   document.getElementById('BattleArea').style.display = 'none';
    document.getElementById('NowMap').style.display = 'block';
    
    MAPx = Math.floor(SELECTx / 75);
@@ -5942,7 +5692,7 @@ async function OpenChest(code){
    }
    document.getElementById('EventArea').innerHTML = '';
    log.textContent = '';
-   document.getElementById('GameArea').style.display = 'none';
+   document.getElementById('BattleArea').style.display = 'none';
    document.getElementById('NowMap').style.display = 'block';
    
 
@@ -5987,7 +5737,7 @@ async function Cookietake(){
    await delay(1000);
    document.getElementById('EventArea').innerHTML = '';
    log.textContent = '';
-   document.getElementById('GameArea').style.display = 'none';
+   document.getElementById('BattleArea').style.display = 'none';
    document.getElementById('NowMap').style.display = 'block';
    
 
