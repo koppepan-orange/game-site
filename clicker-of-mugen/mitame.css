@@ -219,6 +219,15 @@ body {
   width: 260px;
   height: 490px;
 }
+#MagicAppearence{
+  text-align: left!important;
+  overflow-y: scroll;
+  max-height: 400px;
+  width: 260px;
+  border: 1px solid #23232369;
+  word-wrap: break-word;
+  white-space: normal;
+}
 /* ここからおしごと */
 .task-bar-container {
   position: relative;

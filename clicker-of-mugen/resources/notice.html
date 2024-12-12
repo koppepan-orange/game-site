@@ -37,13 +37,48 @@
       <button class="button" onclick="setTimeout(`N('1.206.txt')`, 10)">"1.206"の更新の話</button>
       <button class="button" onclick="setTimeout(`N('1.200-1.205.txt')`, 10)">"1.200~1.205"までの更新の話</button>
       <button class="button" onclick="setTimeout(`N('introduction.txt')`, 10)">"お知らせ"機能、登場！！！</button>
+      <button class="button" onclick="setTimeout(`N('todoリストとか.txt')`, 10)">todolistとか</button>
     </div>
     <div id="AppearArea"></div>
     <script>
-     function N(s) {
-      document.getElementById('ButtonArea').style.display = 'none';
-      document.getElementById('AppearArea').style.display = 'block';
-      document.getElementById('AppearArea').innerHTML = `<iframe id="notice" src="notices/${s}"</iframe>`;
+     async function N(s) {
+      // document.getElementById('ButtonArea').style.display = 'none';
+      // document.getElementById('AppearArea').style.display = 'block';
+      // document.getElementById('AppearArea').innerHTML = `<iframe id="notice" src="notices/${s}"</iframe>`;
+
+        try {
+    // todoフォルダ内のすべてのテキストファイルを読み取る
+    const todoFiles = await fetch('./notices/')
+      .then(response => response.text())
+      .then(text => {
+        const parser = new DOMParser();
+        const htmlDoc = parser.parseFromString(text, 'text/html');
+        const fileLinks = htmlDoc.getElementsByTagName('a');
+        
+        return Array.from(fileLinks)
+          .filter(link => link.href.endsWith('.txt'))
+          .map(link => link.href);
+      });
+    
+    // 各ファイルの内容を読み取り、ファイル名と内容を紐付ける
+    const noticeContents = await Promise.all(
+      todoFiles.map(async (file) => {
+        const content = await fetch(file).then(response => response.text());
+        const fileName = file.split('/').pop(); // ファイル名を抽出
+        return { fileName, content };
+      })
+    );
+    
+    // 読み取った内容を整形して表示
+    const formattedNotices = noticeContents.map(notice => 
+      `【${notice.fileName}】\n${notice.content}\n---`
+    ).join('\n');
+    
+    // テキストエリアに表示
+    document.getElementById('noticeList').textContent = formattedNotices;
+  } catch (error) {
+    console.error('お知らせ読み込みエラー:', error);
+  }
 
       const handler = function() {
           document.getElementById('notice').removeEventListener('click', handler); // 正しくリスナーを外す

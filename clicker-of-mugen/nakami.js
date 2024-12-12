@@ -835,22 +835,22 @@ function NanigaOkoruKana(code){
 }
 
 
-function SuteFuri(code){
+function SuteFuri(me,code){
    if(sp < 1){return;}
    switch(code){
-      case 'atk':  playerattack   += 5;   break;
-      case 'def':  playerdefense   += 5;   break;
-      case 'hp':   playermaxhealth += 20; playerhealth += 20;break;
-      case 'mp':   playermaxmp    += 5;   break;
-      case 'matk': playermattack   += 5;   break;
-      case 'mdef': playermdefense  += 5;   break;
-      case 'crla': playercritlate *= 100; playercritlate  += 2; playercritlate *= 0.01; break;
-      case 'crdm': playercritdmg *= 10; playercritdmg += 1; playercritdmg *= 0.1;  break;
+      case 'atk':  humans.players[me].attack += 5;   break;
+      case 'def':  humans.players[me].defense   += 5;   break;
+      case 'hp':   humans.players[me].maxhealth += 20; humans.players[me].health += 20;break;
+      case 'mp':   humans.players[me].maxmp    += 5;   break;
+      case 'matk': humans.players[me].mattack   += 5;   break;
+      case 'mdef': humans.players[me].mdefense  += 5;   break;
+      case 'crla': humans.players[me].critlate *= 100; humans.players[me].critlate  += 2; humans.players[me].critlate *= 0.01; break;
+      case 'crdm': humans.players[me].critdmg *= 10; humans.players[me].critdmg  += 1; humans.players[me].critdmg *= 0.1;  break;
    }
    playercritlate *= 100;playercritlate = Math.floor(playercritlate);playercritlate *= 0.01;
    playercritdmg *= 10;playercritdmg = Math.floor(playercritdmg);playercritdmg *= 0.1;
    sp -= 1;
-   inventoryOpen();
+   inventoryOpen(me);
 }
 
 function GoNextFloor(){
@@ -944,6 +944,7 @@ let playercrdm = 0;
 let playercrrs = 0;
 
 //毎ダンジョン変わるデータs
+let enemylv = 1;
 let enemyhp = 0//この辺は固有値というか規定値。接頭辞によってこっから変動させたりできるようにする用
 let enemyatk = 0;
 let enemydef = 0;
@@ -971,13 +972,14 @@ let humans = {
          num:1,
          name:'player',
          level:1,
+         exp:0,
+         sp:0,
    
          speed:10,
          health:0,
          maxhealth:0,
          attack:0,
          defense:0,
-         exp:0,
          power:1,
          shell:1,
          mp:10,
@@ -1031,13 +1033,14 @@ let humans = {
          num:2,
          name:'friend1',
          level:1,
+         exp:0,
+         sp:0,
    
          speed:1,
          health:0,
          maxhealth:0,
          attack:0,
          defense:0,
-         exp:0,
          power:1,
          shell:1,
          mp:0,
@@ -1085,13 +1088,14 @@ let humans = {
          num:3,
          name:'friend2',
          level:1,
+         exp:0,
+         sp:0,
    
          speed:1,
          health:0,
          maxhealth:0,
          attack:0,
          defense:0,
-         exp:0,
          power:1,
          shell:1,
          mp:0,
@@ -1139,13 +1143,14 @@ let humans = {
          num:4,
          name:'friend3',
          level:1,
+         exp:0,
+         sp:0,
    
          speed:1,
          health:0,
          maxhealth:0,
          attack:0,
          defense:0,
-         exp:0,
          power:1,
          shell:1,
          mp:0,
@@ -1563,15 +1568,15 @@ let Slashs = {
       tcam:'players',
       process:async function(cam,tcam,me,target){
          await humandamaged(cam,tcam,me,target,1,'sh',1);
-         if(humans[tcam][target].health == 0){killedenemy(cam,tcam,me,target);return;}
+         if(humans[tcam][target].health == 0){killed(cam,tcam,me,target);return;}
 
          if(humans[cam][me].ps.id == 'sthree' && Math.floor(Math.random() * 4) == 0){//1/4
             log.textContent = humans[cam][me].name+'は頑張った!';
             await delay(500)
             await humandamaged(cam,tcam,me,target,1,'sh',1);
-            if(humans[tcam][target].health == 0){killedenemy(cam,tcam,me,target);return;}
+            if(humans[tcam][target].health == 0){killed(cam,tcam,me,target);return;}
             await humandamaged(cam,tcam,me,target,1,'sh',1);
-            if(humans[tcam][target].health == 0){killedenemy(cam,tcam,me,target);return;}
+            if(humans[tcam][target].health == 0){killed(cam,tcam,me,target);return;}
          }
       }
    },
@@ -1586,13 +1591,13 @@ let Slashs = {
             log.textContent = 'miss! ダメージを与えられない!';await delay(1000);
          }else{
             await humandamaged(cam,tcam,me,target,1,'sh',2);
-            if(humans[tcam][target].health == 0){killedenemy(cam,tcam,me,target);return;}
+            if(humans[tcam][target].health == 0){killed(cam,tcam,me,target);return;}
          }
          if(Math.floor(Math.random() * 3) == 0){
             log.textContent = 'miss! ダメージを与えられない!';await delay(1000);
          }else{
             await humandamaged(cam,tcam,me,target,1,'sh',2);
-            if(humans[tcam][target].health == 0){killedenemy(cam,tcam,me,target);return;}
+            if(humans[tcam][target].health == 0){killed(cam,tcam,me,target);return;}
          }
       }
    },
@@ -1603,11 +1608,11 @@ let Slashs = {
       lv:1,
       tcam:'players',
       process:async function(cam,tcam,me,target){
-         x = Math.floor(Math.random() * 3); // 1/3です
+         x = Math.floor(Math.random() * 1); // 1/3です
          if(humans[cam][me].ps.id == 'highsol'){x = Math.floor(Math.random() * 5);}; // 1/5です。
          if(x == 0){
             await humandamaged(cam,tcam,me,target,3,'sh',3);//switch消して、camもちゃんと指定するようにしてちゃんといろいろやっといて
-            if(humans[tcam][target].health == 0){killedenemy(cam,tcam,me,target);return;}
+            if(humans[tcam][target].health == 0){killed(cam,tcam,me,target);return;}
          }else{
             if(humans[cam][me].ps.id !== 'solx5but'){
                log.textContent = 'miss! ダメージを与えられない!';
@@ -1810,14 +1815,14 @@ let Magics = {
    },
    'random':{
       name:'Random',
-      mp:12,
+      mp:5,
       lv:1,
       process:async function(cam,tcam,me,target){
          log.textContent = 'randomを唱えた.......';await delay(1000);
-         x = Magics.filter(a => a.lv <= humans[cam][me].lv).map(a => a.process,a => a.name);
-         y = Math.floor(Math.random() * x[0].length);
-         log.textContent = x[1][y]+'が出た！';await delay(1000);
-         x[0][y](cam,tcam,me,target);
+         x = Object.keys(Magics).map(a => Magics[a].lv <= humans[cam][me].level ? Magics[a].name : null).filter(Boolean)
+         y = Math.floor(Math.random() * x.length);
+         log.textContent = x[y]+'が出た！';await delay(1000);
+         x[y](cam,tcam,me,target);
       }
    },
 
@@ -1894,7 +1899,7 @@ let Tools = {
          if(humans[tcam][target].health < x){x = humans[tcam][target].health};
          humans[tcam][target].health -= x
          log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';tekiou();await delay(1000);
-         if(humans.enemies[target].health <= 0){killedenemy(cam,tcam,me,target);return;}
+         if(humans.enemies[target].health <= 0){killed(cam,tcam,me,target);return;}
          NextTurnis(cam,tcam,me,target);
       }
    },
@@ -1917,7 +1922,7 @@ let Tools = {
          if(humans[tcam][target].health < x){x = humans[tcam][target].health};
          humans[tcam][target].health -= x;
          log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';tekiou();await delay(1000);
-         if(humans[tcam][target].health <= 0){log.textContent = 'ちょろい、ちょろい。BANG！';killedenemy(cam,tcam,me,target);return;}
+         if(humans[tcam][target].health <= 0){log.textContent = 'ちょろい、ちょろい。BANG！';killed(cam,tcam,me,target);return;}
          NextTurnis(cam,tcam,me,target);
       }
    },
@@ -1931,7 +1936,7 @@ let Tools = {
          humans[tcam][target].health -= x;
          buffadd(tcam,target,'burn',3,1);
          log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';tekiou();await delay(1000);
-         if(humans[tcam][target].health <= 0){log.textContent = 'レッドウィンターの問題児にしては上出来じゃない？';killedenemy(cam,tcam,me,target);return;}
+         if(humans[tcam][target].health <= 0){log.textContent = 'レッドウィンターの問題児にしては上出来じゃない？';killed(cam,tcam,me,target);return;}
          NextTurnis(cam,tcam,me,target);
       }
    },
@@ -1944,7 +1949,7 @@ let Tools = {
          if(humans[tcam][target].health < x){x = humans[tcam][target].health};
          humans[tcam][target].health -= x
          log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';tekiou();await delay(1000);
-         if(humans[tcam][target].health <= 0){log.textContent = 'わ、私のことはお気になさらずに...';killedenemy(cam,tcam,me,target);return;}
+         if(humans[tcam][target].health <= 0){log.textContent = 'わ、私のことはお気になさらずに...';killed(cam,tcam,me,target);return;}
          NextTurnis(cam,tcam,me,target);
       }
    },
@@ -1954,7 +1959,7 @@ let Tools = {
       process:async function(cam,tcam,me,target){
          humans[tcam][target].health = 0;
          log.textContent = '爆発オチなんてサイテー！！';tekiou();await delay(1000);
-         killedenemy(cam,tcam,me,target);
+         killed(cam,tcam,me,target);return;
       }
    },
    'redcard':{
@@ -2600,24 +2605,36 @@ function DesideEnemyName(target){
 
 //#region Inventory
 let InventoryPage = 1;
-function inventoryOpen(){
+function inventoryOpen(num){
+   InventoryPage = num??1;
    AllowMove = 1;
    localStorage.setItem('num', humans.players[InventoryPage].level);
    document.getElementById('InventoryArea').style.display = 'flex';
    document.getElementById('InventoryArea').innerHTML = `
-      <div id="Status">${humans.players[InventoryPage].name}<br>Level: ${humans.players[InventoryPage].level}<br>exP: ${humans.players[InventoryPage].exp}<br>Health: ${humans.players[InventoryPage].health}/${humans.players[InventoryPage].maxhealth}<br>MP: ${humans.players[InventoryPage].mp}/${humans.players[InventoryPage].maxmp}<br>attack: ${humans.players[InventoryPage].attack}<br>defense: ${humans.players[InventoryPage].defense}<br>crit-late: ${humans.players[InventoryPage].critlate}<br>crit-dmg: ${humans.players[InventoryPage].critdmg}<br>crit-resist: ${humans.players[InventoryPage].critresist}</div>　
-      <div id="Sutefuri">magics<br>1:${humans.players[InventoryPage].magic1} <button class="button" onclick="MagicChange(1)">change</button><br>2:${humans.players[InventoryPage].magic2} <button class="button" onclick="MagicChange(2)">change</button><br>3:${humans.players[InventoryPage].magic3} <button class="button" onclick="MagicChange(3)">change</button><br><iframe src="resources/appearmagics.html" style="width: 90%; height: 100px;"></iframe><br><div id="MagicChangePlace"></div><br><br><span id="Appearsp">${humans.players[InventoryPage].sp} pt</span><br><button class="button" onclick="SuteFuri('atk')">attack</button><br><button class="button" onclick="SuteFuri('def')">defense</button><br><button class="button" onclick="SuteFuri('hp')">maxhealth</button><br><button class="button" onclick="SuteFuri('mp')">magicpt</button><br><button class="button" onclick="SuteFuri('crla')">clit-late</button><br><button class="button" onclick="SuteFuri('crdm')">clit-dmg</button></div>
+      <div id="Status">${humans.players[InventoryPage].name}<br>Level: ${humans.players[InventoryPage].level}<br>exp: ${humans.players[InventoryPage].exp}<br>Health: ${humans.players[InventoryPage].health}/${humans.players[InventoryPage].maxhealth}<br>MP: ${humans.players[InventoryPage].mp}/${humans.players[InventoryPage].maxmp}<br>attack: ${humans.players[InventoryPage].attack}<br>defense: ${humans.players[InventoryPage].defense}<br>crit-late: ${humans.players[InventoryPage].critlate}<br>crit-dmg: ${humans.players[InventoryPage].critdmg}<br>crit-resist: ${humans.players[InventoryPage].critresist}</div>　
+      <div id="Sutefuri">magics<br>1:${humans.players[InventoryPage].magic1} <button class="button" onclick="MagicChange(1)">change</button><br>2:${humans.players[InventoryPage].magic2} <button class="button" onclick="MagicChange(2)">change</button><br>3:${humans.players[InventoryPage].magic3} <button class="button" onclick="MagicChange(3)">change</button><br><div id="MagicAppearence" style="width: 90%; height: 100px;"></div><br><div id="MagicChangePlace"></div><br><br><span id="Appearsp">${humans.players[InventoryPage].sp} pt</span><br><button class="button" onclick="SuteFuri('atk')">attack</button><br><button class="button" onclick="SuteFuri('def')">defense</button><br><button class="button" onclick="SuteFuri('hp')">maxhealth</button><br><button class="button" onclick="SuteFuri('mp')">magicpt</button><br><button class="button" onclick="SuteFuri('crla')">clit-late</button><br><button class="button" onclick="SuteFuri('crdm')">clit-dmg</button></div>
    `;
+   let magics = Object.keys(Magics).map(a => Magics[a].lv <= humans.players[InventoryPage].level ? Magics[a].name : null).filter(Boolean)
+   document.getElementById('MagicAppearence').innerHTML = magics.join('<br>');
+
    let nextpage = addEventListener('keydown', (event) => {
       if (event.key === 'ArrowRight') {
          InventoryPage++;if(InventoryPage>4){InventoryPage=1;}
-         inventoryOpen();
-         nextpage.remove();
+         if(humans.players[InventoryPage].status >= 1){
+            inventoryOpen();
+            nextpage.remove();
+         }else{
+            InventoryPage--;
+         }
       }
       if (event.key === 'ArrowLeft') {
          InventoryPage--;if(InventoryPage<1){InventoryPage=4;}
-         inventoryOpen();
-         nextpage.remove();
+         if(humans.players[InventoryPage].status >= 1){
+            inventoryOpen();
+            nextpage.remove();
+         }else{
+            InventoryPage++;
+         }
       }
    });
 }
@@ -2631,24 +2648,33 @@ function inventoryClose(){
 
 //#region magics
 
-function MagicChange(num){document.getElementById('MagicChangePlace').innerHTML = `<input type="text" size="10" id="MagicChangeInput"></input><button class="button" onclick="MagicChangeDecide(${num})">Go</button>`}
-function MagicChangeDecide(num){
-   y = +document.getElementById('MagicChangeInput').value;
-   document.getElementById('MagicChangePlace').innerHTML = '';
-   y = Magics[y-1];
-   let code = Math.floor((humans.players[InventoryPage].level+2)/3);
-   code = Magics.slice(0, code);
-   if(code.includes(y)){
-   switch(num){
-      case 1:humans.players[InventoryPage].magic1 = y;break;
-      case 2:humans.players[InventoryPage].magic2 = y;break;
-      case 3:humans.players[InventoryPage].magic3 = y;break;
+function MagicChange(num){
+   let availableMagics = Object.keys(Magics)
+      .filter(a => Magics[a].lv <= humans.players[InventoryPage].level)
+      .map(a => Magics[a].name);
+   let magicSelectHTML = availableMagics.map(magic => 
+      `<button class="button" onclick="MagicChangeDecide('${magic}', ${num}, ${InventoryPage})">${magic}</button>`
+  ).join(' ');
+  
+  document.getElementById('MagicChangePlace').innerHTML = `
+      <div>Select Magic for Slot ${num}:</div>
+      ${magicSelectHTML}
+  `;
+}
+function MagicChangeDecide(name,num,nowpage){
+   // 選択したスロットに魔法を割り当て
+   switch(num) {
+       case 1:
+           humans.players[InventoryPage].magic1 = name;
+           break;
+       case 2:
+           humans.players[InventoryPage].magic2 = name;
+           break;
+       case 3:
+           humans.players[InventoryPage].magic3 = name;
+           break;
    }
-   log.textContent = y+'を覚えた！';
-   }else{
-      log.textContent = 'error';
-   }
-   inventoryOpen();
+   inventoryOpen(nowpage)
 }
 //#endregion
 //#region Notice
@@ -3775,7 +3801,7 @@ async function humandamaged(cam,tcam,me,target,multiplier,kind,code){//矛先の
          if(humans[tcam][target].health < 0){humans[tcam][target].health = 0};
          tekiou();
          log.textContent = humans[tcam][target].name + 'に' + x + 'のダメージ！';
-         if(code == 3 && humans[cam][me].ps.id == 'solplaceturret'){PlayerTurretPlace(me);}
+         if(code == 3 && humans[cam][me].ps.id == 'solplaceturret'){turretPlace(cam);}
          
          if(cam == 'players'){
             x = 1;if(code == 3){x = 2};
@@ -3922,7 +3948,7 @@ async function playerturn(cam,me){
       await humandamaged(cam,target[1],me,target[0],2,'sh',4);
       tekiou();
       if(humans.enemies[me].health <= 0){humans.enemies[me].health = 0; tekiou();};
-      if(humans.enemies[me].health == 0){window.setTimeout(killedenemy,1000);}
+      if(humans.enemies[me].health == 0){window.setTimeout(killed,1000);}
       else{window.setTimeout(enemyorplayer,1000);}
       return;
    }
@@ -4255,7 +4281,7 @@ async function skillAct(cam,me,skill){
          break;
       };
       case 'placeturret':{
-         PlayerTurretPlace();
+         turretPlace('players');
          log.textContent = humans[cam][me].name+'はturretを設置した!';
          skillReset();
          break;
@@ -4273,7 +4299,7 @@ async function skillAct(cam,me,skill){
          }
          await delay(1000);
          await humandamaged(cam,tcam,me,target,x,'sh',4);
-         if(humans.enemies[target].health == 0){killedenemy(cam,tcam,me,target);}
+         if(humans.enemies[target].health == 0){killed(cam,tcam,me,target);return;}
          else{phase = 1; NextTurnis(cam,tcam,me,target);};
          skillReset();
          break;
@@ -4385,7 +4411,7 @@ async function skillAct(cam,me,skill){
             case 0:log.textContent = 'いけっ！ピカピカの実！';buffadd(target[1],target[0],'stan',2,2);break;
          }
          await humandamaged(cam,target[1],me,target[0],x,'sh',4);
-         if(humans[target[1]][target[0]].health == 0){killedenemy(cam,target[1],me,target[0]);}
+         if(humans[target[1]][target[0]].health == 0){killed(cam,target[1],me,target[0]);return;}
          else{phase = 1; NextTurnis(cam,target[1],me,target[0]);};
          skillReset();
          break;
@@ -4414,34 +4440,34 @@ function Splitbreak(){
    document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()"></button>'
    document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';
 }
-function PlayerTurretPlace(){
-   if(!document.getElementById('PlayerTurret')){
+function turretPlace(cam){
+   if(!document.getElementById(`${cam}Turret`)){
       let div = document.createElement('div');
-      div.id = 'PlayerTurret';
-      div.className = 'turret'
-      document.getElementById('players').appendChild(div);
+      div.id = `${cam}Turret`;
+      div.className = 'turrets'
+      document.getElementById(cam).appendChild(div);
    }
-   Turret['players'] = {
-      num:Turret['players'].num??0 + 1,
-      attack:(Turret['players'].num??0+1) * 5,
-      health:(Turret['players'].num??0+1) * 15,
-      maxhealth:(Turret['players'].num??0+1) * 15,
+   Turret[cam] = {
+      num:(Turret[cam].num??0) + 1,
+      attack:5,
+      health:((Turret[cam].num??0)+1) * 15,
+      maxhealth:((Turret[cam].num??0)+1) * 15,
    },
-   document.getElementById('PlayerTurret').innerHTML = `
-      <b>turret</b>x${Turret['players'].num}<br>
-      <span>${Turret['players'].health}</span>/<span>${Turret['players'].maxhealth}</span><br>
+   document.getElementById(`${cam}Turret`).innerHTML = `
+      <b>Turret</b>x${Turret[cam].num}<br>
+      <span>${Turret[cam].health}</span>/<span>${Turret[cam].maxhealth}</span><br>
    `
 }
 function PlayerTurrettekiou(){tekiou();console.log('今はなきPlayerTurrettekiouが実行されたよ');};
-function PlayerTurretbreak(){
-   Turret['players'].num -= 1;
-   if(Turret['players'].num <= 0){
-      Turret['players'] = {};
-      document.getElementById('PlayersTurret').remove();
+function turretBreak(cam){
+   Turret[cam].num -= 1;
+   if(Turret[cam].num <= 0){
+      Turret[cam] = {};
+      document.getElementById(`${cam}Turret`).remove();
    }else{
-      document.getElementById('PlayerTurret').innerHTML = `
-         <b>turret</b>x${Turret['players'].num}<br>
-         <span>${Turret['players'].health}</span>/<span>${Turret['players'].maxhealth}</span><br>
+      document.getElementById(`${cam}Turret`).innerHTML = `
+         <b>Turret</b>x${Turret[cam].num}<br>
+         <span>${Turret[cam].health}</span>/<span>${Turret[cam].maxhealth}</span><br>
       `;
    }
 }
@@ -4493,26 +4519,35 @@ async function NextTurnis(cam,tcam,me,target){
    acted += 1;
    if(acted < bar.num.length){
    }else{
-      if(Turret.players.num > 0){
+      let cams = 0;
+      x = [1, 2, 3, 4].every(id => {let enemy = humans.enemies[id];return enemy.status == 0 || enemy.status == 2;});
+      if(Turret.players.num > 0 && x == false){
          log.textContent = '我らのturretの攻撃!';
          await delay(1000);
+         cams = 'players';
          let selected = ShallTargetSelect(1,`ehpl`,0);
          let tcams = selected[1];let targets = selected[0];
-         x = Math.ceil(Turret[cam].attack * Turret[cam].num) - Math.ceil(humans[tcams][targets].defense*humans[tcams][targets].shell);
+         console.log(Turret[cams].attack,Turret[cams].num,humans[tcams][targets].defense,humans[tcams][targets].shell);
+         x = Math.ceil(Turret[cams].attack * Turret[cams].num) - Math.ceil(humans[tcams][targets].defense*humans[tcams][targets].shell);
          if(x < 0){x = 0};if(x > humans[tcams][targets].health){x = humans[tcams][targets].health};
+         console.log(`damage:${x}, attack:${Turret.players.attack}`)//なぜかダメージが0になる問題が発生。attackは5のはずなので多分ここでなんかミス起きてる。突き止めて
          humans[tcams][targets].health -= x;tekiou();
-         log.textContent = `${humans[tcam][targets].name}に${x}のダメージ！`;
+         log.textContent = `${humans[tcams][targets].name}に${x}のダメージ！`;
+         if(humans[tcams][targets].health <= 0){killed(cams,tcams,1,targets);return;};
          await delay(1000);
       }
-      if(Turret.enemies.num > 0){
+      x = [1, 2, 3, 4].every(id => {let player = humans.players[id];return player.status == 0 || player.status == 2;});
+      if(Turret.enemies.num > 0 && x == false){
          log.textContent = '敵のturretの攻撃!';
          await delay(1000);
+         cams = 'enemies';
          let selected = ShallTargetSelect(0,`phpl`,0);
          let tcams = selected[1];let targets = selected[0];
-         x = Math.ceil(Turret[tcams].attack * Turret[tcams].num) - Math.ceil(humans[tcams][targets].defense*humans[tcams][targets].shell);
+         x = Math.ceil(Turret[cams].attack * Turret[cams].num) - Math.ceil(humans[tcams][targets].defense*humans[tcams][targets].shell);
          if(x < 0){x = 0};if(x > humans[tcams][targets].health){x = humans[tcams][targets].health};
          humans[tcams][targets].health -= x;tekiou();
          log.textContent = `${humans[tcams][targets].name}に${x}のダメージ！`;
+         if(humans[tcams][targets].health <= 0){killed(cams,tcams,1,targets);return;};
          await delay(1000);
       }
 
@@ -4646,7 +4681,7 @@ async function enemyturn(cam,me){
          break;
    }
    */
-   if(humans.enemies[me].health <= 0){;window.setTimeout(killedenemy, 1000)}
+   if(humans.enemies[me].health <= 0){;window.setTimeout(killed, 1000)}
    else{
       NextTurnis(cam,selected[1],me,selected[0]);
    }
@@ -4781,7 +4816,6 @@ function ShallTargetSelect(me,code,both){//これは敵しか使わないター�
 
       //enemy
       case 'er':
-         ret.push('enemies');
          x = enemystatus.health[Math.floor(Math.random() * enemystatus.length)]
          if(both == 0){
             ret.push(x);
@@ -4794,7 +4828,6 @@ function ShallTargetSelect(me,code,both){//これは敵しか使わないター�
          }
          break;
       case 'ehpl':
-         ret.push('enemies');
          x = enemystatus.health[0]
          if(both == 0){
             ret.push(x);
@@ -4807,7 +4840,6 @@ function ShallTargetSelect(me,code,both){//これは敵しか使わないター�
          }
          break;
       case 'ehph':
-         ret.push('enemies');
          x = enemystatus.health[enemystatus.length - 1]
          if(both == 0){
             ret.push(x);
@@ -4820,7 +4852,6 @@ function ShallTargetSelect(me,code,both){//これは敵しか使わないター�
          }
          break;
       case 'eatkl':
-         ret.push('enemies');
          x = enemystatus.atk[0]
          if(both == 0){
             ret.push(x);
@@ -4833,7 +4864,6 @@ function ShallTargetSelect(me,code,both){//これは敵しか使わないター�
          }
          break;
       case 'eatkh':
-         ret.push('enemies');
          x = enemystatus.atk[enemystatus.length - 1]
          if(both == 0){
             ret.push(x);
@@ -4846,7 +4876,6 @@ function ShallTargetSelect(me,code,both){//これは敵しか使わないター�
          }
          break;
       case 'edefl':
-         ret.push('enemies');
          x = enemystatus.def[0]
          if(both == 0){
             ret.push(x);
@@ -4859,7 +4888,6 @@ function ShallTargetSelect(me,code,both){//これは敵しか使わないター�
          }
          break;
       case 'edefh':
-         ret.push('enemies');
          x = enemystatus.def[enemystatus.length - 1]
          if(both == 0){
             ret.push(x);
@@ -4872,7 +4900,6 @@ function ShallTargetSelect(me,code,both){//これは敵しか使わないター�
          }
          break;
       case 'ec'://center..まあ自分よな
-         ret.push('enemies');
          x = me;
          if(both == 0){
             ret.push(x);
@@ -4893,7 +4920,7 @@ function ShallTargetSelect(me,code,both){//これは敵しか使わないター�
 //#endregion
 
 //#region 勝利/負けの動き
-async function killedenemy(cam,tcam,me,target){//殺った側cam,meと殺された側tcam,target
+async function killed(cam,tcam,me,target){//殺った側cam,meと殺された側tcam,target
    //log.textContent = humans.enemies[target].name + 'を倒した!';
 
    //さあ、ここを作っていきましょうか killedenemy呼び出し階層全チェックよろ
@@ -4930,32 +4957,34 @@ async function killedenemy(cam,tcam,me,target){//殺った側cam,meと殺され�
    karix = false;
    karix = [1, 2, 3, 4].every(id => {
       let enemy = humans.enemies[id];
-      return enemy.execute == 0 || enemy.execute == 2;
+      return enemy.status == 0 || enemy.status == 2;
    });
    if(karix){
       //敵全滅
       karix = (Math.floor(Math.random() *11)+5)*numberofenemy;
       euro += karix;
-      karix = [1, 2, 3, 4].reduce((sum, id) => {
+      karix = Object.keys(humans.enemies).filter(a => humans.enemies[a].status >= 1).reduce((sum, id) => {
          let enemy = humans.enemies[id];
          return sum + (enemy.level||0);
       }, 0);
       rpt += karix;
       updateUI();
       log.textContent = '敵を倒した！！';await delay(1000)
-      log.textContent = x+'の経験値を奪った!';
-      Object.keys(humans.players.map(a => a.execute == 1/*|| a.execute == 2*/).forEach(nanka => {
-         nanka.exp += karix;
-         while(nanka.exp >= nanka.level){
-            nanka.exp -= nanka.level;
-            nanka.rlevel += 1;
-            nanka.sp += 1;
+      log.textContent = karix+'の経験値を奪った!';
+      Object.keys(humans.players).filter(a => humans.players[a].status == 1).forEach(nanka => {// || humans.players[a].status == 2
+         console.log(nanka)
+         humans.players[nanka].exp += karix;
+         while(humans.players[nanka].exp >= humans.players[nanka].level){
+            humans.players[nanka].exp -= humans.players[nanka].level;
+            humans.players[nanka].level += 1;
+            humans.players[nanka].sp += 1;
          }
          tekiou();
-      }));
+      });
       await delay(1000);
 
       z = Math.floor(Math.random() * 7)-2;// -2~4
+      enemylv += z;if(enemylv < 1){enemylv = 1;}
       if(!z <= 0){
          for(i = 0; i < z; i++){
          y = Math.floor(Math.random() * 3) + 1;
@@ -4986,10 +5015,10 @@ async function killedenemy(cam,tcam,me,target){//殺った側cam,meと殺され�
       ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
       AllowMove = 0;
    }
-   //PlayerTurretbreak();
+   //turretBreak(cam);
 
    /*
-   Object.keys(humans.enemies.map(a => a.execute == 1/*|| a.execute == 2).forEach(nanka => {
+   Object.keys(humans.enemies.map(a => a.status == 1/*|| a.status == 2).forEach(nanka => {
       z = Math.floor(Math.random() * 5)-2;// -2~2
       nanka.level += z;
       if(nanka.level < 1){nanka.level = 1;}
@@ -5042,6 +5071,7 @@ async function EnemyAppear(){
       let num = i-1;
       document.getElementById(`enemies${i}`).style.display = 'block';
       humans.enemies[i].status = 1;
+      humans.enemies[i].level = enemylv + Math.floor(Math.random() * 7)-3;if(humans.enemies[i].level < 1){humans.enemies[i].level = 1;}
       humans.enemies[i].name = DesideEnemyName(i);
       tekiou();
    }
@@ -5168,7 +5198,7 @@ async function bossenemyturn(){
          EnemyTurrettekiou();
       }
       if((turncount % 2) == 0){
-         document.getElementById('EnemyFriendBack').innerHTML = '<br><b><font color="#DF0101">turret</font><span id="EnemyTurret"></span></b><br><br>';
+         document.getElementById('EnemyFriendBack').innerHTML = '<br><b><font color="#DF0101">Turret</font><span id="EnemyTurret"></span></b><br><br>';
          enemyturret += 1;
          EnemyTurrettekiou();
          log.textContent = humans.enemies[me].name+'はturretを設置した!';
@@ -5200,7 +5230,7 @@ async function bossenemyturn(){
    }
    await enemycontidmg(me);
    if(humans.enemies[me].health < 0){humans.enemies[me].health = 0};
-   if(humans.enemies[me].health == 0){window.setTimeout(killedenemy, 1000)}
+   if(humans.enemies[me].health == 0){window.setTimeout(killed, 1000)}
    else {
       await delay(1000);
       NextTurnis(cam,tcam,me,target);
