@@ -838,17 +838,21 @@ function NanigaOkoruKana(code){
 function SuteFuri(me,code){
    if(sp < 1){return;}
    switch(code){
-      case 'atk':  humans.players[me].attack += 5;   break;
-      case 'def':  humans.players[me].defense   += 5;   break;
-      case 'hp':   humans.players[me].maxhealth += 20; humans.players[me].health += 20;break;
-      case 'mp':   humans.players[me].maxmp    += 5;   break;
-      case 'matk': humans.players[me].mattack   += 5;   break;
-      case 'mdef': humans.players[me].mdefense  += 5;   break;
-      case 'crla': humans.players[me].critlate *= 100; humans.players[me].critlate  += 2; humans.players[me].critlate *= 0.01; break;
-      case 'crdm': humans.players[me].critdmg *= 10; humans.players[me].critdmg  += 1; humans.players[me].critdmg *= 0.1;  break;
+      case 'maxhealth': humans.players[me].maxhealth += 20; humans.players[me].health += 20;   break;
+      case 'attack':  humans.players[me].attack    += 5;   break;
+      case 'defence':  humans.players[me].defense   += 5;   break;
+      case 'maxmp':   humans.players[me].maxmp    += 5;   break;
+      case 'mattack': humans.players[me].mattack   += 5;   break;
+      case 'mdefence': humans.players[me].mdefense  += 5;   break;
+      case 'critlate': humans.players[me].critlate *= 100; humans.players[me].critlate  += 2; humans.players[me].critlate *= 0.01; break;
+      case 'critdmg': humans.players[me].critdmg *= 10; humans.players[me].critdmg  += 1; humans.players[me].critdmg *= 0.1;  break;
+      case 'critresist': humans.players[me].critresist *= 100; humans.players[me].critresist  += 2; humans.players[me].critresist *= 0.01; break;
    }
-   playercritlate *= 100;playercritlate = Math.floor(playercritlate);playercritlate *= 0.01;
-   playercritdmg *= 10;playercritdmg = Math.floor(playercritdmg);playercritdmg *= 0.1;
+
+   humans.players[me].critlate *= 100;humans.players[me].critlate = Math.floor(humans.players[me].critlate);humans.players[me].critlate *= 0.01;
+   humans.players[me].critdmg *= 10;humans.players[me].critdmg = Math.floor(humans.players[me].critdmg);humans.players[me].critdmg *= 0.1;
+   humans.players[me].critresist *= 100;humans.players[me].critresist = Math.floor(humans.players[me].critresist);humans.players[me].critresist *= 0.01;
+
    sp -= 1;
    inventoryOpen(me);
 }
@@ -959,7 +963,7 @@ let rp = 0;//スキルツリー(永続)用
 
 let acted = 0;
 let bar = {
-   cam:['player','player','player','player','enemy','enemy','enemy','enemy'],
+   cam:['players','players','players','players','enemies','enemies','enemies','enemies'],
    num:[1,2,3,4,1,2,3,4]
 }
 let numberofplayer = 1;
@@ -968,9 +972,9 @@ let humans = {
    players:{
       1:{
          status:1,//0 = none, 1 = alive, 2 = dead
-         cam:'player',
+         cam:'players',
          num:1,
-         name:'player',
+         name:'players',
          level:1,
          exp:0,
          sp:0,
@@ -1029,7 +1033,7 @@ let humans = {
       },
       2:{
          status:0,
-         cam:'player',
+         cam:'players',
          num:2,
          name:'friend1',
          level:1,
@@ -1084,7 +1088,7 @@ let humans = {
       },
       3:{
          status:0,
-         cam:'player',
+         cam:'players',
          num:3,
          name:'friend2',
          level:1,
@@ -1139,7 +1143,7 @@ let humans = {
       },
       4:{
          status:0,
-         cam:'player',
+         cam:'players',
          num:4,
          name:'friend3',
          level:1,
@@ -1191,12 +1195,52 @@ let humans = {
             id:0,
             name:'null'
          },
+      },
+      't':{
+         status:0,
+         cam:'players',
+         num:'t',
+         name:'Turret',
+         level:1,
+         exp:0,
+         sp:0,
+   
+         speed:20,
+
+         kazu:0,
+         attack:5,
+         health:15,
+         maxhealth:15,
+
+         defense:0,
+         power:1,
+         shell:1,
+         mp:0,
+         maxmp:10,
+         mattack:0,
+         mdefense:0,
+         critlate:0,
+         critdmg:10,
+         critresist:0,
+   
+         buffs:[],
+   
+         weapon:{
+            name:'拳',
+            num:0,
+            power:0,
+         },
+         armor:{
+            name:'筋肉',
+            num:0,
+            power:0,
+         },
       }
    },
    enemies:{
       1:{
          status:0,//存在の有無
-         cam:'enemy',
+         cam:'enemies',
          num:1,
          level:1,
          name:'古書館の魔術師',
@@ -1245,7 +1289,7 @@ let humans = {
       },
       2:{
          status:0,
-         cam:'enemy',
+         cam:'enemies',
          num:2,
          level:1,
          name:'†古書館の魔術師†',
@@ -1294,7 +1338,7 @@ let humans = {
       },
       3:{
          status:0,
-         cam:'enemy',
+         cam:'enemies',
          num:3,
          level:1,
          name:'†古書館の魔術師†',
@@ -1343,7 +1387,7 @@ let humans = {
       },
       4:{
          status:0,
-         cam:'enemy',
+         cam:'enemies',
          num:4,
          level:1,
          name:'†古書館の魔術師†',
@@ -1389,6 +1433,46 @@ let humans = {
             id:0,
             name:'null'
          }
+      },
+      't':{
+         status:0,
+         cam:'enemies',
+         num:'t',
+         name:'Turret',
+         level:1,
+         exp:0,
+         sp:0,
+   
+         speed:20,
+
+         kazu:0,
+         attack:5,
+         health:15,
+         maxhealth:15,
+
+         defense:0,
+         power:1,
+         shell:1,
+         mp:0,
+         maxmp:10,
+         mattack:0,
+         mdefense:0,
+         critlate:0,
+         critdmg:10,
+         critresist:0,
+   
+         buffs:[],
+   
+         weapon:{
+            name:'拳',
+            num:0,
+            power:0,
+         },
+         armor:{
+            name:'筋肉',
+            num:0,
+            power:0,
+         },
       }
    }
 }
@@ -1399,6 +1483,8 @@ let Turret = {
       attack:0,
       health:0,
       maxhealth:0,
+
+      
    },
    'enemies':{
       num:0,
@@ -2013,6 +2099,17 @@ let Tools = {
    }
 }
 
+let Skills = {
+   ex:{
+      '50%split':{
+         type:'ex',
+         id:'50%split',
+         name:'GO!SPLIT!!',
+         description:`自分の体力を最大の50%削り、分身を作りだす`
+      }
+   }
+}
+
 let Stages = {
    '1-1':{
       name:'創生黎明の原野',
@@ -2021,7 +2118,7 @@ let Stages = {
       phase:1,
       enemies:['蒼白の粘液','翠嵐の風刃','黄昏の穿影','燐光の妖花','琥珀の甲羅獣','蒼碧の震鱗','白霧の幻影獣']
    }
-}
+};
 
 let Enemies = {
    '蒼白の粘液':{
@@ -2223,7 +2320,7 @@ let Enemies = {
             num:2,
             process:async function(cam, me){
                log.textContent = `${humans[cam][me].name}は古書の専門家だ！！`;await delay(1000);//いやごめん、は？ (ウイさんのEX「古書の専門家」より)
-               let selected = ShallTargetSelect(me,'eatkh',0);//enemy atk high
+               let selected = ShallTargetSelect(me,'eatkh',0);//enemies atk high
                await Magics.power.process(cam,selected[0],me,selected[1]);
             }
          },
@@ -2336,7 +2433,7 @@ let Enemies = {
          }
       }
    }
-}
+};
 //#endregion
 //#region 全道具です 
 let Aspirin = {
@@ -2448,7 +2545,7 @@ const tools = {
 //#region 超シンプルで使いやすい子達
 function tekiou(){
    Object.keys(humans).forEach(cam => {
-      Object.keys(humans[cam]).forEach(me => {
+      Object.keys(humans[cam]).map(a => a.toString()).forEach(me => {
          if(humans[cam][me].status == 1||humans[cam][me].status == 2){
             let apply = buffcheck(cam,me);
             document.getElementById(`${cam}${me}`).innerHTML = `
@@ -2476,14 +2573,15 @@ function tekiou(){
    })
 
 
-   Object.keys(Turret).forEach(cam => {
-      if(Turret[cam].num > 0){
+   /*
+   Object.keys(humans).forEach(cam => {
+      if(humans[cam]['t'].kazu > 0){
          document.getElementById(`${cam}Turret`).innerHTML = `
-         <b>Turret</b>x${Turret[cam].num}<br>
-         <span>${Turret[cam].health}</span>/<span>${Turret[cam].maxhealth}</span><br>
+         <b>Turret</b>x${humans[cam]['t'].kazu}<br>
+         <span>${humans[cam]['t'].health}</span>/<span>${humans[cam]['t'].maxhealth}</span><br>
          `;
       }
-   })
+   })*/
 
 
 
@@ -2608,17 +2706,42 @@ let InventoryPage = 1;
 function inventoryOpen(num){
    InventoryPage = num??1;
    AllowMove = 1;
-   localStorage.setItem('num', humans.players[InventoryPage].level);
+   let array = ['name','level','exp','health','maxhealth','attack','defense','maxmp','mattack','mdefense','critlate','critdmg','critresist'];
+   let Status = array.map(a => `${a}: ${humans.players[InventoryPage][a]}`).join('<br>');
+   array = ['maxhealth','attack','defense','maxmp','mattack','mdefense','critlate','critdmg','critresist'];
+   let Sutefuri = array.map(a => `<button class="button" onclick="SuteFuri${a}">${a}</button>`).join('<br>');
    document.getElementById('InventoryArea').style.display = 'flex';
    document.getElementById('InventoryArea').innerHTML = `
-      <div id="Status">${humans.players[InventoryPage].name}<br>Level: ${humans.players[InventoryPage].level}<br>exp: ${humans.players[InventoryPage].exp}<br>Health: ${humans.players[InventoryPage].health}/${humans.players[InventoryPage].maxhealth}<br>MP: ${humans.players[InventoryPage].mp}/${humans.players[InventoryPage].maxmp}<br>attack: ${humans.players[InventoryPage].attack}<br>defense: ${humans.players[InventoryPage].defense}<br>crit-late: ${humans.players[InventoryPage].critlate}<br>crit-dmg: ${humans.players[InventoryPage].critdmg}<br>crit-resist: ${humans.players[InventoryPage].critresist}</div>　
-      <div id="Sutefuri">magics<br>1:${humans.players[InventoryPage].magic1} <button class="button" onclick="MagicChange(1)">change</button><br>2:${humans.players[InventoryPage].magic2} <button class="button" onclick="MagicChange(2)">change</button><br>3:${humans.players[InventoryPage].magic3} <button class="button" onclick="MagicChange(3)">change</button><br><div id="MagicAppearence" style="width: 90%; height: 100px;"></div><br><div id="MagicChangePlace"></div><br><br><span id="Appearsp">${humans.players[InventoryPage].sp} pt</span><br><button class="button" onclick="SuteFuri('atk')">attack</button><br><button class="button" onclick="SuteFuri('def')">defense</button><br><button class="button" onclick="SuteFuri('hp')">maxhealth</button><br><button class="button" onclick="SuteFuri('mp')">magicpt</button><br><button class="button" onclick="SuteFuri('crla')">clit-late</button><br><button class="button" onclick="SuteFuri('crdm')">clit-dmg</button></div>
+   <div id="Iblock1">
+      <div id="IStatus">${Status}</div>
+      <div id="Skills"></div>
+   </div>
+   <div id="Iblock2">
+      <div id="ISlashs">slashs<br>
+      1:${humans.players[InventoryPage].slash1} <button class="button" onclick="SlashChange(1)">change</button><br>
+      2:${humans.players[InventoryPage].slash2} <button class="button" onclick="SlashChange(2)">change</button><br>
+      3:${humans.players[InventoryPage].slash3} <button class="button" onclick="SlashChange(3)">change</button><br>
+      </div>
+      <div id="ISlashAppearence""></div><br><div id="SlashChangePlace"></div>
+      <div id="IMagics">magics<br>
+      1:${humans.players[InventoryPage].magic1} <button class="button" onclick="MagicChange(1)">change</button><br>
+      2:${humans.players[InventoryPage].magic2} <button class="button" onclick="MagicChange(2)">change</button><br>
+      3:${humans.players[InventoryPage].magic3} <button class="button" onclick="MagicChange(3)">change</button><br>
+      </div>
+      <div id="IMagicAppearence""></div><br><div id="MagicChangePlace"></div>
+      <span id="IAppearsp">${humans.players[InventoryPage].sp}pt</span><br>
+      <div id="ISutefuri">${Sutefuri}</div>
+   </div>
    `;
+   let slashs = Object.keys(Slashs).map(a => Slashs[a].lv <= humans.players[InventoryPage].level ? Slashs[a].name : null).filter(Boolean)
+   document.getElementById('ISlashAppearence').innerHTML = slashs.join('<br>');
    let magics = Object.keys(Magics).map(a => Magics[a].lv <= humans.players[InventoryPage].level ? Magics[a].name : null).filter(Boolean)
-   document.getElementById('MagicAppearence').innerHTML = magics.join('<br>');
+   document.getElementById('IMagicAppearence').innerHTML = magics.join('<br>');
+   let skills = ['ex','ns','ps'].map(a => `${a}:<span class="Iskill"   data-description=${Skills[a].description}>${humans.players[InventoryPage][a].name}`)
+   document.getElementById('Skills').innerHTML = skills.join('<br>');
 
    let nextpage = addEventListener('keydown', (event) => {
-      if (event.key === 'ArrowRight') {
+      if (event.key === 'ArrowRight') {   
          InventoryPage++;if(InventoryPage>4){InventoryPage=1;}
          if(humans.players[InventoryPage].status >= 1){
             inventoryOpen();
@@ -2644,10 +2767,54 @@ function inventoryClose(){
    document.getElementById('InventoryArea').style.display = 'none';
    log.textContent = '';
 };
-//#endregion
 
-//#region magics
+document.addEventListener('mousemove', (e) => {
+   const HasDescription = document.getElementById('movabledescription');
+   HasDescription.style.left = `${e.clientX + 10}px`;
+   HasDescription.style.top = `${e.clientY + 10}px`;
+});
+const HasDs = document.querySelectorAll('.HasD');
 
+HasDs.forEach(HasD => {
+   HasD.addEventListener('mouseover', (e) => {
+      const movabledescription = e.target.dataset.description;
+      document.getElementById('movabledescription').textContent = movabledescription;
+
+   });
+
+   HasD.addEventListener('mouseout', () => {
+      document.getElementById('movabledescription').textContent = '';
+   });
+});
+
+function SlashChange(num){
+   let availableSlashs = Object.keys(Slashs)
+      .filter(a => Slashs[a].lv <= humans.players[InventoryPage].level)
+      .map(a => Slashs[a].name);
+   let slashSelectHTML = availableSlashs.map(slash => 
+      `<button class="button" onclick="SlashChangeDecide('${slash}', ${num}, ${InventoryPage})">${slash}</button>`
+  ).join(' ');
+  
+  document.getElementById('SlashChangePlace').innerHTML = `
+      <div>Select Slash for Slot ${num}:</div>
+      ${slashSelectHTML}
+  `;
+}
+function SlashChangeDecide(name,num,nowpage){
+   // 選択したスロットに魔法を割り当て
+   switch(num) {
+       case 1:
+           humans.players[InventoryPage].slash1 = name;
+           break;
+       case 2:
+           humans.players[InventoryPage].slash2 = name;
+           break;
+       case 3:
+           humans.players[InventoryPage].slash3 = name;
+           break;
+   }
+   inventoryOpen(nowpage)
+}
 function MagicChange(num){
    let availableMagics = Object.keys(Magics)
       .filter(a => Magics[a].lv <= humans.players[InventoryPage].level)
@@ -3404,12 +3571,14 @@ async function UpdateProfile(){
    <span style="font-size: 24px; border: 1px solid #000000">${username}</span>　Rank:${rank}<br><br>
    <textarea id="about" placeholder="write about you" style="width: 255px; height: 124px;" oninput="InputAboutMe()">${about}</textarea>
    `
+   document.getElementById('about').addEventListener('change', InputAboutMe);
 }//自己紹介とかも入れたいよね
 function InputAboutMe(){
    const textarea = document.getElementById('about');
    usersRef.update({
       about: textarea.value
    });
+   load();
 }
 //#endregion
 //#region Homeの動き達
@@ -4443,32 +4612,25 @@ function Splitbreak(){
 function turretPlace(cam){
    if(!document.getElementById(`${cam}Turret`)){
       let div = document.createElement('div');
-      div.id = `${cam}Turret`;
-      div.className = 'turrets'
+      div.id = `${cam}t`;
+      div.className = 'players'
       document.getElementById(cam).appendChild(div);
+      kazu = 0;
+      humans.players.t.maxhealth = 0;
+      humans.players.t.health = 0;
    }
-   Turret[cam] = {
-      num:(Turret[cam].num??0) + 1,
-      attack:5,
-      health:((Turret[cam].num??0)+1) * 15,
-      maxhealth:((Turret[cam].num??0)+1) * 15,
-   },
-   document.getElementById(`${cam}Turret`).innerHTML = `
-      <b>Turret</b>x${Turret[cam].num}<br>
-      <span>${Turret[cam].health}</span>/<span>${Turret[cam].maxhealth}</span><br>
-   `
+   humans.players.t.kazu += 1;
+   humans.players.t.maxhealth += 15;
+   humans.players.t.health += 15;
+   tekiou()
 }
-function PlayerTurrettekiou(){tekiou();console.log('今はなきPlayerTurrettekiouが実行されたよ');};
 function turretBreak(cam){
-   Turret[cam].num -= 1;
-   if(Turret[cam].num <= 0){
-      Turret[cam] = {};
+   humans[cam]['t'].kazu -= 1;
+   if(humans[cam]['t'].kazu <= 0){
+      humans[cam]['t'] = {};
       document.getElementById(`${cam}Turret`).remove();
    }else{
-      document.getElementById(`${cam}Turret`).innerHTML = `
-         <b>Turret</b>x${Turret[cam].num}<br>
-         <span>${Turret[cam].health}</span>/<span>${Turret[cam].maxhealth}</span><br>
-      `;
+      tekiou()
    }
 }
 //#endregion
@@ -4520,30 +4682,29 @@ async function NextTurnis(cam,tcam,me,target){
    if(acted < bar.num.length){
    }else{
       let cams = 0;
-      x = [1, 2, 3, 4].every(id => {let enemy = humans.enemies[id];return enemy.status == 0 || enemy.status == 2;});
-      if(Turret.players.num > 0 && x == false){
+      x = [1, 2, 3, 4].every(id => {let Enemy = humans.enemies[id];return Enemy.status == 0 || Enemy.status == 2;});
+      if(humans.players['t'].kazu > 0 && x == false){
          log.textContent = '我らのturretの攻撃!';
          await delay(1000);
          cams = 'players';
          let selected = ShallTargetSelect(1,`ehpl`,0);
          let tcams = selected[1];let targets = selected[0];
-         console.log(Turret[cams].attack,Turret[cams].num,humans[tcams][targets].defense,humans[tcams][targets].shell);
-         x = Math.ceil(Turret[cams].attack * Turret[cams].num) - Math.ceil(humans[tcams][targets].defense*humans[tcams][targets].shell);
+         console.log(humans[cams]['t'].attack,humans[cams]['t'].kazu,humans[tcams][targets].defense,humans[tcams][targets].shell);
+         x = Math.ceil(humans[cams]['t'].attack * humans[cams]['t'].kazu) - Math.ceil(humans[tcams][targets].defense*humans[tcams][targets].shell);
          if(x < 0){x = 0};if(x > humans[tcams][targets].health){x = humans[tcams][targets].health};
-         console.log(`damage:${x}, attack:${Turret.players.attack}`)//なぜかダメージが0になる問題が発生。attackは5のはずなので多分ここでなんかミス起きてる。突き止めて
          humans[tcams][targets].health -= x;tekiou();
          log.textContent = `${humans[tcams][targets].name}に${x}のダメージ！`;
          if(humans[tcams][targets].health <= 0){killed(cams,tcams,1,targets);return;};
          await delay(1000);
       }
-      x = [1, 2, 3, 4].every(id => {let player = humans.players[id];return player.status == 0 || player.status == 2;});
-      if(Turret.enemies.num > 0 && x == false){
+      x = [1, 2, 3, 4].every(id => {let Players = humans.players[id];return Players.status == 0 || Players.status == 2;});
+      if(humans.enemies['t'].kazu > 0 && x == false){
          log.textContent = '敵のturretの攻撃!';
          await delay(1000);
          cams = 'enemies';
          let selected = ShallTargetSelect(0,`phpl`,0);
          let tcams = selected[1];let targets = selected[0];
-         x = Math.ceil(Turret[cams].attack * Turret[cams].num) - Math.ceil(humans[tcams][targets].defense*humans[tcams][targets].shell);
+         x = Math.ceil(humans[cams]['t'].attack * humans[cams]['t'].kazu) - Math.ceil(humans[tcams][targets].defense*humans[tcams][targets].shell);
          if(x < 0){x = 0};if(x > humans[tcams][targets].health){x = humans[tcams][targets].health};
          humans[tcams][targets].health -= x;tekiou();
          log.textContent = `${humans[tcams][targets].name}に${x}のダメージ！`;
@@ -4558,7 +4719,7 @@ async function NextTurnis(cam,tcam,me,target){
             if(a.cam === b.cam){
                return a.num - b.num;  // 同じcamならnumの小さい方が優先
             }
-            return a.cam === 'p' ? -1 : 1;  // camが'p'なら優先
+            return a.cam === 'players' ? -1 : 1;  // camが'p'なら優先
          }
          return b.speed - a.speed;  // 速度の高い順に並べる
       });
@@ -4573,14 +4734,7 @@ async function NextTurnis(cam,tcam,me,target){
    } 
 
    nowturn = bar.num[acted];
-   switch(bar.cam[acted]){
-      case 'player':
-         cam = 'players';
-         break;
-      case 'enemy':
-         cam = 'enemies';
-         break;
-   }
+   cam = bar.cam[acted]
 
    console.log('現在、'+cam+'の'+nowturn+'さんのターンですわ〜');
 
@@ -4644,50 +4798,10 @@ async function enemyturn(cam,me){
       selected = ShallTargetSelect(me,'phpl',0);
       await humandamaged(cam,selected[1],me,selected[0],1,'sh',1);
    }
-   /**
-   switch(humans.enemies[me].ai){
-      case 'supporter':
-         switch(name){
-            case '†古書館の魔術師†'://古関ウイ。コッペパンの"めっちゃ好きなキャラ"。ヒナタさんと仲がいい。
-               switch(Math.floor(Math.random() * 3)){
-                  case 1:
-                     log.textContent = `${name}はピストルカービンで撃った！`;await delay(1000);//ウイさんの武器やね デ・リーズル カービン
-                     selected = ShallTargetSelect(me,'phpl',0);
-                     await humandamaged(cam,selected[0],me,selected[1],1,'sh',1);
-                     break;
-                  case 2:
-                     log.textContent = `${name}は古書の専門家だ！！`;await delay(1000);//いやごめん、は？ (ウイさんのEX「古書の専門家」より)
-                     selected = ShallTargetSelect(me,'eatkh',0);//enemy atk high
-                     await Magics.power.process(cam,selected[0],me,selected[1]);
-                     break;
-                  case 3:
-                     log.textContent = `${name}は知識を伝達した！`;await delay(1000);//ウイさんのNS「伝達されていく知識」..いやそのまますぎるか...?
-                     selected = ShallTargetSelect(me,'ec',1);//自分付近
-                     await Magics.boost.process(cam,selected[0],me,selected[1]);
-                     break;
-               }
-               break;
-            default:
-               log.textContent = `${name}は何かで攻撃した！`;await delay(1000);
-               selected = ShallTargetSelect(me,'phpl',0);
-               await humandamaged(cam,selected[1],me,selected[0],1,'sh',1);
-               break;
-         }
-         break;
-      default:
-         log.textContent = `${name}は何かで攻撃した！`;await delay(1000);
-         selected = ShallTargetSelect(me,'phpl',0);
-         await humandamaged(cam,selected[1],me,selected[0],1,'sh',1);//矛先の陣営、攻撃タイプ(物理||魔法)、自分、矛先、倍率、コード(PS用)
-         break;
-   }
-   */
-   if(humans.enemies[me].health <= 0){;window.setTimeout(killed, 1000)}
-   else{
-      NextTurnis(cam,selected[1],me,selected[0]);
-   }
+   NextTurnis(cam,selected[1],me,selected[0]);
 }
 function ShallTargetSelect(me,code,both){//これは敵しか使わないターゲットセレクト。だから陣営とかは考えんでいいよ
-   //標的陣営、起動者、コード(e = enemy, p = player | m = most highest, l = most lowest,| atk = 攻撃力, def = 防御力, hp = 体力 || r = random)、両隣にも被害を与えるか0,1
+   //標的陣営、起動者、コード(e = enemies, p = players | m = most highest, l = most lowest,| atk = 攻撃力, def = 防御力, hp = 体力 || r = random)、両隣にも被害を与えるか0,1
    //,b => b.health//playerのhealth達を、statusが1のやつだけ、小さい順(昇順)に並べてる。
    const playerstatus = {
       num:Object.values(humans.players).filter(c => c.status == 1 && c.health > 0).sort((p1, p2) => p1.num - p2.num).map(a => a.num),
@@ -4703,7 +4817,7 @@ function ShallTargetSelect(me,code,both){//これは敵しか使わないター�
    }
    let ret = [];
    switch(code){
-      //player
+      //players
       case 'pr'://random
          x = playerstatus.health[Math.floor(Math.random() * playerstatus.length)]
          if(both == 0){
@@ -4814,7 +4928,7 @@ function ShallTargetSelect(me,code,both){//これは敵しか使わないター�
          ret.push(x);
          break;
 
-      //enemy
+      //enemies
       case 'er':
          x = enemystatus.health[Math.floor(Math.random() * enemystatus.length)]
          if(both == 0){
@@ -4923,8 +5037,6 @@ function ShallTargetSelect(me,code,both){//これは敵しか使わないター�
 async function killed(cam,tcam,me,target){//殺った側cam,meと殺された側tcam,target
    //log.textContent = humans.enemies[target].name + 'を倒した!';
 
-   //さあ、ここを作っていきましょうか killedenemy呼び出し階層全チェックよろ
-
    humans[tcam][target].health = 0;
    buffclear(tcam,target);
    humans[tcam][target].status = 2;
@@ -4956,16 +5068,16 @@ async function killed(cam,tcam,me,target){//殺った側cam,meと殺された側
 
    karix = false;
    karix = [1, 2, 3, 4].every(id => {
-      let enemy = humans.enemies[id];
-      return enemy.status == 0 || enemy.status == 2;
+      let Enemy = humans.enemies[id];
+      return Enemy.status == 0 || Enemy.status == 2;
    });
    if(karix){
       //敵全滅
       karix = (Math.floor(Math.random() *11)+5)*numberofenemy;
       euro += karix;
       karix = Object.keys(humans.enemies).filter(a => humans.enemies[a].status >= 1).reduce((sum, id) => {
-         let enemy = humans.enemies[id];
-         return sum + (enemy.level||0);
+         let Enemy = humans.enemies[id];
+         return sum + (Enemy.level||0);
       }, 0);
       rpt += karix;
       updateUI();
@@ -5516,19 +5628,19 @@ const SHOPexrandom = {
    price: [95, 95, 95, 95, 110, 60, 90, 50],
    id: ['50%split', 'placeturret', 'trickyvariables', 'bigdiamond', 'kyrieeleison', 'standrone', 'recievechallenge', 'timidpursuit'],
    explain:['体力が半分以上ならば分身を召喚し、<br>ダメージを代わりに受けさせます。','タレットを配置する。<br>タレットは攻撃力の50%の攻撃力を持ちます。','爆弾を投擲し、<br>敵にランダムな効果を与える。','敵に攻撃力の150%のダメージを与え、<br>50%の確率で凍らせる。','敵に攻撃力の200%のダメージを与える。<br>対象の体力が70%以上の場合、400%のダメージ。','敵に攻撃力の75%のダメージを与え、<br>スタンさせる。','敵の防御力を下げ、自身の攻撃力を上げる。<br>','敵に攻撃力の60%のダメージを与え、<br>弱点把握状態を付与する。(2ターン)'],
-  };
-  const SHOPnsrandom = {
+};
+const SHOPnsrandom = {
    name: ['Attach!slime!!', '匙を投げる？これはレンチだよ', 'かけ上手', '改善が必要だよ'],
    price: [70, 70, 70, 70],
    id: ['throwslime', 'throwwrench', 'gambler', 'improve'],
    explain:['敵にスライムをくっつけ、<br>攻撃を無効化する。','レンチを投げる準備をする。<br>レンチは攻撃力の200%の攻撃力を持つ。','ギャンブル熱状態に入り、<br>攻撃時0,2,4倍のいずれかの倍率がかかる。','攻撃力を上昇させる。バフをかける。<br>すでにある場合は解除する。',]
-  };
-  const SHOPpsrandom = {
+};
+const SHOPpsrandom = {
    name: ['DoYourBest!!', '雷ちゃん、もうちょっと', '生粋の勝負師', '一度限りの取引'],
    price: [90, 90, 90, 90],
    id: ['sthree', 'solplaceturret', 'highsol', 'enemy50%pursuit'],
    explain:['slash時、たまに3回攻撃する。<br>','slashoflightが当たった時、<br>タレットを配置する。','slashoflightの当たる確率が下がるが、<br>倍率が9倍になる。','攻撃によって敵の体力が50%を下回った時、<br>攻撃力の70%で追撃する。',]
-  };
+};
 
   const allItems = [...SHOPexrandom.name.map((name, index) => ({name, price: SHOPexrandom.price[index], explain: SHOPexrandom.explain[index], id: SHOPexrandom.id[index], type: 'ex'})),
                ...SHOPnsrandom.name.map((name, index) => ({name, price: SHOPnsrandom.price[index], explain: SHOPnsrandom.explain[index], id: SHOPnsrandom.id[index], type: 'ns'})),
