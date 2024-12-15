@@ -999,37 +999,42 @@ let humans = {
          slash1:'slash',
          slash2:'doubleslash',
          slash3:'slashoflight',
+         
          magic1:'heal',
          magic2:'power',
          magic3:'shell',
+
          tool1:'aspirin',
          tool2:'throwknife',
          tool3:'redcard',
 
          weapon:{
-            name:'拳',
-            num:0,
-            power:0,
+            id:'none',
+            lv:1,
          },
          armor:{
-            name:'筋肉',
-            num:0,
-            power:0,
+            id:'none',
+            lv:1,
          },
+         ear:{ // 耳
+            id:'none',
+            lv:1,
+         },
+         ring:{ // 腕
+            id:'none',
+            lv:1,
+         },
+         neck:{ // 首
+            id:'none',
+            lv:1,
+         },
+         //ああそうさ、俺の趣味さ！！！！！"おもちゃ箱の夢"みたいなステージであることをしたくってねぇ...もしかしたら首はなくなるかも..いやまあ好きだけど解像度低いから自分でできなさそう
+         //...あれ？これ読まれたらやばくね？..まあ....いいか！！！！直接的な表現無いしだいじょぶっしょ、多分 え？なんのことかわからないって？ならdiscordのなんか..なんか。のkoppekun-uraを見るといい！！！！え？見れないって？ふっふっふ..ざまぁ♡(可愛くてごめん風)
    
          cool:100,
-         ex:{
-            id:'50%heal',
-            name:'50%回復',
-         },
-         ns:{
-            id:'5%heal',
-            name:'5%回復',
-         },
-         ps:{
-            id:0,
-            name:'null'
-         },
+         ex:'50%heal',
+         ns:'5%heal',
+         ps:0,
       },
       2:{
          status:0,
@@ -1057,34 +1062,43 @@ let humans = {
    
          buffs:[],
    
+         slash1:'slash',
+         slash2:'doubleslash',
+         slash3:'slashoflight',
+
          magic1:0,
          magic2:0,
          magic3:0,
+
+         tool1:'aspirin',
+         tool2:'throwknife',
+         tool3:'redcard',
    
          weapon:{
-            name:'拳',
-            num:0,
-            power:0,
+            id:'none',
+            lv:1,
          },
          armor:{
-            name:'筋肉',
-            num:0,
-            power:0,
+            id:'none',
+            lv:1,
+         },
+         ear:{
+            id:'none',
+            lv:1,
+         },
+         ring:{
+            id:'none',
+            lv:1,
+         },
+         neck:{
+            id:'none',
+            lv:1,
          },
 
          cool:100,
-         ex:{
-            id:0,
-            name:'null',
-         },
-         ns:{
-            id:0,
-            name:'null',
-         },
-         ps:{
-            id:0,
-            name:'null'
-         },
+         ex:0,
+         ns:0,
+         ps:0,
       },
       3:{
          status:0,
@@ -1112,34 +1126,43 @@ let humans = {
    
          buffs:[],
    
+         slash1:'slash',
+         slash2:'doubleslash',
+         slash3:'slashoflight',
+
          magic1:0,
          magic2:0,
          magic3:0,
+
+         tool1:'aspirin',
+         tool2:'throwknife',
+         tool3:'redcard',
    
          weapon:{
-            name:'拳',
-            num:0,
-            power:0,
+            id:'none',
+            lv:1,
          },
          armor:{
-            name:'筋肉',
-            num:0,
-            power:0,
+            id:'none',
+            lv:1,
          },
-         
+         ear:{
+            id:'none',
+            lv:1,
+         },
+         ring:{
+            id:'none',
+            lv:1,
+         },
+         neck:{
+            id:'none',
+            lv:1,
+         },
+
          cool:100,
-         ex:{
-            id:0,
-            name:'null',
-         },
-         ns:{
-            id:0,
-            name:'null',
-         },
-         ps:{
-            id:0,
-            name:'null'
-         },
+         ex:0,
+         ns:0,
+         ps:0,
       },
       4:{
          status:0,
@@ -1167,34 +1190,43 @@ let humans = {
    
          buffs:[],
    
+         slash1:'slash',
+         slash2:'doubleslash',
+         slash3:'slashoflight',
+
          magic1:0,
          magic2:0,
          magic3:0,
 
+         tool1:'aspirin',
+         tool2:'throwknife',
+         tool3:'redcard',
+   
          weapon:{
-            name:'拳',
-            num:0,
-            power:0,
+            id:'none',
+            lv:1,
          },
          armor:{
-            name:'筋肉',
-            num:0,
-            power:0,
+            id:'none',
+            lv:1,
+         },
+         ear:{
+            id:'none',
+            lv:1,
+         },
+         ring:{
+            id:'none',
+            lv:1,
+         },
+         neck:{
+            id:'none',
+            lv:1,
          },
 
          cool:100,
-         ex:{
-            id:0,
-            name:'null',
-         },
-         ns:{
-            id:0,
-            name:'null',
-         },
-         ps:{
-            id:0,
-            name:'null'
-         },
+         ex:0,
+         ns:0,
+         ps:0,
       },
       't':{
          status:0,
@@ -1225,16 +1257,43 @@ let humans = {
    
          buffs:[],
    
+         slash1:'slash',
+         slash2:'doubleslash',
+         slash3:'slashoflight',
+
+         magic1:0,
+         magic2:0,
+         magic3:0,
+
+         tool1:'aspirin',
+         tool2:'throwknife',
+         tool3:'redcard',
+   
          weapon:{
-            name:'拳',
-            num:0,
-            power:0,
+            id:'none',
+            lv:1,
          },
          armor:{
-            name:'筋肉',
-            num:0,
-            power:0,
+            id:'none',
+            lv:1,
          },
+         ear:{
+            id:'none',
+            lv:1,
+         },
+         ring:{
+            id:'none',
+            lv:1,
+         },
+         neck:{
+            id:'none',
+            lv:1,
+         },
+
+         cool:100,
+         ex:0,
+         ns:0,
+         ps:0,
       }
    },
    enemies:{
@@ -1264,28 +1323,30 @@ let humans = {
          buffs:[],
 
          weapon:{
-            name:'拳',
-            num:0,
-            power:0,
+            id:'none',
+            lv:1,
          },
          armor:{
-            name:'筋肉',
-            num:0,
-            power:0,
+            id:'none',
+            lv:1,
+         },
+         ear:{
+            id:'none',
+            lv:1,
+         },
+         ring:{
+            id:'none',
+            lv:1,
+         },
+         neck:{
+            id:'none',
+            lv:1,
          },
 
-         ps:{
-            id:0,
-            name:'null'
-         },
-         ns:{
-            id:0,
-            name:'null'
-         },
-         ex:{
-            id:0,
-            name:'null'
-         }
+         cool:100,
+         ex:0,
+         ns:0,
+         ps:0,
       },
       2:{
          status:0,
@@ -1656,7 +1717,7 @@ let Slashs = {
          await humandamaged(cam,tcam,me,target,1,'sh',1);
          if(humans[tcam][target].health == 0){killed(cam,tcam,me,target);return;}
 
-         if(humans[cam][me].ps.id == 'sthree' && Math.floor(Math.random() * 4) == 0){//1/4
+         if(humans[cam][me].ps == 'sthree' && Math.floor(Math.random() * 4) == 0){//1/4
             log.textContent = humans[cam][me].name+'は頑張った!';
             await delay(500)
             await humandamaged(cam,tcam,me,target,1,'sh',1);
@@ -1689,18 +1750,18 @@ let Slashs = {
    },
    'slashoflight':{
       id:'slash of light',
-      name:'一閃',//魔神斬り も作りたいね 霹靂一閃も
+      name:'一閃',//まじん斬り も作りたいね 霹靂一閃も
       mp:0,
       lv:1,
       tcam:'players',
       process:async function(cam,tcam,me,target){
          x = Math.floor(Math.random() * 1); // 1/3です
-         if(humans[cam][me].ps.id == 'highsol'){x = Math.floor(Math.random() * 5);}; // 1/5です。
+         if(humans[cam][me].ps == 'highsol'){x = Math.floor(Math.random() * 5);}; // 1/5です。
          if(x == 0){
             await humandamaged(cam,tcam,me,target,3,'sh',3);//switch消して、camもちゃんと指定するようにしてちゃんといろいろやっといて
             if(humans[tcam][target].health == 0){killed(cam,tcam,me,target);return;}
          }else{
-            if(humans[cam][me].ps.id !== 'solx5but'){
+            if(humans[cam][me].ps !== 'solx5but'){
                log.textContent = 'miss! ダメージを与えられない!';
                await delay(1000);
             }else{
@@ -2101,11 +2162,256 @@ let Tools = {
 
 let Skills = {
    ex:{
-      '50%split':{
+      '50%split':{//変更予定
          type:'ex',
          id:'50%split',
          name:'GO!SPLIT!!',
-         description:`自分の体力を最大の50%削り、分身を作りだす`
+         description:`自分の体力を最大の50%削り、分身を作りだす`,
+         price:95,
+         process:async function(cam,me){
+            console.log('slimeのex発動ですわ〜〜〜')
+         }
+      },
+      'placeturret':{
+         type:'ex',
+         id:'placeturret',
+         name:'雷ちゃん、召喚',
+         description:'タレットを1つ配置する',
+         price:95,
+         process:async function(cam,me){
+            turretPlace(cam);
+            skillReset(cam,me);
+         }
+      },
+      'trickyvariables':{
+         type:'ex',
+         id:'trickyvariables',
+         name:'トリッキーな変数',
+         description:'爆弾を投げる。効果はランダム',
+         price:95,
+         process:async function(cam,me){
+            phase = 0; disappear();
+            let target = await LetsTargetSelect();
+            log.textContent = humans[cam][me].name+'は爆弾を投げた...';
+            switch(Math.floor(Math.random() * 6)){
+               case 0:x=0;log.textContent = 'しかし不発弾だった!!';break;//これによる効果とかもあっていいかも
+               case 5:x=5;log.textContent = 'Lucky! 爆弾は焼夷弾だった!!!';break;
+               case 4:x=4;log.textContent = '爆弾は花火だった!';break;
+               case 3:x=3;log.textContent = '爆弾は毒ガス入りだった!!';buffadd(target[1],target[0],'poison',3,1);break; //毒ガス入りだった場合
+               case 2:x=2;log.textContent = '爆弾はスライム入りだった!!';buffadd(target[1],target[0],'onslime',2,1);break;//スライム入りだった場合
+               case 1:x=1;log.textContent = '爆発した..だがただの特殊な薬品だった!!';break;
+            }
+            await delay(1000);
+            await humandamaged(cam,target[1],me,target[0],x,'sh',4);
+            if(humans[target[1]][target[0]].health == 0){killed(cam,target[1],me,target[0]);return;}
+            else{phase = 1; NextTurnis(cam,target[1],me,target[0]);};
+            skillReset(cam,me);
+         }
+      },
+      'bigdiamond':{
+         type:'ex',
+         id:'bigdiamond',
+         name:'私がかけた魔法だよ',
+         description:'敵に攻撃力の150%のダメージを与え、たまに凍らせる',
+         price:95,
+         process:async function(cam,me){
+            phase = 0; disappear();
+            let target = await LetsTargetSelect();
+            let serifs = ['こんな大きなダイアモンド見たことないでしょ？あげるね～','あなた…それじゃあダメだよ','ちょっとは静かになさい！','私が誰だか知ってるの？']
+            document.getElementById('log').textContent = serifs[Math.floor(Math.random() * serifs.length)];//そのうち消える
+            await delay(1000);
+            await humandamaged(cam,target[1],me,target[0],1.5,'sh',4);
+            if(Math.floor(Math.random()*2) == 0){buffadd('enemydebuff','freeze',4,1)};
+            skillReset(cam,me);
+         }
+      },
+      'kylieeleison':{
+         type:'ex',
+         id:'kylieelison',
+         name:'Kylie Eleison',
+         description:'敵に攻撃力の200%のダメージ。もし敵の体力が70%以上ならば400%',
+         price:110,
+         process:async function(cam,me){
+            phase = 0; disappear();
+            let target = await LetsTargetSelect();
+            x = 2;
+            if(humans[target[1]][target[0]].health > humans[target[1]][target[0]].maxhealth * 0.7){x = 4;}
+            await humandamaged(cam,target[1],me,target[0],x,'sh',4);
+            skillReset(cam,me);
+         }
+      },
+      'standrone':{
+         type:'ex',
+         id:'standrone',
+         name:'自走式閃光ドローン',
+         description:'敵に攻撃力の75%のダメージを与え、スタンさせる',
+         price:60,
+         process:async function(cam,me){
+            phase = 0; disappear();
+            let target = await LetsTargetSelect();
+            await humandamaged(cam,target[1],me,target[0],0.75,'sh',4);
+            buffadd(target[1],target[0],'stun',1,1);
+            skillReset(cam,me);
+         }
+      },
+      'recievechallenge':{//仲間にした方がいいかも
+         type:'ex',
+         id:'recievechallenge',
+         name:'挑戦状を受け取ってください!!',
+         description:'敵の防御力を下げ、自身の攻撃力を上げる',
+         price:90,
+         process:async function(cam,me){
+            phase = 0; disappear();
+            let target = await LetsTargetSelect();
+            await humandamaged(cam,target[1],me,target[0],0.5,'sh',4);
+            buffadd(target[1],target[0],'shelldown',3,1);
+            buffadd(cam,me,'powerup',3,2);
+            skillReset(cam,me);
+         }
+      },
+      'timedpursuit':{//上に同じく
+         type:'ex',
+         id:'timedpursuit',
+         name:'小心者の観測',
+         description:'敵を弱点把握状態を付与する',
+         price:50,
+         process:async function(cam,me){
+            phase = 0; disappear();
+            switch(Math.floor(Math.random()*3)+1){
+               case 1:
+                  serif = '私はその辺の小石...';
+                  break;
+               case 2:
+                  serif = '私のことなんて...気にしないでください...';
+                  break;
+               case 3:
+                  serif = 'すみません...一人にさせてください......';
+                  break;
+            }
+            log.textContent = serif;
+            buffadd(target[1],target[0],'weaknessgrasp',2,1);//弱点把握状態
+            skillReset();
+         },
+      },
+      'bombe':{
+         type:'ex',
+         id:'bombe',
+         name:'ボマー',
+         process:async function(cam,me){
+            phase = 0; disappear();
+            await LetsTargetSelect();
+            log.textContent = humans.players[me].name+'は爆弾を投げた...';
+            await delay(1000);//普通　水　マグマ　閃光弾
+            const bombetype = [3,6,0];
+            x = bombetype[Math.floor(Math.random()*4)]
+            switch(x){
+               case 1:log.textContent = '普通の爆弾だった..!';break;
+               //case 1:log.textContent = '水爆弾だった！！';break;//強制終了です
+               case 4:log.textContent = 'Lucky♪マグマ爆弾だった!!';break;
+               case 0:log.textContent = 'いけっ！ピカピカの実！';buffadd(target[1],target[0],'stan',2,1);break;
+            }
+            await humandamaged(cam,target[1],me,target[0],x,'sh',4);
+            if(humans[target[1]][target[0]].health == 0){killed(cam,target[1],me,target[0]);return;}
+            else{phase = 1; NextTurnis(cam,target[1],me,target[0]);};
+            skillReset();  
+         }
+      }
+   },
+   ns:{
+      'throwslime':{
+         type:'ns',
+         id:'throwslime',
+         name:'Attach!Slime!!',
+         description:'敵にスライムをくっつける',
+         price:70,
+         cool:3,
+         process:async function(cam,me){
+            let target = await ShallTargetSelect(me,'er',0);
+            buffadd(target[1],target[0],'onslime',1,1);
+            log.textContent = humans[cam][me].name + 'にスライムが覆い被さった!';
+         }
+      },
+      'throwwrench':{
+         type:'ns',
+         id:'throwwrench',
+         name:'匙を投げる？これはレンチだよ',
+         description:'レンチを投げる準備をし、次の攻撃が二倍になる',
+         price:70,
+         cool:4,
+         process:async function(cam,me){
+            buffadd(cam,me,'LetsThrow',2,1);
+            log.textContent = 'wrenchを投げる準備ができた!';
+         }
+      },
+      'gambler':{
+         type:'ns',
+         id:'gambler',
+         name:'かけ上手',
+         description:'次の攻撃時に0,2,4倍の倍率がかかる',
+         price:70,
+         cool:3,
+         process:async function(cam,me){
+            buffadd(cam,me,'gambling',1,1);
+            log.textContent = 'さあ、ギャンブルの時間だ!!';
+         }
+      },
+      'improve':{
+         type:'ns',
+         id:'improve',
+         name:'改善が必要だよ',
+         description:'攻撃力を1.4倍に上昇させる',//変更予定,
+         price:70,
+         cool:5,
+         process:async function(cam,me){
+            buffadd(cam,me,'improve',4,1);
+            log.textContent = 'パーツアップグレード。';
+         }
+      },
+      'hitelec':{
+         type:'ns',
+         id:'hitelec',
+         name:'エレキギター殴り',
+         description:'エレキギターで殴ります',
+         cool:4,
+         process:async function(cam,me){
+            disappear();
+            buffadd(cam,me,'powerup',2,2);
+            log.textContent = 'エレキギターで殴るぞ..ごめんここのセリフどしよ'
+            let target = ShallTargetSelect(me,'er',0);
+            await humandamaged(cam,target[1],me,target[0],2,'sh',4);
+            log.textContent = 'かまってぇや、マジで'
+         }
+      }
+   },
+   ps:{
+      'sthree':{
+         type:'ps',
+         id:'sthree',
+         name:'DoYourBest!!',
+         description:'slash時、たまに3回攻撃する',
+         price:90,
+
+      },
+      'solplaceturret':{
+         type:'ps',
+         id:'solplaceturret',
+         name:'雷ちゃん、もうちょっと',
+         description:'slash of light命中時、タレットを1つ配置する',
+         price:90,
+      },
+      'highsol':{
+         type:'ps',
+         id:'highsol',
+         name:'生粋の勝負師',
+         description:'slash of lightの命中率が下がるが、命中時3倍のダメージ',
+         price:90,
+      },
+      'enemy50%pursuit':{
+         type:'ps',
+         id:'enemy50%pursuit',
+         name:'一度限りの取引',
+         description:'攻撃によって敵の体力を50%以下だった場合、攻撃力の70%で追撃する',
+         price:90,
       }
    }
 }
@@ -2724,16 +3030,16 @@ function inventoryOpen(num){
       </div>
       <div id="ISlashAppearence""></div><br><div id="SlashChangePlace"></div>
       <div id="IMagics">magics<br>
-      1:${humans.players[InventoryPage].magic1} <button class="button" onclick="MagicChange(1)">change</button><br>
-      2:${humans.players[InventoryPage].magic2} <button class="button" onclick="MagicChange(2)">change</button><br>
-      3:${humans.players[InventoryPage].magic3} <button class="button" onclick="MagicChange(3)">change</button><br>
+      1:${humans.players[InventoryPage].magic1.name} <button class="button" onclick="MagicChange(1)">change</button><br>
+      2:${humans.players[InventoryPage].magic2.name} <button class="button" onclick="MagicChange(2)">change</button><br>
+      3:${humans.players[InventoryPage].magic3.name} <button class="button" onclick="MagicChange(3)">change</button><br>
       </div>
       <div id="IMagicAppearence""></div><br><div id="MagicChangePlace"></div>
       <span id="IAppearsp">${humans.players[InventoryPage].sp}pt</span><br>
       <div id="ISutefuri">${Sutefuri}</div>
    </div>
    `;
-   let slashs = Object.keys(Slashs).map(a => Slashs[a].lv <= humans.players[InventoryPage].level ? Slashs[a].name : null).filter(Boolean)
+   let slashs = Object.keys(Slashs).map(a => Slashs[a].lv <= humans.players[InventoryPage].level ? Slashs[a].id : null).filter(Boolean)
    document.getElementById('ISlashAppearence').innerHTML = slashs.join('<br>');
    let magics = Object.keys(Magics).map(a => Magics[a].lv <= humans.players[InventoryPage].level ? Magics[a].name : null).filter(Boolean)
    document.getElementById('IMagicAppearence').innerHTML = magics.join('<br>');
@@ -2761,7 +3067,6 @@ function inventoryOpen(num){
       }
    });
 }
-// <div id="Equip">武器:${weapons.name[equipweapon]}(+${weapons.num[equipweapon]})<br>装甲:${armors.name[equiparmor]}(+${armors.num[equiparmor]})<br>${equiptool1.name}:${equiptool1.num}<br>${equiptool2.name}:${equiptool2.num}<br>${equiptool3.name}:${equiptool3.num}<br><br>ex:${playerex.name}<br>ns:${playerns.name}<br>ps:${playerps.name}</div>　
 function inventoryClose(){
    AllowMove = 0;
    document.getElementById('InventoryArea').style.display = 'none';
@@ -3664,27 +3969,28 @@ function HomeGoDungeon(name){
    switch(humans.players[1].name){//これはキャラ固有のやつやね
       case 'wretch'://wretch〜持たざる者〜
          humans.players[1].name = '持たざる者';
-         humans.players[1].ex.id = 'none';
-         humans.players[1].ns.id = 'none';
-         humans.players[1].ps.id = 'none';
+         humans.players[1].ex = 'none';
+         humans.players[1].ns = 'none';
+         humans.players[1].ps = 'none';
          buttonsolid = '#000000'
          buttonback = '#999999'
       break;
       case 'greenslime'://greenslime
          humans.players[1].name = 'greenslime';
-         humans.players[1].ex.id = 'none';
-         humans.players[1].ns.id = 'none';
-         humans.players[1].ps.id = 'none';
+         humans.players[1].ex = 'none';
+         humans.players[1].ns = 'none';
+         humans.players[1].ps = 'none';
          buttonsolid = '#000000'
          buttonback = '#999999'
          humans.players[1].maxmp = 0;
          humans.players[1].defense += 5;
+         humans.players[1].mdefense -= 20;
       break;
       case 'mechanic'://mechanic
          humans.players[1].name = 'メカニッカ';
-         humans.players[1].ex.id = 'placeturret';
-         humans.players[1].ns.id = 'throwwrench';
-         humans.players[1].ps.id = 'solplaceturret';
+         humans.players[1].ex = 'placeturret';
+         humans.players[1].ns = 'throwwrench';
+         humans.players[1].ps = 'solplaceturret';
          buttonsolid = '#ff7373';
          buttonback = '#fcffc0';
          humans.players[1].maxhealth -= 50;
@@ -3694,9 +4000,9 @@ function HomeGoDungeon(name){
       break;
       case 'clown'://clown //ごめん好きこいつ...ww 終末もそのうち作るよ
          humans.players[1].name = '週末の道化師';
-         humans.players[1].ex.id = 'trickyvariables';
-         humans.players[1].ns.id = 'gambler';
-         humans.players[1].ps.id = 'highsol';
+         humans.players[1].ex = 'trickyvariables';
+         humans.players[1].ns = 'gambler';
+         humans.players[1].ps = 'highsol';
          buttonsolid = '#FFACF9';
          buttonback = '#ACF8FF';
          humans.players[1].critlate += 0.06;
@@ -3704,9 +4010,9 @@ function HomeGoDungeon(name){
       break;
       case 'herta'://herta
          humans.players[1].name = 'ヘルタ'
-         humans.players[1].ex.id = 'bigdiamond';//こんな大きなダイアモンド見たことないでしょ、あげるね〜
-         humans.players[1].ns.id = 'improve';//パーツアップグレード。
-         humans.players[1].ps.id = 'enemy50%pursuit';//くるくる〜っと、くるりん〜っと
+         humans.players[1].ex = 'bigdiamond';//こんな大きなダイアモンド見たことないでしょ、あげるね〜
+         humans.players[1].ns = 'improve';//パーツアップグレード。
+         humans.players[1].ps = 'enemy50%pursuit';//くるくる〜っと、くるりん〜っと
          buttonsolid = '#F1EA66';
          buttonback = '#A163CB';
          humans.players[1].attack -= 5;
@@ -3716,15 +4022,15 @@ function HomeGoDungeon(name){
       break;
       case 'magodiaqua'://MagoDiAqua
          humans.players[1].name = 'Luna Di Mare';
-         humans.players[1].ex.id = 'none';
-         humans.players[1].ns.id = 'none';
-         humans.players[1].ps.id = 'none';
+         humans.players[1].ex = 'none';
+         humans.players[1].ns = 'none';
+         humans.players[1].ps = 'none';
          buttonsolid = '#4473ad'
          buttonback = '#AFC4DE'
          humans.players[1].maxhealth -= 50;
          humans.players[1].attack -= 10;
          humans.players[1].mattack += 20;
-         humans.players[1].mdefense += 10;
+         humans.players[1].mdefense += 20;
          humans.players[1].maxmp += 50;
       break;
    }
@@ -3948,8 +4254,8 @@ async function humandamaged(cam,tcam,me,target,multiplier,kind,code){//矛先の
          if(humans[cam][me].weapon.num == 8){x = Math.floor(Math.random() * 13)+1};
          if(humans[cam][me].weapon.num == 13){x = Math.floor(Math.random() * 1000)+1};//えぐ...
          x = (humans[cam][me].attack * humans[cam][me].power * multiplier + x);
-         if(code == 3 && humans[cam][me].ps.id == 'highsol'){x *= 3};
-         if(code == 3 && humans[cam][me].ps.id == 'solx5but'){x *= 5};
+         if(code == 3 && humans[cam][me].ps == 'highsol'){x *= 3};
+         if(code == 3 && humans[cam][me].ps == 'solx5but'){x *= 5};
          x -= (humans[tcam][target].defense * humans[tcam][target].shell);
       
          if(equipweapon == 7){humans[cam][me].critlate += 0.5}
@@ -3970,7 +4276,7 @@ async function humandamaged(cam,tcam,me,target,multiplier,kind,code){//矛先の
          if(humans[tcam][target].health < 0){humans[tcam][target].health = 0};
          tekiou();
          log.textContent = humans[tcam][target].name + 'に' + x + 'のダメージ！';
-         if(code == 3 && humans[cam][me].ps.id == 'solplaceturret'){turretPlace(cam);}
+         if(code == 3 && humans[cam][me].ps == 'solplaceturret'){turretPlace(cam);}
          
          if(cam == 'players'){
             x = 1;if(code == 3){x = 2};
@@ -4013,7 +4319,7 @@ async function humandamaged(cam,tcam,me,target,multiplier,kind,code){//矛先の
          }
       
          //追撃ゾーン
-         if(humans[cam][me].ps.id == 'enemy50%pursuit' && humans[tcam][target].health <= humans[tcam][target].maxhealth / 2 && enemy50pursuitenelgy == 1 && humans[tcam][target].health > 0){
+         if(humans[cam][me].ps == 'enemy50%pursuit' && humans[tcam][target].health <= humans[tcam][target].maxhealth / 2 && enemy50pursuitenelgy == 1 && humans[tcam][target].health > 0){
             enemy50pursuitenelgy = 0;
             z = Math.floor(Math.random() * 2);
             if(z == 0){log.textContent = 'くるくる～――っと';}else{log.textContent = 'くるりん～っと';}
@@ -4060,7 +4366,7 @@ async function humandamaged(cam,tcam,me,target,multiplier,kind,code){//矛先の
 //#region playerturn
 function backtoplayerturn(){
    if(skillcooldown == 100){document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()">skill</button>';}else{document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';};
-   if(humans.players[1].ex.id == 'placeturret'){PlayerTurretattack = Math.round(humans.players[1].attack * 0.5);};
+   if(humans.players[1].ex == 'placeturret'){PlayerTurretattack = Math.round(humans.players[1].attack * 0.5);};
    phase = 1;
    log.textContent = 'あなたのターンです！';
    document.getElementById('select1').textContent = 'attack';
@@ -4083,48 +4389,13 @@ async function playerturn(cam,me){
    }
    tekiou();
 
-   nstimeout = 0;
-   if ((turncount % 3) == 0 && humans.players[me].ns.id == 'throwslime'){
-      buffadd('enemies',target,'onslime',3,1);
-      log.textContent = humans.enemies[me].name + 'にスライムが覆い被さった!';
-      nstimeout = 1;
-   } else if ((turncount % 4) == 0 && humans.players[me].ns.id == 'throwwrench'){
-      buffadd('players',me,'LetsThrow',3,1);
-      log.textContent = 'wrenchを投げる準備ができた!';
-      nstimeout = 1;
-   } else if ((turncount % 3) == 0 && humans.players[me].ns.id == 'gambler'){
-      buffadd('players',me,'gambling',1,1);
-      log.textContent = 'さあ、ギャンブルの時間だ!!';
-      nstimeout = 1;
-   }else if(turncount == 6 && humans.players[me].ns.id == 'improve'){
-      if(buffhas(cam,me,'improve') == false){
-         buffadd('players',me,'improve',4,1);
-         log.textContent = 'パーツアップグレード。';
-         nstimeout = 1;
-      }
-   }else if((turncount % 3) == 0 && humans.players[me].ns.id == '5%heal'){
-      x = humans.players[me].health;
-      humans.players[me].health += Math.ceil(humans.players[me].maxhealth * 0.2);
-      if(humans.players[me].health > humans.players[me].maxhealth){humans.players[me].health = humans.players[me].maxhealth};
-      x = humans.players[me].health - x;
-      tekiou();
-      if(x > 0){log.textContent = '5%のHPを回復した!!'; nstimeout = 1;}
-   }else if((turncount % 4) == 0 && humans.players[me].ns.id == 'hitelec'){
-      disappear();
-      buffadd('players',me,'powerup',2,2);
-      log.textContent = 'エレキギターで殴るぞ..ごめんここのセリフどしよ'
-      let target = await LetsTargetSelect();
-      await humandamaged(cam,target[1],me,target[0],2,'sh',4);
-      tekiou();
-      if(humans.enemies[me].health <= 0){humans.enemies[me].health = 0; tekiou();};
-      if(humans.enemies[me].health == 0){window.setTimeout(killed,1000);}
-      else{window.setTimeout(enemyorplayer,1000);}
-      return;
-   }
-   if(nstimeout == 1){await delay(1000);};
+   if((turncount % Skills.ns[humans[cam][me].ns].cool) == 0){
+      await Skills[humans[cam][me].ns].process(cam,me);
+      await delay(1000)
+   };
 
    if(skillcooldown == 100){document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()">skill</button>';}else{document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';};
-   if(humans.players[me].ex.id == 'placeturret'){PlayerTurretattack = Math.round(humans.players[me].attack * 0.5);};
+   if(humans.players[me].ex == 'placeturret'){PlayerTurretattack = Math.round(humans.players[me].attack * 0.5);};
    phase = 1;
    log.textContent = 'あなたのターンです！';
    document.getElementById('sbuttons').innerHTML = `<button class="button" id="select1" onclick="select1(${me})">attack</button>  <button class="button" id="select2" onclick="select2(${me})">magic</button>  <button class="button" id="select3" onclick="select3(${me})">tools</button>  <button class="button" id="back" onclick="back(${me})">runaway</button>`
@@ -4178,7 +4449,7 @@ async function select2(me){
       phase = 3;
    } else if (phase == 2) {
       disappear()
-      if(humans.players[me].slash2.id !== 0){
+      if(humans.players[me].slash2 !== 0){
          log.textContent = `${humans.players[me].name}は${humans.players[me].slash2.name}をした！`;
          Slash(2,me)
       }else{
@@ -4232,7 +4503,7 @@ async function select3(me){
       disappear()
       if(equiptool3.num > 0){
          log.textContent = humans.players[me].name + 'は'+equiptool3.name+'を使用した!'
-         window.setTimeout(eval(equiptool3.id+'act(me)'), 1000)
+         window.setTimeout(eval(equiptool3+'act(me)'), 1000)
       }else{
          log.textContent = 'not enough item ...';
          window.setTimeout(backtoplayerturn, 1000)
@@ -4426,166 +4697,14 @@ let hertaexvoice = ['こんな大きなダイアモンド見たことないで�
 // スキル予約関数
 let skillQueue = [];
 function skillReserve(cam,me){
-   x = humans[cam][me].ex.id;
+   x = humans[cam][me].ex;
    skillQueue.push({cam,me,x});
    console.log(`スキル予約済み: ${cam} ${num} -> ${skill}  現在キュー: ${skillQueue}`);
 }
 async function skillAct(cam,me,skill){
-   let serif = 'errored';
-   switch(skill){
-      case '50%split':{
-         if(buffhas(cam,me,'spliting') == false){
-            if(playerhealth > Math.floor(playermaxhealth * 0.5)){
-            buffadd(cam,me,'spliting',7);//廃止予定
-            x = Math.floor(playermaxhealth * 0.5);
-            playerhealth -= x;
-            document.getElementById('PlayerFriendFront').innerHTML = '<br><br><b><font color="#2EFE2E">'+humans[cam][me].name+'のコピー</font></b>  <br><span id="SplitHealth">0</span>/<span id="SplitMaxHealth">0</span>';
-            Splitmaxhealth = x;
-            Splithealth = x;
-            Splittekiou()
-            log.textContent = humans[cam][me].name+'は分裂した!!';
-            tekiou()
-            }else{log.textContent = 'tairyoku ga sukunai desu...';}
-         }
-         break;
-      };
-      case 'placeturret':{
-         turretPlace('players');
-         log.textContent = humans[cam][me].name+'はturretを設置した!';
-         skillReset();
-         break;
-      };
-      case 'trickyvariables':{
-         phase = 0; disappear();
-         log.textContent = humans[cam][me].name+'は爆弾を投げた...';
-         switch(Math.floor(Math.random() * 6)){
-            case 0:x=0;log.textContent = 'しかし不発弾だった!!';break;//これによる効果とかもあっていいかも
-            case 5:x=5;log.textContent = 'Lucky! 爆弾は焼夷弾だった!!!';break;
-            case 4:x=4;log.textContent = '爆弾は花火だった!';break;
-            case 3:x=3;log.textContent = '爆弾は毒ガス入りだった!!';buffadd(tcam,target,'poison',3,1);break; //毒ガス入りだった場合
-            case 2:x=2;log.textContent = '爆弾はスライム入りだった!!';buffadd(tcam,target,'onslime',2,1);break;//スライム入りだった場合
-            case 1:x=1;log.textContent = '爆発した..だがただの特殊な薬品だった!!';break;
-         }
-         await delay(1000);
-         await humandamaged(cam,tcam,me,target,x,'sh',4);
-         if(humans.enemies[target].health == 0){killed(cam,tcam,me,target);return;}
-         else{phase = 1; NextTurnis(cam,tcam,me,target);};
-         skillReset();
-         break;
-      };
-      case 'bigdiamond':{
-         phase = 0; disappear();
-         log.textContent = humans[cam][me].name+'は爆弾を投げた...';
-         document.getElementById('Skillbutton').innerHTML = '';
-         window.setTimeout(BigDiamond, 1000)
-         skillReset();
-         break;
-      };
-      case '50%heal':{
-         phase = 0;disappear();skillcooldown = 0;
-         let target = await LetsTargetSelect();
-         x = humans[target[1]][target[0]].health;
-         humans[target[1]][target[0]].health += Math.floor(humans[target[1]][target[0]].maxhealth * 0.5);
-         if (humans[target[1]][target[0]].health > humans[target[1]][target[0]].maxhealth){humans[target[1]][target[0]].health = humans[target[1]][target[0]].maxhealth;}
-         x = humans[target[1]][target[0]].health - x;
-         log.textContent = '体力が' + x + '回復した!';
-         skillReset();
-         break;
-      };
-      case 'kyrieeleison':{
-         phase = 0; disappear();
-         let target = await LetsTargetSelect();
-         switch(Math.floor(Math.random()*3)+1){
-            case 1:serif = 'あなたたちは通れないよ';break;
-            case 2:serif = 'ここから先は進ませないよ';break;
-            case 3:serif = 'ここは私が守るから';break;
-         }
-         log.textContent = serif;
-         x = 2;
-         if(humans[target[1]][target[0]].health >= humans[target[1]][target[0]].health * 0.7){x = 4};
-         await humandamaged(cam,target[1],me,target[0],x,'sh',4);
-         skillReset();
-         break;
-      };
-      case 'standrone':{
-         phase = 0; disappear();
-         let target = await LetsTargetSelect();
-         switch(Math.floor(Math.random()*3)+1){
-            case 1:
-               serif = '1';
-               break;
-            case 2:
-               serif = '2';
-               break;
-            case 3:
-               serif = '3';
-               break;
-         }//ミヤコさん
-         log.textContent = serif;
-         await humandamaged(cam,target[1],me,target[0],0.75,'sh',4);
-         buffadd(target[1],target[0],'stan',1,1);
-         skillReset();
-         break;
-      };
-      case 'recievechallenge':{
-         phase = 0; disappear();
-         let target = await LetsTargetSelect();
-         switch(Math.floor(Math.random()*3)+1){
-            case 1:
-               serif = '宇沢レイサにお任せください！！';
-               break;
-            case 2:
-               serif = '外れ〜〜〜ww';
-               break;
-            case 3:
-               serif = '外れ〜〜〜ww()';
-               break;
-         }//宇沢レイサ
-         log.textContent = serif;
-         await humandamaged(cam,target[1],me,target[0],0.5,'sh',1)
-         buffadd(target[1],target[0],'shelldown',2,2);
-         skillReset();
-         break;
-      };
-      case 'timidpursuit':{
-         phase = 0; disappear();
-         switch(Math.floor(Math.random()*3)+1){
-            case 1:
-               serif = '私はその辺の小石...';
-               break;
-            case 2:
-               serif = '私のことなんて...気にしないでください...';
-               break;
-            case 3:
-               serif = 'すみません...一人にさせてください......';
-               break;
-         }
-         log.textContent = serif;
-         buffadd(target[1],target[0],'weaknessgrasp',2,1);//弱点把握状態
-         skillReset();
-         break;
-      };
-      case 'bombe':{
-         phase = 0; disappear();
-         await LetsTargetSelect();
-         log.textContent = humans.players[me].name+'は爆弾を投げた...';
-         document.getElementById('Skillbutton').innerHTML = '';
-         await delay(1000);//普通　水　マグマ　閃光弾
-         const bombetype = [3,1,6,0];
-         x = bombetype[Math.floor(Math.random()*4)]
-         switch(x){
-            case 3:log.textContent = '普通の爆弾だった..!';break;
-            case 1:log.textContent = '水爆弾だった！！';break;//強制終了です
-            case 6:log.textContent = 'Lucky♪マグマ爆弾だった!!';break;
-            case 0:log.textContent = 'いけっ！ピカピカの実！';buffadd(target[1],target[0],'stan',2,2);break;
-         }
-         await humandamaged(cam,target[1],me,target[0],x,'sh',4);
-         if(humans[target[1]][target[0]].health == 0){killed(cam,target[1],me,target[0]);return;}
-         else{phase = 1; NextTurnis(cam,target[1],me,target[0]);};
-         skillReset();
-         break;
-      };
-   }
+   await Skills.ex[skill].process(cam,me);
+   skillReset(cam,me);
+   await delay(1000);
 }
 function skillReset(cam,me){
    humans[cam][me].cooldown = 0;
@@ -5237,7 +5356,7 @@ function BossEnemyAppear(){
    document.getElementById('TurnCount').textContent = turncount;
    playermp = playermaxmp;
    playerpower = 1;playershell = 1;
-   if(playerps.id == 'enemy50%pursuit'){enemy50pursuitenelgy = 1;};
+   if(playerps == 'enemy50%pursuit'){enemy50pursuitenelgy = 1;};
    humans.enemies[me].health = humans.enemies[me].health; document.getElementById('EnemyMaxHealth').textContent = humans.enemies[me].health; tekiou();
    if (enemylevel < 1){enemylevel = 1}
    humans.enemies[me].name = bossenemies[me].names[stage-1]; //敵の名前を決めます
@@ -5623,29 +5742,12 @@ function Campselecttool(code){
 }
 // #endregion
 //#region skillshop
-const SHOPexrandom = {
-   name: ['GO!SPLIT!!', '雷ちゃん、召喚', 'トリッキーな変数', '私がかけた魔法だよ', 'Kyrie Eleison', '自走式閃光ドローン', '挑戦状を受け取ってください!!', '小心者の観測'],
-   price: [95, 95, 95, 95, 110, 60, 90, 50],
-   id: ['50%split', 'placeturret', 'trickyvariables', 'bigdiamond', 'kyrieeleison', 'standrone', 'recievechallenge', 'timidpursuit'],
-   explain:['体力が半分以上ならば分身を召喚し、<br>ダメージを代わりに受けさせます。','タレットを配置する。<br>タレットは攻撃力の50%の攻撃力を持ちます。','爆弾を投擲し、<br>敵にランダムな効果を与える。','敵に攻撃力の150%のダメージを与え、<br>50%の確率で凍らせる。','敵に攻撃力の200%のダメージを与える。<br>対象の体力が70%以上の場合、400%のダメージ。','敵に攻撃力の75%のダメージを与え、<br>スタンさせる。','敵の防御力を下げ、自身の攻撃力を上げる。<br>','敵に攻撃力の60%のダメージを与え、<br>弱点把握状態を付与する。(2ターン)'],
-};
-const SHOPnsrandom = {
-   name: ['Attach!slime!!', '匙を投げる？これはレンチだよ', 'かけ上手', '改善が必要だよ'],
-   price: [70, 70, 70, 70],
-   id: ['throwslime', 'throwwrench', 'gambler', 'improve'],
-   explain:['敵にスライムをくっつけ、<br>攻撃を無効化する。','レンチを投げる準備をする。<br>レンチは攻撃力の200%の攻撃力を持つ。','ギャンブル熱状態に入り、<br>攻撃時0,2,4倍のいずれかの倍率がかかる。','攻撃力を上昇させる。バフをかける。<br>すでにある場合は解除する。',]
-};
-const SHOPpsrandom = {
-   name: ['DoYourBest!!', '雷ちゃん、もうちょっと', '生粋の勝負師', '一度限りの取引'],
-   price: [90, 90, 90, 90],
-   id: ['sthree', 'solplaceturret', 'highsol', 'enemy50%pursuit'],
-   explain:['slash時、たまに3回攻撃する。<br>','slashoflightが当たった時、<br>タレットを配置する。','slashoflightの当たる確率が下がるが、<br>倍率が9倍になる。','攻撃によって敵の体力が50%を下回った時、<br>攻撃力の70%で追撃する。',]
-};
-
-  const allItems = [...SHOPexrandom.name.map((name, index) => ({name, price: SHOPexrandom.price[index], explain: SHOPexrandom.explain[index], id: SHOPexrandom.id[index], type: 'ex'})),
-               ...SHOPnsrandom.name.map((name, index) => ({name, price: SHOPnsrandom.price[index], explain: SHOPnsrandom.explain[index], id: SHOPnsrandom.id[index], type: 'ns'})),
-               ...SHOPpsrandom.name.map((name, index) => ({name, price: SHOPpsrandom.price[index], explain: SHOPpsrandom.explain[index], id: SHOPpsrandom.id[index], type: 'ps'}))];
-
+   const Allakill = [
+      ...Object.values(Skills.ex),
+      ...Object.values(Skills.ns),
+      ...Object.values(Skills.ps)
+   ];
+ 
   function skillshopshuffle(array){
    for (let i = array.length - 1; i > 0; i--) {
      const j = Math.floor(Math.random() * (i + 1));
@@ -5712,9 +5814,9 @@ const SHOPpsrandom = {
   function BuyItem(name, price, id, type) {
    if (euro >= price) {
      euro -= price;
-     if(type === 'ex') humans.players[me].ex.id = id;
- else if(type === 'ns') playerns.id = id;
- else if(type === 'ps') playerps.id = id;
+     if(type === 'ex') humans.players[me].ex = id;
+ else if(type === 'ns') playerns = id;
+ else if(type === 'ps') playerps = id;
      log.textContent = name + 'を購入しました！';
      
    } else {
@@ -5938,9 +6040,9 @@ async function ScorpionAct(code){
 function ZomuEvent(){//創生黎明の原野
    log.textContent = 'かまってぇや、マジで';
    playername = 'zomusan'
-   humans.players[me].ex.id = 'bombe';//clownみたいな感じで爆弾投げ。普通、水、マグマ、閃光弾。ex使用後は攻撃力が1.5倍になる(1ターン)
-   playerns.id = 'hitelec';//4の倍数のターンの時、強制的にエレキギターで殴る。攻撃力の3倍のダメージを与える。
-   playerps.id = 'solx5but'//slashoflightを使った際、当たれば5倍だが、外れれば自分にダメージを与える。
+   humans.players[me].ex = 'bombe';//clownみたいな感じで爆弾投げ。普通、水、マグマ、閃光弾。ex使用後は攻撃力が1.5倍になる(1ターン)
+   playerns = 'hitelec';//4の倍数のターンの時、強制的にエレキギターで殴る。攻撃力の3倍のダメージを与える。
+   playerps = 'solx5but'//slashoflightを使った際、当たれば5倍だが、外れれば自分にダメージを与える。
    buttonsolid = '#000000';buttonback = '#50C878';
    document.getElementById('ButtonStyle').textContent = `.button{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};cursor: pointer;}input[type="text"]:focus{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};}`;
    MAPx = Math.floor(SELECTx / 75);
@@ -5954,9 +6056,9 @@ function ZomuEvent(){//創生黎明の原野
 function UtusenEvent(){
    log.textContent = 'はいどうも〜、僕です';
    playername = 'utusen'
-   humans.players[me].ex.id = '50%appease';//相手の体力が半分以下なら仲間にする｡でなければ､攻撃力の1.5倍のダメージ
-   playerns.id = 'ehp50%but';//3の倍数のターンの時、相手か自分の体力を半分にする。運ゲー
-   playerps.id = 'reverseta';//逆TA(相手より体力がめちゃ低いとダメージを喰らわない)
+   humans.players[me].ex = '50%appease';//相手の体力が半分以下なら仲間にする｡でなければ､攻撃力の1.5倍のダメージ
+   playerns = 'ehp50%but';//3の倍数のターンの時、相手か自分の体力を半分にする。運ゲー
+   playerps = 'reverseta';//逆TA(相手より体力がめちゃ低いとダメージを喰らわない)
    buttonsolid = '#4c6cb3';buttonback = '#949495';
    document.getElementById('ButtonStyle').textContent = `.button{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};cursor: pointer;}input[type="text"]:focus{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};}`;
    MAPx = Math.floor(SELECTx / 75);
