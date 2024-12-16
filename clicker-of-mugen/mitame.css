@@ -346,6 +346,20 @@ body {
 #skillshopcornerback{
   display: none;
 }
+.card{
+  border: 1px solid #222;
+  border-radius: 5px;
+  overflow-x: scroll;
+  margin: 5px 0;
+  text-align: left!important;
+  width: 300px;
+  height: 101.33px;
+  padding: 2px;
+}
+.card-titletext{
+  width: 100%;
+  overflow-x: auto;
+}
 
 /* バトル中のそれ */
 .EnemyName{

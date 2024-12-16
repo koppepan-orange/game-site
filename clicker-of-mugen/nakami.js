@@ -3020,7 +3020,7 @@ function inventoryOpen(num){
    document.getElementById('InventoryArea').innerHTML = `
    <div id="Iblock1">
       <div id="IStatus">${Status}</div>
-      <div id="Skills"></div>
+      <div id="ISkills"></div>
    </div>
    <div id="Iblock2">
       <div id="ISlashs">slashs<br>
@@ -3043,8 +3043,8 @@ function inventoryOpen(num){
    document.getElementById('ISlashAppearence').innerHTML = slashs.join('<br>');
    let magics = Object.keys(Magics).map(a => Magics[a].lv <= humans.players[InventoryPage].level ? Magics[a].name : null).filter(Boolean)
    document.getElementById('IMagicAppearence').innerHTML = magics.join('<br>');
-   let skills = ['ex','ns','ps'].map(a => `${a}:<span class="Iskill"   data-description=${Skills[a].description}>${humans.players[InventoryPage][a].name}`)
-   document.getElementById('Skills').innerHTML = skills.join('<br>');
+   let skills = ['ex','ns','ps'].map(a => `${a}:<span class="Iskill"   data-description=${Skills[a][humans.players[InventoryPage][a]].description}>${Skills[a][humans.players[InventoryPage][a]].name}`)
+   document.getElementById('ISkills').innerHTML = skills.join('<br>');
 
    let nextpage = addEventListener('keydown', (event) => {
       if (event.key === 'ArrowRight') {   
@@ -5742,7 +5742,7 @@ function Campselecttool(code){
 }
 // #endregion
 //#region skillshop
-   const Allakill = [
+   const Allskill = [
       ...Object.values(Skills.ex),
       ...Object.values(Skills.ns),
       ...Object.values(Skills.ps)
@@ -5760,21 +5760,21 @@ function Campselecttool(code){
    const card = document.createElement('div');
    card.classList.add('card');
    
-   const cardTextbox = document.createElement('div');
-   cardTextbox.classList.add('card__textbox');
+   //const cardTextbox = document.createElement('div');
+   //cardTextbox.classList.add('card__textbox');
    
    const titleText = document.createElement('span');
-   titleText.classList.add('card__titletext');
-   titleText.innerHTML = `${item.name}   ${item.type}<br>価格: ${item.price}€<br>${item.explain}<br>`;
+   titleText.classList.add('card-titletext');
+   titleText.innerHTML = `${item.type}   ${item.name}<br>価格: ${item.price}€<br>${item.description}<br>`;
    
    const buyButton = document.createElement('button');
    buyButton.classList.add('button');
-   buyButton.setAttribute('onclick', `BuyItem('${item.name}', '${item.price}', '${item.id}', '${item.type}')`);
+   buyButton.setAttribute('onclick', `BuyItem('${item.type}','${item.id}','${item.name}','${item.price}')`);
    buyButton.textContent = 'Buy';
    
-   cardTextbox.appendChild(titleText);
-   cardTextbox.appendChild(buyButton);
-   card.appendChild(cardTextbox);
+   card.appendChild(titleText);
+   card.appendChild(buyButton);
+   //card.appendChild(cardTextbox);
    
    return card;
   }
@@ -5790,7 +5790,7 @@ function Campselecttool(code){
    const cardsContainer = document.getElementById('skillshopcorner');
    cardsContainer.style.display = 'block';
    cardsContainer.innerHTML = ''; // 前の内容をクリアする
-   const selectedItems = skillshopshuffle(allItems).slice(0, 6);
+   const selectedItems = skillshopshuffle(Allskill).slice(0, 6);
    selectedItems.forEach(item => {
      const card = skillshopcreateCard(item);
      cardsContainer.appendChild(card);
@@ -5811,18 +5811,15 @@ function Campselecttool(code){
    AllowMove = 0;
   }
 
-  function BuyItem(name, price, id, type) {
-   if (euro >= price) {
+  function BuyItem(type,id,name,price) {
+   if(euro >= price){
      euro -= price;
-     if(type === 'ex') humans.players[me].ex = id;
- else if(type === 'ns') playerns = id;
- else if(type === 'ps') playerps = id;
+     humans.players[1][type][id] = id;
      log.textContent = name + 'を購入しました！';
-     
-   } else {
+   }else{
      log.textContent = 'not enough euro...';
    }
-   save();
+   updateUI();
   }
 
 // #endregion
