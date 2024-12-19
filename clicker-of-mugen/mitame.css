@@ -367,6 +367,13 @@ body {
   overflow-x: auto;
   overflow-y: hidden;
 }
+#toolsdesuwa{
+  border: 1px solid #222;
+  max-width: 100px;
+  word-wrap: break-word;
+  white-space: normal;
+  overflow-y: scroll;
+}
 
 /* こっからクエスト */
 #quest-list{
@@ -476,7 +483,7 @@ body {
 
 }
 
-/* ここからcard..いる？これ */
+/* ここからbattle */
 
 #enemies{
   display: flex;

@@ -1714,17 +1714,18 @@ let Slashs = {
       lv:1,
       tcam:'players',
       process:async function(cam,tcam,me,target){
-         await humandamaged(cam,tcam,me,target,1,'sh',1);
-         if(humans[tcam][target].health == 0){killed(cam,tcam,me,target);return;}
+         let result = await humandamaged(cam,tcam,me,target,1,'sh',1);
+         if(result == 'dead'){return 'dead';}
 
          if(humans[cam][me].ps == 'sthree' && Math.floor(Math.random() * 4) == 0){//1/4
             log.textContent = humans[cam][me].name+'は頑張った!';
             await delay(500)
-            await humandamaged(cam,tcam,me,target,1,'sh',1);
-            if(humans[tcam][target].health == 0){killed(cam,tcam,me,target);return;}
-            await humandamaged(cam,tcam,me,target,1,'sh',1);
-            if(humans[tcam][target].health == 0){killed(cam,tcam,me,target);return;}
+            result = await humandamaged(cam,tcam,me,target,1,'sh',1);
+            if(result == 'dead'){return 'dead';}
+            result = await humandamaged(cam,tcam,me,target,1,'sh',1);
+            if(result == 'dead'){return 'dead';}
          }
+         return 'alive';
       }
    },
    'doubleslash':{
@@ -1737,15 +1738,16 @@ let Slashs = {
          if(Math.floor(Math.random() * 3) == 0){
             log.textContent = 'miss! ダメージを与えられない!';await delay(1000);
          }else{
-            await humandamaged(cam,tcam,me,target,1,'sh',2);
-            if(humans[tcam][target].health == 0){killed(cam,tcam,me,target);return;}
+            let result = await humandamaged(cam,tcam,me,target,1,'sh',2);
+            if(result == 'dead'){return 'dead';}
          }
          if(Math.floor(Math.random() * 3) == 0){
             log.textContent = 'miss! ダメージを与えられない!';await delay(1000);
          }else{
-            await humandamaged(cam,tcam,me,target,1,'sh',2);
-            if(humans[tcam][target].health == 0){killed(cam,tcam,me,target);return;}
+            let result = await humandamaged(cam,tcam,me,target,1,'sh',2);
+            if(result == 'dead'){return 'dead';}
          }
+         return 'alive';
       }
    },
    'slashoflight':{
@@ -1758,8 +1760,8 @@ let Slashs = {
          x = Math.floor(Math.random() * 1); // 1/3です
          if(humans[cam][me].ps == 'highsol'){x = Math.floor(Math.random() * 5);}; // 1/5です。
          if(x == 0){
-            await humandamaged(cam,tcam,me,target,3,'sh',3);//switch消して、camもちゃんと指定するようにしてちゃんといろいろやっといて
-            if(humans[tcam][target].health == 0){killed(cam,tcam,me,target);return;}
+            let result = await humandamaged(cam,tcam,me,target,3,'sh',3);
+            if(result == 'dead'){return 'dead';}
          }else{
             if(humans[cam][me].ps !== 'solx5but'){
                log.textContent = 'miss! ダメージを与えられない!';
@@ -1772,6 +1774,7 @@ let Slashs = {
                await delay(1000);
             }
          }
+         return 'alive';
       }
    }
 }
@@ -1787,7 +1790,7 @@ let Magics = {
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
          humans[tcam][target].health += x;
          log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000);
-         NextTurnis(cam,tcam,me,target);
+         return 'alive';
       }
    },
    'power':{
@@ -1797,7 +1800,7 @@ let Magics = {
       process:async function(cam,tcam,me,target){
          log.textContent = humans[cam][me].name + 'はpowerを唱えた!';await delay(1000);
          buffadd(tcam,target,'powerup',3,1);
-         NextTurnis(cam,tcam,me,target);
+         return 'alive';
       }
    },
    'shell':{
@@ -1807,7 +1810,7 @@ let Magics = {
       process:async function(cam,tcam,me,target){
          log.textContent = humans[cam][me].name + 'はshellを唱えた!';await delay(1000);
          buffadd(tcam,target,'shellup',3,1);
-         NextTurnis(cam,tcam,me,target);
+         return 'alive';
       }
    },
    'poison':{
@@ -1817,7 +1820,7 @@ let Magics = {
       process:async function(cam,tcam,me,target){
          log.textContent = humans[cam][me].name + 'はpoisonを唱えた!';await delay(1000);
          buffadd(tcam,target,'poison',4,1);
-         NextTurnis(cam,tcam,me,target);
+         return 'alive';
       }
    },
    'thunder':{
@@ -1826,8 +1829,8 @@ let Magics = {
       lv:4,
       process:async function(cam,tcam,me,target){
          log.textContent = humans[cam][me].name + 'はthunderを唱えた!!';await delay(1000);
-         await humandamaged(cam,tcam,me,target,0.7,'mg',4);//雷
-         NextTurnis(cam,tcam,me,target)
+         let result = await humandamaged(cam,tcam,me,target,0.7,'mg',4);//雷
+         return result;
       }
    },
    'fire':{
@@ -1836,9 +1839,9 @@ let Magics = {
       lv:4,
       process:async function(cam,tcam,me,target){
          log.textContent = `${humans[cam].name}はfireを唱えた！`;await delay(1000);
-         await humandamaged(cam,tcam,me,target,1.1,'mg',2);//火
+         let result = await humandamaged(cam,tcam,me,target,1.1,'mg',2);//火
          buffadd(tcam,target,'burn',2,1);
-         NextTurnis(cam,tcam,me,target)
+         return result
       }
    },
    'healerthan':{
@@ -1851,7 +1854,7 @@ let Magics = {
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
          humans[tcam][target].health += x;
          log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000);
-         NextTurnis(cam,tcam,me,target)
+         return 'alive'
       }
    },
    'luck':{
@@ -1861,7 +1864,7 @@ let Magics = {
       process:async function(cam,tcam,me,target){
          buffadd(tcam,target,'luck',4,1);
          log.textContent = humans[cam][me].name + 'はluckを唱えた!';await delay(1000);
-         NextTurnis(cam,tcam,me,target)
+         return 'alive'
       }
    },
    'ellthunder':{
@@ -1871,7 +1874,7 @@ let Magics = {
       process:async function(cam,tcam,me,target){
          log.textContent = humans[cam][me].name + 'はellthunderを唱えた!';await delay(1000);
          humandamaged(cam,tcam,me,target,1.2,'mg',4);//雷
-         NextTurnis(cam,tcam,me,target)
+         return 'alive'
       }
    },
    'morepower':{
@@ -1881,7 +1884,7 @@ let Magics = {
       process:async function(cam,tcam,me,target){
          buffadd(tcam,target,'powerup',3,2)
          log.textContent = humans[cam][me].name + 'はmore powerを唱えた!';await delay(1000);
-         NextTurnis(cam,tcam,me,target)
+         return 'alive'
       }
    },
    'moreshell':{
@@ -1891,7 +1894,7 @@ let Magics = {
       process:async function(cam,tcam,me,target){
          buffadd(tcam,target,'shellup',3,2)
          log.textContent = humans[cam][me].name + 'はmore shellを唱えた!';await delay(1000);
-         NextTurnis(cam,tcam,me,target)
+         return 'alive'
       }
    },
    'deadlypoison':{
@@ -1901,7 +1904,7 @@ let Magics = {
       process:async function(cam,tcam,me,target){
          buffadd(tcam,target,'poison',5,2);
          log.textContent = humans[cam][me].name + 'はdeadly poisonを唱えた!';await delay(1000);
-         NextTurnis(cam,tcam,me,target)
+         return 'alive'
       }
    },
    'gigafire':{
@@ -1910,9 +1913,9 @@ let Magics = {
       lv:11,
       process:async function(cam,tcam,me,target){
          log.textContent = humans[cam][me].name + 'はgiga fireを唱えた!';await delay(1000);
-         await humandamaged(cam,tcam,me,target,2.3,'mg',2);//火
+         let result = await humandamaged(cam,tcam,me,target,2.3,'mg',2);//火
          buffadd(tcam,target,'burn',2,2);
-         NextTurnis(cam,tcam,me,target)
+         return result
       }
    },
    'the healest':{
@@ -1925,7 +1928,7 @@ let Magics = {
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
          humans[tcam][target].health += x;
          log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000)
-         NextTurnis(cam,tcam,me,target)
+         return 'alive'
       }
    },
    'luckgreat':{
@@ -1935,7 +1938,7 @@ let Magics = {
       process:async function(cam,tcam,me,target){
          buffadd(tcam,target,'luck',5,2);
          log.textContent = humans[cam][me].name + 'はluckgreatを唱えた!';await delay(1000);
-         NextTurnis(cam,tcam,me,target)
+         return 'alive'
       }
    },
    'merazoma':{
@@ -1945,9 +1948,9 @@ let Magics = {
       process:async function(cam,tcam,me,target){
          log.textContent = humans[cam][me].name + 'はメラゾーマを唱えた!';
          await delay(1000);
-         await humandamaged(cam,tcam,me,target,3.5,'mg',4);//雷
+         let result = await humandamaged(cam,tcam,me,target,3.5,'mg',4);//雷
          buffadd(tcam,target,'burn',3,2);
-         NextTurnis(cam,tcam,me,target)
+         return result
       }
    },
    'thoron':{
@@ -1956,8 +1959,8 @@ let Magics = {
       lv:15,
       process:async function(cam,tcam,me,target){
          log.textContent = 'トロン！！！';await delay(1000);//byルフレ
-         await humandamaged(cam,tcam,me,target,6,'mg',4);//雷
-         NextTurnis(cam,tcam,me,target)
+         let result = await humandamaged(cam,tcam,me,target,6,'mg',4);//雷
+         return result
       }
    },
    'random':{
@@ -1976,9 +1979,153 @@ let Magics = {
    
 }
 
+let Weapons = {
+   'none':{
+      name:'なし',
+      id:'none',
+      num:0,
+      power:0,
+      price:0,
+      sp:0
+   },
+   'woodenstick':{
+      name:'木の棒',
+      id:'woodstick',
+      num:0,
+      power:2,
+      price:10,
+      sp:0
+   },
+   'woodensword':{
+      name:'木の剣',
+      id:'woodsword',
+      num:0,
+      power:4,
+      price:20,
+      sp:0
+   },
+   'bamboosword':{
+      name:'竹刀',
+      id:'bamboosword',
+      num:0,
+      power:6,
+      price:30,
+      sp:0
+   },
+   'stone':{
+      name:'石ころ',
+      id:'stone',
+      num:0,
+      power:8,
+      price:50,
+      sp:0
+   },
+   'bigrock':{
+      name:'大きな石',
+      id:'bigrock',
+      num:0,
+      power:10,
+      price:80,
+      sp:0
+   },
+   'brick':{
+      name:'レンガ',
+      id:'brick',
+      num:0,
+      power:12,
+      price:100,
+      sp:0
+   },
+   'thinpaper':{
+      name:'薄めの紙',
+      id:'thinpaper',
+      num:0,
+      power:20,
+      price:5,
+      sp:0
+   },
+   'card':{
+      name:'カード',
+      id:'card',
+      num:0,
+      power:'Math.floor(Math.random()*13)+1',
+      price:77,
+      sp:0
+   },
+   'scissors':{
+      name:'はさみ',
+      id:'scissors',
+      num:0,
+      power:25,
+      price:200,
+      sp:0
+   },
+   'knife':{
+      name:'ほんもののナイフ',
+      id:'knife',
+      num:0,
+      power:40,
+      price:300,
+      sp:0
+   },
+
+   'blooddagger':{
+      name:'ジェン・ソルテ',
+      id:'blooddagger',
+      num:0,
+      power:0,
+      price:150,
+      sp:1,
+      process:async function(cam,tcam,me,target){
+         log.textContent = '血を吸った！';await delay(1000);
+         x = Math.ceil(humans[tcam][target].health*0.1);
+         humans[cam][me].health += x;
+         if(humans[cam][me].health > humans[cam][me].maxhealth){humans[cam][me].health = humans[cam][me].maxhealth;}
+         log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000);
+         return 'alive';
+      }
+   },
+   'timeontarget':{
+      name:'time on target',
+      id:'timeontarget',
+      num:0,
+      power:10,
+      price:150,
+      sp:1,
+      process:async function(cam,tcam,me,target){
+         log.textContent = 'トリニティの砲撃術は優秀ですから。';await delay(1000);
+         x = Math.ceil(humans[cam][me].attack * humans[cam][me].power * 0.9 + weaponpower - humans[tcam][target].defense);
+         if(x < 0){x = 0};if(x > humans[tcam][target].health){x = humans[tcam][target].health};
+         humans[tcam][target].health -= x;
+         buffadd(tcam,target,'shelldown',3,1);
+         log.textContent = 'お口に合うと良いのですが..';
+         await delay(1000);
+         if(humans[tcam][target].health <= 0){return 'dead';}
+         else{return 'alive';}
+      }
+   },
+   'biggamble':{
+      name:'大博打',
+      id:'biggamble',
+      num:0,
+      power:'Math.floor(Math.random()*100)+1',
+      price:150,
+      sp:1,
+   },
+   'contrarian':{
+      name:'天邪鬼',
+      id:'contrarian',
+      num:0,
+      power:80,
+      price:150,
+      sp:1,
+   }
+}
+
 let Tools = {
    'aspirin':{
-      name:'aspirin',
+      name:'アスピリン',
+      id:'aspirin',
       num:0,
       process:async function(cam,tcam,me,target){
          log.textContent = `おや、頭が痛いって？痛みに効くのはアスピリン！`;await delay(1000);
@@ -1986,11 +2133,12 @@ let Tools = {
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
          humans[tcam][target].health += x;
          log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000);
-         NextTurnis(cam,tcam,me,target);
+         return 'alive';
       }
    },
    'pablon':{
-      name:'pablon',
+      name:'パブロン',
+      id:'pablon',
       num:0,
       process:async function(cam,tcam,me,target){
          log.textContent = `早めのパブロン♪`;await delay(1000);
@@ -1998,11 +2146,12 @@ let Tools = {
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
          humans[tcam][target].health += x;
          log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000);
-         NextTurnis(cam,tcam,me,target);
+         return 'alive';
       }
    },
    'trypsin':{
-      name:'trypsin',
+      name:'トリプシン',
+      id:'trypsin',
       num:0,
       process:async function(cam,tcam,me,target){
          log.textContent = `トリプシンを飲んだ！！え？これは薬じゃないって？`;await delay(1000);
@@ -2010,11 +2159,12 @@ let Tools = {
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
          humans[tcam][target].health += x;
          log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000);
-         NextTurnis(cam,tcam,me,target);
+         return 'alive';
       }
    },
    'lulu':{
-      name:'lulu',
+      name:'ルル',
+      id:'lulu',
       num:0,
       process:async function(cam,tcam,me,target){
          log.textContent = `求愛性 孤独 ドク 流るルル♪`;await delay(1000);
@@ -2022,11 +2172,12 @@ let Tools = {
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
          humans[tcam][target].health += x;
          log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000);
-         NextTurnis(cam,tcam,me,target);
+         return 'alive';
       }
    },
    'potion':{
-      name:'potion',
+      name:'魔法薬',
+      id:'potion',
       num:0,
       process:async function(cam,tcam,me,target){
          log.textContent = `なんか一番しょうもないよね、これ あ、全回復です`;await delay(1000);
@@ -2034,11 +2185,12 @@ let Tools = {
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
          humans[tcam][target].health += x;
          log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000);
-         NextTurnis(cam,tcam,me,target);
+         return 'alive';
       }
    },
    'throwknife':{
-      name:'throwknife',
+      name:'投げナイフ',
+      id:'throwknife',
       num:0,
       process:async function(cam,tcam,me,target){
          log.textContent = 'では、ナイフの錆にしてあげましょう';await delay(1000);
@@ -2047,11 +2199,12 @@ let Tools = {
          humans[tcam][target].health -= x
          log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';tekiou();await delay(1000);
          if(humans.enemies[target].health <= 0){killed(cam,tcam,me,target);return;}
-         NextTurnis(cam,tcam,me,target);
+         return 'alive';
       }
    },
    'trickyvariables':{
-      name:'trickyvariables',
+      name:'トリッキーな変数',
+      id:'trickyvariables',
       num:0,
       process:async function(cam,tcam,me,target){
          x = Math.floor(Math.random() * 3) + 1;
@@ -2070,11 +2223,12 @@ let Tools = {
          humans[tcam][target].health -= x;
          log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';tekiou();await delay(1000);
          if(humans[tcam][target].health <= 0){log.textContent = 'ちょろい、ちょろい。BANG！';killed(cam,tcam,me,target);return;}
-         NextTurnis(cam,tcam,me,target);
+         return 'alive';
       }
    },
    'bottlegrenade':{
-      name:'bottlegrenade',
+      name:'ボトルグレネード',
+      id:'bottlegrenade',
       num:0,
       process:async function(cam,tcam,me,target){
          log.textContent = 'これはちょっと、スパイシーなやつだよ';await delay(1000);
@@ -2084,11 +2238,12 @@ let Tools = {
          buffadd(tcam,target,'burn',3,1);
          log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';tekiou();await delay(1000);
          if(humans[tcam][target].health <= 0){log.textContent = 'レッドウィンターの問題児にしては上出来じゃない？';killed(cam,tcam,me,target);return;}
-         NextTurnis(cam,tcam,me,target);
+         return 'alive';
       }
    },
    'coveringfire':{
-      name:'coveringfire',
+      name:'援護射撃',
+      id:'coveringfire',
       num:0,
       process:async function(cam,tcam,me,target){
          log.textContent = 'え、援護します...';await delay(1000);
@@ -2097,11 +2252,12 @@ let Tools = {
          humans[tcam][target].health -= x
          log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';tekiou();await delay(1000);
          if(humans[tcam][target].health <= 0){log.textContent = 'わ、私のことはお気になさらずに...';killed(cam,tcam,me,target);return;}
-         NextTurnis(cam,tcam,me,target);
+         return 'alive';
       }
    },
    'bomb':{
-      name:'bomb',
+      name:'爆弾',
+      id:'bomb',
       num:0,
       process:async function(cam,tcam,me,target){
          humans[tcam][target].health = 0;
@@ -2110,7 +2266,8 @@ let Tools = {
       }
    },
    'redcard':{
-      name:'redcard',
+      name:'レッドカード',
+      id:'redcard',
       num:0,
       process:async function(cam,tcam,me,target){
          buffadd(tcam,target,'skip',1,1);
@@ -2119,7 +2276,8 @@ let Tools = {
       }
    },
    'bluecard':{
-      name:'bluecard',
+      name:'ブルーカード',
+      id:'bluecard',
       num:0,
       process:async function(cam,tcam,me,target){
          x = humans.players[me].health/humans.players[me].maxhealth*humans.enemies[target].health;//割合交換(そのうちゲージにする時用)
@@ -2133,7 +2291,8 @@ let Tools = {
       }
    },
    'greencard':{
-      name:'greencard',
+      name:'グリーンカード',
+      id:'greencard',
       num:0,
       process:async function(cam,tcam,me,target){
          const Greenrandombuffs = ['poison','burn1','powerdown1','shelldown1']
@@ -2147,7 +2306,8 @@ let Tools = {
       }
    },
    'blackcard':{
-      name:'blackcard',
+      name:'ブラックカード',
+      id:'blackcard',
       num:0,
       process:async function(cam,tcam,me,target){
          buffadd(tcam,target,'poison',3,1);
@@ -2180,7 +2340,7 @@ let Skills = {
          price:95,
          process:async function(cam,me){
             turretPlace(cam);
-            skillReset(cam,me);
+            return 'alive';
          }
       },
       'trickyvariables':{
@@ -2202,10 +2362,8 @@ let Skills = {
                case 1:x=1;log.textContent = '爆発した..だがただの特殊な薬品だった!!';break;
             }
             await delay(1000);
-            await humandamaged(cam,target[1],me,target[0],x,'sh',4);
-            if(humans[target[1]][target[0]].health == 0){killed(cam,target[1],me,target[0]);return;}
-            else{phase = 1; NextTurnis(cam,target[1],me,target[0]);};
-            skillReset(cam,me);
+            let result = await humandamaged(cam,target[1],me,target[0],x,'sh',4);
+            return result;
          }
       },
       'bigdiamond':{
@@ -2220,9 +2378,9 @@ let Skills = {
             let serifs = ['こんな大きなダイアモンド見たことないでしょ？あげるね～','あなた…それじゃあダメだよ','ちょっとは静かになさい！','私が誰だか知ってるの？']
             document.getElementById('log').textContent = serifs[Math.floor(Math.random() * serifs.length)];//そのうち消える
             await delay(1000);
-            await humandamaged(cam,target[1],me,target[0],1.5,'sh',4);
+            let result = await humandamaged(cam,target[1],me,target[0],1.5,'sh',4);
             if(Math.floor(Math.random()*2) == 0){buffadd('enemydebuff','freeze',4,1)};
-            skillReset(cam,me);
+            return result;
          }
       },
       'kylieeleison':{
@@ -2236,8 +2394,8 @@ let Skills = {
             let target = await LetsTargetSelect();
             x = 2;
             if(humans[target[1]][target[0]].health > humans[target[1]][target[0]].maxhealth * 0.7){x = 4;}
-            await humandamaged(cam,target[1],me,target[0],x,'sh',4);
-            skillReset(cam,me);
+            let result = await humandamaged(cam,target[1],me,target[0],x,'sh',4);
+            return result;
          }
       },
       'standrone':{
@@ -2249,9 +2407,9 @@ let Skills = {
          process:async function(cam,me){
             phase = 0; disappear();
             let target = await LetsTargetSelect();
-            await humandamaged(cam,target[1],me,target[0],0.75,'sh',4);
+            let result = await humandamaged(cam,target[1],me,target[0],0.75,'sh',4);
             buffadd(target[1],target[0],'stun',1,1);
-            skillReset(cam,me);
+            return result;
          }
       },
       'recievechallenge':{//仲間にした方がいいかも
@@ -2263,10 +2421,10 @@ let Skills = {
          process:async function(cam,me){
             phase = 0; disappear();
             let target = await LetsTargetSelect();
-            await humandamaged(cam,target[1],me,target[0],0.5,'sh',4);
+            let result = await humandamaged(cam,target[1],me,target[0],0.5,'sh',4);
             buffadd(target[1],target[0],'shelldown',3,1);
             buffadd(cam,me,'powerup',3,2);
-            skillReset(cam,me);
+            return result;
          }
       },
       'timedpursuit':{//上に同じく
@@ -2277,6 +2435,7 @@ let Skills = {
          price:50,
          process:async function(cam,me){
             phase = 0; disappear();
+            let target = await LetsTargetSelect();
             switch(Math.floor(Math.random()*3)+1){
                case 1:
                   serif = '私はその辺の小石...';
@@ -2290,7 +2449,7 @@ let Skills = {
             }
             log.textContent = serif;
             buffadd(target[1],target[0],'weaknessgrasp',2,1);//弱点把握状態
-            skillReset();
+            return 'alive';
          },
       },
       'bombe':{
@@ -2299,7 +2458,7 @@ let Skills = {
          name:'ボマー',
          process:async function(cam,me){
             phase = 0; disappear();
-            await LetsTargetSelect();
+            let target = await LetsTargetSelect();
             log.textContent = humans.players[me].name+'は爆弾を投げた...';
             await delay(1000);//普通　水　マグマ　閃光弾
             const bombetype = [3,6,0];
@@ -2310,14 +2469,20 @@ let Skills = {
                case 4:log.textContent = 'Lucky♪マグマ爆弾だった!!';break;
                case 0:log.textContent = 'いけっ！ピカピカの実！';buffadd(target[1],target[0],'stan',2,1);break;
             }
-            await humandamaged(cam,target[1],me,target[0],x,'sh',4);
-            if(humans[target[1]][target[0]].health == 0){killed(cam,target[1],me,target[0]);return;}
-            else{phase = 1; NextTurnis(cam,target[1],me,target[0]);};
-            skillReset();  
+            let result = await humandamaged(cam,target[1],me,target[0],x,'sh',4);
+            return result;
          }
       }
    },
    ns:{
+      'null':{
+         type:'ns',
+         id:'null',
+         name:'null',
+         description:'(まじでnullです。効果無し。外れ。乙)',
+         price:0,
+         cool:0
+      },
       'throwslime':{
          type:'ns',
          id:'throwslime',
@@ -2326,9 +2491,10 @@ let Skills = {
          price:70,
          cool:3,
          process:async function(cam,me){
-            let target = await ShallTargetSelect(me,'er',0);
+            let target = ShallTargetSelect(me,'er',0);
             buffadd(target[1],target[0],'onslime',1,1);
             log.textContent = humans[cam][me].name + 'にスライムが覆い被さった!';
+            return 'alive';
          }
       },
       'throwwrench':{
@@ -2341,6 +2507,7 @@ let Skills = {
          process:async function(cam,me){
             buffadd(cam,me,'LetsThrow',2,1);
             log.textContent = 'wrenchを投げる準備ができた!';
+            return 'alive';
          }
       },
       'gambler':{
@@ -2353,6 +2520,7 @@ let Skills = {
          process:async function(cam,me){
             buffadd(cam,me,'gambling',1,1);
             log.textContent = 'さあ、ギャンブルの時間だ!!';
+            return 'alive';
          }
       },
       'improve':{
@@ -2365,6 +2533,7 @@ let Skills = {
          process:async function(cam,me){
             buffadd(cam,me,'improve',4,1);
             log.textContent = 'パーツアップグレード。';
+            return 'alive';
          }
       },
       'hitelec':{
@@ -2378,19 +2547,26 @@ let Skills = {
             buffadd(cam,me,'powerup',2,2);
             log.textContent = 'エレキギターで殴るぞ..ごめんここのセリフどしよ'
             let target = ShallTargetSelect(me,'er',0);
-            await humandamaged(cam,target[1],me,target[0],2,'sh',4);
-            log.textContent = 'かまってぇや、マジで'
+            let result = await humandamaged(cam,target[1],me,target[0],2,'sh',4);
+            log.textContent = 'かまってぇや、マジで';
+            return result;
          }
       }
    },
    ps:{
+      'null':{
+         type:'ps',
+         id:'null',
+         name:'null',
+         description:'(まじでnullです。効果無し。外れ。乙)',
+         price:0,
+      },
       'sthree':{
          type:'ps',
          id:'sthree',
          name:'DoYourBest!!',
          description:'slash時、たまに3回攻撃する',
          price:90,
-
       },
       'solplaceturret':{
          type:'ps',
@@ -2445,7 +2621,8 @@ let Enemies = {
             process:async function(cam, me){
                log.textContent = `${humans[cam][me].name}は粘液を飛ばしてきた！`;await delay(1000);
                let selected = ShallTargetSelect(me,'phph',0);
-               await humandamaged(cam,selected[1],me,selected[0],1,'sh',1);
+               let result = await humandamaged(cam,selected[1],me,selected[0],1,'sh',1);
+               return result;
             }
          },
          2:{
@@ -2454,7 +2631,8 @@ let Enemies = {
             process:async function(cam, me){
                log.textContent = `${humans[cam][me].name}は粘液を飛ばしてきた！`;await delay(1000);
                let selected = ShallTargetSelect(me,'phpl',0);
-               await humandamaged(cam,selected[1],me,selected[0],1,'sh',1);
+               let result = await humandamaged(cam,selected[1],me,selected[0],1,'sh',1);
+               return result;
             }
          },
          3:{
@@ -2464,6 +2642,7 @@ let Enemies = {
                log.textContent = `${humans[cam][me].name}は粘液を絡ませてきた！`;await delay(1000);//いやこれはこれでやばいか...?いや全然捉えようによってはやばいわ
                let selected = ShallTargetSelect(me,'phph',0);
                buffadd(selected[1],selected[0],'stickyslime',2,1);
+               return 'alive';
             }
          }
       }
@@ -2486,7 +2665,8 @@ let Enemies = {
             process:async function(cam, me){
                log.textContent = `${humans[cam][me].name}は体当たりを仕掛けてきた！`;await delay(1000);
                let selected = ShallTargetSelect(me,'phpl',0);
-               await humandamaged(cam,selected[1],me,selected[0],1,'sh',1);
+               let result = await humandamaged(cam,selected[1],me,selected[0],1,'sh',1);
+               return result;
             }
          },
          2:{
@@ -2495,7 +2675,8 @@ let Enemies = {
             process:async function(cam, me){
                log.textContent = `${humans[cam][me].name}は体当たりを仕掛けてきた！`;await delay(1000);
                let selected = ShallTargetSelect(me,'phpl',0);
-               await humandamaged(cam,selected[1],me,selected[0],1,'sh',1);
+               let result = await humandamaged(cam,selected[1],me,selected[0],1,'sh',1);
+               return result;
             }
          },
          3:{
@@ -2504,7 +2685,8 @@ let Enemies = {
             process:async function(cam, me){
                log.textContent = `${humans[cam][me].name}は回転しながら突進してきた！`;await delay(1000);
                let selected = ShallTargetSelect(me,'phpl',0);
-               await humandamaged(cam,selected[1],me,selected[0],1.5,'sh',1);
+               let result = await humandamaged(cam,selected[1],me,selected[0],1.5,'sh',1);
+               return result;
             }
          }
       }
@@ -2526,8 +2708,9 @@ let Enemies = {
             num:1,
             process:async function(cam, me){
                log.textContent = `${humans[cam][me].name}は姿を消..あれどこ行った？`;await delay(1000);
-               let selected = ShallTargetSelect(me,'ec',0);//私は気づいた。これcamとmeでよくね？　まあ左右対策か
+               let selected = ShallTargetSelect(me,'ec',0);
                buffadd(selected[1],selected[0],'disappear',2,1);
+               return 'alive';
             }
          },
          2:{
@@ -2537,7 +2720,8 @@ let Enemies = {
                if(buffhas(cam,me,'disappear')){x = 2;buffremove(cam,me,'disappear');}else{x = 1};
                log.textContent = `${humans[cam][me].name}は突進してきた！`;await delay(1000);
                let selected = ShallTargetSelect(me,'pr',0);
-               await humandamaged(cam,selected[1],me,selected[0],x,'sh',1);
+               let result = await humandamaged(cam,selected[1],me,selected[0],x,'sh',1);
+               return result;
             }
          },
          3:{
@@ -2547,8 +2731,9 @@ let Enemies = {
                if(buffhas(cam,me,'disappear')){x = 1.5;buffremove(cam,me,'disappear')}else{x = 0.75};
                log.textContent = `${humans[cam][me].name}はローキックしてきた！`;await delay(1000);
                let selected = ShallTargetSelect(me,'phpl',0);
-               await humandamaged(cam,selected[1],me,selected[0],x,'sh',1);
+               let result = await humandamaged(cam,selected[1],me,selected[0],x,'sh',1);
                buffadd(selected[1],selected[0],'speeddown',2,1);
+               return result;
             }
          }
       }
@@ -2572,6 +2757,7 @@ let Enemies = {
                log.textContent = `${humans[cam][me].name}は痺れ粉を振りかけてきた！`;await delay(1000);
                let selected = ShallTargetSelect(me,'patkh',0);
                buffadd(selected[1],selected[0],'palsy',2,1);
+               return 'alive';
             }
          },
          2:{
@@ -2581,6 +2767,7 @@ let Enemies = {
                log.textContent = `${humans[cam][me].name}は毒の粉を振りかけてきた！`;await delay(1000);
                let selected = ShallTargetSelect(me,'phph',0);
                buffadd(selected[1],selected[0],'poison',2,1);
+               return 'alive';
             }
          },
          3:{
@@ -2590,6 +2777,7 @@ let Enemies = {
                log.textContent = `${humans[cam][me].name}は眠り粉を振りかけてきた！`;await delay(1000);
                let selected = ShallTargetSelect(me,'patkh',0);
                buffadd(selected[1],selected[0],'sleep',1,1);
+               return 'alive';
             }
          }
       }
@@ -2618,7 +2806,8 @@ let Enemies = {
             process:async function(cam, me){  
                log.textContent = `${humans[cam][me].name}はピストルカービンで撃った！`;await delay(1000);//ウイさんの武器やね デ・リーズル カービン
                let selected = ShallTargetSelect(me,'phpl',0);
-               await humandamaged(cam,selected[0],me,selected[1],1,'sh',1);
+               let result = await humandamaged(cam,selected[0],me,selected[1],1,'sh',1);
+               return result;
             }
          },
          2:{
@@ -2627,7 +2816,8 @@ let Enemies = {
             process:async function(cam, me){
                log.textContent = `${humans[cam][me].name}は古書の専門家だ！！`;await delay(1000);//いやごめん、は？ (ウイさんのEX「古書の専門家」より)
                let selected = ShallTargetSelect(me,'eatkh',0);//enemies atk high
-               await Magics.power.process(cam,selected[0],me,selected[1]);
+               let result = await Magics.power.process(cam,selected[0],me,selected[1]);
+               return result;
             }
          },
          3:{
@@ -2637,6 +2827,7 @@ let Enemies = {
                log.textContent = `${humans[cam][me].name}は知識を伝達した！`;await delay(1000);//ウイさんのNS「伝達されていく知識」..いやそのまますぎるか...?
                let selected = ShallTargetSelect(me,'ec',1);//自分付近
                await Magics.boost.process(cam,selected[0],me,selected[1]);
+               return 'alive';
             }
          }
       }
@@ -2827,12 +3018,12 @@ let Blackcard={
    price:70
 };
 
-const weapons = {
-   name:['拳','木の棒','木刀','竹刀','石ころ','大きな石','薄めの紙','カード','はさみ','ほんもののナイフ','ジェン・ソルテ','time on target','大博打','天邪鬼'],
-   num:[0,1,3,5,10,20,40,1,'1~13',100,300,15,20,'10~1000',80],
-  power:[0,1,3,5,10,20,40,1,0,100,300,15,200,0,800],
-  price:[0,10,20,30,50,80,25,77,200,300]
-}
+//const weapons = {
+   // name:['拳','木の棒','木刀','竹刀','石ころ','大きな石','薄めの紙','カード','はさみ','ほんもののナイフ','ジェン・ソルテ','time on target','大博打','天邪鬼'],
+   // num:[0,1,3,5,10,20,40,1,'1~13',100,300,15,20,'10~1000',80],
+//   power:[0,1,3,5,10,20,40,1,0,100,300,15,200,0,800],
+//   price:[0,10,20,30,50,80,25,77,200,300]
+// }
 const rareweapons = {
    name:['none','ジェン・ソルテ','time on target','大博打','天邪鬼'],
   price:[0,150,150,150,150]
@@ -2850,6 +3041,8 @@ const tools = {
 
 //#region 超シンプルで使いやすい子達
 function tekiou(){
+   //存在確認用コマンド
+   //Object.keys(humans).forEach(cam => {Object.keys(humans[cam]).map(a => a.toString()).filter(s => humans[cam][s].status == 1 || humans[cam][s].status == 2).forEach(me => {console.log(me)})})
    Object.keys(humans).forEach(cam => {
       Object.keys(humans[cam]).map(a => a.toString()).forEach(me => {
          if(humans[cam][me].status == 1||humans[cam][me].status == 2){
@@ -2862,6 +3055,7 @@ function tekiou(){
 
             humans[cam][me].power = 1;humans[cam][me].shell = 1;
             let karix = 0;
+            
 
             if(buffhas(cam,me,'powerup')){karix = buffhas(cam,me,'powerup').lv};
             if(buffhas(cam,me,'powerdown')){karix -= buffhas(cam,me,'powerdown').lv};
@@ -2934,6 +3128,12 @@ function load(){
 }
 
 function delay(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
+
+function inSelect(array){
+   let select = Math.floor(Math.random()*array.length);
+   return array[select];
+}
+   
 
 async function NicoNicoText(mes){
    const newDiv = document.createElement('div');
@@ -3021,6 +3221,9 @@ function inventoryOpen(num){
    <div id="Iblock1">
       <div id="IStatus">${Status}</div>
       <div id="ISkills"></div>
+      <div id="IWeapons"></div>
+      <div id="IArmors"></div>
+      <div id="IItems"></div>
    </div>
    <div id="Iblock2">
       <div id="ISlashs">slashs<br>
@@ -3045,6 +3248,9 @@ function inventoryOpen(num){
    document.getElementById('IMagicAppearence').innerHTML = magics.join('<br>');
    let skills = ['ex','ns','ps'].map(a => `${a}:<span class="Iskill"   data-description=${Skills[a][humans.players[InventoryPage][a]].description}>${Skills[a][humans.players[InventoryPage][a]].name}`)
    document.getElementById('ISkills').innerHTML = skills.join('<br>');
+
+   let weapons = Object.keys(weapons).map(a => Weapons[a].num <= humans.players[InventoryPage].level ? Weapons[a].name : null).filter(Boolean)
+   document.getElementById('IWeapons').innerHTML = weapons.join('<br>');
 
    let nextpage = addEventListener('keydown', (event) => {
       if (event.key === 'ArrowRight') {   
@@ -3382,11 +3588,6 @@ function ClearedMainQuest(code){
 }
 //#endregion
 //#region buffの動き
-function bufftekiou(){
-   console.log('今は無きbufftekiouが実行されたで')
-};
-
-
 function buffadd(tcam,target,buff,time,lv){//誰のバフ/デバフか,バフ/デバフの名前,効果時間,効果レベル
    console.log(tcam, target, buff, time, lv ?? 0);
    let Time = time ?? 1;
@@ -4272,7 +4473,6 @@ async function humandamaged(cam,tcam,me,target,multiplier,kind,code){//矛先の
          y = humans[tcam][target].health;
          humans[tcam][target].health -= x;
          console.log(`damage:${y}->${humans[tcam][target].health}(${x})`);
-         
          if(humans[tcam][target].health < 0){humans[tcam][target].health = 0};
          tekiou();
          log.textContent = humans[tcam][target].name + 'に' + x + 'のダメージ！';
@@ -4292,8 +4492,9 @@ async function humandamaged(cam,tcam,me,target,multiplier,kind,code){//矛先の
             else{document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';};//新！クールダウン！！
          }
          await delay(1000);
+         if(humans[tcam][target].health <= 0){return 'dead';}
 
-         //特殊武器ゾーン
+         //特殊武器ゾーン Weaponsのprocessで
          if(equipweapon == 11){//体力を吸収するやつ。(ジェン・ソルテ)
             log.textContent = humans[cam][me].name+'は'+humans[tcam][target].name+'の体力を吸収した！';
             await delay(500);
@@ -4316,9 +4517,10 @@ async function humandamaged(cam,tcam,me,target,multiplier,kind,code){//矛先の
             buffadd(tcam,target,4,1);
             log.textContent = 'お口に合うと良いのですが..';
             await delay(1000);
+            if(humans[tcam][target].health <= 0){return 'dead';}
          }
       
-         //追撃ゾーン
+         //追撃ゾーン　ここどしよ
          if(humans[cam][me].ps == 'enemy50%pursuit' && humans[tcam][target].health <= humans[tcam][target].maxhealth / 2 && enemy50pursuitenelgy == 1 && humans[tcam][target].health > 0){
             enemy50pursuitenelgy = 0;
             z = Math.floor(Math.random() * 2);
@@ -4336,6 +4538,8 @@ async function humandamaged(cam,tcam,me,target,multiplier,kind,code){//矛先の
             log.textContent = humans[tcam][target].name + 'に' + x + 'のダメージ!';
             skillcooldown += 10;
             if(skillcooldown > 100){skillcooldown = 100};if(skillcooldown == 100){document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()">skill</button>';}else{document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';};
+            await delay(1000)
+            if(humans[tcam][target].health <= 0){return 'dead';}
          }else if(humans[cam][me].name == 'herta' && humans[tcam][target].health <= humans[tcam][target].maxhealth / 2 && humans[cam][me].level >= 10 && humans[tcam][target].health > 0){//1凸効果「弱みは付け込み」
             x = (humans[cam][me].attack * humans[cam][me].power * 0.4 + weaponpower) - (humans[tcam][target].defense);
             if((Math.floor(Math.random()+ humans[cam][me].critlate - 0.05)) == 1){x += (humans[tcam][target].defense); x *= humans[cam][me].critdmg; log.textContent = '会心の一撃！'; await delay(1000);};
@@ -4347,6 +4551,8 @@ async function humandamaged(cam,tcam,me,target,multiplier,kind,code){//矛先の
             log.textContent = humans[tcam][target].name + 'に' + x + 'のダメージ!';
             skillcooldown += 5;
             if(skillcooldown > 100){skillcooldown = 100};if(skillcooldown == 100){document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button" onclick="skillact()">skill</button>';}else{document.getElementById("SkillCoolDown").textContent = skillcooldown + '%';};
+            await delay(1000);
+            if(humans[tcam][target].health <= 0){return 'dead';}
          }
          break;
       case 'mg':
@@ -4631,13 +4837,12 @@ async function Slash(num,me){
       case 3:UseSlash = humans.players[me].slash3; break;
    }
 
+   humans.players[me].mp -= Slashs[UseSlash].mp;tekiou();
    if(humans.players[me].mp >= Slashs[UseSlash].mp){
       target = await LetsTargetSelect();
-      console.log('ターゲットセレクト完了、殴るよ！！')
       log.textContent = `${humans.players[me].name}の${Slashs[UseSlash].name}！`;await delay(1000);
-      await Slashs[UseSlash].process('players',target[1],me,target[0]);
-      humans.players[me].mp -= Slashs[UseSlash].mp;
-      tekiou();
+      let result = await Slashs[UseSlash].process('players',target[1],me,target[0]);
+      if(result == 'dead'){killed('players',target[1],me,target[0])};
       NextTurnis('players',target[1],me,target[0]);
    }else{
       log.textContent = 'not enough mp...';
@@ -4656,9 +4861,10 @@ async function Magic(num,me){
    
    if(humans.players[me].mp >= Magics[UseMagic].mp){
       target = await LetsTargetSelect();
-      await Magics[UseMagic].process('players',target[1],me,target[0]);
-      humans.players[me].mp -= Magics[UseMagic].mp;
-      tekiou();
+      humans.players[me].mp -= Magics[UseMagic].mp;tekiou();
+      let result = await Magics[UseMagic].process('players',target[1],me,target[0]);
+      if(result == 'dead'){killed('players',target[1],me,target[0])};
+      NextTurnis('players',target[1],me,target[0]);
    }else{
       log.textContent = 'not enough mp...';
       window.setTimeout(backtoplayerturn, 1000)
@@ -4702,9 +4908,10 @@ function skillReserve(cam,me){
    console.log(`スキル予約済み: ${cam} ${num} -> ${skill}  現在キュー: ${skillQueue}`);
 }
 async function skillAct(cam,me,skill){
-   await Skills.ex[skill].process(cam,me);
+   let result = await Skills.ex[skill].process(cam,me);
    skillReset(cam,me);
    await delay(1000);
+   return result;
 }
 function skillReset(cam,me){
    humans[cam][me].cooldown = 0;
@@ -4738,6 +4945,7 @@ function turretPlace(cam){
       humans.players.t.maxhealth = 0;
       humans.players.t.health = 0;
    }
+   humans.players.t.status = 1;
    humans.players.t.kazu += 1;
    humans.players.t.maxhealth += 15;
    humans.players.t.health += 15;
@@ -5464,7 +5672,7 @@ async function bossenemyturn(){
    if(humans.enemies[me].health == 0){window.setTimeout(killed, 1000)}
    else {
       await delay(1000);
-      NextTurnis(cam,tcam,me,target);
+      return 'alive';
    }
 }
 //こっから変数とか関数とか
@@ -5526,8 +5734,6 @@ let Camprestper
 }
      
   }
-  const Camprandomtool = ['Aspirin','Pablon','Trypsin','ThrowKnife','TrickyVariable','BottleGrenade','Redcard','Bluecard','Greencard'];
-  const RareCamprandomtool = ['Lulu','Potion','CoveringFire','Bomb','Blackcard'];
   
 //shop
 let nowshop = 0;
@@ -5662,23 +5868,9 @@ function ShopEquipButton(){
 }
 function GoToEquipTool(){
    nowshop = 6;
-   localStorage.setItem('Aspirin', Aspirin.num);
-   localStorage.setItem('Pablon', Pablon.num);
-   localStorage.setItem('Trypsin', Trypsin.num);
-   localStorage.setItem('Lulu', Lulu.num);
-   localStorage.setItem('Potion', Potion.num);
-   localStorage.setItem('ThrowKnife', ThrowKnife.num);
-   localStorage.setItem('TrickyVariable', TrickyVariable.num);
-   localStorage.setItem('CoveringFire', CoveringFire.num);
-   localStorage.setItem('BottleGrenade', BottleGrenade.num);
-   localStorage.setItem('Bomb', Bomb.num);
-   localStorage.setItem('Redcard', Redcard.num);
-   localStorage.setItem('Bluecard', Bluecard.num);
-   localStorage.setItem('Greencard', Greencard.num);
-   localStorage.setItem('Blackcard', Blackcard.num);
-
+   
    document.getElementById('EventArea').innerHTML = '<iframe src="resources/appeartools.html" width="100%" height="100%" frameborder="0"></iframe><br><div id="Camptoolequip"><button id="Campequipedtool1" class="button" onclick="Campequiptool(1)"> </button>　<button id="Campequipedtool2" class="button" onclick="Campequiptool(2)"> </button>　<button id="Campequipedtool3" class="button" onclick="Campequiptool(3)"> </button></div><br><br><button class="button" onclick="GoToEquip()">Back</button>'; //持ってないやつも登録できるようにしたら処理楽かな？
-   document.getElementById('Campequipedtool1').textContent = equiptool1.name;
+   document.getElementById('Campequipedtool1').textContent = humans.players[1].tool1.name;
    document.getElementById('Campequipedtool2').textContent = equiptool2.name;
    document.getElementById('Campequipedtool3').textContent = equiptool3.name;
    log.textContent = 'どうしようかな...?';
@@ -5686,59 +5878,27 @@ function GoToEquipTool(){
 function Campequiptool(code){
    x = code;
    log.textContent = '何を持とう？';
-   document.getElementById('Camptoolequip').innerHTML = '<i>Item一覧</i><br>' +'<button id="CampselectTool01" class="button" onclick="Campselecttool(Aspirin)">アスピリン</button>' +'<button id="CampselectTool02" class="button" onclick="Campselecttool(Pablon)">パブロン</button>' +'<button id="CampselectTool03" class="button" onclick="Campselecttool(Trypsin)">トリプシン</button>' +'<button id="CampselectTool04" class="button" onclick="Campselecttool(Lulu)">ルル</button>' +'<button id="CampselectTool05" class="button" onclick="Campselecttool(Potion)">ポーション</button><br>' +'<button id="CampselectTool11" class="button" onclick="Campselecttool(ThrowKnife)">投げナイフ</button>' +'<button id="CampselectTool12" class="button" onclick="Campselecttool(TrickyVariable)">トリッキーな変数</button>' +'<button id="CampselectTool13" class="button" onclick="Campselecttool(CoveringFire)">援護射撃</button>' +'<button id="CampselectTool14" class="button" onclick="Campselecttool(BottleGrenade)">ボトルグレネード</button>' +'<button id="CampselectTool15" class="button" onclick="Campselecttool(Bomb)">爆弾</button><br>' +'<button id="CampselectTool21" class="button" onclick="Campselecttool(Redcard)">赤のスキップ</button>' +'<button id="CampselectTool22" class="button" onclick="Campselecttool(Bluecard)">青のリバース</button>' +'<button id="CampselectTool23" class="button" onclick="Campselecttool(Greencard)">緑のドロアル</button>' +'<button id="CampselectTool24" class="button" onclick="Campselecttool(Blackcard)">黒のドロスー</button>';
-   }
-function Campselecttool(code){
-   let equiptoolVar;
-   switch(code){
-   case Aspirin:
-      equiptoolVar = 'アスピリン';
-      break;
-   case Pablon:
-      equiptoolVar = 'パブロン';
-      break;
-   case Trypsin:
-      equiptoolVar = 'トリプシン';
-      break;
-   case Lulu:
-      equiptoolVar = 'ルル';
-      break;
-   case Potion:
-      equiptoolVar= 'ポーション';
-      break;
-   case ThrowKnife:
-      equiptoolVar = '投げナイフ';
-      break;
-   case TrickyVariable:
-      equiptoolVar = 'トリッキーな変数';
-      break;
-   case CoveringFire:
-      equiptoolVar = '援護射撃';
-      break;
-   case BottleGrenade:
-      equiptoolVar = 'ボトルグレネード';
-      break;
-   case Bomb:
-      equiptoolVar = '爆弾';
-      break;
-   case Redcard:
-      equiptoolVar = '赤のスキップ';
-      break;
-   case Bluecard:
-      equiptoolVar = '青のリバース';
-      break;
-   case Greencard:
-      equiptoolVar = '緑のドロアル';
-      break;
-   case Blackcard:
-      equiptoolVar = '黒のドロスー';
-   }
-   eval('equiptool' + x + ' = code');
-   document.getElementById('Camptoolequip').innerHTML = '<button id="Campequipedtool1" class="button" onclick="Campequiptool(1)"> </button>　<button id="Campequipedtool2" class="button" onclick="Campequiptool(2)"> </button>　<button id="Campequipedtool3" class="button" onclick="Campequiptool(3)"> </button>';
-   document.getElementById('Campequipedtool1').textContent = equiptool1.name;
-   document.getElementById('Campequipedtool2').textContent = equiptool2.name;
-   document.getElementById('Campequipedtool3').textContent = equiptool3.name;
-   log.textContent = equiptoolVar+'を持つことにした！';
+   x = [];
+   document.getElementById('Camptoolequip').innerHTML = `
+   <i>Item一覧</i><br>
+   <div id="toolsdesuwa"></div>
+   `;
+   Object.keys(Tools).filter(a => Tools[a].num > 0).forEach(nanka => {
+      let c = document.createElement('button');
+      c.textContent = Tools[nanka].name+' x'+Tools[nanka].num;
+      c.classList.add('button');
+      c.addEventListener('click', () => {
+         document.getElementById('toolsdesuwa').remove();
+         humans.players[1].tool1[code] = Tools[nanka].id;
+         document.getElementById('Camptoolequip').innerHTML = '<button id="Campequipedtool1" class="button" onclick="Campequiptool(1)"> </button>　<button id="Campequipedtool2" class="button" onclick="Campequiptool(2)"> </button>　<button id="Campequipedtool3" class="button" onclick="Campequiptool(3)"> </button>';
+         document.getElementById('Campequipedtool1').textContent = humans.players[1].tool1.name;
+         document.getElementById('Campequipedtool2').textContent = humans.players[1].tool2.name;
+         document.getElementById('Campequipedtool3').textContent = humans.players[1].tool3.name;
+         log.textContent = Tools[nanka].name+'を持つことにした！';
+      })
+      x.push(c);
+   })
+   document.getElementById('toolsdesuwa').innerHTML = x.join('');
 }
 // #endregion
 //#region skillshop
@@ -5895,40 +6055,30 @@ async function HopeButtonact(){
 }
 // #endregion
 //#region chest
+const inchestTool = ['aspirin','pablon','trypsin','throwknife','trickyvariable','bottlegrenade','redcard','bluecard','greencard'];
+const inchestRareTool = ['lulu','potion','cdveringfire','bomb','blackcard'];
 async function OpenChest(code){
    AllowMove = 1;
    switch(code){
    case 1:
       log.textContent = 'チェストを開けた...';
       await delay(1000);
-      x = Camprandomtool[Math.floor(Math.random() * Camprandomtool.length)];
-      w = eval(x); w.num += 1;
-      log.textContent = w.name+'を手に入れた！';
-      await delay(750);
-      x = Camprandomtool[Math.floor(Math.random() * Camprandomtool.length)];
-      w = eval(x); w.num += 1;
-      log.textContent = w.name+'を手に入れた！';
-      await delay(750);
-      x = Camprandomtool[Math.floor(Math.random() * Camprandomtool.length)];
-      w = eval(x); w.num += 1;
-      log.textContent = w.name+'を手に入れた！';
-      await delay(1000);
+      for(let i = 0; i < 3; i++){
+         x = inSelect(inchestTool);
+         Tools[x].num += 1;
+         log.textContent = Tools[x].name+'を手に入れた！';
+         await delay(750);
+      }
    break;
    case 2:
       log.textContent = 'チェストを開けた...';
       await delay(1000);
-      x = RareCamprandomtool[Math.floor(Math.random() * RareCamprandomtool.length)];
-      w = eval(x); w.num += 1;
-      log.textContent = w.name+'を手に入れた！';
-      await delay(750);
-      x = RareCamprandomtool[Math.floor(Math.random() * RareCamprandomtool.length)];
-      w = eval(x); w.num += 1;
-      log.textContent = w.name+'を手に入れた！';
-      await delay(750);
-      x = RareCamprandomtool[Math.floor(Math.random() * RareCamprandomtool.length)];
-      w = eval(x); w.num += 1;
-      log.textContent = w.name+'を手に入れた！';
-      await delay(1000);
+      for(let i = 0; i < 3; i++){
+         x = inSelect(inchestRareTool);
+         Tools[x].num += 1;
+         log.textContent = Tools[x].name+'を手に入れた！';
+         await delay(750);
+      }
    break;
    }
    document.getElementById('EventArea').innerHTML = '';
