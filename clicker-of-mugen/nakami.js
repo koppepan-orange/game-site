@@ -1580,6 +1580,7 @@ let skillcooldown = 0
 let Buffs = {
    'powerup':{
       name:'powerup',
+      description:'攻撃力が上がる。やったね！',
       lv:{
          1:1.25,
          2:1.5,
@@ -1591,6 +1592,7 @@ let Buffs = {
    },
    'shellup':{
       name:'shellup',
+      description:'防御力が上がる。あんまり実感しづらい。',
       lv:{
          1:1.25,
          2:1.5,
@@ -1602,6 +1604,7 @@ let Buffs = {
    },
    'luck':{
       name:'luck',
+      description:'ターン終了時、たまにもう一回行動できる。気分はさながらラスボスですね',
       lv:{
          1:5,
          2:3,
@@ -1609,12 +1612,14 @@ let Buffs = {
    },
    'LetsThrow':{
       name:'LetsThrow',
+      description:'レンチを投げる準備をしている状態。次の攻撃与ダメ2倍',
       lv:{
          1:1,
       }
    },
    'gambling':{
       name:'gambling',
+      description:'次の攻撃が0,2,4倍になる。これぞ醍醐味..ってやつ？',
       lv:{
          1:1,
       }
@@ -1624,6 +1629,7 @@ let Buffs = {
 let Debuffs = {
    'powerdown':{
       name:'powerdown',
+      description:'攻撃力が下がる。stackするようにしたいけどまあいっか',
       lv:{//割合ダウン
          1:0.25,
          2:0.5,
@@ -1635,6 +1641,7 @@ let Debuffs = {
    },
    'shelldown':{
       name:'shelldown',
+      description:'防御力が下がる。こっちは実感しやすいのよね',
       lv:{//割合ダウン
          1:0.25,
          2:0.5,
@@ -1646,6 +1653,7 @@ let Debuffs = {
    },
    'poison':{
       name:'poison',
+      description:'ターン終了時割合で防御貫通ダメージ。毒の苦しみもお好きなんですね',
       lv:{//受けるダメージ(max*x)
          1:0.05,
          2:0.1,
@@ -1654,6 +1662,7 @@ let Debuffs = {
    },
    'burn':{
       name:'burn',
+      description:'ターン終了時固定ダメージ。まじでこれ嫌い...ww',
       lv:{//受けるダメージ(固定)
          1:10,
          2:20,
@@ -1662,6 +1671,7 @@ let Debuffs = {
    },
    'freeze':{
       name:'freeze',
+      description:'凍っている状態。これ燃やされたら解除みたいにしたい',
       lv:{//1/xの確率で抜け出せる
          1:3,//-
          2:5,//deep
@@ -1670,37 +1680,43 @@ let Debuffs = {
    },
    'palsy':{
       name:'palsy',
+      description:'麻痺ですね。これ好き',
       lv:{//1/xの確率で行動不可
-         1:3,//-
+         1:5,//-
       }
    },
    'stan':{
       name:'stan',
+      description:'スタンなうです。おつおつお〜',
       lv:{
          1:1,
       }
    },
    'skip':{
       name:'skip',
+      description:'はいお前スキップ〜〜ww状態です。ざまぁ',
       lv:{
          1:1,
       }
    },
    'sleep':{
       name:'sleep',
+      description:'睡眠ですね...いやね....ちょ..っと......w',//あーーもうやります！！そのうち！！！あの人を作りましょう！！！www いや大丈夫かな...?まあいっか、戦略性あっておもろいしょ、多分
       lv:{//起きる確率
          1:0.5,
       }
    },
    'onslime':{
       name:'onslime',
+      description:'スライムが体に粘りついている状態です。やばいね(行動不可)',
       lv:{
          1:1,
       }
    },
    'stickyslime':{
       name:'stickyslime',
-      lv:{
+      description:'スライムがくっついているおかげで行動するとダメージを受けます。これ好き',//こいつは..どしよね ちょっと違う形で作りますか コンセプトとしてはおもちゃ箱のゆめっぽくしたいから
+      lv:{//行動時ダメージ(固定)
          1:5,
       }
    }
@@ -1710,6 +1726,7 @@ let Slashs = {
    'slash':{
       id:'slash',
       name:'シンプル斬り',
+      description:'必中ー倍単体刹那斬',
       mp:0,
       lv:1,
       tcam:'players',
@@ -1731,6 +1748,7 @@ let Slashs = {
    'doubleslash':{
       id:'double slash',
       name:'つばめ返し',
+      description:'二回攻撃。あたらないこともあるけど現環境最強',
       mp:0,
       lv:1,
       tcam:'players',
@@ -1753,6 +1771,7 @@ let Slashs = {
    'slashoflight':{
       id:'slash of light',
       name:'一閃',//まじん斬り も作りたいね 霹靂一閃も
+      description:'初期のロマン技。当たれば幸いてきな感じで打ったほうが楽',
       mp:0,
       lv:1,
       tcam:'players',
@@ -1781,7 +1800,9 @@ let Slashs = {
 
 let Magics = {
    'heal':{
+      id:'heal',
       name:'heal',
+      description:'体力を回復する。20%',
       mp:4,
       lv:1,
       process:async function(cam,tcam,me,target){
@@ -1794,6 +1815,7 @@ let Magics = {
       }
    },
    'power':{
+      id:'power',
       name:'power',
       mp:5,
       lv:1,
@@ -1804,6 +1826,7 @@ let Magics = {
       }
    },
    'shell':{
+      id:'shell',
       name:'shell',
       mp:5,
       lv:1,
@@ -1814,6 +1837,7 @@ let Magics = {
       }
    },
    'poison':{
+      id:'poison',
       name:'poison',
       mp:7,
       lv:3,
@@ -1824,6 +1848,7 @@ let Magics = {
       }
    },
    'thunder':{
+      id:'thunder',
       name:'thunder',
       mp:3,
       lv:4,
@@ -1834,6 +1859,7 @@ let Magics = {
       }
    },
    'fire':{
+      id:'fire',
       name:'fire',
       mp:4,
       lv:4,
@@ -1845,6 +1871,7 @@ let Magics = {
       }
    },
    'healerthan':{
+      id:'healerthan',
       name:'healer than',
       mp:8,
       lv:6,
@@ -1858,6 +1885,7 @@ let Magics = {
       }
    },
    'luck':{
+      id:'luck',
       name:'luck',
       mp:4,
       lv:7,
@@ -1868,6 +1896,7 @@ let Magics = {
       }
    },
    'ellthunder':{
+      id:'ellthunder',
       name:'ellthunder',
       mp:8,
       lv:8,
@@ -1878,6 +1907,7 @@ let Magics = {
       }
    },
    'morepower':{
+      id:'morepower',
       name:'more power',
       mp:8,
       lv:9,
@@ -1888,6 +1918,7 @@ let Magics = {
       }
    },
    'moreshell':{
+      id:'moreshell',
       name:'more shell',
       mp:8,
       lv:9,
@@ -1898,6 +1929,7 @@ let Magics = {
       }
    },
    'deadlypoison':{
+      id:'deadlypoison',
       name:'deadly poison',
       mp:12,
       lv:10,
@@ -1908,6 +1940,7 @@ let Magics = {
       }
    },
    'gigafire':{
+      id:'gigafire',
       name:'giga fire',
       mp:10,
       lv:11,
@@ -1918,7 +1951,8 @@ let Magics = {
          return result
       }
    },
-   'the healest':{
+   'thehealest':{
+      id:'thehealest',
       name:'the healest',
       mp:12,
       lv:12,
@@ -1932,6 +1966,7 @@ let Magics = {
       }
    },
    'luckgreat':{
+      id:'luckgreat',
       name:'luckgreat',
       mp:12,
       lv:14,
@@ -1942,6 +1977,7 @@ let Magics = {
       }
    },
    'merazoma':{
+      id:'merazoma',
       name:'メラゾーマ',
       mp:12,
       lv:12,
@@ -1954,6 +1990,7 @@ let Magics = {
       }
    },
    'thoron':{
+      id:'thoron',
       name:'Thoron',
       mp:20,
       lv:15,
@@ -1964,6 +2001,7 @@ let Magics = {
       }
    },
    'random':{
+      id:'random',
       name:'Random',
       mp:5,
       lv:1,
@@ -1986,6 +2024,8 @@ let Weapons = {
       num:0,
       power:0,
       price:0,
+      description:'ないです。素手とか念とか自由に解釈しておk',
+      buyable:1,
       sp:0
    },
    'woodenstick':{
@@ -1994,14 +2034,18 @@ let Weapons = {
       num:0,
       power:2,
       price:10,
+      description:'初期装備あるあるの武器。値段に見合わず割と強い',
+      buyable:1,
       sp:0
    },
    'woodensword':{
-      name:'木の剣',
+      name:'木刀',
       id:'woodsword',
       num:0,
       power:4,
       price:20,
+      description:'木の棒よりも強い。言うなれば気の剣。',
+      buyable:1,
       sp:0
    },
    'bamboosword':{
@@ -2010,6 +2054,8 @@ let Weapons = {
       num:0,
       power:6,
       price:30,
+      description:'さあ、剣道しようぜ！！',
+      buyable:1,
       sp:0
    },
    'stone':{
@@ -2018,6 +2064,8 @@ let Weapons = {
       num:0,
       power:8,
       price:50,
+      description:'石です。よわよわ',
+      buyable:1,
       sp:0
    },
    'bigrock':{
@@ -2026,6 +2074,8 @@ let Weapons = {
       num:0,
       power:10,
       price:80,
+      description:'岩です。つよつよ',
+      buyable:1,
       sp:0
    },
    'brick':{
@@ -2034,6 +2084,8 @@ let Weapons = {
       num:0,
       power:12,
       price:100,
+      description:'岩にセメントつけたら強くなるのって意味わからなくね？',
+      buyable:1,
       sp:0
    },
    'thinpaper':{
@@ -2042,6 +2094,8 @@ let Weapons = {
       num:0,
       power:20,
       price:5,
+      description:'薄い紙です。すって相手に切り付けて｢いたっ..｣ってさせる用です',
+      buyable:1,
       sp:0
    },
    'card':{
@@ -2049,7 +2103,9 @@ let Weapons = {
       id:'card',
       num:0,
       power:'Math.floor(Math.random()*13)+1',
-      price:77,
+      price:7,
+      description:'ちょっとした運要素。攻撃方法は切り付けなのでよわい(つよい)',
+      buyable:0,
       sp:0
    },
    'scissors':{
@@ -2058,6 +2114,8 @@ let Weapons = {
       num:0,
       power:25,
       price:200,
+      description:'持って｢近づいたら*すよ..?｣っていう用。実際*せない',
+      buyable:1,
       sp:0
    },
    'knife':{
@@ -2066,6 +2124,8 @@ let Weapons = {
       num:0,
       power:40,
       price:300,
+      description:'わりとつよい。花や骨に向かって振り回しましょう。',
+      buyable:1,
       sp:0
    },
 
@@ -2075,6 +2135,8 @@ let Weapons = {
       num:0,
       power:0,
       price:150,
+      description:'名前意味わからんランキング第1位',
+      buyable:1,
       sp:1,
       process:async function(cam,tcam,me,target){
          log.textContent = '血を吸った！';await delay(1000);
@@ -2091,6 +2153,8 @@ let Weapons = {
       num:0,
       power:10,
       price:150,
+      description:'まじでナギサさんの手良くない.....??',
+      buyable:1,
       sp:1,
       process:async function(cam,tcam,me,target){
          log.textContent = 'トリニティの砲撃術は優秀ですから。';await delay(1000);
@@ -2110,7 +2174,9 @@ let Weapons = {
       num:0,
       power:'Math.floor(Math.random()*100)+1',
       price:150,
-      sp:1,
+      description:'このどっちかは',
+      buyable:0,
+      sp:0,
    },
    'contrarian':{
       name:'天邪鬼',
@@ -2118,8 +2184,104 @@ let Weapons = {
       num:0,
       power:80,
       price:150,
-      sp:1,
+      description:'名前変更予定。',
+      buyable:0,
+      sp:0,
    }
+}
+
+let Armors = {
+   'none':{
+      name:'なし',
+      id:'none',
+      num:0,
+      shell:0,
+      price:0,
+      buyable:0,
+      sp:0
+   },
+   'mask':{
+      name:'マスク',
+      id:'mask',
+      num:0,
+      shell:0,
+      price:1,
+      buyable:1,
+      sp:0
+   },
+   'thinbook':{
+      name:'薄い本',
+      id:'thinbook',
+      num:0,
+      shell:1,
+      price:5,
+      buyable:1,
+      sp:0
+   },
+   'woodenplank':{
+      name:'木の板',
+      id:'woodenplank',
+      num:0,
+      shell:5,
+      price:20,
+      buyable:1,
+      sp:0
+   },
+   'ironplate':{
+      name:'テッパン',
+      id:'ironplate',
+      num:0,
+      shell:10,
+      price:30,
+      buyable:1,
+      sp:0
+   },
+   'potlid':{
+      name:'鍋の蓋',
+      id:'potlid',
+      num:0,
+      shell:15,
+      price:50,
+      buyable:1,
+      sp:0
+   },
+   'thickbook':{
+      name:'厚めの本',
+      id:'thickbook',
+      num:0,
+      shell:20,
+      price:80,
+      buyable:1,
+      sp:0
+   },
+   'door':{
+      name:'ドア',
+      id:'door',
+      num:0,
+      shell:25,
+      price:100,
+      buyable:1,
+      sp:0
+   },
+   'electricfan':{
+      name:'扇風機',
+      id:'electricfan',
+      num:0,
+      shell:30,
+      price:200,
+      buyable:1,
+      sp:0
+   },
+   'perorodoll':{
+      name:'ペロロ様人形',
+      id:'perorodoll',
+      num:0,
+      shell:50,
+      price:400,
+      buyable:1,
+      sp:0
+   }
+
 }
 
 let Tools = {
@@ -3146,9 +3308,9 @@ async function NicoNicoText(mes){
    color: #000000;
    font-size: 20px;
    `
-   document.getElementById('Gamezone').appendChild(newDiv);
-   let speed = Math.random()*100+1;
-   //let speed = mes.toString().length*2 
+   document.getElementById('All').appendChild(newDiv);
+   //let speed = Math.random()*100+1;
+   let speed = mes.toString().length*2 
    for(let i = 0; window.innerWidth > i*speed; i++){
        let val = i*speed;
        newDiv.style.right = `${val}px`
@@ -3242,15 +3404,18 @@ function inventoryOpen(num){
       <div id="ISutefuri">${Sutefuri}</div>
    </div>
    `;
-   let slashs = Object.keys(Slashs).map(a => Slashs[a].lv <= humans.players[InventoryPage].level ? Slashs[a].id : null).filter(Boolean)
+   let slashs = Object.keys(Slashs).map(a => Slashs[a].lv <= humans.players[InventoryPage].level ? `<span class="hasd" data-description=${Slashs[a].description}>${Slashs[a].id}</span>` : null).filter(Boolean)
    document.getElementById('ISlashAppearence').innerHTML = slashs.join('<br>');
-   let magics = Object.keys(Magics).map(a => Magics[a].lv <= humans.players[InventoryPage].level ? Magics[a].name : null).filter(Boolean)
+   let magics = Object.keys(Magics).map(a => Magics[a].lv <= humans.players[InventoryPage].level ? `<span class="hasd" data-description=${Magics[a].description}>${Magics[a].id}</span>` : null).filter(Boolean)
    document.getElementById('IMagicAppearence').innerHTML = magics.join('<br>');
-   let skills = ['ex','ns','ps'].map(a => `${a}:<span class="Iskill"   data-description=${Skills[a][humans.players[InventoryPage][a]].description}>${Skills[a][humans.players[InventoryPage][a]].name}`)
+   let skills = ['ex','ns','ps'].map(a => `${a}:<span class="hasd" data-description=${Skills[a][humans.players[InventoryPage][a]].description}>${Skills[a][humans.players[InventoryPage][a]].name}</span>`)
    document.getElementById('ISkills').innerHTML = skills.join('<br>');
-
-   let weapons = Object.keys(weapons).map(a => Weapons[a].num <= humans.players[InventoryPage].level ? Weapons[a].name : null).filter(Boolean)
+   let weapons = Object.keys(Weapons).map(a => Weapons[a].num >= 1 && Weapons[a].num > Object.keys(humans.players).filter(b => humans.players[b].weapon.id == Weapons[a].id).length ? `<span class="hasd" data-description=${Weapons[a].description}>${Weapons[a].name} x${Weapons[a].num}</span>` : null).filter(Boolean)
    document.getElementById('IWeapons').innerHTML = weapons.join('<br>');
+   let armors = Object.keys(Armors).map(a => Armors[a].num >= 1 && Armors[a].num > Object.keys(humans.players).filter(b => humans.players[b].armor.id == Armors[a].id).length ? `<span class=" hasd" data-description=${Armors[a].description}>${Armors[a].name} x${Armors[a].num}</span>` : null).filter(Boolean)
+   document.getElementById('IArmors').innerHTML = armors.join('<br>');
+   let tools = Object.keys(Tools).map(a => `<span class="hasd" data-description=${Tools[a].description}>${Tools[a].name} x${Tools[a].num}:</span>`).filter(Boolean)
+   document.getElementById('IItems').innerHTML = tools.join('<br>');
 
    let nextpage = addEventListener('keydown', (event) => {
       if (event.key === 'ArrowRight') {   
@@ -3284,18 +3449,19 @@ document.addEventListener('mousemove', (e) => {
    HasDescription.style.left = `${e.clientX + 10}px`;
    HasDescription.style.top = `${e.clientY + 10}px`;
 });
-const HasDs = document.querySelectorAll('.HasD');
 
-HasDs.forEach(HasD => {
-   HasD.addEventListener('mouseover', (e) => {
+document.addEventListener('mouseover', (e) => {
+   if(e.target.classList.contains('hasd')){
       const movabledescription = e.target.dataset.description;
+      console.log(movabledescription)
       document.getElementById('movabledescription').textContent = movabledescription;
+   }
+});
 
-   });
-
-   HasD.addEventListener('mouseout', () => {
+document.addEventListener('mouseout', (e) => {
+   if(e.target.classList.contains('hasd')){
       document.getElementById('movabledescription').textContent = '';
-   });
+   }
 });
 
 function SlashChange(num){
@@ -3303,7 +3469,7 @@ function SlashChange(num){
       .filter(a => Slashs[a].lv <= humans.players[InventoryPage].level)
       .map(a => Slashs[a].name);
    let slashSelectHTML = availableSlashs.map(slash => 
-      `<button class="button" onclick="SlashChangeDecide('${slash}', ${num}, ${InventoryPage})">${slash}</button>`
+      `<button class="button" onclick="SlashChangeDecide('${slash}', ${num})">${slash}</button>`
   ).join(' ');
   
   document.getElementById('SlashChangePlace').innerHTML = `
@@ -3311,7 +3477,7 @@ function SlashChange(num){
       ${slashSelectHTML}
   `;
 }
-function SlashChangeDecide(name,num,nowpage){
+function SlashChangeDecide(name,num){
    // 選択したスロットに魔法を割り当て
    switch(num) {
        case 1:
@@ -3324,14 +3490,14 @@ function SlashChangeDecide(name,num,nowpage){
            humans.players[InventoryPage].slash3 = name;
            break;
    }
-   inventoryOpen(nowpage)
+   inventoryOpen(InventoryPage)
 }
 function MagicChange(num){
    let availableMagics = Object.keys(Magics)
       .filter(a => Magics[a].lv <= humans.players[InventoryPage].level)
       .map(a => Magics[a].name);
    let magicSelectHTML = availableMagics.map(magic => 
-      `<button class="button" onclick="MagicChangeDecide('${magic}', ${num}, ${InventoryPage})">${magic}</button>`
+      `<button class="button" onclick="MagicChangeDecide('${magic}', ${num})">${magic}</button>`
   ).join(' ');
   
   document.getElementById('MagicChangePlace').innerHTML = `
@@ -3339,7 +3505,7 @@ function MagicChange(num){
       ${magicSelectHTML}
   `;
 }
-function MagicChangeDecide(name,num,nowpage){
+function MagicChangeDecide(name,num){
    // 選択したスロットに魔法を割り当て
    switch(num) {
        case 1:
@@ -3352,8 +3518,34 @@ function MagicChangeDecide(name,num,nowpage){
            humans.players[InventoryPage].magic3 = name;
            break;
    }
-   inventoryOpen(nowpage)
+   inventoryOpen(InventoryPage)
 }
+
+function WeaponChange(){
+   let weapons = Object.keys(Weapons).map(a => Weapons[a].num >= 1 && Weapons[a].num > Object.keys(humans.players).filter(b => humans.players[b].weapon.id == Weapons[a].id).length ? `<button class="button" onclick="ChangeWeapon('${Weapons[a].id}')">${Weapons[a].name}</button>` : null).filter(Boolean)
+   weapons.unshift(`<button class="button" onclick="ChangeWeapon('none')">none</button>`)
+   document.getElementById('IWeapons').innerHTML = weapons.join(' ');
+}
+function WeaponChangeDeside(code){
+   humans.players[InventoryPage].weapon = {
+      id: Weapons[code].id,
+      lv: 1,//一旦。そのうち消えるかも
+   }
+   inventoryOpen(InventoryPage);
+}
+function ArmorChange(){
+   let armors = Object.keys(Armors).map(a => Armors[a].num >= 1 && Armors[a].num > Object.keys(humans.players).filter(b => humans.players[b].armor.id == Armors[a].id).length ? `<button class="button" onclick="ChangeArmor('${Armors[a].id}')">${Armors[a].name}</button>` : null).filter(Boolean)
+   armors.unshift(`<button class="button" onclick="ChangeArmor('none')">none</button>`)
+   document.getElementById('IArmors').innerHTML = armors.join(' ');
+}
+function ArmorChangeDeside(code){
+   humans.players[InventoryPage].armor = {
+      id: Armors[code].id,
+      lv: 1,//一旦。そのうち消えるかも
+   }
+   inventoryOpen(InventoryPage);
+}
+
 //#endregion
 //#region Notice
 let noticenow = 0;

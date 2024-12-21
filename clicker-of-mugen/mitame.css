@@ -361,20 +361,6 @@ body {
   overflow-x: auto;
 }
 
-/* バトル中のそれ */
-.EnemyName{
-  max-width: 80px;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-#toolsdesuwa{
-  border: 1px solid #222;
-  max-width: 100px;
-  word-wrap: break-word;
-  white-space: normal;
-  overflow-y: scroll;
-}
-
 /* こっからクエスト */
 #quest-list{
   width: 62%;
@@ -484,6 +470,20 @@ body {
 }
 
 /* ここからbattle */
+
+
+.EnemyName{
+  max-width: 80px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+#toolsdesuwa{
+  border: 1px solid #222;
+  max-width: 100px;
+  word-wrap: break-word;
+  white-space: normal;
+  overflow-y: scroll;
+}
 
 #enemies{
   display: flex;
