@@ -932,7 +932,7 @@ let log = document.getElementById('log');
 let fun = Math.floor(Math.random() * 100)+1;
 
 //保存されるデータs
-let username = 'user';
+let username = 'no name';
 let rank = 1;
 let rpt = 0;
 let maxrpt = 100;let euro = 0;
@@ -968,6 +968,26 @@ let bar = {
 }
 let numberofplayer = 1;
 let numberofenemy = 2;
+
+
+//0 = false,1 = true
+let afknow = 0;
+let dungeonnow = 0;
+let bossbattlenow = 0;
+
+let enemynames = ["彷徨わない亡霊", "地上の月兎", "悠々自適なクラス委員", "大胆不敵な問題児", "兎角のシルバージャグラー", "デスブリンガー・ナース",//草原
+                  "ついに動いたサボテン","スフィンクスの残像","襲来セシ砂嵐","サソリ風ザリガニ","毒無しのガラガラヘビ","裏切りのアリジゴク",//昼砂漠
+                  "ピンクな先輩", "ブルーな後輩", "過激派のハッカー", "反旗を翻したアンドロイド", "腐敗した落武者", "アスピリン中毒者",//夜砂漠
+                  "†古書館の魔術師†", "トラブルメーカーな天才少女","黒服","無邪気な夜の希望"];//学校(ここだけブルアカにしましょ)
+const enemynamenum = ['0.5','6.5','12.5','18.3'];
+let bossenemynames = ['purpleslime','steampumker','RailwayGun "Shemata"','joker']//RailwayGun "Shemata"...wwあ、列車砲シェマタね 対策委員会が壊そうとしてたやつ
+let enemyprefixes = ['激昂','冷静沈着な','ギャンブラーな','守りが固い','心眼持ちの'];
+let nstimeout = 0;
+let skillcooldown = 0
+
+//#endregion
+
+//#region datas
 let humans = {
    players:{
       1:{
@@ -1374,14 +1394,24 @@ let humans = {
          buffs:[],
 
          weapon:{
-            name:'拳',
-            num:0,
-            power:0,
+            id:'none',
+            lv:1,
          },
          armor:{
-            name:'筋肉',
-            num:0,
-            power:0,
+            id:'none',
+            lv:1,
+         },
+         ear:{
+            id:'none',
+            lv:1,
+         },
+         ring:{
+            id:'none',
+            lv:1,
+         },
+         neck:{
+            id:'none',
+            lv:1,
          },
 
          ps:{
@@ -1423,14 +1453,24 @@ let humans = {
          buffs:[],
 
          weapon:{
-            name:'拳',
-            num:0,
-            power:0,
+            id:'none',
+            lv:1,
          },
          armor:{
-            name:'筋肉',
-            num:0,
-            power:0,
+            id:'none',
+            lv:1,
+         },
+         ear:{
+            id:'none',
+            lv:1,
+         },
+         ring:{
+            id:'none',
+            lv:1,
+         },
+         neck:{
+            id:'none',
+            lv:1,
          },
          
          ps:{
@@ -1472,14 +1512,24 @@ let humans = {
          buffs:[],
 
          weapon:{
-            name:'拳',
-            num:0,
-            power:0,
+            id:'none',
+            lv:1,
          },
          armor:{
-            name:'筋肉',
-            num:0,
-            power:0,
+            id:'none',
+            lv:1,
+         },
+         ear:{
+            id:'none',
+            lv:1,
+         },
+         ring:{
+            id:'none',
+            lv:1,
+         },
+         neck:{
+            id:'none',
+            lv:1,
          },
          
          ps:{
@@ -1525,33 +1575,30 @@ let humans = {
          buffs:[],
    
          weapon:{
-            name:'拳',
-            num:0,
-            power:0,
+            id:'none',
+            lv:1,
          },
          armor:{
-            name:'筋肉',
-            num:0,
-            power:0,
+            id:'none',
+            lv:1,
          },
+         ear:{
+            id:'none',
+            lv:1,
+         },
+         ring:{
+            id:'none',
+            lv:1,
+         },
+         neck:{
+            id:'none',
+            lv:1,
+         },
+
+         ex:0,
+         ps:0,
+         ns:0
       }
-   }
-}
-
-let Turret = {
-   'players':{
-      num:0,
-      attack:0,
-      health:0,
-      maxhealth:0,
-
-      
-   },
-   'enemies':{
-      num:0,
-      attack:0,
-      health:0,
-      maxhealth:0,
    }
 }
 
@@ -1559,23 +1606,6 @@ let turn = 0;//今誰のターンか
 let turncount = 0;//今のターン数
 
 let phase = 0;//何中か
-
-
-//0 = false,1 = true
-let afknow = 0;
-let dungeonnow = 0;
-let bossbattlenow = 0;
-
-let enemynames = ["彷徨わない亡霊", "地上の月兎", "悠々自適なクラス委員", "大胆不敵な問題児", "兎角のシルバージャグラー", "デスブリンガー・ナース",//草原
-                  "ついに動いたサボテン","スフィンクスの残像","襲来セシ砂嵐","サソリ風ザリガニ","毒無しのガラガラヘビ","裏切りのアリジゴク",//昼砂漠
-                  "ピンクな先輩", "ブルーな後輩", "過激派のハッカー", "反旗を翻したアンドロイド", "腐敗した落武者", "アスピリン中毒者",//夜砂漠
-                  "†古書館の魔術師†", "トラブルメーカーな天才少女","黒服","無邪気な夜の希望"];//学校(ここだけブルアカにしましょ)
-const enemynamenum = ['0.5','6.5','12.5','18.3'];
-let bossenemynames = ['purpleslime','steampumker','RailwayGun "Shemata"','joker']//RailwayGun "Shemata"...wwあ、列車砲シェマタね 対策委員会が壊そうとしてたやつ
-let enemyprefixes = ['激昂','冷静沈着な','ギャンブラーな','守りが固い','心眼持ちの'];
-let saydefeats = 0;
-let nstimeout = 0;
-let skillcooldown = 0
 
 let Buffs = {
    'powerup':{
@@ -1817,6 +1847,7 @@ let Magics = {
    'power':{
       id:'power',
       name:'power',
+      description:'攻撃力が1.25倍になります。やったね！',
       mp:5,
       lv:1,
       process:async function(cam,tcam,me,target){
@@ -1828,6 +1859,7 @@ let Magics = {
    'shell':{
       id:'shell',
       name:'shell',
+      description:'防御力が1.25倍になります！実感あんまりないけど..',
       mp:5,
       lv:1,
       process:async function(cam,tcam,me,target){
@@ -1839,6 +1871,7 @@ let Magics = {
    'poison':{
       id:'poison',
       name:'poison',
+      description:'相手を毒にします！わーい！！',
       mp:7,
       lv:3,
       process:async function(cam,tcam,me,target){
@@ -1850,6 +1883,7 @@ let Magics = {
    'thunder':{
       id:'thunder',
       name:'thunder',
+      description:'牽制に使われがち。吹っ飛び率は低め。(雷の小ダメージ)',
       mp:3,
       lv:4,
       process:async function(cam,tcam,me,target){
@@ -1860,7 +1894,8 @@ let Magics = {
    },
    'fire':{
       id:'fire',
-      name:'fire',
+      name:'ふぁいあ',
+      description:'ひらがな大好きさ(炎の小ダメージ)',
       mp:4,
       lv:4,
       process:async function(cam,tcam,me,target){
@@ -1873,6 +1908,7 @@ let Magics = {
    'healerthan':{
       id:'healerthan',
       name:'healer than',
+      description:'体力を40%回復します。healよりもつよい。だから比較のthanなんですね〜',
       mp:8,
       lv:6,
       process:async function(cam,tcam,me,target){
@@ -1887,6 +1923,7 @@ let Magics = {
    'luck':{
       id:'luck',
       name:'luck',
+      description:'二回行動マンになれるかも？なやつ。lv1',
       mp:4,
       lv:7,
       process:async function(cam,tcam,me,target){
@@ -1898,6 +1935,7 @@ let Magics = {
    'ellthunder':{
       id:'ellthunder',
       name:'ellthunder',
+      description:'ギガサンダー出そうとしてたまに出るやつ。そこそこつよい。(雷の中ダメージ)',
       mp:8,
       lv:8,
       process:async function(cam,tcam,me,target){
@@ -1909,6 +1947,7 @@ let Magics = {
    'morepower':{
       id:'morepower',
       name:'more power',
+      description:'攻撃力が1.5倍になります。power使ってた人いるんかな',
       mp:8,
       lv:9,
       process:async function(cam,tcam,me,target){
@@ -1920,6 +1959,7 @@ let Magics = {
    'moreshell':{
       id:'moreshell',
       name:'more shell',
+      description:'防御力が1.5倍になります。けどあんまり実感はないよね',
       mp:8,
       lv:9,
       process:async function(cam,tcam,me,target){
@@ -1931,6 +1971,7 @@ let Magics = {
    'deadlypoison':{
       id:'deadlypoison',
       name:'deadly poison',
+      description:'敵を猛毒にします。やったね！！！',
       mp:12,
       lv:10,
       process:async function(cam,tcam,me,target){
@@ -1942,6 +1983,7 @@ let Magics = {
    'gigafire':{
       id:'gigafire',
       name:'giga fire',
+      description:'激ウザ攻撃No2ですね。1はPKファイア。これの後にスマッシュするのが最高(炎の中ダメージ)',//ずっっっとルフレの話してます私 まじであの人楽しい
       mp:10,
       lv:11,
       process:async function(cam,tcam,me,target){
@@ -1954,6 +1996,7 @@ let Magics = {
    'thehealest':{
       id:'thehealest',
       name:'the healest',
+      description:'60%回復。これ以上はない、っていう意味ですね。xyzじゃないよ',
       mp:12,
       lv:12,
       process:async function(cam,tcam,me,target){
@@ -1968,6 +2011,7 @@ let Magics = {
    'luckgreat':{
       id:'luckgreat',
       name:'luckgreat',
+      description:'luckよりも行動しやすいです。嬉しいね',
       mp:12,
       lv:14,
       process:async function(cam,tcam,me,target){
@@ -1979,6 +2023,7 @@ let Magics = {
    'merazoma':{
       id:'merazoma',
       name:'メラゾーマ',
+      description:'ぬわーーっっ!!ってしてやりましょうぜ(炎の大ダメージ)',//対パパス最強にしたいね、これ
       mp:12,
       lv:12,
       process:async function(cam,tcam,me,target){
@@ -1992,6 +2037,7 @@ let Magics = {
    'thoron':{
       id:'thoron',
       name:'Thoron',
+      description:'当たったらラッキー、シールドでされたら空前で追撃なつよつよ技。けどギガサンダーの方が好き(雷の大ダメージ)',
       mp:20,
       lv:15,
       process:async function(cam,tcam,me,target){
@@ -2003,6 +2049,7 @@ let Magics = {
    'random':{
       id:'random',
       name:'Random',
+      description:'自身が覚えてる魔法からランダム(mpは5固定)。これぞ醍醐味ってやつよな',
       mp:5,
       lv:1,
       process:async function(cam,tcam,me,target){
@@ -2197,6 +2244,7 @@ let Armors = {
       num:0,
       shell:0,
       price:0,
+      description:'ないです。筋肉とでもフォースとでもなんとでも解釈しておk',
       buyable:0,
       sp:0
    },
@@ -2206,6 +2254,7 @@ let Armors = {
       num:0,
       shell:0,
       price:1,
+      description:'大事ですね。防御力は関係ありませんが病気にはならない',
       buyable:1,
       sp:0
    },
@@ -2215,6 +2264,7 @@ let Armors = {
       num:0,
       shell:1,
       price:5,
+      description:'***なのは駄目！！死刑！！！！',//コハルさんなのでセーフ
       buyable:1,
       sp:0
    },
@@ -2224,6 +2274,7 @@ let Armors = {
       num:0,
       shell:5,
       price:20,
+      description:'これを使って最初はつるはしを作りましょう',
       buyable:1,
       sp:0
    },
@@ -2233,6 +2284,7 @@ let Armors = {
       num:0,
       shell:10,
       price:30,
+      description:'突進してくるあいつ。こいつに手間取ると他のがきてす*ぬので注意',
       buyable:1,
       sp:0
    },
@@ -2242,6 +2294,7 @@ let Armors = {
       num:0,
       shell:15,
       price:50,
+      description:'初期装備あるあるⅡですね。多分コスパ最強',
       buyable:1,
       sp:0
    },
@@ -2251,6 +2304,7 @@ let Armors = {
       num:0,
       shell:20,
       price:80,
+      description:'辞書とかなのかな。いや六法全書かも',
       buyable:1,
       sp:0
    },
@@ -2260,6 +2314,7 @@ let Armors = {
       num:0,
       shell:25,
       price:100,
+      description:'え？木の板と一緒だって？君は知らないのかい...?木の板を6つ並べるとドアが3つできるってことを',
       buyable:1,
       sp:0
    },
@@ -2269,6 +2324,7 @@ let Armors = {
       num:0,
       shell:30,
       price:200,
+      description:'涼めるのに便利。また武器にもなり、ついでに敵から身を守れる万能装備',
       buyable:1,
       sp:0
    },
@@ -2278,6 +2334,7 @@ let Armors = {
       num:0,
       shell:50,
       price:400,
+      description:'ペロロ様の出番です！！まじでヒフミさんいいよね',
       buyable:1,
       sp:0
    }
@@ -2288,6 +2345,8 @@ let Tools = {
    'aspirin':{
       name:'アスピリン',
       id:'aspirin',
+      price:20,
+      description:'頭痛薬らしいですね、これ。痛み止め薬とか耐えればいらんくね？とかいったら炎上するかな',
       num:0,
       process:async function(cam,tcam,me,target){
          log.textContent = `おや、頭が痛いって？痛みに効くのはアスピリン！`;await delay(1000);
@@ -2301,6 +2360,8 @@ let Tools = {
    'pablon':{
       name:'パブロン',
       id:'pablon',
+      price:40,
+      description:'風邪薬。大人とかむけらしいね',
       num:0,
       process:async function(cam,tcam,me,target){
          log.textContent = `早めのパブロン♪`;await delay(1000);
@@ -2314,6 +2375,8 @@ let Tools = {
    'trypsin':{
       name:'トリプシン',
       id:'trypsin',
+      price:60,
+      description:'タンパク質を分解し、アミノ酸にする働きのある消化酵素。所属事務所は膵臓。',
       num:0,
       process:async function(cam,tcam,me,target){
          log.textContent = `トリプシンを飲んだ！！え？これは薬じゃないって？`;await delay(1000);
@@ -2327,6 +2390,8 @@ let Tools = {
    'lulu':{
       name:'ルル',
       id:'lulu',
+      price:80,
+      description:'sick sickな頭痛薬。毒が流るルルですね。',
       num:0,
       process:async function(cam,tcam,me,target){
          log.textContent = `求愛性 孤独 ドク 流るルル♪`;await delay(1000);
@@ -2340,6 +2405,8 @@ let Tools = {
    'potion':{
       name:'魔法薬',
       id:'potion',
+      price:100,
+      description:'投げつけたい。敵に',
       num:0,
       process:async function(cam,tcam,me,target){
          log.textContent = `なんか一番しょうもないよね、これ あ、全回復です`;await delay(1000);
@@ -2353,6 +2420,8 @@ let Tools = {
    'throwknife':{
       name:'投げナイフ',
       id:'throwknife',
+      price:20,
+      description:'シンプルに20%ダメージ。十六夜(じゅうろくや)さんが投げるあれ',
       num:0,
       process:async function(cam,tcam,me,target){
          log.textContent = 'では、ナイフの錆にしてあげましょう';await delay(1000);
@@ -2360,13 +2429,15 @@ let Tools = {
          if(humans[tcam][target].health < x){x = humans[tcam][target].health};
          humans[tcam][target].health -= x
          log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';tekiou();await delay(1000);
-         if(humans.enemies[target].health <= 0){killed(cam,tcam,me,target);return;}
+         if(humans.enemies[target].health <= 0){return 'dead';}
          return 'alive';
       }
    },
    'trickyvariables':{
       name:'トリッキーな変数',
       id:'trickyvariables',
+      price:40,
+      description:'黒崎コユキ、きちゃいました！！なんか面白いことないですか？(10%,25%,40%からランダム)',
       num:0,
       process:async function(cam,tcam,me,target){
          x = Math.floor(Math.random() * 3) + 1;
@@ -2384,62 +2455,72 @@ let Tools = {
          if(humans[tcam][target].health < x){x = humans[tcam][target].health};
          humans[tcam][target].health -= x;
          log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';tekiou();await delay(1000);
-         if(humans[tcam][target].health <= 0){log.textContent = 'ちょろい、ちょろい。BANG！';killed(cam,tcam,me,target);return;}
+         if(humans[tcam][target].health <= 0){log.textContent = 'ちょろい、ちょろい。BANG！';await delay(1000);return 'dead';}
          return 'alive';
       }
    },
    'bottlegrenade':{
       name:'ボトルグレネード',
       id:'bottlegrenade',
+      price:60,
+      description:'殴るついでに燃やす。まじでつよい レッドウィンターの問題児にしては上出来すぎる',
       num:0,
       process:async function(cam,tcam,me,target){
          log.textContent = 'これはちょっと、スパイシーなやつだよ';await delay(1000);
-         x = Math.ceil(humans[tcam][target].health*0.45);
+         x = Math.ceil(humans[cam][me].attack * 0.8)
          if(humans[tcam][target].health < x){x = humans[tcam][target].health};
          humans[tcam][target].health -= x;
          buffadd(tcam,target,'burn',3,1);
          log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';tekiou();await delay(1000);
-         if(humans[tcam][target].health <= 0){log.textContent = 'レッドウィンターの問題児にしては上出来じゃない？';killed(cam,tcam,me,target);return;}
+         if(humans[tcam][target].health <= 0){log.textContent = 'レッドウィンターの問題児にしては上出来じゃない？';await delay(1000);return 'dead';}
          return 'alive';
       }
    },
    'coveringfire':{
       name:'援護射撃',
       id:'coveringfire',
+      price:80,
+      description:'ダメージ与える。ゴミ箱に隠れてる人。',
       num:0,
       process:async function(cam,tcam,me,target){
          log.textContent = 'え、援護します...';await delay(1000);
-         x = Math.ceil(humans[tcam][target].health*0.60);
+         x = Math.ceil(humans[cam][me].attack * 2.2);
          if(humans[tcam][target].health < x){x = humans[tcam][target].health};
          humans[tcam][target].health -= x
          log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';tekiou();await delay(1000);
-         if(humans[tcam][target].health <= 0){log.textContent = 'わ、私のことはお気になさらずに...';killed(cam,tcam,me,target);return;}
+         if(humans[tcam][target].health <= 0){log.textContent = 'わ、私のことはお気になさらずに...';await delay(1000);return 'dead';}
          return 'alive';
       }
    },
    'bomb':{
       name:'爆弾',
       id:'bomb',
+      price:100,
+      description:'エクスプローージョン！！！',
       num:0,
       process:async function(cam,tcam,me,target){
-         humans[tcam][target].health = 0;
-         log.textContent = '爆発オチなんてサイテー！！';tekiou();await delay(1000);
-         killed(cam,tcam,me,target);return;
+         humans[tcam][target].health = 0;tekiou();
+         log.textContent = '爆発オチなんてサイテー！！';await delay(1000);
+         return 'dead';
       }
    },
    'redcard':{
       name:'レッドカード',
       id:'redcard',
+      price:35,
+      description:'退場です。帰れ(スキップ)',
       num:0,
       process:async function(cam,tcam,me,target){
          buffadd(tcam,target,'skip',1,1);
-         log.textContent = 'カードを仕込みました!';
-         backtoplayerturn(cam,me)
+         log.textContent = 'カードを仕込みました!';await delay(1000);
+         return 'alive';
       }
    },
    'bluecard':{
       name:'ブルーカード',
       id:'bluecard',
+      price:35,
+      description:'リバースを召喚！このカードは相手と自分の体力を交換する！！割合だ！！！！',
       num:0,
       process:async function(cam,tcam,me,target){
          x = humans.players[me].health/humans.players[me].maxhealth*humans.enemies[target].health;//割合交換(そのうちゲージにする時用)
@@ -2448,36 +2529,54 @@ let Tools = {
          if(humans.enemies[target].health < humans.enemies[target].health){humans.enemies[target].health = humans.enemies[target].health;}
          humans.players[me].health = y;
          if(humans.players[me].maxhealth < humans.players[me].health){humans.players[me].health = humans.players[me].maxhealth;}
-         log.textContent = '体力を交換しました！';tekiou();await delay(1000);
-         backtoplayerturn(cam,me);
+         tekiou();
+         log.textContent = 'これはリバースのモニュメントか？';await delay(1000);
+         return 'alive';
       }
    },
    'greencard':{
       name:'グリーンカード',
       id:'greencard',
+      price:35,
+      description:'バフを2個ランダムでつける。つよい',
       num:0,
       process:async function(cam,tcam,me,target){
-         const Greenrandombuffs = ['poison','burn1','powerdown1','shelldown1']
-         x = Greenrandombuffs[Math.floor(Math.random() * Greenrandombuffs.length)];
-         y = Greenrandombuffs[Math.floor(Math.random() * Greenrandombuffs.length)];
-         while (y == x) {y = Greenrandombuffs[Math.floor(Math.random() * Greenrandombuffs.length)];}
-         buffadd(tcam,target,x,3,1);
-         buffadd(tcam,target,y,3,1);
+         let rbuffs = ['powerup','shellup','luck'];
+         rbuffs = shuffleArray(rbuffs);
+         x = rbuffs[0];
+         y = rbuffs[1];
+         buffadd(tcam,target,x,3,Math.floor(Math.random()*2)+1);
+         buffadd(tcam,target,y,3,Math.floor(Math.random()*2)+1);
          log.textContent = humans[tcam][target].name+'にバフを二個つけました！！';await delay(1000);
-         backtoplayerturn(cam,me);
+         return 'alive';
       }
    },
    'blackcard':{
       name:'ブラックカード',
       id:'blackcard',
+      price:35,
+      description:'デバフを2個つける。割とつよい',
       num:0,
       process:async function(cam,tcam,me,target){
-         buffadd(tcam,target,'poison',3,1);
-         buffadd(tcam,target,'burn1',3,1);
-         buffadd(tcam,target,'powerdown1',3,1);
-         buffadd(tcam,target,'shelldown1',3,1);
-         log.textContent = humans[tcam][target].name+'にバフを四個つけました！！';await delay(1000);
-         backtoplayerturn(cam,me);
+         let rbuffs = ['powerdown','shelldown','poison','burn','freeze'];
+         rbuffs = shuffleArray(rbuffs);
+         for(i = 0;i < 2;i++){
+            buffadd(tcam,target,rbuffs[i],3,Math.floor(Math.random()*2)+1);
+         }
+         log.textContent = humans[tcam][target].name+'にバフをニ個つけました！！';await delay(1000);
+         return 'alive';
+      }
+   },
+   'gentlecard':{
+      name:'大人のカード',
+      id:'gentlecard',
+      price:35,
+      description:'「大人のカード」を取り出す。...プレ先ではないぞ',
+      num:0,
+      process:async function(cam,tcam,me,target){
+         euro += 120;updateUI()
+         log.textContent = '大人のカードを割りました！粉々になりました';await delay(1000);
+         return 'alive';
       }
    }
 }
@@ -3094,112 +3193,7 @@ let Enemies = {
    }
 };
 //#endregion
-//#region 全道具です 
-let Aspirin = {
-   name:'アスピリン',
-   id:'Aspirin',
-   num:0,
-   price:20
-}
-let Pablon = {
-   name:'パブロン',
-   id:'Pablon',
-   num:0,
-   price:40
-}
-let Trypsin = {
-   name:'トリプシン',
-   id:'Trypsin',
-   num:0,
-   price:60
-}
-let Lulu = {
-   name:'ルル',
-   id:'Lulu',
-   num:0,
-   price:80
-}
-let Potion={
-   name:'ポーション',
-   id:'Potion',
-   num:3,
-   price:100
-};
-let ThrowKnife={
-   name:'投げナイフ',
-   id:'ThrowKnife',
-   num:0,
-   price:20
-};
-let TrickyVariable={
-   name:'トリッキーな変数',
-   id:'TrickyVariable',
-   num:0,
-   price:40
-};
-let CoveringFire={
-   name:'援護射撃',
-   id:'CoveringFire',
-   num:0,
-   price:60
-};
-let BottleGrenade={
-   name:'ボトルグレネード',
-   id:'BottleGrenade',
-   num:0,
-   price:80
-};
-let Bomb={
-   name:'爆弾',
-   id:'Bomb',
-   num:3,
-   price:100
-};
-let Redcard={
-   name:'赤のスキップ',
-   id:'Redcard',
-   num:3,
-   price:35
-};
-let Bluecard={
-   name:'青のリバース',
-   id:'Bluecard',
-   num:0,
-   price:35
-};
-let Greencard={
-   name:'緑のドロアル',
-   id:'Greencard',
-   num:0,
-   price:35
-};
-let Blackcard={
-   name:'黒のドロスー',
-   id:'Blackcard',
-   num:0,
-   price:70
-};
 
-//const weapons = {
-   // name:['拳','木の棒','木刀','竹刀','石ころ','大きな石','薄めの紙','カード','はさみ','ほんもののナイフ','ジェン・ソルテ','time on target','大博打','天邪鬼'],
-   // num:[0,1,3,5,10,20,40,1,'1~13',100,300,15,20,'10~1000',80],
-//   power:[0,1,3,5,10,20,40,1,0,100,300,15,200,0,800],
-//   price:[0,10,20,30,50,80,25,77,200,300]
-// }
-const rareweapons = {
-   name:['none','ジェン・ソルテ','time on target','大博打','天邪鬼'],
-  price:[0,150,150,150,150]
-}
-const armors  = {
-   name:['筋肉','マスク','薄い本','木の板','テッパン','鍋の蓋','厚めの本','ドア','扇風機','ペロロ様人形'],
-   num:[0,0,1,5,10,15,20,25,30,50],
-  price:[0,1,5,20,30,50,80,100,200,400]
-}
-const tools = {
-  name:['none','アスピリン','パブロン','トリプシン','ルル','ポーション','投げナイフ','トリッキーな変数','援護射撃','ボトルグレネード','爆弾','赤のスキップ','青のリバース','緑のドロアル','黒のドロスー'],
- price:[20,40,60,80,100,20,40,60,80,100,35,35,35,70]
-}
-//#endregion
 
 //#region 超シンプルで使いやすい子達
 function tekiou(){
@@ -3235,15 +3229,6 @@ function tekiou(){
    })
 
 
-   /*
-   Object.keys(humans).forEach(cam => {
-      if(humans[cam]['t'].kazu > 0){
-         document.getElementById(`${cam}Turret`).innerHTML = `
-         <b>Turret</b>x${humans[cam]['t'].kazu}<br>
-         <span>${humans[cam]['t'].health}</span>/<span>${humans[cam]['t'].maxhealth}</span><br>
-         `;
-      }
-   })*/
 
 
 
@@ -3294,6 +3279,13 @@ function delay(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 function inSelect(array){
    let select = Math.floor(Math.random()*array.length);
    return array[select];
+}
+function shuffleArray(array) {
+   for(let i = array.length - 1; i > 0; i--) {
+       const j = Math.floor(Math.random() * (i + 1));
+       [array[i], array[j]] = [array[j], array[i]];
+   }
+   return array;
 }
    
 
@@ -3395,26 +3387,26 @@ function inventoryOpen(num){
       </div>
       <div id="ISlashAppearence""></div><br><div id="SlashChangePlace"></div>
       <div id="IMagics">magics<br>
-      1:${humans.players[InventoryPage].magic1.name} <button class="button" onclick="MagicChange(1)">change</button><br>
-      2:${humans.players[InventoryPage].magic2.name} <button class="button" onclick="MagicChange(2)">change</button><br>
-      3:${humans.players[InventoryPage].magic3.name} <button class="button" onclick="MagicChange(3)">change</button><br>
+      1:${humans.players[InventoryPage].magic1} <button class="button" onclick="MagicChange(1)">change</button><br>
+      2:${humans.players[InventoryPage].magic2} <button class="button" onclick="MagicChange(2)">change</button><br>
+      3:${humans.players[InventoryPage].magic3} <button class="button" onclick="MagicChange(3)">change</button><br>
       </div>
       <div id="IMagicAppearence""></div><br><div id="MagicChangePlace"></div>
       <span id="IAppearsp">${humans.players[InventoryPage].sp}pt</span><br>
       <div id="ISutefuri">${Sutefuri}</div>
    </div>
    `;
-   let slashs = Object.keys(Slashs).map(a => Slashs[a].lv <= humans.players[InventoryPage].level ? `<span class="hasd" data-description=${Slashs[a].description}>${Slashs[a].id}</span>` : null).filter(Boolean)
+   let slashs = Object.keys(Slashs).map(a => Slashs[a].lv <= humans.players[InventoryPage].level ? `<span class="hasd" data-description="${Slashs[a].description}">${Slashs[a].id}</span>` : null).filter(Boolean)
    document.getElementById('ISlashAppearence').innerHTML = slashs.join('<br>');
-   let magics = Object.keys(Magics).map(a => Magics[a].lv <= humans.players[InventoryPage].level ? `<span class="hasd" data-description=${Magics[a].description}>${Magics[a].id}</span>` : null).filter(Boolean)
+   let magics = Object.keys(Magics).map(a => Magics[a].lv <= humans.players[InventoryPage].level ? `<span class="hasd" data-description="${Magics[a].description}">${Magics[a].id}</span>` : null).filter(Boolean)
    document.getElementById('IMagicAppearence').innerHTML = magics.join('<br>');
-   let skills = ['ex','ns','ps'].map(a => `${a}:<span class="hasd" data-description=${Skills[a][humans.players[InventoryPage][a]].description}>${Skills[a][humans.players[InventoryPage][a]].name}</span>`)
+   let skills = ['ex','ns','ps'].map(a => `${a}:<span class="hasd" data-description="${Skills[a][humans.players[InventoryPage][a]].description}">${Skills[a][humans.players[InventoryPage][a]].name}</span>`)
    document.getElementById('ISkills').innerHTML = skills.join('<br>');
-   let weapons = Object.keys(Weapons).map(a => Weapons[a].num >= 1 && Weapons[a].num > Object.keys(humans.players).filter(b => humans.players[b].weapon.id == Weapons[a].id).length ? `<span class="hasd" data-description=${Weapons[a].description}>${Weapons[a].name} x${Weapons[a].num}</span>` : null).filter(Boolean)
+   let weapons = Object.keys(Weapons).map(a => Weapons[a].num >= 1 && Weapons[a].num > Object.keys(humans.players).filter(b => humans.players[b].weapon.id == Weapons[a].id).length ? `<span class="hasd" data-description="${Weapons[a].description}">${Weapons[a].name} x${Weapons[a].num}</span>` : null).filter(Boolean)
    document.getElementById('IWeapons').innerHTML = weapons.join('<br>');
-   let armors = Object.keys(Armors).map(a => Armors[a].num >= 1 && Armors[a].num > Object.keys(humans.players).filter(b => humans.players[b].armor.id == Armors[a].id).length ? `<span class=" hasd" data-description=${Armors[a].description}>${Armors[a].name} x${Armors[a].num}</span>` : null).filter(Boolean)
+   let armors = Object.keys(Armors).map(a => Armors[a].num >= 1 && Armors[a].num > Object.keys(humans.players).filter(b => humans.players[b].armor.id == Armors[a].id).length ? `<span class=" hasd" data-description="${Armors[a].description}">${Armors[a].name} x${Armors[a].num}</span>` : null).filter(Boolean)
    document.getElementById('IArmors').innerHTML = armors.join('<br>');
-   let tools = Object.keys(Tools).map(a => `<span class="hasd" data-description=${Tools[a].description}>${Tools[a].name} x${Tools[a].num}:</span>`).filter(Boolean)
+   let tools = Object.keys(Tools).map(a => `<span class="hasd" data-description="${Tools[a].description}">${Tools[a].name} x${Tools[a].num}:</span>`).filter(Boolean)
    document.getElementById('IItems').innerHTML = tools.join('<br>');
 
    let nextpage = addEventListener('keydown', (event) => {
@@ -3453,14 +3445,15 @@ document.addEventListener('mousemove', (e) => {
 document.addEventListener('mouseover', (e) => {
    if(e.target.classList.contains('hasd')){
       const movabledescription = e.target.dataset.description;
-      console.log(movabledescription)
       document.getElementById('movabledescription').textContent = movabledescription;
+      document.getElementById('movabledescription').style.display = 'block';
    }
 });
 
 document.addEventListener('mouseout', (e) => {
    if(e.target.classList.contains('hasd')){
       document.getElementById('movabledescription').textContent = '';
+      document.getElementById('movabledescription').style.display = 'none';
    }
 });
 
@@ -5719,11 +5712,15 @@ async function EnemyAppear(){
 }
 
 async function defeat(){
-   //if(playerlevel < 3){saydefeats = ['あはは..負けちゃいましたね....防御力を上げると良いですよ!', 'あはは..負けちゃいましたね....double slashは運要素も少ないので強いですよ!', 'あはは..負けちゃいましたね....魔法にターン数制限はありません!いっぱい使っちゃいましょう!','あはは..負けちゃいましたね....mechanicは防御全振りで戦うと良いですよ!','あれ〜？負けちゃったんですか〜？？おにいさんよわいね〜？？'];}
-   saydefeats = [playername + 'は力尽きた...残念でしたね！にはははは〜！','残念だったね!すごい惜しかったね!!','あ、あれ..？もう負けちゃったんですか....？','ほら、負けを認めてください？'];
-   log.textContent = saydefeats[Math.floor(Math.random() * saydefeats.length)];
+   let saydefeats = [playername + 'は力尽きた...残念でしたね！にはははは〜！','残念だったね!すごい惜しかったね!!','あ、あれ..？もう負けちゃったんですか....？','ほら、負けを認めてください？'];
+   if(humans.players[1].level < 3){saydefeats = ['あはは..負けちゃいましたね....防御力を上げると良いですよ!', 'あはは..負けちゃいましたね....double slashは運要素も少ないので強いですよ!', 'あはは..負けちゃいましたね....魔法にターン数制限はありません!いっぱい使っちゃいましょう!','あはは..負けちゃいましたね....mechanicは防御全振りで戦うと良いですよ!','あれ〜？負けちゃったんですか〜？？おにいさんよわいね〜？？'];}
+   log.textContent = inSelect(saydefeats);
    await delay(2000);
-   playerhealth = Math.floor(playermaxhealth*0.5);
+   Object.keys(humans.players).filter(a => humans.players[a].status == 1||humans.players[a].status == 2).forEach(nanka => {
+      humans.players[nanka].status = 1;
+      humans.players[nanka].health = Math.floor(humans.players[nanka].maxhealth*0.5);
+   })
+   tekiou();
    bossbattlenow = 0;
    floor = 0;
    GoNextFloor();
@@ -5929,15 +5926,6 @@ let Camprestper
   
 //shop
 let nowshop = 0;
-let haveweapons = [];
-let havearmors = [];
-let equipweapon = 0;
-let equiparmor = 0;
-let equiptool1 = Potion;
-let equiptool2 = Bomb;
-let equiptool3 = Redcard;
-let weaponpower = 0;
-let armorshell = 0;
 function ShopBuyButton(){
    const num = +document.getElementById('ShopInputText').value;
    switch(nowshop){

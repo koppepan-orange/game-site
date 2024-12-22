@@ -87,6 +87,9 @@
                         [0, 0, 0]], color: '#e6325f'},//石神のぞみのイメージカラー
 
         };
+        
+        
+
 
         let score = 0;
         function tekiou(){
@@ -378,6 +381,7 @@
             context.clearRect(0, 0, canvas.width, canvas.height);
             drawMatrix(arena, { x: 0, y: 0 });
             drawMatrix(player.matrix, player.pos);
+            drawGrid(context, cols, rows, 20);
 
             requestAnimationFrame(update);
         }
@@ -405,6 +409,23 @@
             }
         });
 
+        const cellSize = 30; // 各セルのサイズ（ピクセル）
+        function drawGrid(context, cols, rows, cellSize) {
+            context.strokeStyle = '#ffffff'; // 枠線の色
+            for (let x = 0; x <= cols; x++) {
+                context.beginPath();
+                context.moveTo(x * cellSize, 0);
+                context.lineTo(x * cellSize, rows * cellSize);
+                context.stroke();
+            }
+            for (let y = 0; y <= rows; y++) {
+                context.beginPath();
+                context.moveTo(0, y * cellSize);
+                context.lineTo(cols * cellSize, y * cellSize);
+                context.stroke();
+            }
+        }
+        drawGrid(context, cols, rows, cellSize);
     </script>
 </body>
 </html>

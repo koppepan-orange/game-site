@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>簡易版ぷよぷよ</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #eee;
+        }
+
+        #game {
+            display: grid;
+            grid-template-rows: repeat(12, 40px);
+            grid-template-columns: repeat(6, 40px);
+            gap: 1px;
+            background: #333;
+        }
+
+        .cell {
+            width: 40px;
+            height: 40px;
+            background: #444;
+        }
+
+        .puyo {
+            border-radius: 50%;
+        }
+
+        .red {
+            background: red;
+        }
+
+        .blue {
+            background: blue;
+        }
+
+        .green {
+            background: green;
+        }
+
+        .yellow {
+            background: yellow;
+        }
+    </style>
+</head>
+<body>
+    <div id="game"></div>
+
+    <script>
+        const ROWS = 12;
+        const COLS = 6;
+        const COLORS = ["red", "blue", "green", "yellow"];
+
+        const gameElement = document.getElementById("game");
+        const grid = [];
+
+        function createGrid() {
+            for (let r = 0; r < ROWS; r++) {
+                grid[r] = [];
+                for (let c = 0; c < COLS; c++) {
+                    const cell = document.createElement("div");
+                    cell.classList.add("cell");
+                    grid[r][c] = null;
+                    gameElement.appendChild(cell);
+                }
+            }
+        }
+
+        function spawnPuyoPair() {
+            const color1 = COLORS[Math.floor(Math.random() * COLORS.length)];
+            const color2 = COLORS[Math.floor(Math.random() * COLORS.length)];
+            const puyo1 = { row: 0, col: Math.floor(COLS / 2), color: color1 };
+            const puyo2 = { row: 0, col: Math.floor(COLS / 2) + 1, color: color2 };
+
+            if (!grid[puyo1.row][puyo1.col] && !grid[puyo2.row][puyo2.col]) {
+                grid[puyo1.row][puyo1.col] = puyo1;
+                grid[puyo2.row][puyo2.col] = puyo2;
+                renderGrid();
+                return { puyo1, puyo2, orientation: "horizontal" };
+            } else {
+                alert("ゲームオーバー");
+                clearInterval(gameLoop);
+                return null;
+            }
+        }
+
+        function movePuyoPair(pair, dRow, dCol) {
+            const newRow1 = pair.puyo1.row + dRow;
+            const newCol1 = pair.puyo1.col + dCol;
+            const newRow2 = pair.puyo2.row + dRow;
+            const newCol2 = pair.puyo2.col + dCol;
+
+            if (
+                newRow1 >= ROWS ||
+                newCol1 < 0 ||
+                newCol1 >= COLS ||
+                newRow2 >= ROWS ||
+                newCol2 < 0 ||
+                newCol2 >= COLS ||
+                grid[newRow1][newCol1] ||
+                grid[newRow2][newCol2]
+            ) {
+                return false;
+            }
+
+            grid[pair.puyo1.row][pair.puyo1.col] = null;
+            grid[pair.puyo2.row][pair.puyo2.col] = null;
+
+            pair.puyo1.row = newRow1;
+            pair.puyo1.col = newCol1;
+            pair.puyo2.row = newRow2;
+            pair.puyo2.col = newCol2;
+
+            grid[pair.puyo1.row][pair.puyo1.col] = pair.puyo1;
+            grid[pair.puyo2.row][pair.puyo2.col] = pair.puyo2;
+
+            renderGrid();
+            return true;
+        }
+
+        function rotatePuyoPair(pair) {
+            const { puyo1, puyo2, orientation } = pair;
+
+            let newRow, newCol;
+            if (orientation === "horizontal") {
+                newRow = puyo1.row - 1;
+                newCol = puyo1.col;
+                if (
+                    newRow >= 0 &&
+                    !grid[newRow][newCol]
+                ) {
+                    grid[puyo2.row][puyo2.col] = null;
+                    puyo2.row = newRow;
+                    puyo2.col = newCol;
+                    pair.orientation = "vertical";
+                }
+            } else if (orientation === "vertical") {
+                newRow = puyo1.row;
+                newCol = puyo1.col + 1;
+                if (
+                    newCol < COLS &&
+                    !grid[newRow][newCol]
+                ) {
+                    grid[puyo2.row][puyo2.col] = null;
+                    puyo2.row = newRow;
+                    puyo2.col = newCol;
+                    pair.orientation = "horizontal";
+                }
+            }
+
+            grid[puyo1.row][puyo1.col] = puyo1;
+            grid[puyo2.row][puyo2.col] = puyo2;
+            renderGrid();
+        }
+
+        function renderGrid() {
+            const cells = gameElement.children;
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    const cell = cells[r * COLS + c];
+                    cell.className = "cell";
+                    if (grid[r][c]) {
+                        cell.classList.add("puyo", grid[r][c].color);
+                    }
+                }
+            }
+        }
+
+        function checkForMatches() {
+            const visited = Array.from({ length: ROWS }, () => Array(COLS).fill(false));
+            const matches = [];
+
+            function dfs(row, col, color, chain) {
+                if (
+                    row < 0 ||
+                    col < 0 ||
+                    row >= ROWS ||
+                    col >= COLS ||
+                    visited[row][col] ||
+                    !grid[row][col] ||
+                    grid[row][col].color !== color
+                ) {
+                    return;
+                }
+                visited[row][col] = true;
+                chain.push({ row, col });
+
+                dfs(row - 1, col, color, chain);
+                dfs(row + 1, col, color, chain);
+                dfs(row, col - 1, color, chain);
+                dfs(row, col + 1, color, chain);
+            }
+
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    if (!visited[r][c] && grid[r][c]) {
+                        const chain = [];
+                        dfs(r, c, grid[r][c].color, chain);
+                        if (chain.length >= 4) matches.push(...chain);
+                    }
+                }
+            }
+
+            matches.forEach(({ row, col }) => (grid[row][col] = null));
+            return matches.length > 0;
+        }
+
+        function applyGravity() {
+            for (let c = 0; c < COLS; c++) {
+                for (let r = ROWS - 1; r > 0; r--) {
+                    if (!grid[r][c] && grid[r - 1][c]) {
+                        grid[r][c] = grid[r - 1][c];
+                        grid[r - 1][c] = null;
+                    }
+                }
+            }
+        }
+
+        let currentPuyoPair = null;
+        const gameLoop = setInterval(() => {
+            if (!currentPuyoPair) {
+                currentPuyoPair = spawnPuyoPair();
+            } else if (!movePuyoPair(currentPuyoPair, 1, 0)) {
+                currentPuyoPair = null;
+                while (checkForMatches()) {
+                    applyGravity();
+                }
+            }
+        }, 500);
+
+        document.addEventListener("keydown", (e) => {
+            if (!currentPuyoPair){return};
+            if (e.key == "ArrowLeft"){movePuyoPair(currentPuyoPair, 0, -1)};
+            if (e.key == "ArrowRight"){movePuyoPair(currentPuyoPair, 0, 1)};
+            if (e.key == "ArrowDown"){movePuyoPair(currentPuyoPair, 1, 0)};
+            if (e.key == "ArrowUp"){rotatePuyoPair(currentPuyoPair)};
+            if (e.key == " "){
+                while (movePuyoPair(currentPuyoPair, 1, 0));
+            }
+        });
+
+        createGrid();
+    </script>
+</body>
+</html>

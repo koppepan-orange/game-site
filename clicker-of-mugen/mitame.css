@@ -17,10 +17,11 @@ body {
   margin: 0 auto;
 }
 #movabledescription {
+  display: none;
   position: fixed;  /* 画面上の絶対位置に固定 */
   pointer-events: none;  /* マウスイベントを通過させる */
-  background-color: rgba(136, 136, 136, 0.138);
-  color: white;
+  background-color: rgba(90, 90, 90, 0.9);
+  color: rgb(255, 255, 255);
   padding: 5px 10px;
   border-radius: 5px;
   z-index: 1000;  /* 他の要素の上に表示 */

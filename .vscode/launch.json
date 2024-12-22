@@ -16,5 +16,17 @@
             "name": "clicker(dungeon)",
             "file": "/Users/koppepanorange/orange_bread/game-site/clicker-of-mugen-dungeon/hontai.html"
         },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "テトリス(歌じゃないよ)",
+            "file": "/Users/koppepanorange/orange_bread/game-site/tetris.html"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "ぷよぷよ",
+            "file": "/Users/koppepanorange/orange_bread/game-site/puyopuyo.html"
+        }  
     ]
 }
