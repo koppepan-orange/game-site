@@ -4004,6 +4004,11 @@ const Notices = {
       txt:'todo',
       headline:'todoリストとか',
       name:'something to do for me'
+   },
+   '1.300..?!':{
+      txt:'1.300..?!',
+      headline:'1.300..?!',
+      name:'1.300..?!(まだ)'
    }
 }
 let noticenow = 0;
