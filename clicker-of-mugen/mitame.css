@@ -98,7 +98,7 @@ body {
   right: 10px;
   color: #000000;
   padding: 3px 7px;
-  font-size:33px;
+  font-size:37px;
   font-family: Hangyaku;
 }
 #notice-list{
@@ -122,12 +122,14 @@ body {
   left: 10px;
   color: #000000;
   padding: 3px 7px;
-  font-size:38px;
+  font-size:43px;
   font-family: Hangyaku;
 }
 #notice-text{
   text-align: left;
   font-size:18px;
+  max-height:600px;
+  overflow-y: scroll;
 }
 /*ここからrankとeuroのあれ*/
 .rank-euro-zone {
