@@ -77,11 +77,57 @@ body {
   top: 30px;
   left: 50%;
   transform: translateX(-50%);
-  width: 600px;
-  height: 900px;
+  width: 500px;
+  height: 700px;
   background-color: #dfdfdf;
   border: 2px solid #FFE500;
   z-index: 9999;/*たしか一番上にやるやつ*/
+  font-family: Hangyaku;
+  font-size:25px;
+}
+#notice-notice{
+  font-family: Hangyaku;
+  font-size:28px;
+}
+#notice-honmei{
+  font-family: Hangyaku;
+}
+#notice-end{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #000000;
+  padding: 3px 7px;
+  font-size:33px;
+  font-family: Hangyaku;
+}
+#notice-list{
+  overflow-y: scroll;
+  height: 600px;
+  border:1px solid #f0f8ff;
+  text-align: left;
+  font-family: Hangyaku;
+}
+.notice{
+  text-align: left;
+  font-family: Hangyaku;
+}
+#notice-main{
+  display: none;
+  font-family: Hangyaku;
+}
+#notice-back{
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: #000000;
+  padding: 3px 7px;
+  font-size:38px;
+  font-family: Hangyaku;
+}
+#notice-text{
+  text-align: left;
+  font-size:18px;
 }
 /*ここからrankとeuroのあれ*/
 .rank-euro-zone {
@@ -237,6 +283,7 @@ body {
   border: 1px solid #23232369;
   word-wrap: break-word;
   white-space: normal;
+  margin-bottom: 4px;
 }
 #ISkills{
   overflow-y: scroll;
@@ -246,8 +293,18 @@ body {
   border: 1px solid #23232369;
   word-wrap: break-word;
   white-space: normal;
+  margin-bottom: 4px;
 }
-#ITools{
+#IEquips{
+  overflow-y: scroll;
+  max-height: 180px;
+  width: 260px;
+  text-align: left;
+  border: 1px solid #23232369;
+  word-wrap: break-word;
+  white-space: normal;
+}
+#IEquipChangeZone{
   overflow-y: scroll;
   max-height: 180px;
   width: 260px;
@@ -265,38 +322,18 @@ body {
 }
 #ISlashs{
   overflow-y: scroll;
-  max-height: 120px;
+  max-height: 150px;
   width: 260px;
   text-align: left;
   border: 1px solid #23232369;
   word-wrap: break-word;
   white-space: normal;
-}
-#ISlashAppearence{
-  text-align: left!important;
-  overflow-y: scroll;
-  max-height: 80px;
-  width: 260px;
-  font-size: 14px;
-  border: 1px solid #23232369;
-  word-wrap: break-word;
-  white-space: normal;
-  margin-bottom: 5px;
 }
 #IMagics{
   overflow-y: scroll;
-  max-height: 120px;
+  max-height: 150px;
   width: 260px;
   text-align: left;
-  border: 1px solid #23232369;
-  word-wrap: break-word;
-  white-space: normal;
-}
-#IMagicAppearence{
-  text-align: left!important;
-  overflow-y: scroll;
-  max-height: 80px;
-  width: 260px;
   border: 1px solid #23232369;
   word-wrap: break-word;
   white-space: normal;
