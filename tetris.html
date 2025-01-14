@@ -390,15 +390,24 @@
         update();
 
         document.addEventListener('keydown', event => {
-            if (event.key === 'ArrowLeft' || event.key === 'a') {
-                playerMove(-1);
-            } else if (event.key === 'ArrowRight' || event.key === 'd') {
-                playerMove(1);
-            } else if (event.key === 'ArrowDown' || event.key === 's') {
-                playerDrop();
-            } else if (event.key === 'ArrowUp' || event.key === 'w') {
-                playerRotate();
-            } else if (event.key === ' ') {
+                if (event.key === 'ArrowLeft' || event.key === 'a') {
+                    event.preventDefault();
+                    playerMove(-1);
+                } else if (event.key === 'ArrowRight' || event.key === 'd') {
+                    event.preventDefault();
+                    playerMove(1);
+                } else if (event.key === 'ArrowDown' || event.key === 's') {
+                    event.preventDefault();
+                    playerDrop();
+                } else if (event.key === 'ArrowUp' || event.key === 'w') {
+                    event.preventDefault();
+                    playerRotate();
+                }
+        });
+
+        document.addEventListener('keyup', async event => {
+            if(event.key === ' '){
+                event.preventDefault();
                 while (!collide(arena, player)) {
                     player.pos.y++;
                 }
@@ -406,8 +415,20 @@
                 merge(arena, player);
                 playerReset();
                 arenaSweep();
+            }else if(event.key === 'p'){
+                if(grownow == 1){return;}
+                grownow = 1;
+                Events.blackout.process();
+                for(let i = 0; i < 500; i++){
+                    score += 2;
+                    tekiou();
+                    await delay(10)
+                }
+                resetCanvas();
+                grownow = 0;
             }
         });
+        let grownow = 0;
 
         const cellSize = 30; // 各セルのサイズ（ピクセル）
         function drawGrid(context, cols, rows, cellSize) {

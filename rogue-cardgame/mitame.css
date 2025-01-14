@@ -37,6 +37,73 @@ body{
     z-index: 9999;/*たしか一番上にやるやつ*/
 }
 
+/*log & text*/
+#log-opener{
+    position: absolute;
+    bottom: 230px;
+    right: 0px;
+    width: 20px;
+    height: 200px;
+    background-color: rgba(0,0,0,0.9);
+    color: #fefefe;
+    cursor: pointer;
+    transition: right 0.3s;
+    z-index: 254;
+}
+#log{
+    position: absolute;
+    bottom: 230px;
+    right: -300px;
+    width: 300px;
+    height: 200px;
+    max-height: 200px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    background-color: rgba(0,0,0,0.8);
+    color: #fefefe;
+    text-align: left;
+    font-size: 14px;
+    transition: right 0.3s;
+    z-index: 253;
+}
+#text {
+    display: none;
+    background: rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 1.2em;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 255;
+
+    white-space: nowrap; /* 幅を文字数に応じて調整 */
+    overflow: hidden; /* アニメーション中の表示崩れを防ぐ */
+    width: fit-content; /* 文字の長さに応じた幅 */
+    animation: fadeIn 0.5s ease forwards; /* 表示時のフェードイン効果 */
+}
+
+@keyframes fadeIn {
+    0%{
+        opacity: 0;
+    }
+    100%{
+        opacity: 1;
+    }
+}
+
+.color-red{
+    color: #ff1919;
+}
+.color-pink{
+    color: #ff56e9;
+}
+.color-blue{
+    color: #1919ff;
+}
+
 #ZentaiMiruo{
     display: block;
     position: absolute;
@@ -207,10 +274,6 @@ body{
     flex: 1;
 }
 #ShowPhase{font-size: 35px;}
-#log{
-    text-align: center;
-    margin: 0 auto;
-}
 #ShowCardInfo{
     width: 50%;
     text-align: center;

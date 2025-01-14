@@ -1735,6 +1735,20 @@ let Charas = {
    },
 }
 
+let Friends = {
+   '飛花レイル':{
+      name:'飛花レイル',
+      belongto:'',
+      rare:3,
+      description:``,
+      comment:``,
+      N:0,
+      S:0,
+      E:0,
+      P:0,
+   }
+}
+
 let Buffs = {
    'powerup':{
       name:'powerup',
