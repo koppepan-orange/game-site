@@ -19,6 +19,12 @@
         {
             "type": "chrome",
             "request": "launch",
+            "name": "cardgame",
+            "file": "/Users/koppepanorange/orange_bread/game-site/rogue-cardgame/hontai.html"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
             "name": "テトリス(歌じゃないよ)",
             "file": "/Users/koppepanorange/orange_bread/game-site/tetris.html"
         },
