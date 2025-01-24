@@ -1002,23 +1002,23 @@ function PlaceNoteCard(){
             let nam = ed[card.id]??1
             let cardinfo = Cards[card.id]
 
-            const messageElement = document.createElement('div');
-            messageElement.id = card.id;
-            messageElement.setAttribute('data-id', card.id);
-            messageElement.setAttribute('data-cool', card.cool);
-            messageElement.setAttribute('data-num', nam);
-            messageElement.setAttribute('data-lv', card.lv);
-            messageElement.setAttribute('data-description', Cards[card.id].description);
+            const cardEle = document.createElement('div');
+            cardEle.id = card.id;
+            cardEle.setAttribute('data-id', card.id);
+            cardEle.setAttribute('data-cool', card.cool);
+            cardEle.setAttribute('data-num', nam);
+            cardEle.setAttribute('data-lv', card.lv);
+            cardEle.setAttribute('data-description', Cards[card.id].description);
 
             if(card.cool == 0){
-                messageElement.className = `notecard ${cardinfo.code} ${cardinfo.rare}`;
-                messageElement.innerHTML = `<img src="assets/cards/${cardinfo.name}.png" class="notecard-img">${cardinfo.nume}`;
+                cardEle.className = `notecard ${cardinfo.code} ${cardinfo.rare}`;
+                cardEle.innerHTML = `<img src="assets/cards/${cardinfo.name}.png" class="notecard-img">${cardinfo.nume}`;
             }else{
-                messageElement.className = `notecard ${cardinfo.code} ${cardinfo.rare} cooldown`;
-                messageElement.innerHTML = `<img src="assets/cards/${cardinfo.name}.png" class="notecard-img">${card.cool}`;
+                cardEle.className = `notecard ${cardinfo.code} ${cardinfo.rare} cooldown`;
+                cardEle.innerHTML = `<img src="assets/cards/${cardinfo.name}.png" class="notecard-img">${card.cool}`;
             }
 
-            messageElement.addEventListener('click', function (event) {
+            cardEle.addEventListener('click', function (event) {
                 if(event.target.classList.contains('cooldown')){return;}
                 event.stopPropagation();
                 changeBackgroundColor('yellow');
@@ -1096,7 +1096,7 @@ function PlaceNoteCard(){
                 }
             });
 
-            document.getElementById(`NoteCard${code}`).appendChild(messageElement);
+            document.getElementById(`NoteCard${code}`).appendChild(cardEle);
          })
     });
 }
