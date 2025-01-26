@@ -224,6 +224,19 @@ body{
 .SR{background-color: #ffff6b!important;}
 .SSR{background-color: #f64bff!important;}
 .UR{background-color: #ff4060!important;}
+
+.r0{background-color: #dddddd!important;}
+.r1{background-color: #777777!important;}
+.r2{background-color: #575757!important;}
+.r3{background-color: #80ee80!important;}
+.r4{background-color: #3884ff!important;}
+.r5{background-color: #ffff91!important;}
+.r6{background-color: #ffbbf9!important;}
+.r7{background-color: #f64bff!important;}
+.r8{background-color: #d36dff!important;}
+.r9{background-color: #ff4060!important;}
+
+
 #UIzone {
     margin: 0 auto;
     display: flex;

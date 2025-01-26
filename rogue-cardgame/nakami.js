@@ -131,15 +131,31 @@ function EnemyNameDeside(num){
 //#region カード系統
 let target = 1; //tabキーで狙う敵変れるようにしますか?いやいいや
 const Cards = {
+    'none':{
+        id:'none',
+        name: 'none',
+        nume: '',
+        code: 'A',
+        rare: 1,
+        cool: 1,
+        have: {},
+        buyable: 0,
+        description: '"何もない"。デジタル絵師ならわかるよね？',
+        process:async function(c,t){
+            let atk = 0;
+            atk += eleatk;
+        }
+    },
     //こっからA
     'slash':{
         id:'slash',
         name: 'スラッシュ',
         nume: 2,
         code: 'A',
-        rare: 'N',
+        rare: 1,
         cool: 2,
         have: {}, //.lengthで所持枚数、中の数字が残りクールダウン
+        buyable: 0,
         description: '軽い斬撃。',
         process:async function(c,t){
             let atk = 2;
@@ -153,9 +169,10 @@ const Cards = {
         name: 'ソード',
         nume: 3,
         code: 'A',
-        rare: 'N',
+        rare: 1,
         cool: 3,
         have: {},
+        buyable: 0,
         description: '使うたびに攻撃力が上昇する。',
         process:async function(c,t){
             let atk = 3;
@@ -172,9 +189,10 @@ const Cards = {
         name: 'ラッシュソード',
         nume: '3+',
         code: 'A',
-        rare: 'R',
+        rare: 3,
         cool: 4,
         have: {},
+        buyable: 1,
         description: '基本3ダメージ、次のカードが自分の攻撃カードの場合3回攻撃になる。',
         process:async function(c,t){
             let atk = 3;
@@ -190,9 +208,10 @@ const Cards = {
         name: 'ソウルナイフ',
         nume: 4,
         code: 'A',
-        rare: 'R',
+        rare: 3,
         cool: 3,
         have: {},
+        buyable: 1,
         description: '相手にダメージを与え、与えた分回復する。',
         process:async function(c,t){
             let atk = 4;
@@ -208,16 +227,51 @@ const Cards = {
         name: 'リーフソード',
         nume: '5+',
         code: 'A',
-        rare: 'R',
-        cool: 5,
+        rare: 3,
+        cool: 4,
         have: {},
+        buyable: 1,
         description: '基本5ダメージ、クール中カードが5枚以上なら10ダメージ。',
         process:async function(c,t){
             let atk = 5;
-            if(document.querySelectorAll('.cooldown').length >= 5){let atk = 10;}//こいつ廃止
+            if(document.querySelectorAll('.cooldown').length >= 5){let atk = 10;}
             atk += eleatk;
             let result = await attack(c,me,me,target,atk);
             return result;
+        }
+    },
+    'treesword':{
+        id:'treesword',
+        name: 'ツリーソード',
+        nume: '6+',
+        code: 'A',
+        rare: 4,
+        cool: 5,
+        have: {},
+        buyable: 1,
+        description: '基本7ダメージ、クール中カードが7枚以上なら14ダメージ。',
+        process:async function(c,t){
+            let atk = 7;
+            if(document.querySelectorAll('.cooldown').length >= 7){let atk = 14;}
+            atk += eleatk;
+            let result = await attack(c,me,me,target,atk);
+            return result;
+        }
+    },
+    'forest_anger':{
+        id:'forest_anger',
+        name: '森の怒り',
+        nume: '7+',
+        code: 'A',
+        rare: 7,
+        cool: 7,
+        have: {},
+        buyable: 1,
+        description: '基本6ダメージ、クール中カードが枚以上で、<br>自身の体力が半分以下ならなら18ダメージ、自身の体力を10回復',
+        process:async function(c,t){
+            let atk = 7;
+            if(document.querySelectorAll('.cooldown').length >= 7){let atk = 14;}//こいつ廃止
+            atk += eleatk;
         }
     },
     'gamble':{
@@ -225,11 +279,12 @@ const Cards = {
         name: '博打',
         nume: 8,
         code: 'A',
-        rare: 'R',
-        cool: 4,
+        rare: 4,
+        cool: 5,
         have: {},
-        description: '3ダメージ、もしくは8ダメージを与える。',
-        process:async function(c,t){
+        buyable: 1,
+        description: '基本3ダメージ、確率で8ダメージ。',
+        process:async function(card,c,t){
             let atk = Math.floor(Math.random() * 2) == 0 ? 8 : 3; //3または8 50%
             atk += eleatk;
             let result = await attack(c,me,me,target,atk);
@@ -241,29 +296,15 @@ const Cards = {
         name: 'デュアルカッター',
         nume: '4x2',
         code: 'A',
-        rare: 'R',
-        cool: 3,
+        rare: 4,
+        cool: 4,
         have: {},
+        buyable: 1,
         description: '4ダメージで2回攻撃する。',
         process:async function(c,t){
             let atk = 4;
             atk += eleatk;
-            let result = await attack(c,me,me,target,atk);
-            return result;
-        }
-    },
-    'fevercutter':{
-        id:'fevercutter',
-        name: 'フィーバーカッター',
-        nume: '7+',
-        code: 'A',
-        rare: 'R',
-        cool: 3,
-        have: {},
-        description: '攻撃力+相手のデバフの持続時間の合計で攻撃する。',
-        process:async function(c,t){
-            let atk = 4;
-            atk += enemydebuff.time;
+            atknum = 2;
             let result = await attack(c,me,me,target,atk);
             return result;
         }
@@ -273,14 +314,51 @@ const Cards = {
         name: 'クアッドカッター',
         nume: '4x4',
         code: 'A',
-        rare: 'SR',
+        rare: 7,
+        cool: 7,
+        have: {},
+        buyable: 1,
+        description: '3ダメージで4回攻撃する。',
+        process:async function(c,t){
+            let atk = 3;//ぶっ壊れになりそう..まあ名前かっこいいからいいよね！！
+            atk += eleatk;
+            atknum = 4;
+            let result = await attack(c,me,me,target,atk);
+            return result;
+        }
+    },
+    'demondance':{
+        id:'demondance',
+        name: '鬼神乱舞',//アークナイツモンハンコラボ、キリンRヤトウの2ndスキルより
+        nume: '4x6',//ちょっとやばいか...?ww
+        code: 'A',
+        rare: 9,
+        cool: 8,
+        have: {},
+        buyable: 1,
+        description: '3ダメージで6回攻撃する。',
+        serif: '足掻こうが抗おうが無駄だ！',
+        process:async function(c,t){
+            let atk = 3;
+            atk += eleatk;
+            atknum = 6//ちょっとやばいかもよ？？ww
+            let result = await attack(c,me,me,target,atk);
+            return result;
+        }
+    },//鬼踊....ww
+    'fevercutter':{
+        id:'fevercutter',
+        name: 'フィーバーカッター',
+        nume: '7+',
+        code: 'A',
+        rare: 4,
         cool: 4,
         have: {},
-        description: '4ダメージで4回攻撃する。',
+        buyable: 1,
+        description: '攻撃力+相手のデバフの持続時間の合計で攻撃する。',
         process:async function(c,t){
-            let atk = 4;//ぶっ壊れになりそう..まあ名前かっこいいからいいよね！！
-            atk += eleatk;
-            atknum += 3;
+            let atk = 4;
+            atk += enemydebuff.time;
             let result = await attack(c,me,me,target,atk);
             return result;
         }
@@ -290,14 +368,15 @@ const Cards = {
         name: 'フィーバースラッシュ',
         nume: '7+x2',
         code: 'A',
-        rare: 'SR',
-        cool: 4,
+        rare: 7,
+        cool: 7,
         have: {},
+        buyable: 1,
         description: '攻撃力+相手のデバフの持続時間の合計で2回攻撃する。',
         process:async function(c,t){
             let atk = 4;
             atk += enemydebuff.time;
-            atknum += 1;
+            atknum = 2;
             let result = await attack(c,me,me,target,atk);
             return result;
         }
@@ -307,9 +386,10 @@ const Cards = {
         name: 'ハートシーカー',
         nume: 'X',
         code: 'A',
-        rare: 'SR',
-        cool: 5,
+        rare: 6,
+        cool: 6,
         have: {},
+        buyable: 1,
         description: '自身のバリアを全て消費し、<br>相手に消費前のバリアの1.5倍のダメージを与える。',
         process:async function(c,t){
             let atk = shield;
@@ -325,42 +405,11 @@ const Cards = {
         name: 'ブラッドナイフ',//これ好き(元:学マス-はじける水しぶき)
         nume: '16',
         code: 'A',
-        rare: 'SR',
-        cool: 5,
+        rare: 4,
+        cool: 4,
         have: {},
-        description: '自分のHPを7減らした後相手にダメージを与える。<br>自身にバリアがある場合、リカバリを2付与する'
-    },
-    'demondance':{
-        id:'demondance',
-        name: '鬼神乱舞',//アークナイツモンハンコラボ、キリンRヤトウの2ndスキルより
-        nume: '4x6',//ちょっとやばいか...?ww
-        code: 'A',
-        rare: 'SSR',
-        cool: 6,
-        have: {},
-        description: '4ダメージで6回攻撃する。<br>足掻こうが抗おうが無駄だ！',
-        process:async function(c,t){
-            let atk = 4;
-            atk += eleatk;
-            atknum += 5;//ちょっとやばいかもよ？？ww
-            let result = await attack(c,me,me,target,atk);
-            return result;
-        }
-    },//鬼踊....ww
-    'feverchainsaw':{
-        id:'feverchainsaw',
-        name: 'フィーバーチェーンソー',//夢の塊 ...え名前としてありすぎない？？夢の塊
-        nume: '7+x4',
-        code: 'A',
-        rare: 'UR',
-        cool: 5,
-        have: {},
-        description: '攻撃力+相手のデバフの持続時間の合計で4回攻撃する。',
-        process:async function(c,t){
-            const atk = 4 + enemydebuff.time;
-            await attack(c,me,me,target,atk);
-            atknum += 3;
-        }
+        buyable: 1,
+        description: '自分のHPを7減らした後相手にダメージを与える。<br>自身にバリアがある場合、リカバリを2付与する' //作った本人記憶なくて"何これ?!"ってなったのは内緒のお話
     },
 
 
@@ -370,9 +419,10 @@ const Cards = {
         name: '盾',
         nume: 4,
         code: 'M',
-        rare: 'N',
-        cool: 3,
+        rare: 1,
+        cool: 2,
         have: {},
+        buyable: 1,
         description: '軽く盾を構える。',
         process:async function(c,t){
             let shl = 4;
@@ -385,9 +435,10 @@ const Cards = {
         name: '回復',
         nume: 4,
         code: 'M',
-        rare: 'N',
+        rare: 1,
         cool: 2,
         have: {},
+        buyable: 1,
         description: '自身のHPを4回復する。',
         process:async function(c,t){
             let result = await heal(c,me,me,4);
@@ -399,9 +450,10 @@ const Cards = {
         name: '攻撃力上昇',
         nume: 1,
         code: 'M',
-        rare: 'R',
-        cool: 4,
+        rare: 6,
+        cool: 6,
         have: {},
+        buyable: 1,
         description: '自身の攻撃力を上昇させる。',
         process:async function(c,t){
             eleatk += 1;
@@ -414,9 +466,10 @@ const Cards = {
         name: 'グリーン・トレイン',
         nume: '',
         code: 'M',
-        rare: 'R',
-        cool: 5,
+        rare: 3,
+        cool: 4,
         have: {},
+        buyable: 1,
         description: '使用されたフェーズの配置されたカードを全て無効化する。<br>簡単に言えばスキップである',
         process:async function(c,t){
             //ないっすよ。だってこれ存在するだけで効果だし
@@ -424,15 +477,32 @@ const Cards = {
             return 'alive';
         }
     },
+    'yellowtrain':{
+        id:'yellowtrain', //黄色のドクターとかありじゃね？ だからあえてのそのまま
+        name: 'ドクター・イエロー',
+        nume: 'Px2',//p = Phase
+        code: 'M',
+        rare: 4,
+        cool: 5,
+        have: {},
+        buyable: 1,
+        description: '使用されたフェーズの配置されたカードを全て無効化する。<br>ついでに体力を現在のフェーズ数x2回復する。',
+        process:async function(c,t){
+            let result = await heal(c,me,me,me.phase*2);
+            result = await skip(c,t);
+            return result;
+        }
+    },
     'behard':{
         id:'behard', //die hardも作りたいね DBDのやつ
         name: '硬化',
         nume: '',
         code: 'M',
-        rare: 'R',
-        cool: 5,
+        rare: 3,
+        cool: 3,
         have: {},
-        description: '4硬化状態を得る',
+        buyable: 1,
+        description: '4硬化状態を得る',//硬化:攻撃を受けた時バフの持続時間分ダメージを減らす。減らした分バフの持続時間を減少
         process:async function(c,t){
             buffAdd(c,me,'硬化',4);
             return 'alive';
@@ -443,42 +513,28 @@ const Cards = {
         name: 'デュアルコアシステム',//ダブルエントリーシステム的なやつができたらシステム消しといて
         nume: '',
         code: 'M',
-        rare: 'R',
-        cool: 5,
+        rare: 3,
+        cool: 3,
         have: {},
+        buyable: 1,
         description: '次のターン、相手のカードを後ろに配置する。',
         process:async function(c,t){
-            if(c == 'p'){nextcardactpat = '0011';}
-            if(c == 'e'){nextcardactpat = '1100';}
+            if(c == 'p'){bar = '0011';}
+            if(c == 'e'){bar = '1100';}
             return 'alive';
         }
-    },
-    'yellowtrain':{
-        id:'yellowtrain', //黄色のドクターとかありじゃね？ だからあえてのそのまま
-        name: 'ドクター・イエロー',
-        nume: 'Px2',//p = Phase
-        code: 'M',
-        rare: 'SR',
-        cool: 6,
-        have: {},
-        description: '使用されたフェーズの配置されたカードを全て無効化する。<br>ついでに体力を現在のフェーズ数x2回復する。',
-        process:async function(c,t){
-            let result = await heal(c,me,me,me.phase*2);
-            result = await skip(c,t);
-            return result;
-        }
-
     },
     'thiefmask':{
         id:'thiefmask',
         name: 'シーフマスク',
         nume: '',
         code: 'M',
-        rare: 'SR',
+        rare: 5,
         cool: 5,
         have: {},
-        description: 'このカードの一つ前のカードを盗む。',
-        process:async function(c,t){
+        buyable: 1,
+        description: 'このカードの一つ前のカードを盗む。', //敵が使うと自身のやつがなくなるだけ
+        process:async function(c,t){　//今風に適応させといて PREV,NEXT処理部瑞花も
             if(prevcard){//敵が使った時
                 if(prevcard.classList.contains('p')&&nowturn == 'e'){
                 if(prevcard.classList.contains('A')){
@@ -512,19 +568,37 @@ const Cards = {
         name: 'オーバードライブ',
         nume: '',
         code: 'M',
-        rare: 'UR',//初URこれね？ww
-        cool: 5,
+        rare: 8,//初URこれね？ww
+        cool: 6,
         have: {},
-        description: '次のターン、相手のカードを無くす。<br>敵が使うことは絶対にない。',//まあ..使えたらかなりきっついからね とはいいつつ一人くらいあってもいいかも
+        buyable: 1,
+        description: '自身の体力をクール中カードx2にし、<br>次のターン、相手のカードを無くす。<br>敵が使うことは絶対にない。',//まあ..使えたらかなりきっついからね とはいいつつ一人くらいあってもいいかも
         process:async function(c,me,t,targat){
             playerhealth = document.querySelectorAll('.cooldown').length*2;
-            nextcardactpat = '0000';
+            if(c == 'p'){bar = '0000';}
+            if(c == 'e'){bar = '1111';}
+        }
+    },
+    'backwater_camp':{ //こいつの相手のカード無くし無くして、分離させてもいいかも
+        id:'backwater_camp',
+        name: '背水の陣',
+        nume: '',
+        code: 'M',
+        rare: 8,
+        cool: 6,
+        have: {},
+        buyable: 1,
+        description: '自身の体力を1にし、攻撃力を2増加し、次のターン、相手のカードをなくす。',
+        process:async function(c,t){
+            if(c == 'p'){bar = '0011';}
+            if(c == 'e'){bar = '1100';}
+            return 'alive';
         }
     }
 };
 
-const SortCardA = Object.keys(Cards).filter(card => card.code === 'A').map(card => card.name);
-const SortCardM = Object.keys(Cards).filter(card => card.code === 'M').map(card => card.name);
+const SortCardA = Object.keys(Cards).filter(card => Cards[card].code === 'A').map(card => Cards[card].id);
+const SortCardM = Object.keys(Cards).filter(card => Cards[card].code === 'M').map(card => Cards[card].id);
 //#endregion
 //#region 敵の動きのまとめ
 let enemyname = '古書館の魔術師';
@@ -534,9 +608,9 @@ let Enemies = {
         elite:0,
         appeable:1,
         actpat:{
-            1:['attackup', 0, 0, 'sword'],
-            2:[0, 'thiefmask', 0, 'gamble'],
-            3:[0,'shield',0,'dualcutter'],
+            1:['attackup 1', 0, 0, 'sword 1'],
+            2:[0, 'thiefmask 1', 0, 'gamble 1'],
+            3:[0,'shield 1',0,'dualcutter 1'],
         }
     },
     '船上のバニーチェイサー':{
@@ -544,28 +618,12 @@ let Enemies = {
         elite:0,
         appeable:1,
         actpat:{
-            1:['攻撃力上昇',0,'攻撃力上昇',0],
-            2:[0,'盾','ソード',0],
-            3:['盾',0,0,'ハートシーカー'],
+            1:['attackup 1',0,'attackup 1',0],
+            2:[0,'shield 1','sword 1',0],
+            3:['shield 1',0,0,'heartseeker 1'], 
         }
     },
 }
-
-let actpat = [
-    [
-        ['攻撃力上昇', 0, 0, 'ソード'],
-        [0, 'シーフマスク', 0, '博打'],
-        [0,'盾',0,'デュアルカッター'],
-    ],
-    [
-        ['攻撃力上昇',0,'攻撃力上昇',0],
-        [0,'盾','ソード',0],
-        ['盾',0,0,'ハートシーカー'],
-    ],
-    [
-        ['攻撃力上昇',0,0,0],
-    ],
-];
 
 //#endregion
 //#region 変数s
@@ -649,7 +707,6 @@ let bar = 0;//バーの状態 0 == 特に条件なし
 let barcard = [0,0,0,0];
 
 let phase = 0;
-let nextcardactpat = 0;//dualとかoverdriveとか
 
 //#endregion
 //#region バフ/デバフのそれ
@@ -704,14 +761,14 @@ function buffrem(tcam,tme,buff,time){
     tekiou();
 }
 function buffclear(){
-    playerbuff.name = 0;
-    playerbuff.time = 0;
-    playerdebuff.name = 0;
-    playerdebuff.time = 0;
-    enemybuff.name = 0;
-    enemybuff.time = 0;
-    enemydebuff.name = 0;
-    enemydebuff.time = 0;
+    Object.keys(humans).forEach(cam => {
+        Object.keys(humans[cam]).forEach(me => {
+            Object.keys(humans[cam][me].buff).forEach(buff => {
+                delete humans[cam][me].buff[buff];
+                console.log(`${humans[cam][me].buff}を消去しました`);
+            })
+        })
+    })
     tekiou();
 }
 //#endregion
@@ -728,6 +785,22 @@ function tekiou(){
         })
     })
 }
+function copy(obj) {
+    if (obj === null || typeof obj !== 'object') {
+        return obj; // 基本型はそのまま返す
+    }
+    if (Array.isArray(obj)) {
+        return obj.map(copy); // 配列の各要素を再帰コピー
+    }
+    const result = {};
+    for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            result[key] = copy(obj[key]); // オブジェクトのプロパティを再帰コピー
+        }
+    }
+    return result;
+}
+
 function arrayRandom(array){
     return array[Math.floor(Math.random() * array.length)];
 }
@@ -941,7 +1014,7 @@ function cardAdd(ids, lv){
         num: leg+1, //${ids}
         id: ids,
         cool: 0,
-        lv: lv??0,
+        lv: lv??1,
     }
 }
 function cardRemove(ids){
@@ -950,44 +1023,67 @@ function cardRemove(ids){
 }
 //#endregion
 //#region make bar, place notecard
+function nextActpat(){
+    actpatnum++;
+    if(actpatnum >= Enemies[enemyname].actpat.length){actpatnum = 1;};
+}
 function BarCardCreate() {
     document.getElementById('PhaseBar').innerHTML = '';
 
-    let barCards= Enemies[enemyname].actpat[actpatnum];
-    barcard = [0,0,0,0]
-
-    let bars = Array.from(bar).map((val, index) => (val === '1' ? index + 1 : null)) .filter((val) => val !== null);
-    bars.forEach(nanka =>{
-        let card = barCards[nanka]
-        barcard[nanka] = Cards[card]
-    })
+    barcard = copy(Enemies[enemyname].actpat[actpatnum]); //コピー？らしい
+    let moto = barcard.map((val, index) => (val !== 0 ? index + 1 : null)) .filter((val) => val !== null);
+    let ato = Array.from(bar).map((val, index) => (val === '1' ? index + 1 : null)) .filter((val) => val !== null);
+    for(let i = 0; i < ato.length; i++){
+        let nanka = ato[i];
+        let card = barcard[moto[ato.indexOf(nanka)] - 1];
+        barcard[moto[ato.indexOf(nanka)] - 1] = 0;
+        barcard[nanka - 1] = Cards[card];
+        if(i >= 1){break;}
+    }
     if(bar === '1111'){//埋め合わせの動き
         nextActpat();
-        let barCards= Enemies.actpat[actpatnum];
-        [3,4].forEach(nanka => {
-            let card = barCards[nanka]
-            barcard[nanka] = Cards[card]
-        })
+        let motonoko= copy(Enemies[enemyname].actpat[actpatnum]);
+        moto = motonoko.map((val, index) => (val !== 0 ? index + 1 : null)) .filter((val) => val !== null);
+        ato = [3,4]
+
+        for(let i = 0; i < ato.length; i++){
+            let nanka = ato[i];
+            let card = motonoko[moto[ato.indexOf(nanka)] - 1];
+            motonoko[moto[ato.indexOf(nanka)] - 1] = 0;
+            barcard[nanka - 1] = Cards[card];
+            if(i >= 1){break;}
+        }
     }
 
     let i = 0
     for (let nanka of barcard) {
         i++
         const Zone = document.getElementById('PhaseBar');
-        const messageElement = document.createElement('div');
+        const cardEle = document.createElement('div');
 
-        if(nanka !== 0) {
-            const card = Object.keys(Cards).find(c => c.name === nanka);
+        if(nanka !== 0){
+            const card = Cards[nanka];
+            let LV = nanka.slice(-1) //レベルが1~9であると仮定する
+            nanka = nanka.slice(0, -2);
             if(card) {
-                messageElement.id = card.name;
-                messageElement.className = `card ${card.code} G e ${i}`;
-                messageElement.innerHTML = `<img src="assets/cards/${card.name}.png" class="card-img">${card.nume}`;
-                Zone.appendChild(messageElement);
+                cardEle.id = card.name;
+                cardEle.setAttribute('data-id', card.id);
+                cardEle.setAttribute('data-num', i);
+                cardEle.setAttribute('data-lv', LV);
+                cardEle.setAttribute('data-rare', card.rare);
+                cardEle.setAttribute('data-description', card.description);
+                cardEle.className = `card ${card.code} r${card.rare} e ${i}`;
+                cardEle.innerHTML = `<img src="assets/cards/${card.name}.png" class="card-img">${card.nume}`;
+                Zone.appendChild(cardEle);
             }
-        } else {
-            messageElement.className = 'card none ' + i;
-            messageElement.innerHTML = '<img src="assets/cards/none.png" class="card-img">';
-            Zone.appendChild(messageElement);
+        }else{
+            cardEle.id = 'none';
+            cardEle.setAttribute('data-id', 'none');
+            cardEle.setAttribute('data-num', i);
+            cardEle.setAttribute('data-description', Cards['none'].description);
+            cardEle.className = 'card r0 ' + i;
+            cardEle.innerHTML = '<img src="assets/cards/none.png" class="card-img">';
+            Zone.appendChild(cardEle);
         }
     }
 }
@@ -1003,18 +1099,19 @@ function PlaceNoteCard(){
             let cardinfo = Cards[card.id]
 
             const cardEle = document.createElement('div');
-            cardEle.id = card.id;
-            cardEle.setAttribute('data-id', card.id);
-            cardEle.setAttribute('data-cool', card.cool);
-            cardEle.setAttribute('data-num', nam);
-            cardEle.setAttribute('data-lv', card.lv);
-            cardEle.setAttribute('data-description', Cards[card.id].description);
+            cardEle.id = card.id;                                   //以下例
+            cardEle.setAttribute('data-id', card.id); //slash
+            cardEle.setAttribute('data-cool', card.cool); //0 (クールダウン)
+            cardEle.setAttribute('data-num', nam); //1 (何番目の子か)
+            cardEle.setAttribute('data-lv', card.lv); //1(レベル)
+            cardEle.setAttribute('data-rare', cardinfo.rare);
+            cardEle.setAttribute('data-description', Cards[card.id].description); //単体に2ダメージ
 
             if(card.cool == 0){
-                cardEle.className = `notecard ${cardinfo.code} ${cardinfo.rare}`;
+                cardEle.className = `notecard ${cardinfo.code} r${cardinfo.rare}`;
                 cardEle.innerHTML = `<img src="assets/cards/${cardinfo.name}.png" class="notecard-img">${cardinfo.nume}`;
             }else{
-                cardEle.className = `notecard ${cardinfo.code} ${cardinfo.rare} cooldown`;
+                cardEle.className = `notecard ${cardinfo.code} r${cardinfo.rare} cooldown`;
                 cardEle.innerHTML = `<img src="assets/cards/${cardinfo.name}.png" class="notecard-img">${card.cool}`;
             }
 
@@ -1022,83 +1119,82 @@ function PlaceNoteCard(){
                 if(event.target.classList.contains('cooldown')){return;}
                 event.stopPropagation();
                 changeBackgroundColor('yellow');
-                x = notecard.id;
-                NoteCard = notecard;//これは要素の方のnotecard
 
-                notecard.classList.add('holdcooldown');
-                notecard.classList.add('usedbefore');
+                event.target.classList.add('holdcooldown');
+                event.target.classList.add('usedbefore');
+
+
+                document.querySelectorAll('.card.none').forEach(function (barnocard){
+                    function handleClick(event) {
+                        barcardClicked(event, barnocard);
+                    }
+                    barnocard.addEventListener('click', (event) => {
+                        handleClick(event);
+                    });
+                });
             })
 
-            // カードクリック時の背景色変更とクリックイベント設定
-            document.querySelectorAll('.card.none').forEach(function (card) {
-                card.addEventListener('click', function (event) {
-                    event.stopPropagation();
-                    if(getBackgroundColor(card) == 'rgb(255, 255, 0)') {
-                        const classList = card.classList;
-                        z = classList[classList.length - 1];
-                        const notecard = Object.keys(Cards).find(c => c.name === x);//これははカードの詳細
-                        if(notecard){
-                            card.id = notecard.name;
-                            card.className = `card ${notecard.code} ${notecard.rare} p ${z}`;
-                            card.innerHTML = `<img src="assets/cards/${notecard.name}.png" class="card-img">${notecard.nume}`;
-                            changeBackgroundColor('#ddd');
-                            //console.log("Card ID:", x);
-
-                            if(document.querySelector('.holdcooldown')) {
-                                let ittannoyatu = document.querySelector('.holdcooldown');
-                                ittannoyatu.classList.remove('holdcooldown');
-                                ittannoyatu.classList.add('cooldown');
-                                ittannoyatu.innerHTML = `<img src="assets/cards/${x}.png" class="notecard-img">${notecard.cool}`;
-                            }
-
-                            if (havecardA.name.includes(x)) {
-                                indices = havecardA.name.map((name, idx) => name === x ? idx : -1).filter(index => index !== -1);
-                                //console.log("Indices in havecardA:", indices); // 取得されたインデックスを確認
-
-                                for (let index of indices) {
-                                    //console.log("Checking havecardA.ct[index]:", havecardA.ct[index]); // ここでクールダウン値を確認
-                                    if (havecardA.ct[index] === 0) { // クールダウンがない場合のみ更新
-                                        havecardA.ct[index] = Object.keys(Cards).find(c => c.name === x).cool;
-                                        //console.log("Updated havecardA.ct[index]:", havecardA.ct[index]); // 更新後の値を確認
-                                        break; // 更新したらループ終了
-                                    }
-                                }
-                            } else if (havecardM.name.includes(x)) {
-                                indices = havecardM.name.map((name, idx) => name === x ? idx : -1).filter(index => index !== -1);
-                                console.log("Indices in havecardM:", indices);
-
-                                for (let index of indices) {
-                                    console.log("Checking havecardM.ct[index]:", havecardM.ct[index]);
-                                    if (havecardM.ct[index] === 0) { // クールダウンがない場合のみ更新
-                                        havecardM.ct[index] = Object.keys(Cards).find(c => c.name === x).cool;
-                                        console.log("Updated havecardM.ct[index]:", havecardM.ct[index]);
-                                        break; // 更新したらループ終了
-                                    }
-                                }
-                            }
-                        }
-
-                        if(!document.querySelector('.card.none')) {
-                            document.getElementById('NoteCardArea').style.display = 'none';
-                            document.getElementById('PhaseStart').style.display = 'block';
-                            document.getElementById('PhaseStart').innerHTML = '<button onclick="Phasestart()">行動を開始する</button><br><br><button onclick="Phasereset()">やり直す</button>';
-                        }
-                    }
-                });
-            });
-
-            document.addEventListener('click', function () {
-                changeBackgroundColor('#ddd');
-                if(document.querySelector('.holdcooldown')) {
-                    const Ittan = document.querySelector('.holdcooldown');
-                    Ittan.classList.remove('holdcooldown');
-                    Ittan.classList.remove('usedbefore');
-                }
-            });
-
+            
             document.getElementById(`NoteCard${code}`).appendChild(cardEle);
          })
+
+         // カードクリック時の背景色変更とクリックイベント設定
+         
     });
+}
+function barcardClicked(event,card){
+    event.stopPropagation();
+    if(getBackgroundColor(card) == 'rgb(255, 255, 0)') {
+        const classList = card.data.num.split(' ');
+        z = classList[classList.length - 1];
+        const cardinfo = Cards[card.id];
+        if(cardinfo){
+            card.id = cardinfo.name;
+            card.className = `card ${cardinfo.code} r${cardinfo.rare} p ${z}`;
+            card.innerHTML = `<img src="assets/cards/${cardinfo.name}.png" class="card-img">${cardinfo.nume}`;
+            changeBackgroundColor('#dedede');
+
+            if(document.querySelector('.holdcooldown')){
+                let ittannoyatu = document.querySelector('.holdcooldown');
+                ittannoyatu.classList.remove('holdcooldown');
+                ittannoyatu.classList.add('cooldown');
+                ittannoyatu.innerHTML = `<img src="assets/cards/${x}.png" class="notecard-img">${cardinfo.cool}`;
+            }
+
+            if (havecardA.name.includes(x)) {
+                indices = havecardA.name.map((name, idx) => name === x ? idx : -1).filter(index => index !== -1);
+                //console.log("Indices in havecardA:", indices); // 取得されたインデックスを確認
+
+                for (let index of indices) {
+                    //console.log("Checking havecardA.ct[index]:", havecardA.ct[index]); // ここでクールダウン値を確認
+                    if (havecardA.ct[index] === 0) { // クールダウンがない場合のみ更新
+                        havecardA.ct[index] = Object.keys(Cards).find(c => c.name === x).cool; 
+                        //card.removeEventListener('click', barcardClicked);
+                        //console.log("Updated havecardA.ct[index]:", havecardA.ct[index]); // 更新後の値を確認
+                        break; // 更新したらループ終了
+                    }
+                }
+            } else if (havecardM.name.includes(x)) {
+                indices = havecardM.name.map((name, idx) => name === x ? idx : -1).filter(index => index !== -1);
+                console.log("Indices in havecardM:", indices);
+
+                for (let index of indices) {
+                    console.log("Checking havecardM.ct[index]:", havecardM.ct[index]);
+                    if (havecardM.ct[index] === 0) { // クールダウンがない場合のみ更新
+                        havecardM.ct[index] = Object.keys(Cards).find(c => c.name === x).cool;
+                        console.log("Updated havecardM.ct[index]:", havecardM.ct[index]);
+                        break; // 更新したらループ終了
+                    }
+                }
+            }
+        }
+
+        if(!document.querySelector('.card.none')) {
+            document.getElementById('NoteCardArea').style.display = 'none';
+            document.getElementById('PhaseStart').style.display = 'block';
+            document.getElementById('PhaseStart').innerHTML = '<button onclick="Phasestart()">行動を開始する</button><br><br><button onclick="Phasereset()">やり直す</button>';
+        }
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1157,21 +1253,13 @@ function Phasereset() {
         card.addEventListener('click', function (event) {
             event.stopPropagation();
             if(getBackgroundColor(card) == 'rgb(255, 255, 0)') {
-                const classList = card.classList;
-                z = classList[classList.length - 1]; // 一番右のクラス名を取得
-                const notecard = Object.keys(Cards).find(c => c.name === x);
-                if(notecard) {
-                    card.id = notecard.name;
-                    card.className = `card ${notecard.code} ${notecard.rare} ${z}`;
-                    card.innerHTML = `<img src="assets/cards/${notecard.name}.png" class="card-img">${notecard.nume}`;
-                    changeBackgroundColor('#ddd');
+                changeBackgroundColor('#ddd');
 
-                    if(document.querySelector('.holdcooldown')) {
-                        x = document.querySelector('.holdcooldown');
-                        x.classList.remove('holdcooldown');
-                        x.classList.add('cooldown');
-                        x.innerHTML = `<img src="assets/cards/${x.id}.png" class="notecard-img">${Object.keys(Cards).find(c => c.name === x.id).cool}`;
-                    }
+                if(document.querySelector('.holdcooldown')) {
+                    x = document.querySelector('.holdcooldown');
+                    x.classList.remove('holdcooldown');
+                    x.classList.add('cooldown');
+                    x.innerHTML = `<img src="assets/cards/${x.id}.png" class="notecard-img">${Object.keys(Cards).find(c => c.name === x.id).cool}`;
                 }
                 if(!document.querySelector('.card.none')) {
                     document.getElementById('NoteCardArea').style.display = 'none';
@@ -1323,7 +1411,7 @@ async function Phasestart() {
             x.who = card.getAttribute('data-who');
             actCards.push(x);
         });
-        nextcardactpat = 0;//resetにﾖﾛ
+        bar = 0;//resetにﾖﾛ
 
         let ZatuZatuNum = 0;
 
@@ -1416,10 +1504,10 @@ async function Phasestart() {
         }
 
         //セリフ入れるならここ2
-        if(nextcardactpat === '0011'){
+        if(bar === '0011'){
             await addtext( 'デュアルコアシステム、始動！！');
         }
-        if(nextcardactpat === '0000'){
+        if(bar === '0000'){
             await addtext( 'この時を待っていました...');//シュナさんのセリフやね まあ..これはコラボじゃないんで！SSRではないです！！！
             await addtext('オーバードライブ！！！');
         }
