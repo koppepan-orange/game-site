@@ -981,6 +981,58 @@ let enemynames = ["彷徨わない亡霊", "地上の月兎", "悠々自適な�
 const enemynamenum = ['0.5','6.5','12.5','18.3'];
 let bossenemynames = ['purpleslime','steampumker','RailwayGun "Shemata"','joker']//RailwayGun "Shemata"...wwあ、列車砲シェマタね 対策委員会が壊そうとしてたやつ
 let enemyprefixes = ['激昂','冷静沈着な','ギャンブラーな','守りが固い','心眼持ちの'];
+let Prefixes = {
+   'furious':{
+      id:'furious',
+      name:'激昂',
+      rare:1,
+      process:function(cam,me){
+         humans[cam][me].attack  = Math.floor(humans[cam][me].attack*1.5);
+         humans[cam][me].defense = Math.floor(humans[cam][me].defense*0.75);
+         humans[cam][me].critlate = 0.05
+      },
+   },
+   'calm':{
+      id:'calm',
+      name:'冷静沈着な',
+      rare:1,
+      process:function(cam,me){
+         humans[cam][me].attack  = Math.floor(humans[cam][me].attack*0.75);
+         humans[cam][me].defense = Math.floor(humans[cam][me].defense*2.0);
+         humans[cam][me].critrate = 5
+      },
+   },
+   'gambler':{
+      id:'gambler',
+      name:'ギャンブラーな',
+      rare:1,
+      process:function(cam,me){
+         humans[cam][me].critrate += 4
+         humans[cam][me].maxhealth = Math.floor(humans[cam][me].maxhealth*2.0);
+      },
+   },
+   'defender':{
+      id:'defender',
+      name:'守りが固い',
+      rare:2,
+      process:function(cam,me){
+         humans[cam][me].critresist += 5;
+         humans[cam][me].maxhealth = Math.floor(humans[cam][me].maxhealth*1.25);
+         humans[cam][me].defense = Math.floor(humans[cam][me].defense*1.5);
+         humans[cam][me].attack = Math.floor(humans[cam][me].attack*0.3)
+      },
+   },
+   'wise':{
+      id:'wise',
+      name:'心眼持ちの',
+      rare:3,
+      process:function(cam,me){
+         humans[cam][me].critlate = 100; //確定会心人間
+         humans[cam][me].critdmg = 1.2; //さすがに弱め
+         humans[cam][me].attack = Math.floor(humans[cam][me].attack*0.3); //つまり防御力無視害悪敵ってこと
+      },
+   },
+}
 
 let myWeapons = [];
 let myArmors = [];
@@ -2729,7 +2781,7 @@ let Tools = {
       num:0,
       process:async function(cam,tcam,me,target){
          let rbuffs = ['powerup','shellup','luck'];
-         rbuffs = inShuffle(rbuffs);
+         rbuffs = arrayShuffle(rbuffs);
          x = rbuffs[0];
          y = rbuffs[1];
          buffadd(tcam,target,x,3,Math.floor(Math.random()*2)+1);
@@ -2746,7 +2798,7 @@ let Tools = {
       num:0,
       process:async function(cam,tcam,me,target){
          let rbuffs = ['powerdown','shelldown','poison','burn','freeze'];
-         rbuffs = inShuffle(rbuffs);
+         rbuffs = arrayShuffle(rbuffs);
          for(i = 0;i < 2;i++){
             buffadd(tcam,target,rbuffs[i],3,Math.floor(Math.random()*2)+1);
          }
@@ -2916,7 +2968,7 @@ let Skills = {
             phase = 0; disappear();
             let target = await LetsTargetSelect();
             let S = ['わたしはその辺の小石...','わたしのことなんて、気にしないでください...','すみません、一人にさせてください......'];
-            serif = inSelect(S)
+            serif = arraySelect(S)
             log.textContent = serif;
             buffadd(target[1],target[0],'weaknessgrasp',2,1);//弱点把握状態
             return 'alive';
@@ -3651,12 +3703,27 @@ function load(){
 }
 
 function delay(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
+function copy(obj){
+   if (obj === null || typeof obj !== 'object') {
+      return obj; // 基本型はそのまま返す
+  }
+  if (Array.isArray(obj)) {
+      return obj.map(copy); // 配列の各要素を再帰コピー
+  }
+  const result = {};
+  for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+          result[key] = copy(obj[key]); // オブジェクトのプロパティを再帰コピー
+      }
+  }
+  return result;
+}
 
-function inSelect(array){
+function arraySelect(array){
    let select = Math.floor(Math.random()*array.length);
    return array[select];
 }
-function inShuffle(array) {
+function arrayShuffle(array) {
    for(let i = array.length - 1; i > 0; i--) {
        const j = Math.floor(Math.random() * (i + 1));
        [array[i], array[j]] = [array[j], array[i]];
@@ -3669,7 +3736,6 @@ document.addEventListener('mousemove', (e) => {
    HasDescription.style.left = `${e.clientX + 10}px`;
    HasDescription.style.top = `${e.clientY + 10}px`;
 });
-
 document.addEventListener('mouseover', (e) => {
    if(e.target.classList.contains('hasd')){
       const movabledescription = e.target.dataset.description;
@@ -3677,28 +3743,12 @@ document.addEventListener('mouseover', (e) => {
       document.getElementById('movabledescription').style.display = 'block';
    }
 });
-
 document.addEventListener('mouseout', (e) => {
    if(e.target.classList.contains('hasd')){
       document.getElementById('movabledescription').innerHTML = '';
       document.getElementById('movabledescription').style.display = 'none';
    }
 });
-
-// // MutationObserverを使用して要素の削除を監視
-// const observer = new MutationObserver((mutations) => {
-//    mutations.forEach((mutation) => {
-//       mutation.removedNodes.forEach((node) => {
-//          if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('hasd')) {
-//             document.getElementById('movabledescription').textContent = '';
-//             document.getElementById('movabledescription').style.display = 'none';
-//          }
-//       });
-//    });
-// });
-
-// // 監視を開始
-// observer.observe(document.body, {childList: true, subtree: true});
 
 async function NicoNicoText(mes){
    const newDiv = document.createElement('div');
@@ -3728,42 +3778,18 @@ function DesideEnemyName(target){
    let ENEMY1 = +ENEMYarray[1]+1
    let ENEMY2 = +ENEMYarray[0]
    humans.enemies[target].name = enemynames[Math.floor(Math.random() * ENEMY1)+ENEMY2]; // 敵の名前を決めます
-   if(Math.floor(Math.random() * 5) == 0){humans.enemies[target].prefixe = `${enemyprefixes[Math.floor(Math.random() * enemyprefixes.length)]} `};
+   if(Math.floor(Math.random() * 5) == 0){humans.enemies[target].prefixe = `${arraySelect(Object.keys(Prefixes))} `};
    
    humans.enemies[target].attack = enemyatk;//敵の能力を決めます
    humans.enemies[target].defense = enemydef;
-   humans.enemies[target].maxhealth = enemyhp; humans.enemies[target].health = humans.enemies[target].maxhealth;
+   humans.enemies[target].maxhealth = enemyhp;
+   humans.enemies[target].maxmp = enemymp; //どーにかして
    humans.enemies[target].critlate = enemycrla;
    humans.enemies[target].critdmg = enemycrdm;
    humans.enemies[target].critresist = enemycrrs;
-   switch(humans.enemies[target].prefixe){//接頭辞ごとの能力
-      case '激昂 ':
-         humans.enemies[target].attack  = Math.floor(enemyatk*1.5);
-         humans.enemies[target].defense = Math.floor(enemydef*0.75);
-         humans.enemies[target].critlate = 0.05
-         break;
-      case '冷静沈着な ':
-         humans.enemies[target].defense = Math.floor(enemydef*2);
-         humans.enemies[target].attack  = Math.floor(enemyatk*0.75);
-         break;
-      case 'ギャンブラーな ':
-         humans.enemies[target].critlate = enemycrla + 0.3;
-         humans.enemies[target].maxhealth = Math.floor(enemyhp*0.5);
-      break;
-      case '守りが固い ':
-         humans.enemies[target].critresist += 0.5;//会心半減ね
-         humans.enemies[target].health = Math.floor(enemyhp*1.25);
-         humans.enemies[target].defense = Math.floor(enemydef*1.5);
-         humans.enemies[target].attack = Math.floor(enemyatk*0.3);
-      break;
-      case '心眼持ちの ':
-         humans.enemies[target].critlate = 1;//確定会心人間(抵抗無視の場合)
-         humans.enemies[target].critdmg = 1.2;//さすがに弱め
-         humans.enemies[target].attack = Math.floor(enemyatk*0.3);//つまり..防御無視害悪敵だわこれ やば
-         humans.enemies[target].maxhealth = Math.floor(enemyhp*0.5);
-      break;
-   }
+   if(humans.enemies[target].prefixe !== ''){Prefixes[humans.enemies[target].prefixe]('enemies',target)};
    humans.enemies[target].health = humans.enemies[target].maxhealth;
+   humans.enemies[target].mp = humans.enemies[target].maxmp;
    return humans.enemies[target].name;
 }
 
@@ -4408,7 +4434,7 @@ async function GameStart(){
       if(userData && checkLastLogin(userData?.lastact??0)){
          cleareddailyquest = 0;
          Object.keys(Quests).filter(a => a.kind == 'daily').forEach(nanka => {
-            Quests[nanka] = inSelect(AllQuests);
+            Quests[nanka] = arraySelect(AllQuests);
             Quests[nanka].id = eval(nanka.slice(5));
          });
       }
@@ -4906,14 +4932,32 @@ function HomeBarRecluit(){
 
 async function HomeBarRecluitGo(num){
    save();
-   log.textContent = 'ごめんね、まだできてないんよ';
    document.getElementById('HomeArea').innerHTML = `
-   <button onclick="HomeBarRecluit()">←</button>募集<br>
-   ${num}回募集しました<br>
-   <button class="HomeSButton" onclick="HomeBarMeet()">探す</button>
+   <div id="r-go"><img src="assets/system/letsrecruit.png" id="r-go-img"></div>
    `;
-   await delay(1000);
-   HomeBarRecluit();
+}
+document.getElementById('r-go').addEventListener('click',HomeBarRecluitLets);
+function HomeBarRecluitLets(num){
+   document.getElementById('r-go').removeEventListener('click',HomeBarRecluitLets);
+   log.textContent = "";
+   Result.innerHTML = "";
+   result = [];
+   for(i = 0; i < num; i++){
+      let rarity = Math.random();
+      if(rarity < per1){
+         result.push(1)
+      }else if(rarity < (1-per3)){
+         result.push(2)
+      }else{
+         result.push(3)
+      }
+   }
+   if(num == 10 && !result.includes(2)){
+      result.pop();
+      result.push(2)
+      log.textContent = '最低保証が働きました！'
+   }
+   Result.innerHTML = result.join(" ");
 }
 function HomeBarMeet(){
    save();
@@ -5462,6 +5506,9 @@ function turretAllClear(){
 }
 //#endregion
 
+//#region charaのturn
+
+
 //#region prev-enemyturn
 async function NextTurnis(cam,tcam,me,target){
    phase = 0;
@@ -5979,7 +6026,7 @@ async function killedCheck(){
       if(karix){
          let saydefeats = [`${humans.players[1].name}は力尽きた...残念でしたね！にはははは〜！`,'残念だったね!すごい惜しかったね!!','あ、あれ..？もう負けちゃったんですか....？','ほら、負けを認めてください？'];
          if(humans.players[1].level < 3){saydefeats = ['あはは..負けちゃいましたね....防御力を上げると楽ですよ!', 'あはは..負けちゃいましたね....double slashは運要素も少ないので強いですよ!', 'あはは..負けちゃいましたね....魔法にターン数制限はありません!いっぱい使っちゃいましょう!','あはは..負けちゃいましたね....mechanicは防御全振りで戦うと良いですよ!','あれ〜？負けちゃったんですか〜？？おにいさんよわいね〜？？'];}
-         log.textContent = inSelect(saydefeats);
+         log.textContent = arraySelect(saydefeats);
          await delay(2000);
          Object.keys(humans.players).filter(a => humans.players[a].status == 1||humans.players[a].status == 2).forEach(nanka => {
             humans.players[nanka].status = 1;
@@ -6587,7 +6634,7 @@ async function OpenChest(code){
       log.textContent = 'チェストを開けた...';
       await delay(1000);
       for(let i = 0; i < 3; i++){
-         x = inSelect(inchestTool);
+         x = arraySelect(inchestTool);
          Tools[x].num += 1;
          log.textContent = Tools[x].name+'を手に入れた！';
          await delay(750);
@@ -6597,7 +6644,7 @@ async function OpenChest(code){
       log.textContent = 'チェストを開けた...';
       await delay(1000);
       for(let i = 0; i < 3; i++){
-         x = inSelect(inchestRareTool);
+         x = arraySelect(inchestRareTool);
          Tools[x].num += 1;
          log.textContent = Tools[x].name+'を手に入れた！';
          await delay(750);

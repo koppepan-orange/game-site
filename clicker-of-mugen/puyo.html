@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ぷよぷよ</title>
+    <style>
+        body { text-align: center; }
+        canvas { background: #ddd; display: block; margin: auto; }
+    </style>
+</head>
+<body>
+    <canvas id="puyoCanvas" width="300" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById("puyoCanvas");
+        const ctx = canvas.getContext("2d");
+        const COLS = 6;
+        const ROWS = 12;
+        const CELL_SIZE = 50;
+        const COLORS = ["red", "blue", "yellow", "green"];
+        const FIELD = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+        let currentPuyo = generatePuyo();
+        let gameOver = false;
+
+        function generatePuyo() {
+            let color1 = COLORS[Math.floor(Math.random() * 4)];
+            let color2 = COLORS[Math.floor(Math.random() * 4)];
+            return { x: 2, y: 0, color1, color2, rotation: 0 };
+        }
+
+        function drawField() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let y = 0; y < ROWS; y++) {
+                for (let x = 0; x < COLS; x++) {
+                    if (FIELD[y][x]) {
+                        ctx.fillStyle = FIELD[y][x];
+                        ctx.beginPath();
+                        ctx.arc(x * CELL_SIZE + CELL_SIZE / 2, y * CELL_SIZE + CELL_SIZE / 2, CELL_SIZE / 2.5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+            }
+            drawPuyo();
+        }
+
+        function drawPuyo() {
+            const offsets = [
+                [0, 0], [0, 1], [1, 0], [-1, 0] // 回転のオフセット（縦・横）
+            ];
+            ctx.fillStyle = currentPuyo.color1;
+            ctx.beginPath();
+            ctx.arc((currentPuyo.x + offsets[currentPuyo.rotation][0]) * CELL_SIZE + CELL_SIZE / 2, 
+                    (currentPuyo.y + offsets[currentPuyo.rotation][1]) * CELL_SIZE + CELL_SIZE / 2, 
+                    CELL_SIZE / 2.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = currentPuyo.color2;
+            ctx.beginPath();
+            ctx.arc(currentPuyo.x * CELL_SIZE + CELL_SIZE / 2, (currentPuyo.y + 1) * CELL_SIZE + CELL_SIZE / 2, CELL_SIZE / 2.5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function movePuyo(dx, dy) {
+            if (!gameOver) {
+                currentPuyo.x += dx;
+                currentPuyo.y += dy;
+                drawField();
+            }
+        }
+        
+        function rotatePuyo() {
+            currentPuyo.rotation = (currentPuyo.rotation + 1) % 4;
+            drawField();
+        }
+
+        function placePuyo() {
+            FIELD[currentPuyo.y][currentPuyo.x] = currentPuyo.color1;
+            FIELD[currentPuyo.y + 1][currentPuyo.x] = currentPuyo.color2;
+            checkClear();
+            currentPuyo = generatePuyo();
+        }
+
+        function checkClear() {
+            let cleared = false;
+            for (let y = 0; y < ROWS; y++) {
+                for (let x = 0; x < COLS; x++) {
+                    if (FIELD[y][x] && checkFourConnected(x, y, FIELD[y][x])) {
+                        FIELD[y][x] = null;
+                        cleared = true;
+                    }
+                }
+            }
+            if (cleared) dropPuyos();
+        }
+
+        function checkFourConnected(x, y, color) {
+            const directions = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+            let stack = [[x, y]], connected = new Set([`${x},${y}`]);
+            while (stack.length) {
+                let [cx, cy] = stack.pop();
+                for (let [dx, dy] of directions) {
+                    let nx = cx + dx, ny = cy + dy;
+                    if (nx >= 0 && nx < COLS && ny >= 0 && ny < ROWS && FIELD[ny][nx] === color && !connected.has(`${nx},${ny}`)) {
+                        stack.push([nx, ny]);
+                        connected.add(`${nx},${ny}`);
+                    }
+                }
+            }
+            return connected.size >= 4;
+        }
+
+        function dropPuyos() {
+            for (let x = 0; x < COLS; x++) {
+                let stack = [];
+                for (let y = ROWS - 1; y >= 0; y--) {
+                    if (FIELD[y][x]) stack.push(FIELD[y][x]);
+                    FIELD[y][x] = null;
+                }
+                let y = ROWS - 1;
+                while (stack.length) FIELD[y--][x] = stack.pop();
+            }
+        }
+        
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowLeft" || event.key === "a") movePuyo(-1, 0);
+            if (event.key === "ArrowRight" || event.key === "d") movePuyo(1, 0);
+            if (event.key === "ArrowDown" || event.key === "s") movePuyo(0, 1);
+            if (event.key === "ArrowUp" || event.key === "w") rotatePuyo();
+        });
+        
+        function gameLoop() {
+            if (!gameOver) {
+                movePuyo(0, 1);
+                setTimeout(gameLoop, 500);
+            }
+        }
+        
+        gameLoop();
+    </script>
+</body>
+</html>
