@@ -4930,17 +4930,12 @@ function HomeBarRecluit(){
    `;
 }
 
+let per1 = 0.80, per2 = 0.17, per3 = 0.03;
+const Result = document.getElementById('result');
+let result = [];
 async function HomeBarRecluitGo(num){
    save();
-   document.getElementById('HomeArea').innerHTML = `
-   <div id="r-go"><img src="assets/system/letsrecruit.png" id="r-go-img"></div>
-   `;
-}
-document.getElementById('r-go').addEventListener('click',HomeBarRecluitLets);
-function HomeBarRecluitLets(num){
-   document.getElementById('r-go').removeEventListener('click',HomeBarRecluitLets);
-   log.textContent = "";
-   Result.innerHTML = "";
+   log.textContent = '';
    result = [];
    for(i = 0; i < num; i++){
       let rarity = Math.random();
@@ -4955,8 +4950,23 @@ function HomeBarRecluitLets(num){
    if(num == 10 && !result.includes(2)){
       result.pop();
       result.push(2)
-      log.textContent = '最低保証が働きました！'
+      console.log('最低保証が働きました！')
    }
+   let color = result.includes(3) ? 'pink' : 'blue';
+   document.getElementById('HomeArea').innerHTML = `
+   <div id="r-go">
+      recluit agent is cool company
+      <img class='r-go-img' src="assets/system/recluit-${color}.png">
+   </div>
+   `;
+   document.getElementById('r-go').addEventListener('click',HomeBarRecluitLets);
+}
+
+function HomeBarRecluitLets(num){
+   document.getElementById('r-go').removeEventListener('click',HomeBarRecluitLets);
+   log.textContent = "";
+   Result.innerHTML = "";
+   
    Result.innerHTML = result.join(" ");
 }
 function HomeBarMeet(){

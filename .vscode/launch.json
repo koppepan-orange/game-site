@@ -34,5 +34,11 @@
             "name": "テトリス(歌じゃないよ)",
             "file": "/Users/koppepanorange/orange_bread/game-site/tetris.html"
         },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "確率ゲート",
+            "file": "/Users/koppepanorange/orange_bread/game-site/probability/index.html"
+        },
     ]
 }

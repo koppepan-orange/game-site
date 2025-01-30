@@ -257,6 +257,23 @@ body {
   height: 250px;
   text-align: left!important;
 }
+.r-go{
+  width: 200px;
+  height: 350px;
+  background-color: #f0f8ff;
+  border: 1px solid #c2c2c2;
+  border-radius: 8px;
+  padding: 8px;
+  margin: 0 auto;
+  font-size:8px;
+  text-align: left;
+}
+.r-go-img{
+  margin: 0 auto;
+  width: auto;
+  height: auto;
+}
+
 #InventoryArea {
   display: none;
   position: fixed;
@@ -385,20 +402,6 @@ body {
 }
 #skillshopcornerback{
   display: none;
-}
-.card{
-  border: 1px solid #222;
-  border-radius: 5px;
-  overflow-x: scroll;
-  margin: 5px 0;
-  text-align: left!important;
-  width: 300px;
-  height: 101.33px;
-  padding: 2px;
-}
-.card-titletext{
-  width: 100%;
-  overflow-x: auto;
 }
 
 /* こっからクエスト */
