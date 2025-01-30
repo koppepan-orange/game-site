@@ -267,6 +267,7 @@ body {
   margin: 0 auto;
   font-size:8px;
   text-align: left;
+  z-index: 24;
 }
 .r-go-img{
   margin: 0 auto;

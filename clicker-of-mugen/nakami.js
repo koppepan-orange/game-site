@@ -1790,14 +1790,68 @@ let Charas = {
 let Friends = {
    '飛花レイル':{
       name:'飛花レイル',
-      belongto:'',
+      belongto:'', //所属
       rare:3,
-      description:``,
+      description:``, 
       comment:``,
       N:0,
       S:0,
       E:0,
       P:0,
+   },
+   '憚羅レイル':{
+      name:'憚羅レイル',
+      rare:3
+   },
+   '泡沫アリア':{
+      name:'泡沫アリア',
+      belongto:'', //所属
+      rare:2,
+      description:``, 
+      comment:``,
+      N:0,
+      S:0,
+      E:0,
+      P:0,
+   },
+   'メメント・ラメント':{
+      name:'メメント・ラメント',
+      rare:3
+   },
+
+   '小安見ニーク':{
+      name:'小安見ニーク',
+      rare:3,
+   },
+   '面戸ガリヤ':{
+      name:'面戸ガリヤ',
+      rare: 2,
+   },
+   '伊辣キキ':{
+      name:'伊辣キキ',
+      rare: 2,
+   },
+
+   '息留河鹿':{
+      name:'息留 河鹿',
+      rare: 1
+   },
+   'ジャンネ マジデ':{
+      name:'ジャンネ マジデ',
+      rare:1
+   },
+   '手斧バス':{
+      name:'手斧バス',
+      rare:1
+   },
+
+   '久須田和伊男':{
+      name:'久須田和伊男',
+      rare:1,
+   },
+   'ゴードン・ソージィ':{
+      name:'ゴードン・ソージィ',
+      rare:3
    }
 }
 
@@ -4931,8 +4985,9 @@ function HomeBarRecluit(){
 }
 
 let per1 = 0.80, per2 = 0.17, per3 = 0.03;
-const Result = document.getElementById('result');
+const Result = document.getElementById('r-go');
 let result = [];
+let showresult = []
 async function HomeBarRecluitGo(num){
    save();
    log.textContent = '';
@@ -4953,21 +5008,28 @@ async function HomeBarRecluitGo(num){
       console.log('最低保証が働きました！')
    }
    let color = result.includes(3) ? 'pink' : 'blue';
+
+   result.forEach(atai => {
+      let person = arraySelect(Object.keys(Friends).filter(a => Friends[a].rare == atai));
+      showresult.push(person)
+   })
+
+   
    document.getElementById('HomeArea').innerHTML = `
    <div id="r-go">
-      recluit agent is cool company
+      recluit agent is cool company<br>
       <img class='r-go-img' src="assets/system/recluit-${color}.png">
    </div>
    `;
+   document.getElementById('r-go').style.fontSize = '8px';
    document.getElementById('r-go').addEventListener('click',HomeBarRecluitLets);
 }
 
 function HomeBarRecluitLets(num){
    document.getElementById('r-go').removeEventListener('click',HomeBarRecluitLets);
    log.textContent = "";
-   Result.innerHTML = "";
-   
-   Result.innerHTML = result.join(" ");
+   document.getElementById('r-go').style.fontSize = '20px';//
+   document.getElementById('r-go').innerHTML = showresult.join("<br>");
 }
 function HomeBarMeet(){
    save();
