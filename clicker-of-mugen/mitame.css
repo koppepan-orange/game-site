@@ -1,5 +1,5 @@
-@font-face{font-family:comicsans;src:url('comicsans-font.ttf');}
-@font-face{font-family:Hangyaku;src:url('Hangyaku-font.ttf');}
+@font-face{font-family:comicsans;src:url('assets/fonts/comicsans.ttf');}
+@font-face{font-family:Hangyaku;src:url('assets/fonts/Hangyaku.ttf');}
 * {
   font-family:comicsans;
   /* margin: 0 auto; */
@@ -10,12 +10,16 @@
 body {  
   color:#000000;
   background-color: #eeeeee;
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 #All{
   width: 100%;
   height: 950px;
   margin: 0 auto;
 }
+
+/*こっから雑に扱ってもいい子*/
 #movabledescription {
   display: none;
   position: fixed;  /* 画面上の絶対位置に固定 */
@@ -25,6 +29,72 @@ body {
   padding: 5px 10px;
   border-radius: 5px;
   z-index: 1000;  /* 他の要素の上に表示 */
+}
+
+/*logとtext*/
+#log-opener{
+  position: absolute;
+  bottom: 230px;
+  right: 0px;
+  width: 20px;
+  height: 200px;
+  background-color: rgba(0,0,0,0.9);
+  color: #fefefe;
+  cursor: pointer;
+  transition: right 0.3s;
+  z-index: 254;
+}
+#log{
+  position: absolute;
+  bottom: 230px;
+  right: -300px;
+  width: 300px;
+  height: 200px;
+  max-height: 200px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  background-color: rgba(0,0,0,0.8);
+  color: #fefefe;
+  text-align: left;
+  font-size: 14px;
+  transition: right 0.3s;
+  z-index: 253;
+}
+#text {
+  display: none;
+  background: rgba(0, 0, 0, 0.8);
+  color: #ffffff;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 1.2em;
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 255;
+
+  white-space: nowrap; /* 幅を文字数に応じて調整 */
+  overflow: hidden; /* アニメーション中の表示崩れを防ぐ */
+  width: fit-content; /* 文字の長さに応じた幅 */
+  animation: fadeIn 0.5s ease forwards; /* 表示時のフェードイン効果 */
+}
+
+@keyframes fadeIn {
+  0%{
+      opacity: 0;
+  }
+  100%{
+      opacity: 1;
+  }
+}
+.color-red{
+  color: #ff1919;
+}
+.color-pink{
+  color: #ff56e9;
+}
+.color-blue{
+  color: #1919ff;
 }
 
 /*sideMenu*/
@@ -70,6 +140,7 @@ body {
   font-size: 26px;
   cursor: pointer;
 }
+
 /*notice*/
 #Notice-page{
   display: none;
@@ -131,6 +202,7 @@ body {
   max-height:600px;
   overflow-y: scroll;
 }
+
 /*ここからrankとeuroのあれ*/
 .rank-euro-zone {
   display: flex;
@@ -174,6 +246,7 @@ body {
   font-size: 20px;
   margin-top: 10px;
 }
+
 /* ゲーム全体のやつ */
 #GameZone {
   display: block;
@@ -181,6 +254,7 @@ body {
   height: 900px;
   margin: 0 auto;
 }
+
 /* こっからhomeとかtabとか */
 #TabZone {
   display: flex;
@@ -257,6 +331,8 @@ body {
   height: 250px;
   text-align: left!important;
 }
+
+/*こっから酒場*/
 .r-go{
   width: 200px;
   height: 350px;
@@ -275,6 +351,7 @@ body {
   height: auto;
 }
 
+/*インベントリのやつ*/
 #InventoryArea {
   display: none;
   position: fixed;
@@ -367,6 +444,7 @@ body {
   overflow-y: scroll;
   max-height: 100px;
 }
+
 /* ここからおしごと */
 .task-bar-container {
   position: relative;
@@ -393,17 +471,7 @@ body {
   align-items: center;
   color: white;
 }
-/* ここからダンジョン内のそれ */
-#skillshopcorner{
-  width: 620px;
-  display: flex!important;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 10px;
-}
-#skillshopcornerback{
-  display: none;
-}
+
 
 /* こっからクエスト */
 #quest-list{
@@ -513,9 +581,34 @@ body {
 
 }
 
+/* スキルショップ */
+#skillshopcorner{
+  width: 720px;
+  display: flex!important;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin: 0 auto;
+  gap: 10px;
+}
+#skillshopcornerback{
+  display: none;
+}
+.card{
+  width: 350px;
+  height: 150px;
+  background-color: #fefefe;
+  border: 1px solid #2b2b2b;
+  border-radius: 5px;
+  text-align: left;
+  position: relative;
+}
+.card-buy{
+  position: absolute;
+  bottom: 0px;
+  left:0px
+}
+
 /* ここからbattle */
-
-
 .EnemyName{
   max-width: 80px;
   overflow-x: auto;

@@ -14,137 +14,137 @@
 <body>
 <div id="All">
   <div id="movabledescription"></div>
-<div id="Notice-page">
-  <div id="notice-honmei">
-    <span id="notice-end" onclick="CloseNotice()">X</span><br><span id="notice-notice">お知らせ</span><br>
-    <ul id="notice-list"></ul>
-  </div>
-  <div id="notice-main">
-    <span id="notice-back">←</span><br>
-    <div id="notice-title">お知らせ</div><br>
-    <div id="notice-text">これが見えていると言うことは、何かバグっています</div>
-  </div>
-</div>
-<!--サイドメニュー-->
-<div class="menuToggle" id="menuToggle">☰</div>
-<nav id="sideMenu">
-  <hr noshade="true">
-  <ul>
-      <li><button onclick="OpenNotice()">お知らせ</button></li>
-      <li><button>チュートリアル</button></li><!-- onclick="Tutorial()" -->
-      <li><button>設定</button></li><!-- onclick="Setting()" -->
-  </ul>
-  <hr noshade="true">
-  <ul>
-    <li><a href="https://koppepan-orange.github.io/test-site/home.html">to home</a></li>
-    <li><a href="https://koppepan-orange.github.io/test-site/memo.html">to memo</a></li>
-    <li><a href="https://koppepan-orange.github.io/test-site/chat.html">to chat</a></li>
-  </ul>
-  <hr noshade="true">
-  <button id="logout-button" onclick="logout()">Logout</button><br><span class="hasd" id="null" data-description="こんなもん見つけて楽しいか？">/n</span>
-</nav>
-<div class="rank-euro-zone">
-  <div class="rank">Rank: <span id="rank">1</span></div>
-  <div class="rpt-bar-container">
-      <div class="rpt-bar" id="rpt-bar"></div>
-      <div class="rpt-text">EXP: <span id="rpt-text">0/100</span></div>
-  </div>
-  <div class="euro">Euro:<span id="euro">500</span> <button id="GetEuro" onclick="if(afknow == 0){LetsCharge();}">+</button></div>
-</div>
-<div id="GameZone">
-  <div id="HomeTab">
-    <canvas id="NowMap" width="600" height="600" style="border:1px solid #000000"></canvas>
-    <div id="HomeArea"></div>
-    <div id="BattleArea">
-      <span>turn:</span><span id="TurnCount">0</span><br>
-      <div id="enemies">
-        <div id="enemies1" class="enemies">
-          <b class="EnemyName">enemies1</b>   <i class="EnemyLevel">Lv.1</i><br>
-          <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
-          <span class="EnemyMP">20</span>/<span class="EnemyMaxMP">20</span><br>
-          <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
-        </div>
-        <div id="enemies2" class="enemies">
-          <b class="EnemyName">enemies2</b>   <i class="EnemyLevel">Lv.1</i><br>
-          <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
-          <span class="Ene myMP">20</span>/<span class="EnemyMaxMP">20</span><br>
-          <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
-        </div>  
-        <div id="enemies3" class="enemies">
-          <b class="EnemyName">enemies3</b>   <i class="EnemyLevel">Lv.1</i><br>
-          <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
-          <span class="EnemyMP">20</span>/<span class="EnemyMaxMP">20</span><br>
-          <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
-        </div>
-        <div id="enemies4" class="enemies">
-          <b class="EnemyName">enemies4</b>   <i class="EnemyLevel">Lv.1</i><br>
-          <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
-          <span class="EnemyMP">20</span>/<span class="EnemyMaxMP">20</span><br>
-          <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
-        </div>
-      </div>
-      <br><br>
-
-      <div id="players">
-        <div id="players1" class="players">
-          <b class="PlayerName">players</b>   <i class="PlayerLevel">Lv.1</i><br>
-          <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
-          <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
-          <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
-        </div>
-        <div id="players2" class="players">
-          <b class="PlayerName">friend1</b>   <i class="PlayerLevel">Lv.1</i><br>
-          <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
-          <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
-          <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
-        </div>
-        <div id="players3" class="players">
-          <b class="PlayerName">friend2</b>   <i class="PlayerLevel">Lv.1</i><br>
-          <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
-          <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
-          <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
-        </div>
-        <div id="players4" class="players">
-          <b class="PlayerName">friend3</b>   <i class="PlayerLevel">Lv.1</i><br>
-          <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
-          <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
-          <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
-        </div>
-      </div><br><br><br>
-      <div id="sbuttons"><button class="button" id="select1" onclick="select1()">attack</button>  <button class="button" id="select2" onclick="select2()">magic</button>  <button class="button" id="select3" onclick="select3()">tools</button>  <button class="button" id="back" onclick="back()">runaway</button></div><br>
-      <span id="Skillbutton"><button class="button" id="Skill1" onclick="Skill1()">skill</button></span>
+  <div id="text"></div><div id="log-opener"><</div><div id="log"></div> 
+  <div id="Notice-page">
+    <div id="notice-honmei">
+      <span id="notice-end" onclick="CloseNotice()">X</span><br><span id="notice-notice">お知らせ</span><br>
+      <ul id="notice-list"></ul>
     </div>
-    <div id="InventoryArea"></div>
-    <div id="EventArea"></div>
-    <br><span align="center" id="log"></span>
+    <div id="notice-main">
+      <span id="notice-back">←</span><br>
+      <div id="notice-title">お知らせ</div><br>
+      <div id="notice-text">これが見えていると言うことは、何かバグっています</div>
+    </div>
   </div>
-  <div id="InventoryTab">
-    
+  <!--サイドメニュー-->
+  <div class="menuToggle" id="menuToggle">☰</div>
+  <nav id="sideMenu">
+    <hr noshade="true">
+    <ul>
+        <li><button onclick="OpenNotice()">お知らせ</button></li>
+        <li><button>チュートリアル</button></li><!-- onclick="Tutorial()" -->
+        <li><button>設定</button></li><!-- onclick="Setting()" -->
+    </ul>
+    <hr noshade="true">
+    <ul>
+      <li><a href="https://koppepan-orange.github.io/test-site/home.html">to home</a></li>
+      <li><a href="https://koppepan-orange.github.io/test-site/memo.html">to memo</a></li>
+      <li><a href="https://koppepan-orange.github.io/test-site/chat.html">to chat</a></li>
+    </ul>
+    <hr noshade="true">
+    <button id="logout-button" onclick="logout()">Logout</button><br><span class="hasd" id="null" data-description="こんなもん見つけて楽しいか？">/n</span>
+  </nav>
+  <div class="rank-euro-zone">
+    <div class="rank">Rank: <span id="rank">1</span></div>
+    <div class="rpt-bar-container">
+        <div class="rpt-bar" id="rpt-bar"></div>
+        <div class="rpt-text">EXP: <span id="rpt-text">0/100</span></div>
+    </div>
+    <div class="euro">Euro:<span id="euro">500</span> <button id="GetEuro" onclick="if(afknow == 0){LetsCharge();}">+</button></div>
   </div>
-  <div id="QuestTab"><div id="quest-list"></div></div><!--ここはできれば作りたいね 報酬とかどうしよ-->
-  <div id="ChatTab">
-    <div class="chat-container" id="chat-container">
-    <select id="room-select" name="room-select" onchange="selectRoom()">
-       <option value="1">01</option>
-       <option value="2">02</option>
-       <option value="3">03</option>
-       <option value="4">04</option>
-       <option value="5">05</option>
-       <option value="cs">カスタマーサービス</option>
-    </select>
-    <div class="messages" id="messages"></div>
-    <input type="text" id="message-input" placeholder="メッセージを書く">
-    <button id="send-button">送信</button>
- </div></div><!--ここは理想。firebaseとかを勉強したらここは解放しましょ-->
-  <div id="ProfileTab"></div><!--ここは..ゲーム自体をちゃんとオンライン化したら解放で-->
-</div>
-<div id="TabZone">
-  <button id="HomeTabButton" onclick="OpenTab('H')"><img class="TabImg" src="assets/icons/home.png"></button>
-  <button id="InventoryTabButton" onclick="OpenTab('I')"><img class="TabImg" src="assets/icons/inventory.png"></button>
-  <button id="QuestTabButton" onclick="OpenTab('Q')"><img class="TabImg" src="assets/icons/quest.png"></button>
-  <button id="ChatTabButton" onclick="OpenTab('C')"><img class="TabImg" src="assets/icons/chat.png"></button>
-  <button id="ProfileTabButton" onclick="OpenTab('P')"><img class="TabImg" src="assets/icons/profile.png"></button>
-</div>
+  <div id="GameZone">
+    <div id="HomeTab">
+      <canvas id="NowMap" width="600" height="600" style="border:1px solid #000000"></canvas>
+      <div id="HomeArea"></div>
+      <div id="BattleArea">
+        <span>turn:</span><span id="TurnCount">0</span><br>
+        <div id="enemies">
+          <div id="enemies1" class="enemies">
+            <b class="EnemyName">enemies1</b>   <i class="EnemyLevel">Lv.1</i><br>
+            <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
+            <span class="EnemyMP">20</span>/<span class="EnemyMaxMP">20</span><br>
+            <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
+          </div>
+          <div id="enemies2" class="enemies">
+            <b class="EnemyName">enemies2</b>   <i class="EnemyLevel">Lv.1</i><br>
+            <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
+            <span class="Ene myMP">20</span>/<span class="EnemyMaxMP">20</span><br>
+            <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
+          </div>  
+          <div id="enemies3" class="enemies">
+            <b class="EnemyName">enemies3</b>   <i class="EnemyLevel">Lv.1</i><br>
+            <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
+            <span class="EnemyMP">20</span>/<span class="EnemyMaxMP">20</span><br>
+            <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
+          </div>
+          <div id="enemies4" class="enemies">
+            <b class="EnemyName">enemies4</b>   <i class="EnemyLevel">Lv.1</i><br>
+            <span class="EnemyHealth">100</span>/<span class="EnemyMaxHealth">100</span><br>
+            <span class="EnemyMP">20</span>/<span class="EnemyMaxMP">20</span><br>
+            <span class="EnemyBuff"></span> <span class="EnemyDebuff"></span>
+          </div>
+        </div>
+        <br><br>
+        <div id="players">
+          <div id="players1" class="players">
+            <b class="PlayerName">players</b>   <i class="PlayerLevel">Lv.1</i><br>
+            <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
+            <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
+            <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
+          </div>
+          <div id="players2" class="players">
+            <b class="PlayerName">friend1</b>   <i class="PlayerLevel">Lv.1</i><br>
+            <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
+            <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
+            <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
+          </div>
+          <div id="players3" class="players">
+            <b class="PlayerName">friend2</b>   <i class="PlayerLevel">Lv.1</i><br>
+            <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
+            <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
+            <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
+          </div>
+          <div id="players4" class="players">
+            <b class="PlayerName">friend3</b>   <i class="PlayerLevel">Lv.1</i><br>
+            <span class="PlayerHealth">100</span>/<span class="PlayerMaxHealth">100</span><br>
+            <span class="PlayerMP">0</span>/<span class="PlayerMaxMP">0</span><br>
+            <span class="PlayerBuff"></span> <span class="PlayerDebuff"></span>
+          </div>
+        </div><br><br><br>
+        <div id="sbuttons"><button class="button" id="select1" onclick="select1()">attack</button>  <button class="button" id="select2" onclick="select2()">magic</button>  <button class="button" id="select3" onclick="select3()">tools</button>  <button class="button" id="back" onclick="back()">runaway</button></div><br>
+        <span id="Skillbutton"><button class="button" id="Skill1" onclick="Skill1()">skill</button></span>
+      </div>
+      <div id="InventoryArea"></div>
+      <div id="EventArea"></div>
+      <br><span align="center" id="log"></span>
+    </div>
+    <div id="InventoryTab">
+      
+    </div>
+    <div id="QuestTab"><div id="quest-list"></div></div><!--ここはできれば作りたいね 報酬とかどうしよ-->
+    <div id="ChatTab">
+      <div class="chat-container" id="chat-container">
+      <select id="room-select" name="room-select" onchange="selectRoom()">
+        <option value="1">01</option>
+        <option value="2">02</option>
+        <option value="3">03</option>
+        <option value="4">04</option>
+        <option value="5">05</option>
+        <option value="cs">カスタマーサービス</option>
+      </select>
+      <div class="messages" id="messages"></div>
+      <input type="text" id="message-input" placeholder="メッセージを書く">
+      <button id="send-button">送信</button>
+  </div></div><!--ここは理想。firebaseとかを勉強したらここは解放しましょ-->
+    <div id="ProfileTab"></div><!--ここは..ゲーム自体をちゃんとオンライン化したら解放で-->
+  </div>
+  <div id="TabZone">
+    <button id="HomeTabButton" onclick="OpenTab('H')"><img class="TabImg" src="assets/icons/home.png"></button>
+    <button id="InventoryTabButton" onclick="OpenTab('I')"><img class="TabImg" src="assets/icons/inventory.png"></button>
+    <button id="QuestTabButton" onclick="OpenTab('Q')"><img class="TabImg" src="assets/icons/quest.png"></button>
+    <button id="ChatTabButton" onclick="OpenTab('C')"><img class="TabImg" src="assets/icons/chat.png"></button>
+    <button id="ProfileTabButton" onclick="OpenTab('P')"><img class="TabImg" src="assets/icons/profile.png"></button>
+  </div>
 </div>  
 <script src="nakami.js"></script>
 </body>

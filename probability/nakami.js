@@ -186,20 +186,20 @@ let backMap = [
    [1,1,1,1,1,2,2,2,2]
 ]
 let objMap = [
-   ['rock','gate','rock','rock','gate','rock','rock','gate','rock'],
+   ['rock2','gate','rock1','rock2','gate','rock1','rock2','gate','rock1'],
    ['none','none','none','none','none','none','none','none','none'],
    ['none','none','none','none','none','none','none','none','none'],
-   ['rock','gate','rock','rock','gate','rock','rock','gate','rock'],
+   ['rock2','gate','rock1','rock2','gate','rock1','rock2','gate','rock1'],
    ['none','none','none','none','none','none','none','none','none'],
    ['none','none','none','none','none','none','none','none','none'],
-   ['rock','gate','rock','rock','gate','rock','rock','gate','rock'],
+   ['rock2','gate','rock1','rock2','gate','rock1','rock2','gate','rock1'],
    ['none','none','none','none','none','none','none','none','none'],
    ['none','none','none','none','none','none','none','none','none']
 ]
 
 let imagesLoaded = 0;
 let images = {};
-let imageNames = [0,1,2,3,4,5,6,'none','gate','rock'];
+let imageNames = [0,1,2,3,4,5,6,'none','gate','rock1','rock2'];
 let totalImages = imageNames.length;
 
 imageNames.forEach(num => {
@@ -217,6 +217,27 @@ imageNames.forEach(num => {
    };
    images[num] = img;
 });
+
+let seLoaded = 0;
+let se = {};
+let seNames = ['failed', 'success'];
+
+seNames.forEach(name => {
+   let sound = new Audio();
+   sound.src = `assets/se/${name}.mp3`;
+   sound.oncanplaythrough = () => {
+      seLoaded++;
+   };
+   se[name] = sound;  // ここでseオブジェクトに格納
+});
+
+// 音を鳴らす関数
+function playSe(name) {
+   if (se[name]) {
+      se[name].currentTime = 0; // 連続再生できるようにリセット
+      se[name].play();
+   }
+}
 
 function DrawBackground(){
    //background、そのまま背景
@@ -266,117 +287,116 @@ let AllowMove = 0;
 let SELECTx = 0; // 初期x座標
 let SELECTy = 0; // 初期y座標
 let MAPx,MAPy;
+let speed = 5;
+let passed = 0;
 
 // キーが押されたときの...やつ
-document.addEventListener('keydown', (event) => {
-   if(AllowMove == 0){//scratchで良くやってたやつ なつかしいっすねぇ..
-      let moved = 0;
-      MAPx = Math.floor(SELECTx / 100);
-      MAPy = Math.floor(SELECTy / 100);
-      switch(event.key) {
-         case 'w':
-         case 'ArrowUp': // 上
-            SELECTy -= 100;
-            MAPy = Math.floor(SELECTy / 100);
-            if(MAPy < 0){SELECTy = 0}else if(objMap[MAPy][MAPx]){if(objMap[MAPy][MAPx] == undefined||objMap[MAPy][MAPx] == 'rock'){SELECTy += 100}}
-            break;
-         case 'a':
-         case 'ArrowLeft': // 左
-            SELECTx -= 100;
-            MAPx = Math.floor(SELECTx / 100);
-            if(MAPx < 0){SELECTx = 0}else if(objMap[MAPy][MAPx]){if(objMap[MAPy][MAPx] == undefined||objMap[MAPy][MAPx] == 'rock'){SELECTx += 100}}
-            moved = 1;
-            break;
-         case 's':
-         case 'ArrowDown': // 下
-            SELECTy += 100;
-            MAPy = Math.floor(SELECTy / 100);
-            if(MAPy > 8){SELECTy = 800}else if(objMap[MAPy][MAPx]){if(objMap[MAPy][MAPx] == undefined||objMap[MAPy][MAPx] == 'rock'){SELECTy -= 100}}
-            moved = 1;
-            break;
-         case 'd':
-         case 'ArrowRight': // 右
-            SELECTx += 100;
-            MAPx = Math.floor(SELECTx / 100);
-            if(MAPx > 8){SELECTx = 800}else if(objMap[MAPy][MAPx]){if(objMap[MAPy][MAPx] == undefined||objMap[MAPy][MAPx] == 'rock'){SELECTx -= 100}}
-            moved = 1;
-            break;
+const keys = {};
+document.addEventListener("keydown", (e) => keys[e.key] = true);
+document.addEventListener("keyup", (e) => keys[e.key] = false);
+
+function update() {
+   if (AllowMove === 0) {
+      let moved = false;
+      let newX = SELECTx, newY = SELECTy;
+
+      if (keys["w"] || keys["ArrowUp"]) {
+         newY -= speed;
+         if(newY < 0){newY = 0};
+         moved = true;
+      }
+      if (keys["a"] || keys["ArrowLeft"]) {
+         newX -= speed;
+         if(newX < 0){newX = 0};
+         moved = true;
+      }
+      if (keys["s"] || keys["ArrowDown"]) {
+         newY += speed;
+         if(newY > 875){newY = 875};
+         moved = true;
+      }
+      if (keys["d"] || keys["ArrowRight"]) {
+         newX += speed;
+         if(newX > 875){newX = 875};
+         moved = true;
       }
 
-      // 枠外に出ないように制限
-      if(SELECTx<0){SELECTx=0};
-      if(SELECTy<0){SELECTy=0};
-      if(SELECTx>800){SELECTx=800};
-      if(SELECTy>800){SELECTy=800};
-      MAPx = Math.floor(SELECTx / 100);
-      MAPy = Math.floor(SELECTy / 100);
+      if (moved) {
+         let newMAPx = Math.floor(newX / 100);
+         let newMAPy = Math.floor(newY / 100);
 
-      // 画面をクリアしてから再描画
-      ctx.clearRect(0, 0, 900, 900); 
-      DrawBackground();
-      ctx.drawImage(IMGselect, SELECTx, SELECTy, 100, 100);
+         if (newMAPx >= 0 && newMAPx <= 8 && newMAPy >= 0 && newMAPy <= 8) {
+            if (objMap[newMAPy][newMAPx] !== undefined && objMap[newMAPy][newMAPx] !== "rock1" && objMap[newMAPy][newMAPx] !== "rock2") {
+               SELECTx = newX;
+               SELECTy = newY;
+               MAPx = newMAPx;
+               MAPy = newMAPy;
 
-      let probability = getGateProbability(MAPx, MAPy);
-      
-      if (probability !== null) {
-         let random = Math.random() * 100; // 0〜100のランダム数
-         if (random > probability) {
-            //NicoNicoText(`ゲート(${MAPx},${MAPy})を通れなかった！`);
-            random = Math.random() * 100;
-            if(random < 2){
-               gates = gates.map(g => ({
-                  ...g, 
-                  probability: Math.min(g.probability + 5, 100) 
-               }));
-               NicoNicoText('超激レアイベント！ 全てのゲートの確率が5%上昇！');
-               console.log('超激レアイベント！ 全てのゲートの確率が5%上昇！')
-            }else if(random < 10){
-               let index = gates.findIndex(g => g.x === MAPx && g.y === MAPy);
-               if (index !== -1) {
-                  gates[index].probability = Math.min(gates[index].probability + 15, 100);
+               if(passed[0] !== MAPx || passed[1] !== MAPy){
+                  passed = 0;
                }
-               NicoNicoText('激レアイベント！ ゲートの確率が10%上昇！')
-               console.log('激レアイベント！ ゲートの確率が10%上昇！')
-            }else if(random < 20){
-                  gates = gates.map(g => ({
-                     ...g, 
-                     probability: Math.min(g.probability + 1, 100) 
-                  }));
-               NicoNicoText('レアイベント！ 全てのゲートの確率が1%上昇！')
-               console.log('レアイベント！ 全てのゲートの確率が1%上昇！')
-            }else{
-               let index = gates.findIndex(g => g.x === MAPx && g.y === MAPy);
-               if(index !== -1){
-                  gates[index].probability = Math.min(gates[index].probability + 5, 100);
+
+               let probability = getGateProbability(MAPx, MAPy);
+               if(probability !== null && passed == 0){
+                  console.log('確率ゲート作動！！！')
+                  let random = Math.random() * 100;
+                  if(random > probability){
+                     handleGateFailure();
+                     playSe('failed')
+                  }else{
+                     handleGateSuccess();
+                     playSe('success')
+                     passed = [MAPx,MAPy];
+                  }
                }
-            }
-
-
-            SELECTx = 400;SELECTy = 800;
-            MAPx = Math.floor(SELECTx / 100);
-            MAPy = Math.floor(SELECTy / 100);
-         } else {
-            //NicoNicoText(`ゲート(${MAPx},${MAPy})を通過！`);
-            
-            let resetProbabilities = { 6: 60, 3: 30, 0: 5 }; // MAPy に対応する確率をオブジェクトで管理
-            let index = gates.findIndex(g => g.x === MAPx && g.y === MAPy);
-            if (index !== -1 && resetProbabilities.hasOwnProperty(MAPy)) {
-               gates[index].probability = resetProbabilities[MAPy];
-            }
-
-            if(MAPy == 0){
-               NextStage();
             }
          }
       }
-
-
-      ctx.clearRect(0, 0, 900, 900); 
-      DrawBackground();
-      ctx.drawImage(IMGselect, SELECTx, SELECTy, 100, 100);
-
    }
-});
+
+   draw();
+   requestAnimationFrame(update);
+}
+
+function handleGateFailure() {
+   let random = Math.random() * 100;
+   if (random < 2) {
+      gates.forEach(g => g.probability = Math.min(g.probability + 5, 100));
+      NicoNicoText("超激レアイベント！ 全てのゲートの確率が5%上昇！");
+   } else if (random < 10) {
+      let gate = gates.find(g => g.x === MAPx && g.y === MAPy);
+      if (gate) gate.probability = Math.min(gate.probability + 15, 100);
+      NicoNicoText("激レアイベント！ ゲートの確率が10%上昇！");
+   } else if (random < 20) {
+      gates.forEach(g => g.probability = Math.min(g.probability + 1, 100));
+      NicoNicoText("レアイベント！ 全てのゲートの確率が1%上昇！");
+   } else {
+      let gate = gates.find(g => g.x === MAPx && g.y === MAPy);
+      if (gate) gate.probability = Math.min(gate.probability + 5, 100);
+   }
+
+    SELECTx = 400;
+    SELECTy = 800;
+    MAPx = Math.floor(SELECTx / 100);
+    MAPy = Math.floor(SELECTy / 100);
+}
+
+function handleGateSuccess() {
+    let resetProbabilities = { 6: 60, 3: 30, 0: 5 };
+    let gate = gates.find(g => g.x === MAPx && g.y === MAPy);
+    if (gate && resetProbabilities.hasOwnProperty(MAPy)) {
+        gate.probability = resetProbabilities[MAPy];
+    }
+    if (MAPy === 0) NextStage();
+}
+
+function draw() {
+    ctx.clearRect(0, 0, 900, 900);
+    DrawBackground();
+    ctx.drawImage(IMGselect, SELECTx, SELECTy, 25, 25);
+}
+
+
 
 function getGateProbability(x, y) {
    let gate = gates.find(g => g.x === x && g.y === y);
@@ -391,6 +411,7 @@ function GameStart(){
    ctx.clearRect(0, 0, 900, 900); 
    DrawBackground();
    ctx.drawImage(IMGselect, SELECTx, SELECTy, 100, 100);
+   update();
 }
 function NextStage(){
    nowstage += 1;

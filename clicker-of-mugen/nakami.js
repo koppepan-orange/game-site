@@ -4,7 +4,7 @@ document.getElementById('BattleArea').style.display = 'block';
 document.getElementById('NowMap').style.display = 'none';
 const canvas = document.getElementById("NowMap");
 const ctx = canvas.getContext("2d");
-const backgroundMaps = [
+const backMaps = [
    [
       ['b','b','b','b','b','b','b','b'],
       ['b','a','b','b','b','b','a','a'],
@@ -217,7 +217,7 @@ const backgroundMaps = [
    ],//bossroom
 
 ]
-let backgroundMap = [
+let backMap = [
    ['a','b','c','d','e','a','a','a'],
    ['a','a','a','a','a','a','a','a'],
    ['a','a','a','a','a','a','a','a'],
@@ -227,9 +227,9 @@ let backgroundMap = [
    ['a','a','a','a','a','a','a','a'],
    ['a','a','a','a','a','a','a','a'],
 ];
-const backgroundMapnum = ['0.3','7.3','14.3'];//開始位置.そっから終了位置までの差
+const backMapnum = ['0.3','7.3','14.3'];//開始位置.そっから終了位置までの差
 
-const objectMaps = [
+const objMaps = [
    [
       [0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0],
@@ -481,8 +481,21 @@ const objectMaps = [
       [0, 0, 0, 0, 0, 0, 0, 14],
    ]//boss
 
+];
+const objsAll = [
+   [
+      {id:2,type:'e',name:'蒼白の粘液',p:35,strong:0},
+      {id:2,type:'e',name:'翠嵐の風刃',p:35,strong:0},
+      {id:2,type:'e',name:'燐光の妖花',p:35,strong:0},
+      {id:2,type:'e',name:'蒼白の粘液',p:15,strong:1},
+      {id:2,type:'e',name:'燐光の妖花',p:12,strong:1},
+      
+      {id:3,type:'o',name:'焚き火',p:25,rare:0,},//このrareは生成時に決めちゃってもいいかも
+      {id:5,type:'0',name:'スキルショップ',p:25},
+   ]
 ]
-let objectMap = [
+//NanigaOkirukana
+let objMap = [
    [0, 0, 0, 0, 0, 0, 0, 0],
    [0, 0, 0, 0, 0, 0, 0, 0],
    [0, 0, 0, 0, 0, 0, 0, 0],
@@ -492,50 +505,59 @@ let objectMap = [
    [0, 0, 0, 0, 0, 0, 0, 0],
    [0, 0, 0, 0, 0, 0, 0, 0]
 ];
-const objectMapnum = ['0.5','9.4','17.4'];
+const objMapnum = ['0.5','9.4','17.4'];
 let stage = 1;
 let floor = 0;
 
+//#region 画像とかをロードする機構
 let imagesLoaded = 0;
-let totalImages = 34;//ここ変えるの忘れないでね
 let images = {};
-let imageNames = ['a','b','c','d','e','f','g',0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26];
+let imageNames = {
+   'maps':['a','b','c','d','e','f','g',0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26],
+   'effects':['explosion_1','explosion_2','explosion_3'],
+   'enemies':['翠嵐の風刃','蒼白の粘液'],
+   'charas':['greenslime','mechanic','clown','magodituono','wretch']
+}
+let totalImages = Object.keys(imageNames).map(a => imageNames[a].length).reduce((a, b) => a + b);
 
-imageNames.forEach(num => {
-  let img = new Image();
-  img.src = `assets/maps/${num}.png`;
-  img.onload = () => {
-   imagesLoaded++;
-   if(imagesLoaded === totalImages){
-      GameStart();
-   }
-  };
-  img.onerror = () => {
-   console.error(`Image ${num} failed to load.`);
-  };
-  images[num] = img;
+Object.keys(imageNames).forEach(belong => {
+   imageNames[belong].forEach(num => {
+      let img = new Image();
+      img.src = `assets/${belong}/${num}.png`;
+      img.onload = () => {
+         imagesLoaded++;
+         if(imagesLoaded === totalImages){
+            GameStart();
+         }
+      };
+      img.onerror = () => {
+         console.error(`Image ${num} failed to load.`);
+      };
+      images[num] = img;
+   });
 });
+//#endregion
 
 function DrawBackground(){
    //background、そのまま背景
    for(let yy = 0; yy < 8; yy++){
      for(let xx = 0; xx < 8; xx++){
-      let img = images[backgroundMap[yy][xx]];
+      let img = images[backMap[yy][xx]];
       if(img){
         ctx.drawImage(img, xx * 75, yy * 75, 75, 75);
       }else{
-        console.error(`Image for background value ${backgroundMap[yy][xx]} not found.`);
+        console.error(`Image for background value ${backMap[yy][xx]} not found.`);
       }
      }
    }
    //object、仕掛けとか
-   for(let y = 0; y < objectMap.length; y++) {
-     for(let x = 0; x < objectMap[y].length; x++) {
-      let img = images[objectMap[y][x]];
+   for(let y = 0; y < objMap.length; y++) {
+     for(let x = 0; x < objMap[y].length; x++) {
+      let img = images[objMap[y][x]];
       if(img){
         ctx.drawImage(img, x * 75, y * 75, 75, 75);
       }else{
-        console.error(`Image for object value ${objectMap[y][x]} not found.`);
+        console.error(`Image for object value ${objMap[y][x]} not found.`);
       }
      }
    }
@@ -549,196 +571,110 @@ const explosion3 = new Image();
 explosion3.src = 'assets/effects/explosion_3.png';
 
 // 選択画像のロードと初期表示
-const IMGselect = new Image();
+let IMGselect = 0;
+IMGselect = new Image();
 IMGselect.src = 'assets/maps/select.png';
 
 let AllowMove = 0;
 
-let SELECTx = 0; // 初期x座標
-let SELECTy = 0; // 初期y座標
+let SELECTx = 0; // x座標
+let SELECTy = 0; // y座標
 let MAPx,MAPy;
 
 let bombtimer = 0;
 let PlacedBombx = 0;
 let PlacedBomby = 0;
 
-canvas.addEventListener('keydown', function(event) {
-   // 上下キーのキーコード
-   if (event.key === 'ArrowUp' || event.key === 'ArrowLeft' ||  event.key === 'ArrowDown' || event.key === 'ArrowRight') {
-       event.preventDefault(); // デフォルトの動作を無効化
-   }
-});
+let speed = 10;
+const keys = {};
+document.addEventListener("keydown", (e) => keys[e.key] = true);
+document.addEventListener("keyup", (e) => keys[e.key] = false);
 
-// キーが押されたときの...やつ
-document.addEventListener('keydown', (event) => {
-   if(AllowMove == 0){//scratchで良くやってたやつ なつかしいっすねぇ..
-   let moved = 0;
-   MAPx = Math.floor(SELECTx / 75);
-   MAPy = Math.floor(SELECTy / 75);
-   switch(event.key) {
-   case 'w':
-   case 'ArrowUp': // 上
-      SELECTy -= 75;
-      MAPy = Math.floor(SELECTy / 75);
-      if(MAPy < 0){SELECTy = 0}else if(objectMap[MAPy][MAPx]){if(objectMap[MAPy][MAPx] == undefined||objectMap[MAPy][MAPx] == 18){SELECTy += 75}}
-      break;
-   case 'a':
-   case 'ArrowLeft': // 左
-      SELECTx -= 75;
-      MAPx = Math.floor(SELECTx / 75);
-      if(MAPx < 0){SELECTx = 0}else if(objectMap[MAPy][MAPx]){if(objectMap[MAPy][MAPx] == undefined||objectMap[MAPy][MAPx] == 18){SELECTx += 75}}
-      moved = 1;
-      break;
-   case 's':
-   case 'ArrowDown': // 下
-      SELECTy += 75;
-      MAPy = Math.floor(SELECTy / 75);
-      if(MAPy > 7){SELECTy = 525}else if(objectMap[MAPy][MAPx]){if(objectMap[MAPy][MAPx] == undefined||objectMap[MAPy][MAPx] == 18){SELECTy -= 75}}
-      moved = 1;
-      break;
-   case 'd':
-   case 'ArrowRight': // 右
-      SELECTx += 75;
-      MAPx = Math.floor(SELECTx / 75);
-      if(MAPx > 7){SELECTx = 525}else if(objectMap[MAPy][MAPx]){if(objectMap[MAPy][MAPx] == undefined||objectMap[MAPy][MAPx] == 18){SELECTx -= 75}}
-      moved = 1;
-      break;
-   }
+let updatestop = 0;
+function update() {
+   if(AllowMove == 0){
+      let moved = false;
+      let newX = SELECTx, newY = SELECTy;
 
-   // 枠外に出ないように制限
-   if(SELECTx<0){SELECTx=0};
-   if(SELECTy<0){SELECTy=0};
-   if(SELECTx>525){SELECTx=525};
-   if(SELECTy>525){SELECTy=525};
-   MAPx = Math.floor(SELECTx / 75);
-   MAPy = Math.floor(SELECTy / 75);
-
-   // 画面をクリアしてから再描画
-   ctx.clearRect(0, 0, 600, 600); 
-   DrawBackground();
-   ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
-
-   //#region bombの処理
-   if(moved == 1){
-   if(objectMap.some(row => row.includes(15))){
-      bombtimer--;
-      if(bombtimer <= 0){
-         triggerExplosion(PlacedBombx, PlacedBomby);
+      if (keys["w"] || keys["ArrowUp"]) {
+         newY -= speed;
+         if(newY < 0){newY = 0};
+         moved = true;
       }
-   }}
-   function triggerExplosion(centerX, centerY) {
-      let explosionStage = 0;
-      const stageDelay = 100; //エフェクトの処理速度
-   
-      function drawExplosion(){
-         let img;
-         if (explosionStage === 0) {
-            img = explosion1;//なんか最初だけ白くなってる もうちょい調整いる
-         } else if (explosionStage === 1) {
-            img = explosion2;
-         } else if (explosionStage === 2) {
-            img = explosion3;
-         }
-
-         //MAPx = Math.floor(SELECTx / 75);
-         //MAPy = Math.floor(SELECTy / 75);
-         //objectMap[MAPy][MAPx] = 15;
-         //bombtimer = 5;
-         //PlacedBombx = MAPx;
-         //PlacedBomby = MAPy;
-   
-         // 爆発のエフェクトを十字に描画する
-         for (let i = 0; i < 4; i++) {
-            let explosionCoords = [
-               [centerX + i, centerY],
-               [centerX - i, centerY],
-               [centerX, centerY + i],
-               [centerX, centerY - i]
-            ];
-   
-            explosionCoords.forEach(([x, y]) => {
-               ctx.clearRect(x * 75, y * 75, 75, 75); // 前のフレームを消去
-               ctx.drawImage(img, x * 75, y * 75, 75, 75); // 新しいフレームを描画
-               //DrawBackground();
-               //ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
-            });
-         }
-   
-         explosionStage++;
-   
-         if (explosionStage < 3) {
-            setTimeout(drawExplosion, stageDelay);
-         } else {
-            clearExplosion(centerX, centerY);
-         }
+      if (keys["a"] || keys["ArrowLeft"]) {
+         newX -= speed;
+         if(newX < 0){newX = 0};
+         moved = true;
       }
-   
-      // 爆発アニメーションを開始
-      drawExplosion();
+      if (keys["s"] || keys["ArrowDown"]) {
+         newY += speed;
+         if(newY > 575){newY = 575};
+         moved = true;
+      }
+      if (keys["d"] || keys["ArrowRight"]) {
+         newX += speed;
+         if(newX > 575){newX = 575};
+         moved = true;
+      }
 
-   
+      if (moved) {
+         let newMAPx = Math.floor(newX / 100);
+         let newMAPy = Math.floor(newY / 100);
 
-   function clearExplosion(centerX, centerY) {
-      for (let i = 0; i < 4; i++) {
-         let explosionCoords = [
-            [centerX + i, centerY],
-            [centerX - i, centerY],
-            [centerX, centerY + i],
-            [centerX, centerY - i]
-         ];
-   
-         explosionCoords.forEach(([x, y]) => {
-            if (x >= 0 && x < objectMap[0].length && y >= 0 && y < objectMap.length) {
-               // 座標がマップ範囲内なら0にする
-               objectMap[y][x] = 0;
+         if (newMAPx >= 0 && newMAPx <= 8 && newMAPy >= 0 && newMAPy <= 8) {
+            if (objMap[newMAPy][newMAPx] !== undefined && objMap[newMAPy][newMAPx] !== 18) {
+               SELECTx = newX;
+               SELECTy = newY;
+               MAPx = newMAPx;
+               MAPy = newMAPy;
+
+               //触れた時の挙動あればここに
             }
-         });
+         }
       }
-      objectMap[PlacedBomby][PlacedBombx] = 0;
-      ctx.clearRect(0, 0, 600, 600); 
-      DrawBackground();
-      ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
    }
-   }
-   //#endregion
-   
-}});
 
+   draw();
+   if(updatestop == 0){requestAnimationFrame(update);}
+}
 
+function draw() {
+   ctx.clearRect(0, 0, 600,600);
+   DrawBackground();
+   ctx.drawImage(IMGselect, SELECTx, SELECTy, 25, 25);
+}
 
-canvas.addEventListener('click', (event) => {
-   if(AllowMove == 0 && dungeonnow == 1){
-      const rect = canvas.getBoundingClientRect();
-      MAPx = Math.floor(event.offsetX / 75);
-      MAPy = Math.floor(event.offsetY / 75);
+// スマホ版対応は移動UIでも作りましょ
+// canvas.addEventListener('click', (event) => {
+//    if(AllowMove == 0 && dungeonnow == 1){
+//       const rect = canvas.getBoundingClientRect();
+//       MAPx = Math.floor(event.offsetX / 75);
+//       MAPy = Math.floor(event.offsetY / 75);
       
-      SELECTx = MAPx*75;
-      SELECTy = MAPy*75;
+//       SELECTx = MAPx*75;
+//       SELECTy = MAPy*75;
 
-      // マップの値をチェック
-      if (MAPy >= 0 && MAPy < objectMap.length && MAPx >= 0 && MAPx < objectMap[MAPy].length) {NanigaOkoruKana(objectMap[MAPy][MAPx]);}
-      ctx.clearRect(0, 0, 600, 600); 
-      DrawBackground();
-      ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
-   }
-});
+//       // マップの値をチェック
+//       if (MAPy >= 0 && MAPy < objMap.length && MAPx >= 0 && MAPx < objMap[MAPy].length) {NanigaOkoruKana(objMap[MAPy][MAPx]);}
+//       draw()
+//    }
+// });
 
 //z,xの動き
+
 document.addEventListener('keydown', (event) => {
-   if(AllowMove == 0 && dungeonnow == 1){
+   if(AllowMove == 0 && dungeonnow == 1 && textShowing == 0){
       if(event.key == 'Enter'||event.key == 'z'){
       if(SELECTx<0){SELECTx=0};if(SELECTy<0){SELECTy=0};if(SELECTx>525){SELECTx=525};if(SELECTy>525){SELECTy=525};
       MAPx = Math.floor(SELECTx / 75);
       MAPy = Math.floor(SELECTy / 75);
 
       // マップの値をチェック
-      if(MAPy >= 0 && MAPy < objectMap.length && MAPx >= 0 && MAPx < objectMap[MAPy].length){NanigaOkoruKana(objectMap[MAPy][MAPx]);}
-      ctx.clearRect(0, 0, 600, 600); 
-      DrawBackground();
-      ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+      if(MAPy >= 0 && MAPy < objMap.length && MAPx >= 0 && MAPx < objMap[MAPy].length){NanigaOkoruKana(objMap[MAPy][MAPx]);}
+      draw()
       }
    }
-   if(event.key == 'x'&&document.getElementById('NowMap').style.display == 'block'){
+   if(event.key == 'e'&&document.getElementById('NowMap').style.display == 'block'){
       if(AllowMove == 0){
          AllowMove = 1;
          phase = 'null'
@@ -750,6 +686,99 @@ document.addEventListener('keydown', (event) => {
    }}
 });
 
+let NanigaOkirukana = {
+   1:{
+      name:'階段',
+      process:async function(){
+         GoNextFloor();
+      },
+   },
+   2:{
+      name:'敵',
+      process:async function(){
+         EnemyAppear();
+      },
+   },
+   3:{
+      name:'焚き火',
+      process:async function(){
+         AllowMove = 1;
+         document.getElementById('NowMap').style.display = 'none';
+         document.getElementById('EventArea').style.display = 'block';
+         document.getElementById('EventArea').innerHTML = '<button id="CampRest" onclick="Camprest()"></button><br><button id="CampTrade" onclick="Camptrade()"></button>'
+         log.textContent = '休憩できそうな場所を見つけた！';
+         Camprestper = (Math.floor(Math.random() * 4)+3)/10;
+         document.getElementById('CampRest').textContent = '朝まで休む(' + Camprestper*100 + '%回復)';//30のときはスキルカード強化みたいなやつあってもいいかも
+         switch(Math.floor(Math.random() * 3)+1){
+            case 1:
+            if(Math.floor(Math.random() * 3)+1){
+                  y = 10;document.getElementById('CampTrade').textContent = '放浪武器商人に話しかける';
+            }else{  y = 1; document.getElementById('CampTrade').textContent = '武器商人に話しかける';}
+            break;
+            case 2: y = 2; document.getElementById('CampTrade').textContent = '防具取扱専門家に話しかける'; break;
+            case 3: y = 3; document.getElementById('CampTrade').textContent = '道具屋24に話しかける'; break;
+         }
+      }
+   },
+   4:{
+      name:'焚き火跡',
+      process:async function(){
+         await addtext(arrayGacha( //この重複感好き
+            ['この焚き火はもう木炭になっている','まだ温かい..この辺りに誰かいるようだ'],
+            [85,15]
+         ));
+      }
+   },
+   5:{
+      name:'スキルショップ',
+      process:async function(){
+         SkillShopOpen();
+      }
+   },
+   6:{
+      name:'宝箱',
+      process:async function(){
+         if(!objMap.some(row => row.includes(2))){OpenChest(1);}
+      }
+   },
+   7:{
+      name:'レア宝箱',
+      process:async function(){
+         if(!objMap.some(row => row.includes(2))){OpenChest(2);}
+      }
+   },
+   8:{
+      name:'救いのボタン',
+      process:async function(){
+         HopeButtonact();
+      },
+   },
+   9:{
+      name:'none',
+      process:async function(){
+         addtext('まだ用意できていないのです...')
+      }
+   },
+   10:{
+      name:'あめ置き場',
+      process:async function(){
+         Candytake();
+      }
+   },
+   11:{
+      name:'クッキー置き場',
+      process:async function(){
+         Cookietake();
+      }
+   },
+   12:{
+      name:'zom_mzyb',
+      process:async function(){
+         ZomuEvent();
+      }
+   },
+
+}
 function NanigaOkoruKana(code){
    switch(code){
       case 1:
@@ -780,10 +809,10 @@ function NanigaOkoruKana(code){
          SkillShopOpen();//こっちはまあいいかな〜って
       break;
       case 6:
-         if(!objectMap.some(row => row.includes(2))){OpenChest(1);}//マップ内に敵がいないなら〜っていうやつです
+         if(!objMap.some(row => row.includes(2))){OpenChest(1);}//マップ内に敵がいないなら〜っていうやつです
       break;
       case 7:
-         if(!objectMap.some(row => row.includes(2))){OpenChest(2);}
+         if(!objMap.some(row => row.includes(2))){OpenChest(2);}
       break;
       case 8:
          HopeButtonact();
@@ -801,13 +830,13 @@ function NanigaOkoruKana(code){
          BossEnemyAppear();
       break;
       case 14:
-         if(!objectMap.some(row => row.includes(13))){NextStage();}
+         if(!objMap.some(row => row.includes(13))){NextStage();}
       break;
       case 16:
-         if(!objectMap.some(row => row.includes(2))){OpenChest(1);}
+         if(!objMap.some(row => row.includes(2))){OpenChest(1);}
       break;
       case 17:
-         if(!objectMap.some(row => row.includes(2))){OpenChest(2);}
+         if(!objMap.some(row => row.includes(2))){OpenChest(2);}
       break;
       case 19:
          ScorpionAct(1);
@@ -855,54 +884,74 @@ function SuteFuri(me,code){
    inventoryOpen(me);
 }
 
+function weightedRandomSelect(items, count) {
+   let pool = [...items]; // 配列をコピーして元のデータを壊さないようにする
+   let result = [];
+   
+   while (result.length < count && pool.length > 0) {
+       const totalWeight = pool.reduce((sum, item) => sum + item.p, 0);
+       let random = Math.random() * totalWeight;
+       
+       for (let i = 0; i < pool.length; i++) {
+           if (random < pool[i].p) {
+               result.push(pool[i]);
+               pool.splice(i, 1); // 選ばれた要素をリストから削除
+               break;
+           }
+           random -= pool[i].p;
+       }
+   }
+   return result;
+}
+
 function GoNextFloor(){
    floor += 1;
    candybar = [];
-      MAPx = backgroundMapnum[stage-1].split('.');
-      MAPy = +MAPx[1]+1
-      MAPx = +MAPx[0]
-      backgroundMap = backgroundMaps[Math.floor(Math.random() * MAPy)+MAPx];
-      MAPx = objectMapnum[stage-1].split('.');
-      MAPy = +MAPx[1]+1
-      MAPx = +MAPx[0]
-      objectMap = objectMaps[Math.floor(Math.random() * MAPy)+MAPx];
-      objectMap = JSON.parse(JSON.stringify(objectMaps[Math.floor(Math.random() * MAPy) + MAPx]));
-      if(stage == 1){
-         if(fun == 23 && Math.floor(Math.random()*10)==0){
-            backgroundMap = backgroundMaps[4];
-            objectMap = objectMaps[6];
-         }else if(fun <= 50 && Math.floor(Math.random()*10)==0){
-            backgroundMap = backgroundMaps[5];
-            objectMap = objectMaps[7];
-         };
-      }else if(stage == 2){
-         if(fun == 68 && Math.floor(Math.random()*10)==0){
-            backgroundMap = backgroundMaps[11];
-            objectMap = objectMaps[14];
-            objectMap = JSON.parse(JSON.stringify(objectMaps[Math.floor(Math.random() * MAPy) + MAPx]));
-         }else if(fun <= 50 && Math.floor(Math.random()*10)==0){
-            backgroundMap = backgroundMaps[19];
-            objectMap = objectMaps[23];
-            objectMap = JSON.parse(JSON.stringify(objectMaps[Math.floor(Math.random() * MAPy) + MAPx]));
-         };
-      }else if(stage == 3){
-         if(fun == 68 && Math.floor(Math.random()*10)==0){
-            backgroundMap = backgroundMaps[18];
-            objectMap = objectMaps[22];
-            objectMap = JSON.parse(JSON.stringify(objectMaps[Math.floor(Math.random() * MAPy) + MAPx]));
-         }else if(fun <= 50 && Math.floor(Math.random()*10)==0){
-            backgroundMap = backgroundMaps[19];
-            objectMap = objectMaps[23];
-            objectMap = JSON.parse(JSON.stringify(objectMaps[Math.floor(Math.random() * MAPy) + MAPx]));
-         };
-      }
-      if(stage == 1 && floor >= 10){SELECTx = 150;SELECTy = 525;backgroundMap = backgroundMaps[6];objectMap = objectMaps[8];}//創生黎明の原野
- else if(stage == 2 && floor >= 7 ){SELECTx = 150;SELECTy = 525;backgroundMap = backgroundMaps[13];objectMap = objectMaps[16];}//ガチェンレイゲスドゥールラート(昼)
- else if(stage == 3 && floor >= 3 ){SELECTx = 150;SELECTy = 525;backgroundMap = backgroundMaps[20];objectMap = objectMaps[24];}//ガチェンレイゲスドゥールラート(夜)
+   MAPx = backMapnum[stage-1].split('.');
+   MAPy = +MAPx[1]+1
+   MAPx = +MAPx[0]
+   backMap = backMaps[Math.floor(Math.random() * MAPy)+MAPx];
 
-   ctx.clearRect(0, 0, 600, 600);
-   DrawBackground();
-   ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+   MAPx = objMapnum[stage-1].split('.');
+   MAPy = +MAPx[1]+1
+   MAPx = +MAPx[0]
+   objMap = objMaps[Math.floor(Math.random() * MAPy)+MAPx];
+   objMap = JSON.parse(JSON.stringify(objMaps[Math.floor(Math.random() * MAPy) + MAPx]));
+
+   if(stage == 1){
+      if(fun == 23 && Math.floor(Math.random()*10)==0){
+         backMap = backMaps[4];
+         objMap = objMaps[6];
+      }else if(fun <= 50 && Math.floor(Math.random()*10)==0){
+         backMap = backMaps[5];
+         objMap = objMaps[7];
+      };
+   }else if(stage == 2){
+      if(fun == 68 && Math.floor(Math.random()*10)==0){
+         backMap = backMaps[11];
+         objMap = objMaps[14];
+         objMap = JSON.parse(JSON.stringify(objMaps[Math.floor(Math.random() * MAPy) + MAPx]));
+      }else if(fun <= 50 && Math.floor(Math.random()*10)==0){
+         backMap = backMaps[19];
+         objMap = objMaps[23];
+         objMap = JSON.parse(JSON.stringify(objMaps[Math.floor(Math.random() * MAPy) + MAPx]));
+      };
+   }else if(stage == 3){
+      if(fun == 68 && Math.floor(Math.random()*10)==0){
+         backMap = backMaps[18];
+         objMap = objMaps[22];
+         objMap = JSON.parse(JSON.stringify(objMaps[Math.floor(Math.random() * MAPy) + MAPx]));
+      }else if(fun <= 50 && Math.floor(Math.random()*10)==0){
+         backMap = backMaps[19];
+         objMap = objMaps[23];
+         objMap = JSON.parse(JSON.stringify(objMaps[Math.floor(Math.random() * MAPy) + MAPx]));
+      };
+   }
+   if(stage == 1 && floor >= 10){SELECTx = 150;SELECTy = 525;backMap = backMaps[6];objMap = objMaps[8];}//創生黎明の原野
+   else if(stage == 2 && floor >= 7 ){SELECTx = 150;SELECTy = 525;backMap = backMaps[13];objMap = objMaps[16];}//ガチェンレイゲスドゥールラート(昼)
+   else if(stage == 3 && floor >= 3 ){SELECTx = 150;SELECTy = 525;backMap = backMaps[20];objMap = objMaps[24];}//ガチェンレイゲスドゥールラート(夜)
+
+   draw()
 }
 function NextStage(){
    floor = 0;
@@ -949,6 +998,7 @@ let playercrrs = 0;
 //毎ダンジョン変わるデータs
 let enemylv = 1;
 let enemyhp = 0//この辺は固有値というか規定値。接頭辞によってこっから変動させたりできるようにする用
+let enemymp = 0
 let enemyatk = 0;
 let enemydef = 0;
 let enemymatk = 0;
@@ -1746,25 +1796,6 @@ let Charas = {
       critresist:0.1,
       buttonsolid:'#ffacf9',
       buttonback:'#acf8ff',
-   },
-   'herta':{
-      id:'herta',
-      name:'ヘルタ',
-      description:'くるくる〜',//これでいっか.....ww
-      ex:'bighdiamond',
-      ns:'improve',
-      ps:'enemy50%pursuit',
-      attack:15,
-      defense:0,
-      mattack:10,
-      mdefense:5,
-      maxhealth:100,
-      maxmp:10,
-      critlate:0.05,
-      critdmg:1.5,
-      critresist:0,
-      buttonsolid:'#f1ea66',
-      buttonback:'#a163cb',
    },
    'magodituono':{
       id:'magodituono',
@@ -2936,7 +2967,7 @@ let Skills = {
          id:'bigdiamond',
          name:'私がかけた魔法だよ',
          description:'敵に攻撃力の150%のダメージを与え、たまに凍らせる',
-         price:95,
+         price:80,
          buyable:1,
          process:async function(cam,me){
             phase = 0; disappear();
@@ -3110,7 +3141,7 @@ let Skills = {
          id:'improve',
          name:'改善が必要だよ',
          description:'攻撃力を1.4倍に上昇させる',//変更予定,
-         price:70,
+         price:30,
          buyable:1,
          cool:5,
          process:async function(cam,me){
@@ -3191,7 +3222,7 @@ let Skills = {
          id:'enemy50%pursuit',
          name:'一度限りの取引',
          description:'攻撃によって敵の体力を50%以下だった場合、攻撃力の70%で追撃する',
-         price:90,
+         price:70,
          buyable:1,
       },
       'elecshock':{
@@ -3784,6 +3815,17 @@ function arrayShuffle(array) {
    }
    return array;
 }
+function arrayGacha(array,probability){
+   if(array.length !== probability.length){throw new Error("長さがあっていないっす！先輩、ちゃんとチェックした方がいいっすよ〜？");}
+   const total = probability.reduce((sum, p) => sum + p, 0);
+   let random = Math.random() * total;
+   for (let i = 0; i < array.length; i++) {
+      if(random < probability[i]){
+         return array[i];
+      }
+      random -= probability[i];
+   }
+}
  
 document.addEventListener('mousemove', (e) => {
    const HasDescription = document.getElementById('movabledescription');
@@ -3837,7 +3879,7 @@ function DesideEnemyName(target){
    humans.enemies[target].attack = enemyatk;//敵の能力を決めます
    humans.enemies[target].defense = enemydef;
    humans.enemies[target].maxhealth = enemyhp;
-   humans.enemies[target].maxmp = enemymp; //どーにかして
+   humans.enemies[target].maxmp = enemymp;
    humans.enemies[target].critlate = enemycrla;
    humans.enemies[target].critdmg = enemycrdm;
    humans.enemies[target].critresist = enemycrrs;
@@ -3848,6 +3890,135 @@ function DesideEnemyName(target){
 }
 
 //async function errorcheck(){if(playerattack==Infinity||playerdefense==Infinity||playerhealth==Infinity||playermaxhealth==Infinity||playerlevel==Infinity||playerpower==Infinity||playermaxmp==Infinity||playershell==Infinity||isNaN(playerhealth)||isNaN(playermaxhealth)||isNaN(playerattack)||isNaN(playerdefense)||isNaN(playermaxmp)||isNaN(playerpower)||isNaN(playershell)||isNaN(playerlevel)||Potion.num==Infinity||euro==Infinity||Bomb.num==Infinity||Redcard.num==Infinity||isNaN(Potion.num)||isNaN(euro)||isNaN(Bomb.num)||isNaN(Redcard.num)){log.textContent='error100が発生しました。';awaitdelay(1000);log.textContent='リブートを開始します。';await delay(1000);open('about:blank','_self').close();}}//おっとこれは...?}
+//#endregion
+//#region log&text
+let textDiv = document.getElementById('text');
+let autoDelay = 1;
+let skipText = false; // スキップフラグ
+let clearText = false; // テキスト消去フラグ
+let textShowing = 0;
+
+function colorcheck(rawtext) {
+   const text = [];
+   let isRed = false; // ** で囲まれた部分かどうか
+   let isPink = false; // && で囲まれた部分かどうか
+   let isBlue = false;
+
+   for(let i = 0; i < rawtext.length; i++){
+      if(rawtext[i] === "*" && rawtext[i + 1] === "*"){
+         isRed = !isRed; // 状態を切り替える
+         i++; // 次の * をスキップ
+      }else if(rawtext[i] === "&" && rawtext[i + 1] === "&"){
+         isPink = !isPink;
+         i++; // 次の & をスキップ
+      }else if(rawtext[i] === "^" && rawtext[i + 1] === "^"){
+         isBlue = !isBlue;
+         i++;
+      }else{
+         text.push({ char: rawtext[i], color: isRed ? "red" : isPink ? "pink" : isBlue ? "blue" : null });
+      }
+   }
+   return text;
+}
+
+async function addtext(text){
+   textShowing = 1;
+   text = colorcheck(text);
+   textDiv.innerHTML = ""; // 中身をリセット
+   textDiv.style.display = "block"; // 表示
+   let index = 0;
+   clearText = false; // 消去フラグをリセット
+
+   return new Promise((resolve) => {
+      async function type() {
+            if (index < text.length) {
+               if (skipText) {
+                  // スキップ処理
+                  while (index < text.length) {
+                        const span = document.createElement("span");
+                        span.textContent = text[index].char;
+                        if (text[index].color) {
+                           span.classList.add(`color-${text[index].color}`);
+                        }
+                        textDiv.appendChild(span);
+                        index++;
+                  }
+                  index = text.length; // 全ての文字を表示済みにする
+                  skipText = false;
+                  setTimeout(type, 10);
+               } else {
+                  // 通常の文字表示
+                  const span = document.createElement("span");
+                  span.textContent = text[index].char;
+                  if (text[index].color) {
+                        span.classList.add(`color-${text[index].color}`);
+                  }
+                  textDiv.appendChild(span);
+
+                  index++;
+                  setTimeout(type, 80); // 次の文字を表示する間隔
+               }
+            } else {
+               addlog(textDiv.innerHTML);
+               const waitTime = autoDelay * 1000;
+               const timeout = new Promise(resolve => setTimeout(resolve, waitTime));
+               const userAction = new Promise(resolve => {
+                  function waitToClear(event) {
+                        if (event.type === 'click' || event.key === 'z' || event.key === 'Enter') {
+                           document.removeEventListener('click', waitToClear);
+                           document.removeEventListener('keydown', waitToClear);
+                           resolve();
+                        }
+                  }
+                  document.addEventListener('click', waitToClear);
+                  document.addEventListener('keydown', waitToClear);
+               });
+
+               Promise.race([timeout, userAction]).then(() => {
+                  textDiv.textContent = "";
+                  textDiv.style.display = "none";
+                  clearText = true;
+                  skipText = false
+                  textShowing = 0;
+                  resolve('end'); // Promiseを解決
+               });
+            }
+      }
+      type();
+   });
+}
+document.addEventListener('keydown', (event) => {
+   if (event.key === 'z' || event.key === 'Enter') {
+      skipText = true;
+   }
+});
+
+document.addEventListener('keyup', (event) => {
+   if (event.key === 'z' || event.key === 'Enter') {
+      skipText = false;
+   }
+});
+
+document.addEventListener('click', () => {
+   skipText = true;
+   setTimeout(() => skipText = false, 50); // 一時的にスキップを有効化
+});
+
+let logDiv = document.getElementById('log');
+let logOpener = document.getElementById('log-opener');
+logOpener.addEventListener('click', function(){
+   if(logDiv.style.right == '-300px'){
+      logDiv.style.right = '0px';
+      logOpener.style.right = '300px';
+   }else{
+      logDiv.style.right = '-300px';
+      logOpener.style.right = '0px';
+   }
+});
+function addlog(text){
+   logDiv.innerHTML += text + '<br>';
+   logDiv.scrollTop = logDiv.scrollHeight;
+}
 //#endregion
 
 //#region Inventory
@@ -4818,8 +4989,8 @@ function HomeLetsDungeon(code){
    document.getElementById('HomeArea').style.textAlign = 'center';
    document.getElementById('BattleArea').style.display = 'none';
    document.getElementById('HomeArea').innerHTML = `
-   <button class="button" onclick="HomeGoDungeon('greenslime');">greenslime</button><button class="button" onclick="HomeGoDungeon('mechanic');">mechanic</button><button class="button" onclick="HomeGoDungeon('clown');">clown</button><button class="button" onclick="HomeGoDungeon('herta');">herta</button><br>
-   <button class="button" onclick="HomeGoDungeon('magodiaqua');">Mago Di Aqua</button><br>
+   <button class="button" onclick="HomeGoDungeon('greenslime');">greenslime</button><button class="button" onclick="HomeGoDungeon('mechanic');">mechanic</button><button class="button" onclick="HomeGoDungeon('clown');">clown</button><button class="button" onclick="HomeGoDungeon('magodituono');">Mago Di Tuono</button><br>
+   <br>
    <button class="button" onclick="HomeGoDungeon('wretch');">wretch〜持たざる者〜</button>
    `;
 }
@@ -4850,21 +5021,11 @@ function HomeGoDungeon(name){
 
    switch(stage){
       case 1:
-         enemylevel = 1;enemyhp = 100;
+         enemylv = 1;enemyhp = 80;enemymp = 50;
          enemyatk = 10;enemypower = 1; enemymatk = 10;
          enemydef = 0; enemyshell = 1; enemymdef = 0;
          enemycrla = 0.03;enemycrdm = 1.5;enemycrrs = 0;
       break;
-      case 2:case 3:
-         enemylevel = 5;enemyhp = 140;
-         enemyatk = 15;enemypower = 1; enemymatk = 10;
-         enemydef = 5; enemyshell = 1; enemymdef = 0;
-         enemycrla = 0.03;enemycrdm = 1.5;enemycrrs = 0;
-      case 4:
-         enemylevel = 10;enemyhp = 160;
-         enemyatk = 25;enemypower = 1; enemymatk = 15;
-         enemydef = 10; enemyshell = 1; enemymdef = 10;
-         enemycrla = 0.03;enemycrdm = 1.5;enemycrrs = 0;
    }
    
    dungeonnow = 1;
@@ -4876,9 +5037,17 @@ function HomeGoDungeon(name){
    GoNextFloor();
 
    AllowMove = 0;
-   ctx.clearRect(0, 0, 600, 600); 
-   DrawBackground();
-   ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+
+   IMGselect = new Image();
+   IMGselect.src = images[humans['players'][1].id].src
+
+   SELECTx = 35;
+   SELECTy = 35;
+   MAPx = Math.floor(SELECTx / 100);
+   MAPy = Math.floor(SELECTy / 100);
+   draw()
+   updatestop = 0;
+   update();
 }
 
 function ExitDungeon(code){
@@ -5417,9 +5586,7 @@ async function back(me){
       document.getElementById('BattleArea').style.display = 'none';
       document.getElementById('NowMap').style.display = 'block';
       
-      ctx.clearRect(0, 0, 600, 600); 
-      DrawBackground();
-      ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+      draw()
       AllowMove = 0;
       log.textContent = 'うまく逃げ切れた！';
       await delay(1000);
@@ -5579,6 +5746,7 @@ function turretAllClear(){
 //#endregion
 
 //#region charaのturn
+//#endregion
 
 
 //#region prev-enemyturn
@@ -6083,10 +6251,8 @@ async function killedCheck(){
 
       MAPx = Math.floor(SELECTx / 75);
       MAPy = Math.floor(SELECTy / 75);
-      objectMap[MAPy][MAPx] = 0;//戦利品的な何かにしてもいいかも..いやなし
-      ctx.clearRect(0, 0, 600, 600); 
-      DrawBackground();
-      ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+      objMap[MAPy][MAPx] = 0;//戦利品的な何かにしてもいいかも..いやなし
+      draw()
       AllowMove = 0;
       return 'end';
    }else{
@@ -6113,9 +6279,7 @@ async function killedCheck(){
 
          MAPx = Math.floor(SELECTx / 75);
          MAPy = Math.floor(SELECTy / 75);
-         ctx.clearRect(0, 0, 600, 600); 
-         DrawBackground();
-         ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+         draw()
          AllowMove = 0;
          log.textContent = '';
          return 'end';
@@ -6321,10 +6485,8 @@ let Camprestper
    
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
-   objectMap[MAPy][MAPx] = 4;
-   ctx.clearRect(0, 0, 600, 600); 
-   DrawBackground();
-   ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+   objMap[MAPy][MAPx] = 4;
+   draw()
    AllowMove = 0;
   }
   async function Camptrade(){
@@ -6521,33 +6683,22 @@ function Campequiptool(code){
       ...Object.values(Skills.ps)
    ];
  
-  function skillshopshuffle(array){
-   for (let i = array.length - 1; i > 0; i--) {
-     const j = Math.floor(Math.random() * (i + 1));
-     [array[i], array[j]] = [array[j], array[i]];
-   }
-   return array;
-  }
 
   function skillshopcreateCard(item){
    const card = document.createElement('div');
    card.classList.add('card');
    
-   //const cardTextbox = document.createElement('div');
-   //cardTextbox.classList.add('card__textbox');
-   
    const titleText = document.createElement('span');
    titleText.classList.add('card-titletext');
    titleText.innerHTML = `${item.type}   ${item.name}<br>価格: ${item.price}€<br>${item.description}<br>`;
+   card.appendChild(titleText);
    
    const buyButton = document.createElement('button');
    buyButton.classList.add('button');
+   buyButton.classList.add('card-buy');
    buyButton.setAttribute('onclick', `BuyItem('${item.type}','${item.id}','${item.name}','${item.price}')`);
    buyButton.textContent = 'Buy';
-   
-   card.appendChild(titleText);
    card.appendChild(buyButton);
-   //card.appendChild(cardTextbox);
    
    return card;
   }
@@ -6563,7 +6714,7 @@ function Campequiptool(code){
    const cardsContainer = document.getElementById('skillshopcorner');
    cardsContainer.style.display = 'block';
    cardsContainer.innerHTML = ''; // 前の内容をクリアする
-   const selectedItems = skillshopshuffle(Allskill).slice(0, 6);
+   const selectedItems = arrayShuffle(Allskill).slice(0, 6);
    selectedItems.forEach(item => {
      const card = skillshopcreateCard(item);
      cardsContainer.appendChild(card);
@@ -6577,10 +6728,8 @@ function Campequiptool(code){
    
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
-   objectMap[MAPy][MAPx] = 0;
-   ctx.clearRect(0, 0, 600, 600); 
-   DrawBackground();
-   ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+   objMap[MAPy][MAPx] = 0;
+   draw()
    AllowMove = 0;
   }
 
@@ -6626,7 +6775,7 @@ let Events = {
          }
       }
    }
-}
+};
 //#region candystand
 let candybar = [];
 async function Candytake(){
@@ -6689,10 +6838,8 @@ async function HopeButtonact(){
 
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
-   objectMap[MAPy][MAPx] = 0;
-   ctx.clearRect(0, 0, 600, 600); 
-   DrawBackground();
-   ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+   objMap[MAPy][MAPx] = 0;
+   draw()
    AllowMove = 0;
 }
 // #endregion
@@ -6731,10 +6878,8 @@ async function OpenChest(code){
 
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
-   objectMap[MAPy][MAPx] = 0;
-   ctx.clearRect(0, 0, 600, 600); 
-   DrawBackground();
-   ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+   objMap[MAPy][MAPx] = 0;
+   draw()
    AllowMove = 0;
 }
 // #endregion
@@ -6776,10 +6921,8 @@ async function Cookietake(){
 
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
-   objectMap[MAPy][MAPx] = 0;
-   ctx.clearRect(0, 0, 600, 600); 
-   DrawBackground();
-   ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+   objMap[MAPy][MAPx] = 0;
+   draw()
    AllowMove = 0;
 }
 // #endregion
@@ -6787,7 +6930,7 @@ async function Cookietake(){
 async function placebomb(){
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
-   objectMap[MAPy][MAPx] = 15;
+   objMap[MAPy][MAPx] = 15;
    bombtimer = 5;
    PlacedBombx = MAPx;
    PlacedBomby = MAPy;
@@ -6801,7 +6944,7 @@ async function CatusAct(){
       humans.players[1].health -= 10;humans.players[1].attack += 5;if(stage == 3){humans.players[1].health -= 10;humans.players[1].attack += 5;}
       MAPx = Math.floor(SELECTx / 75);
       MAPy = Math.floor(SELECTy / 75);
-      objectMap[MAPy][MAPx] = 0;
+      objMap[MAPy][MAPx] = 0;
    }else{
       log.textContent = 'なんか..今触ったら死にそう....'
    }
@@ -6819,7 +6962,7 @@ async function ScorpionAct(code){
    playerattack += 10*code;
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
-   objectMap[MAPy][MAPx] = 0;
+   objMap[MAPy][MAPx] = 0;
    await delay(500);
    log.textContent = '';
 }
@@ -6836,10 +6979,8 @@ function ZomuEvent(){//創生黎明の原野
    document.getElementById('ButtonStyle').textContent = `.button{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};cursor: pointer;}input[type="text"]:focus{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};}`;
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
-   objectMap[MAPy][MAPx] = 0;
-   ctx.clearRect(0, 0, 600, 600); 
-   DrawBackground();
-   ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+   objMap[MAPy][MAPx] = 0;
+   draw()
    AllowMove = 0;
 }
 function UtusenEvent(){
@@ -6852,10 +6993,8 @@ function UtusenEvent(){
    document.getElementById('ButtonStyle').textContent = `.button{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};cursor: pointer;}input[type="text"]:focus{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};}`;
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
-   objectMap[MAPy][MAPx] = 0;
-   ctx.clearRect(0, 0, 600, 600); 
-   DrawBackground();
-   ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+   objMap[MAPy][MAPx] = 0;
+   draw()
    AllowMove = 0;
 }
 // #endregion      

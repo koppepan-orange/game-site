@@ -960,36 +960,6 @@ function addlog(text){
     logDiv.scrollTop = logDiv.scrollHeight;
 }
 
-// 実行例
-let Examples = {
-    1:async function(){
-        await addtext('コッペ「こんにちは、**コッペ・パン**です！」')
-        await addtext('コッペ「あ、気づきました？」')  
-        await addtext('コッペ「&&色が&&**変えれるんですよ**^^！！^^」')
-        await addtext('それに感心しながらも、一つ違和感を覚える')
-        await addtext('コッペパン「誰だお前」')
-    },
-    2:async function(){
-        await addtext('battle start');
-        await addtext('飛花レイルが現れた！');
-        await addtext('飛花レイルに1のダメージ！');
-        await addtext('飛花レイル「も、もう戦うのやめてもいいんじゃないかな?!」');
-        await addtext('飛花レイル「ほら、花もこんなに咲いてるし..」');
-        await addtext('飛花レイル「小鳥も鳴いてるし..さ？」');
-        await delay(1000);
-        await addtext('飛花レイルに9999のダメージ！');
-        await addtext('飛花レイル「むぅ..」');
-        await addtext('battle end');
-        await addtext('1のexpを獲得!');
-    }
-}
-document.addEventListener('keyup', (event) => {
-    if(event.key == '1'){
-        Examples[1]();
-    }else if(event.key == '2'){
-        Examples[2]();
-    }
-})
 //#endregion
 //#region Notice
 let noticenow = 0;
