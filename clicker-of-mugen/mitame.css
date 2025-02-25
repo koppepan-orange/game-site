@@ -1,22 +1,17 @@
 @font-face{font-family:comicsans;src:url('assets/fonts/comicsans.ttf');}
 @font-face{font-family:Hangyaku;src:url('assets/fonts/Hangyaku.ttf');}
 * {
-  font-family:comicsans;
-  /* margin: 0 auto; */
-  padding: 2px;
+  font-family:comicsans, Hangyaku;
   box-sizing: border-box;
-  text-align: center;
+  scrollbar-width: none;
+}
+html{
+  overflow: hidden;
 }
 body {  
   color:#000000;
   background-color: #eeeeee;
-  overflow-x: hidden;
-  overflow-y: hidden;
-}
-#All{
-  width: 100%;
-  height: 950px;
-  margin: 0 auto;
+  overflow-y: scroll;
 }
 
 /*こっから雑に扱ってもいい子*/
@@ -24,11 +19,11 @@ body {
   display: none;
   position: fixed;  /* 画面上の絶対位置に固定 */
   pointer-events: none;  /* マウスイベントを通過させる */
-  background-color: rgba(90, 90, 90, 0.9);
-  color: rgb(255, 255, 255);
+  background-color: #363636c6;
+  color: #000000;
   padding: 5px 10px;
   border-radius: 5px;
-  z-index: 1000;  /* 他の要素の上に表示 */
+  z-index: 10000;  /* 他の要素の上に表示 */
 }
 
 /*logとtext*/
@@ -108,6 +103,7 @@ body {
   color: #333344;
   background-color: #cecece;
   transition: left 0.3s;
+  z-index: 2000;
 }
 #sideMenu ul {
   list-style: none;
@@ -129,16 +125,6 @@ body {
   cursor: pointer;
   text-decoration: none;
   padding: 0;
-}
-#menuToggle {
-  display: none;
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  color: #000000;
-  border: none;
-  font-size: 26px;
-  cursor: pointer;
 }
 
 /*notice*/
@@ -204,65 +190,104 @@ body {
 }
 
 /*ここからrankとeuroのあれ*/
-.rank-euro-zone {
-  display: flex;
-  width: 90%;
-  margin: 0 auto;
-  border: 2px solid #ccc;
+.upperUI {
+  display: block;
+  border-bottom: 3px solid #cfe9ff;
+  background-color: #def0ff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 65px;
+  padding: 10px;
+  z-index: 997;
   align-items: center;
-  gap: 10px;
-  justify-content: space-between; /* 要素間のスペースを均等に */
+  justify-content: center;
 }
 .rank {
   font-size: 20px;
-  margin-bottom: 10px;
-}
-.rpt-bar-container {
-  position: relative;
-  width: 60%;
-  background-color: #ddd;
-  height: 30px;
-  border-radius: 15px;
-  overflow: hidden;
-}
-.rpt-bar {
-  height: 100%;
-  background-color: #8b8b8b;
-  width: 0%; /* 初期の経験値割合 */
-  transition: width 0.3s ease-in-out;
-}
-.rpt-text {
   position: absolute;
-  width: 100%;
-  top: 30px;
-  left: 0;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
+  left: 10px;
+  top: 10px;
 }
 .euro {
   font-size: 20px;
-  margin-top: 10px;
+  position: absolute;
+  left: 10px;
+  top: 30px;
+}
+.rpt-bar-back {
+  display: none;
+  position: absolute;
+  width: 50%;
+  height: 30px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 998;
+  background-color: #d5ffd6;
+  text-align: center;
+}
+.rpt-bar {
+  position: absolute;
+  width:0%;
+  height: 24px;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #9bff9d;
+  z-index: 999;
+  display: inline-block;
+  vertical-align: middle;
+}
+.rpt-text {
+  position:absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-size: 20px;
+  color: #f0f8ff;
+  display: inline-block;
+  vertical-align: middle;
+  z-index: 1000;
+}
+#menuToggle {
+  display: block;
+  position: absolute;
+  right:30px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size:40px;
+  cursor: pointer;
+  z-index: 998;
 }
 
 /* ゲーム全体のやつ */
 #GameZone {
+  margin-top: 75px;
   display: block;
   width: 100%;
-  height: 900px;
-  margin: 0 auto;
+  height: 100%;
+  max-height: 100%;
+  overflow-y: scroll;
+  margin-bottom: 65px;
 }
 
 /* こっからhomeとかtabとか */
-#TabZone {
+#Tabs {
   display: flex;
+  height: 65px;
+  font-size: 45px;
+  justify-content: center;
+  gap: 20%;
+  padding: 5px 5%;
+  background-color: #def0ff;
+  position: fixed;
+  bottom: 0;
   width: 100%;
-  height: 50px;
-  flex-wrap: wrap;
-  gap:15%;
-  margin: 0 auto;
+  box-sizing: border-box;
+  z-index: 998;
 }
 .TabImg{
   width:40px;
@@ -270,7 +295,7 @@ body {
 }
 #HomeTab, #InventoryTab, #QuestTab, #ChatTab, #ProfileTab {
   display: none;
-  margin: 0 auto;
+  overflow-y: scroll;
 }
 #HomeTab{
   display: block;

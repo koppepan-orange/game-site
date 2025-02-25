@@ -492,9 +492,9 @@ const objsAll = [
       
       {id:3,type:'o',name:'焚き火',p:25,rare:0,},//このrareは生成時に決めちゃってもいいかも
       {id:5,type:'0',name:'スキルショップ',p:25},
+      
    ]
 ]
-//NanigaOkirukana
 let objMap = [
    [0, 0, 0, 0, 0, 0, 0, 0],
    [0, 0, 0, 0, 0, 0, 0, 0],
@@ -563,13 +563,6 @@ function DrawBackground(){
    }
 }
 
-const explosion1 = new Image();
-explosion1.src = 'assets/effects/explosion_1.png';
-const explosion2 = new Image();
-explosion2.src = 'assets/effects/explosion_2.png';
-const explosion3 = new Image();
-explosion3.src = 'assets/effects/explosion_3.png';
-
 // 選択画像のロードと初期表示
 let IMGselect = 0;
 IMGselect = new Image();
@@ -580,10 +573,6 @@ let AllowMove = 0;
 let SELECTx = 0; // x座標
 let SELECTy = 0; // y座標
 let MAPx,MAPy;
-
-let bombtimer = 0;
-let PlacedBombx = 0;
-let PlacedBomby = 0;
 
 let speed = 10;
 const keys = {};
@@ -777,88 +766,67 @@ let NanigaOkirukana = {
          ZomuEvent();
       }
    },
-
-}
-function NanigaOkoruKana(code){
-   switch(code){
-      case 1:
-         GoNextFloor();
-      break;
-      case 2:
-         EnemyAppear();
-      break;
-      case 3:
-         AllowMove = 1;
-         document.getElementById('NowMap').style.display = 'none';
-         document.getElementById('EventArea').style.display = 'block';
-         document.getElementById('EventArea').innerHTML = '<button id="CampRest" onclick="Camprest()"></button><br><button id="CampTrade" onclick="Camptrade()"></button>'
-         log.textContent = '休憩できそうな場所を見つけた！';
-         Camprestper = (Math.floor(Math.random() * 4)+3)/10;
-         document.getElementById('CampRest').textContent = '朝まで休む(' + Camprestper*100 + '%回復)';//30のときはスキルカード強化みたいなやつあってもいいかも
-         switch(Math.floor(Math.random() * 3)+1){
-            case 1:
-            if(Math.floor(Math.random() * 3)+1){
-                  y = 10;document.getElementById('CampTrade').textContent = '放浪武器商人に話しかける';
-            }else{  y = 1; document.getElementById('CampTrade').textContent = '武器商人に話しかける';}
-            break;
-            case 2: y = 2; document.getElementById('CampTrade').textContent = '防具取扱専門家に話しかける'; break;
-            case 3: y = 3; document.getElementById('CampTrade').textContent = '道具屋24に話しかける'; break;
-         }
-      break;
-      case 5:
-         SkillShopOpen();//こっちはまあいいかな〜って
-      break;
-      case 6:
-         if(!objMap.some(row => row.includes(2))){OpenChest(1);}//マップ内に敵がいないなら〜っていうやつです
-      break;
-      case 7:
-         if(!objMap.some(row => row.includes(2))){OpenChest(2);}
-      break;
-      case 8:
-         HopeButtonact();
-      break;
-      case 10:
-         Candytake();
-      break;
-      case 11:
-         Cookietake();
-      break;
-      case 12:
-         ZomuEvent();
-      break;
-      case 13:
+   13:{
+      name:'boss',
+      process:async function(){
          BossEnemyAppear();
-      break;
-      case 14:
+      }
+   },
+   14:{
+      name:'door',
+      process:async function(){
          if(!objMap.some(row => row.includes(13))){NextStage();}
-      break;
-      case 16:
+      }
+   },
+   16:{
+      name:'chest',
+      process:async function(){
          if(!objMap.some(row => row.includes(2))){OpenChest(1);}
-      break;
-      case 17:
+      }
+   },
+   17:{
+      name:'rarechest',
+      process:async function(){
          if(!objMap.some(row => row.includes(2))){OpenChest(2);}
-      break;
-      case 19:
+      }
+   },
+   19:{
+      name:'サソリさん',
+      process:async function(){
          ScorpionAct(1);
-      break;
-      case 20:
+      }
+   },
+   20:{
+      name:'サボテン', //ついに動いたサボテン
+      process:async function(){
          CatusAct();
-      break;
-      case 21:
+      }
+   },
+   21:{
+      name:'オアシス',
+      process:async function(){
          OasisAct();
-      break;
-      case 22:
-         //これは触れただけで何か起こるようにしよ
-      break;
-      case 23:
+      }
+   },
+   22:{
+      name:'砂嵐',
+      process:async function(){
+         console.log('これはなんもないよ')
+      }
+   },
+   23:{
+      name:'サソリさんⅡ',
+      process:async function(){
          ScorpionAct(2);
-      break;
-      case 24:
+      }
+   },
+   24:{
+      name:'utu_mzyb',
+      process:async function(){
          UtusenEvent();
-      break;
-      case 25:
-      break;
+      }
    }
+
 }
 
 
@@ -3889,7 +3857,7 @@ function DesideEnemyName(target){
    return humans.enemies[target].name;
 }
 
-//async function errorcheck(){if(playerattack==Infinity||playerdefense==Infinity||playerhealth==Infinity||playermaxhealth==Infinity||playerlevel==Infinity||playerpower==Infinity||playermaxmp==Infinity||playershell==Infinity||isNaN(playerhealth)||isNaN(playermaxhealth)||isNaN(playerattack)||isNaN(playerdefense)||isNaN(playermaxmp)||isNaN(playerpower)||isNaN(playershell)||isNaN(playerlevel)||Potion.num==Infinity||euro==Infinity||Bomb.num==Infinity||Redcard.num==Infinity||isNaN(Potion.num)||isNaN(euro)||isNaN(Bomb.num)||isNaN(Redcard.num)){log.textContent='error100が発生しました。';awaitdelay(1000);log.textContent='リブートを開始します。';await delay(1000);open('about:blank','_self').close();}}//おっとこれは...?}
+
 //#endregion
 //#region log&text
 let textDiv = document.getElementById('text');
@@ -3902,7 +3870,7 @@ function colorcheck(rawtext) {
    const text = [];
    let isRed = false; // ** で囲まれた部分かどうか
    let isPink = false; // && で囲まれた部分かどうか
-   let isBlue = false;
+   let isBlue = false; // ^^ で囲まれた部分かどうか
 
    for(let i = 0; i < rawtext.length; i++){
       if(rawtext[i] === "*" && rawtext[i + 1] === "*"){
@@ -6927,6 +6895,17 @@ async function Cookietake(){
 }
 // #endregion
 //#region placebomb
+const explosion1 = new Image();
+explosion1.src = 'assets/effects/explosion_1.png';
+const explosion2 = new Image();
+explosion2.src = 'assets/effects/explosion_2.png';
+const explosion3 = new Image();
+explosion3.src = 'assets/effects/explosion_3.png';
+
+let bombtimer = 0;
+let PlacedBombx = 0;
+let PlacedBomby = 0;
+
 async function placebomb(){
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);

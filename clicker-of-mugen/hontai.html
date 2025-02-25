@@ -14,7 +14,7 @@
 <body>
 <div id="All">
   <div id="movabledescription"></div>
-  <div id="text"></div><div id="log-opener"><</div><div id="log"></div> 
+  <div id="text"></div><div id="log-opener"><</div><div id="log"></div>
   <div id="Notice-page">
     <div id="notice-honmei">
       <span id="notice-end" onclick="CloseNotice()">X</span><br><span id="notice-notice">お知らせ</span><br>
@@ -27,7 +27,6 @@
     </div>
   </div>
   <!--サイドメニュー-->
-  <div class="menuToggle" id="menuToggle">☰</div>
   <nav id="sideMenu">
     <hr noshade="true">
     <ul>
@@ -42,16 +41,20 @@
       <li><a href="https://koppepan-orange.github.io/test-site/chat.html">to chat</a></li>
     </ul>
     <hr noshade="true">
-    <button id="logout-button" onclick="logout()">Logout</button><br><span class="hasd" id="null" data-description="こんなもん見つけて楽しいか？">/n</span>
+    <button id="logout-button" onclick="logout()">Logout</button>
+    <br><span class="hasd" id="null" data-description="こんなもん見つけて楽しいか？">/n</span>
+    <button class="button"onclick="humans.players[1].health = humans.players[1].maxhealth; tekiou();">回復(全)</button>
   </nav>
-  <div class="rank-euro-zone">
+  <div class="upperUI">
     <div class="rank">Rank: <span id="rank">1</span></div>
-    <div class="rpt-bar-container">
+    <div class="rpt-bar-back">
         <div class="rpt-bar" id="rpt-bar"></div>
         <div class="rpt-text">EXP: <span id="rpt-text">0/100</span></div>
     </div>
     <div class="euro">Euro:<span id="euro">500</span> <button id="GetEuro" onclick="if(afknow == 0){LetsCharge();}">+</button></div>
+    <div id="menuToggle">☰</div>
   </div>
+
   <div id="GameZone">
     <div id="HomeTab">
       <canvas id="NowMap" width="600" height="600" style="border:1px solid #000000"></canvas>
@@ -138,7 +141,8 @@
   </div></div><!--ここは理想。firebaseとかを勉強したらここは解放しましょ-->
     <div id="ProfileTab"></div><!--ここは..ゲーム自体をちゃんとオンライン化したら解放で-->
   </div>
-  <div id="TabZone">
+
+  <div id="Tabs">
     <button id="HomeTabButton" onclick="OpenTab('H')"><img class="TabImg" src="assets/icons/home.png"></button>
     <button id="InventoryTabButton" onclick="OpenTab('I')"><img class="TabImg" src="assets/icons/inventory.png"></button>
     <button id="QuestTabButton" onclick="OpenTab('Q')"><img class="TabImg" src="assets/icons/quest.png"></button>
@@ -149,5 +153,3 @@
 <script src="nakami.js"></script>
 </body>
 </html>
-<br><br><br><br><br>
-<button class="button"onclick="humans.players[1].health = humans.players[1].maxhealth; tekiou();">回復(全)</button>
