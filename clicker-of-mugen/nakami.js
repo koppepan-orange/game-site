@@ -1,9 +1,9 @@
 //内部へようこそ！！！
 //#region 探索部分
-document.getElementById('BattleArea').style.display = 'block';
-document.getElementById('NowMap').style.display = 'none';
-const canvas = document.getElementById("NowMap");
-const ctx = canvas.getContext("2d");
+document.querySelector('#BattleArea').style.display = 'block';
+document.querySelector('#NowMap').style.display = 'none';
+const canvas = document.getElementById('NowMap');
+const ctx = canvas.getContext('2d');
 const backMaps = [
    [
       ['b','b','b','b','b','b','b','b'],
@@ -659,11 +659,13 @@ document.addEventListener('keydown', (event) => {
       MAPy = Math.floor(SELECTy / 75);
 
       // マップの値をチェック
-      if(MAPy >= 0 && MAPy < objMap.length && MAPx >= 0 && MAPx < objMap[MAPy].length){NanigaOkoruKana(objMap[MAPy][MAPx]);}
+      if(MAPy >= 0 && MAPy < objMap.length && MAPx >= 0 && MAPx < objMap[MAPy].length){
+         NanigaOkirukana[objMap[MAPy][MAPx]].process();
+      }
       draw()
       }
    }
-   if(event.key == 'e'&&document.getElementById('NowMap').style.display == 'block'){
+   if(event.key == 'e'&&document.querySelector('#NowMap').style.display == 'block'){
       if(AllowMove == 0){
          AllowMove = 1;
          phase = 'null'
@@ -692,20 +694,20 @@ let NanigaOkirukana = {
       name:'焚き火',
       process:async function(){
          AllowMove = 1;
-         document.getElementById('NowMap').style.display = 'none';
-         document.getElementById('EventArea').style.display = 'block';
-         document.getElementById('EventArea').innerHTML = '<button id="CampRest" onclick="Camprest()"></button><br><button id="CampTrade" onclick="Camptrade()"></button>'
+         document.querySelector('#NowMap').style.display = 'none';
+         document.querySelector('#EventArea').style.display = 'block';
+         document.querySelector('#EventArea').innerHTML = '<button id="CampRest" onclick="Camprest()"></button><br><button id="CampTrade" onclick="Camptrade()"></button>'
          log.textContent = '休憩できそうな場所を見つけた！';
          Camprestper = (Math.floor(Math.random() * 4)+3)/10;
-         document.getElementById('CampRest').textContent = '朝まで休む(' + Camprestper*100 + '%回復)';//30のときはスキルカード強化みたいなやつあってもいいかも
+         document.querySelector('#CampRest').textContent = '朝まで休む(' + Camprestper*100 + '%回復)';//30のときはスキルカード強化みたいなやつあってもいいかも
          switch(Math.floor(Math.random() * 3)+1){
             case 1:
             if(Math.floor(Math.random() * 3)+1){
-                  y = 10;document.getElementById('CampTrade').textContent = '放浪武器商人に話しかける';
-            }else{  y = 1; document.getElementById('CampTrade').textContent = '武器商人に話しかける';}
+                  y = 10;document.querySelector('#CampTrade').textContent = '放浪武器商人に話しかける';
+            }else{  y = 1; document.querySelector('#CampTrade').textContent = '武器商人に話しかける';}
             break;
-            case 2: y = 2; document.getElementById('CampTrade').textContent = '防具取扱専門家に話しかける'; break;
-            case 3: y = 3; document.getElementById('CampTrade').textContent = '道具屋24に話しかける'; break;
+            case 2: y = 2; document.querySelector('#CampTrade').textContent = '防具取扱専門家に話しかける'; break;
+            case 3: y = 3; document.querySelector('#CampTrade').textContent = '道具屋24に話しかける'; break;
          }
       }
    },
@@ -835,10 +837,10 @@ function SuteFuri(me,code){
    switch(code){
       case 'maxhealth': humans.players[me].maxhealth += 20; humans.players[me].health += 20;   break;
       case 'attack':  humans.players[me].attack    += 5;   break;
-      case 'defence':  humans.players[me].defense   += 5;   break;
+      case 'defense':  humans.players[me].defense   += 5;   break;
       case 'maxmp':   humans.players[me].maxmp    += 5;   break;
       case 'mattack': humans.players[me].mattack   += 5;   break;
-      case 'mdefence': humans.players[me].mdefense  += 5;   break;
+      case 'mdefense': humans.players[me].mdefense  += 5;   break;
       case 'critlate': humans.players[me].critlate *= 100; humans.players[me].critlate  += 2; humans.players[me].critlate *= 0.01; break;
       case 'critdmg': humans.players[me].critdmg *= 10; humans.players[me].critdmg  += 1; humans.players[me].critdmg *= 0.1;  break;
       case 'critresist': humans.players[me].critresist *= 100; humans.players[me].critresist  += 2; humans.players[me].critresist *= 0.01; break;
@@ -943,7 +945,7 @@ function NextStage(){
 //#region 変数達
 let w,x,y,z;//こいつらは計算
 let t = 't'
-let log = document.getElementById('log');
+let log = document.querySelector('#log');
 
 let fun = Math.floor(Math.random() * 100)+1;
 
@@ -995,62 +997,10 @@ let bossbattlenow = 0;
 let enemynames = ["彷徨わない亡霊", "地上の月兎", "悠々自適なクラス委員", "大胆不敵な問題児", "兎角のシルバージャグラー", "デスブリンガー・ナース",//草原
                   "ついに動いたサボテン","スフィンクスの残像","襲来セシ砂嵐","サソリ風ザリガニ","毒無しのガラガラヘビ","裏切りのアリジゴク",//昼砂漠
                   "ピンクな先輩", "ブルーな後輩", "過激派のハッカー", "反旗を翻したアンドロイド", "腐敗した落武者", "アスピリン中毒者",//夜砂漠
-                  "†古書館の魔術師†", "トラブルメーカーな天才少女","黒服","無邪気な夜の希望"];//学校(ここだけブルアカにしましょ)
+                  "†古書館の魔術師†", "トラブルメーカーな天才少女","黒服","無邪気な夜の希望"];//学校(ここだけブルアカにしましょ
 const enemynamenum = ['0.5','6.5','12.5','18.3'];
 let bossenemynames = ['purpleslime','steampumker','RailwayGun "Shemata"','joker']//RailwayGun "Shemata"...wwあ、列車砲シェマタね 対策委員会が壊そうとしてたやつ
-let enemyprefixes = ['激昂','冷静沈着な','ギャンブラーな','守りが固い','心眼持ちの'];
-let Prefixes = {
-   'furious':{
-      id:'furious',
-      name:'激昂',
-      rare:1,
-      process:function(cam,me){
-         humans[cam][me].attack  = Math.floor(humans[cam][me].attack*1.5);
-         humans[cam][me].defense = Math.floor(humans[cam][me].defense*0.75);
-         humans[cam][me].critlate = 0.05
-      },
-   },
-   'calm':{
-      id:'calm',
-      name:'冷静沈着な',
-      rare:1,
-      process:function(cam,me){
-         humans[cam][me].attack  = Math.floor(humans[cam][me].attack*0.75);
-         humans[cam][me].defense = Math.floor(humans[cam][me].defense*2.0);
-         humans[cam][me].critrate = 5
-      },
-   },
-   'gambler':{
-      id:'gambler',
-      name:'ギャンブラーな',
-      rare:1,
-      process:function(cam,me){
-         humans[cam][me].critrate += 4
-         humans[cam][me].maxhealth = Math.floor(humans[cam][me].maxhealth*2.0);
-      },
-   },
-   'defender':{
-      id:'defender',
-      name:'守りが固い',
-      rare:2,
-      process:function(cam,me){
-         humans[cam][me].critresist += 5;
-         humans[cam][me].maxhealth = Math.floor(humans[cam][me].maxhealth*1.25);
-         humans[cam][me].defense = Math.floor(humans[cam][me].defense*1.5);
-         humans[cam][me].attack = Math.floor(humans[cam][me].attack*0.3)
-      },
-   },
-   'wise':{
-      id:'wise',
-      name:'心眼持ちの',
-      rare:3,
-      process:function(cam,me){
-         humans[cam][me].critlate = 100; //確定会心人間
-         humans[cam][me].critdmg = 1.2; //さすがに弱め
-         humans[cam][me].attack = Math.floor(humans[cam][me].attack*0.3); //つまり防御力無視害悪敵ってこと
-      },
-   },
-}
+
 
 let myWeapons = [];
 let myArmors = [];
@@ -1093,6 +1043,20 @@ let quests = {
 }
 
 //#endregion
+
+// ダブルタップによる拡大を禁止
+// ダブルタップ完全無効 100%ブロックにしてしまう
+var time = 0;
+document.addEventListener('touchend', function (e) {
+    e.preventDefault();
+
+    console.log("preventDefault");
+    var now = new Date().getTime();
+    if ((now - time) < 350) {
+        e.preventDefault();
+    }
+    time = now;
+}, true);
 
 //#region datas
 let humans = {
@@ -1682,7 +1646,7 @@ let humans = {
    }
 }
 
-let turn = 0;//今誰のターンか
+let turn = ['players', 1];//今誰のターンか
 let turncount = 0;//今のターン数
 let phase = 0;//何中か
 
@@ -1690,7 +1654,7 @@ let Charas = {
    'wretch':{
       id:'wretch',
       name:'持たざる者',
-      description:'持たざる者。何もないが、何でもあるとも言える。',
+      description:'持たざる者。何もないが、何でもあるとも言える。<br>平均的で普遍的。普通の凡才でただの人間。',
       ex:'null',
       ns:'null',
       ps:'null',
@@ -1700,9 +1664,10 @@ let Charas = {
       mdefense:0,
       maxhealth:100,
       maxmp:50,
-      critlate:0.05,
+      critlate:5,
       critdmg:1.5,
       critresist:0,
+      speed:50,
       buttonsolid:'#000000',
       buttonback:'#999999',
    },
@@ -1721,7 +1686,8 @@ let Charas = {
       maxmp:50,
       critlate:0,
       critdmg:1.5,
-      critresist:0,
+      critresist:'absolute',
+      speed:35,
       buttonsolid:'#000000',
       buttonback:'#999999',
    },
@@ -1737,11 +1703,12 @@ let Charas = {
       defense:0,
       mattack:20,
       mdefense:20,
-      maxhealth:20,
+      maxhealth:25,
       maxmp:30,
-      critlate:0.07,
+      critlate:7,
       critdmg:2.0,
       critresist:0,
+      speed:65,
       buttonsolid:'#ff7373',
       buttonback:'#fcffc0',
    },
@@ -1759,9 +1726,10 @@ let Charas = {
       mdefense:0,
       maxhealth:100,
       maxmp:50,
-      critlate:0.09,
+      critlate:9,
       critdmg:3.0,//...ちょまってこれ大丈夫かな
-      critresist:0.1,
+      critresist:10,
+      speed:40,
       buttonsolid:'#ffacf9',
       buttonback:'#acf8ff',
    },
@@ -1778,9 +1746,10 @@ let Charas = {
       mdefense:20,
       maxhealth:40,
       maxmp:100,
-      critlate:0.05,
+      critlate:5,
       critdmg:2.0,
-      critresist:0.05,
+      critresist:5,
+      speed:60,
       buttonsolid:'#7f1184',
       buttonback:'#5f4894',
    },
@@ -1804,7 +1773,7 @@ let Friends = {
    },
    '泡沫アリア':{
       name:'泡沫アリア',
-      belongto:'', //所属
+      belongto:'',
       rare:2,
       description:``, 
       comment:``,
@@ -1854,148 +1823,161 @@ let Friends = {
    }
 }
 
-let Buffs = {
-   'powerup':{
-      name:'powerup',
-      description:'攻撃力が上がる。やったね！',
-      lv:{
-         1:1.25,
-         2:1.5,
-         3:2,
-         4:2.5,
-         5:3,
-         6:4
-      }
+//そのうちEffects内にまとめるかもしれない
+let Effects = {
+   buffs:{
+      'powerup':{
+         name:'powerup',
+         description:'攻撃力が上がる。やったね！',
+         lv:{
+            1:1.25,
+            2:1.5,
+            3:2,
+            4:2.5,
+            5:3,
+            6:4
+         }
+      },
+      'shellup':{
+         name:'shellup',
+         description:'防御力が上がる。あんまり実感しづらい。',
+         lv:{
+            1:1.25,
+            2:1.5,
+            3:2,
+            4:2.5,
+            5:3,
+            6:4
+         }
+      },
+      'luck':{
+         name:'luck',
+         description:'ターン終了時、たまにもう一回行動できる。気分はさながらラスボスですね',
+         lv:{
+            1:5,
+            2:3,
+         }
+      },
+      'disappear':{
+         name:'disappear',
+         description:'姿を消し、攻撃を受けなくなる。しかし範囲攻撃はちゃんと当たる。',
+         lv:{
+            1:1,
+         }
+      },
    },
-   'shellup':{
-      name:'shellup',
-      description:'防御力が上がる。あんまり実感しづらい。',
-      lv:{
-         1:1.25,
-         2:1.5,
-         3:2,
-         4:2.5,
-         5:3,
-         6:4
-      }
+   debuffs:{
+      'powerdown':{
+         name:'powerdown',
+         description:'攻撃力が下がる。stackするようにしたいけどまあいっか',
+         lv:{//割合ダウン
+            1:0.25,
+            2:0.5,
+            3:0.75,
+            4:0.8,
+            5:0.9,
+            6:0.95
+         }
+      },
+      'shelldown':{
+         name:'shelldown',
+         description:'防御力が下がる。こっちは実感しやすいのよね',
+         lv:{//割合ダウン
+            1:0.25,
+            2:0.5,
+            3:0.75,
+            4:0.8,
+            5:0.9,
+            6:0.95
+         }
+      },
+      'poison':{
+         name:'poison',
+         description:'ターン終了時割合で防御貫通ダメージ。毒の苦しみもお好きなんですね',
+         lv:{//受けるダメージ(max*x)
+            1:0.05,
+            2:0.1,
+            3:0.2,
+         }
+      },
+      'burn':{
+         name:'burn',
+         description:'ターン終了時固定ダメージ。まじでこれ嫌い...ww',
+         lv:{//受けるダメージ(固定)
+            1:10,
+            2:20,
+            3:40,
+         }
+      },
    },
-   'luck':{
-      name:'luck',
-      description:'ターン終了時、たまにもう一回行動できる。気分はさながらラスボスですね',
-      lv:{
-         1:5,
-         2:3,
-      }
+   handles:{
+      'freeze':{
+         name:'freeze',
+         description:'凍っている状態。これ燃やされたら解除みたいにしたい',
+         lv:{//1/xの確率で抜け出せる
+            1:3,//-
+            2:5,//deep
+            3:7,//etarnal
+         }
+      },
+      'palsy':{
+         name:'palsy',
+         description:'麻痺ですね。これ好き',
+         lv:{//1/xの確率で行動不可
+            1:5,//-
+         }
+      },
+      'stan':{
+         name:'stan',
+         description:'スタンなうです。おつおつお〜',
+         lv:{
+            1:1,
+         }
+      },
+      'skip':{
+         name:'skip',
+         description:'はいお前スキップ〜〜ww状態です。ざまぁ',
+         lv:{
+            1:1,
+         }
+      },
+      'sleep':{
+         name:'sleep',
+         description:'睡眠ですね...いやね....ちょ..っと......w',//あーーもうやります！！そのうち！！！あの人を作りましょう！！！www いや大丈夫かな...?まあいっか、戦略性あっておもろいしょ、多分
+         lv:{//起きる確率
+            1:0.5,
+         }
+      },
    },
-   'LetsThrow':{
-      name:'LetsThrow',
-      description:'レンチを投げる準備をしている状態。次の攻撃与ダメ2倍',
-      lv:{
-         1:1,
-      }
-   },
-   'gambling':{
-      name:'gambling',
-      description:'次の攻撃が0,2,4倍になる。これぞ醍醐味..ってやつ？',
-      lv:{
-         1:1,
-      }
-   },
-}
-
-let Debuffs = {
-   'powerdown':{
-      name:'powerdown',
-      description:'攻撃力が下がる。stackするようにしたいけどまあいっか',
-      lv:{//割合ダウン
-         1:0.25,
-         2:0.5,
-         3:0.75,
-         4:0.8,
-         5:0.9,
-         6:0.95
-      }
-   },
-   'shelldown':{
-      name:'shelldown',
-      description:'防御力が下がる。こっちは実感しやすいのよね',
-      lv:{//割合ダウン
-         1:0.25,
-         2:0.5,
-         3:0.75,
-         4:0.8,
-         5:0.9,
-         6:0.95
-      }
-   },
-   'poison':{
-      name:'poison',
-      description:'ターン終了時割合で防御貫通ダメージ。毒の苦しみもお好きなんですね',
-      lv:{//受けるダメージ(max*x)
-         1:0.05,
-         2:0.1,
-         3:0.2,
-      }
-   },
-   'burn':{
-      name:'burn',
-      description:'ターン終了時固定ダメージ。まじでこれ嫌い...ww',
-      lv:{//受けるダメージ(固定)
-         1:10,
-         2:20,
-         3:40,
-      }
-   },
-   'freeze':{
-      name:'freeze',
-      description:'凍っている状態。これ燃やされたら解除みたいにしたい',
-      lv:{//1/xの確率で抜け出せる
-         1:3,//-
-         2:5,//deep
-         3:7,//etarnal
-      }
-   },
-   'palsy':{
-      name:'palsy',
-      description:'麻痺ですね。これ好き',
-      lv:{//1/xの確率で行動不可
-         1:5,//-
-      }
-   },
-   'stan':{
-      name:'stan',
-      description:'スタンなうです。おつおつお〜',
-      lv:{
-         1:1,
-      }
-   },
-   'skip':{
-      name:'skip',
-      description:'はいお前スキップ〜〜ww状態です。ざまぁ',
-      lv:{
-         1:1,
-      }
-   },
-   'sleep':{
-      name:'sleep',
-      description:'睡眠ですね...いやね....ちょ..っと......w',//あーーもうやります！！そのうち！！！あの人を作りましょう！！！www いや大丈夫かな...?まあいっか、戦略性あっておもろいしょ、多分
-      lv:{//起きる確率
-         1:0.5,
-      }
-   },
-   'onslime':{
-      name:'onslime',
-      description:'スライムが体に粘りついている状態です。やばいね(行動不可)',
-      lv:{
-         1:1,
-      }
-   },
-   'stickyslime':{
-      name:'stickyslime',
-      description:'スライムがくっついているおかげで行動するとダメージを受けます。これ好き',//こいつは..どしよね ちょっと違う形で作りますか コンセプトとしてはおもちゃ箱のゆめっぽくしたいから
-      lv:{//行動時ダメージ(固定)
-         1:5,
-      }
+   uniques:{
+      'onslime':{
+         name:'onslime',
+         description:'スライムが体に粘りついている状態です。やばいね(行動不可)',
+         lv:{
+            1:1,
+         }
+      },
+      'stickyslime':{
+         name:'stickyslime',
+         description:'スライムがくっついているおかげで行動するとダメージを受けます',
+         lv:{//行動時ダメージ(固定)
+            1:5,
+         }
+      },
+      'LetsThrow':{
+         name:'LetsThrow',
+         description:'レンチを投げる準備をしている状態。次の攻撃与ダメ2倍',
+         lv:{
+            1:1,
+         }
+      },
+      'gambling':{
+         name:'gambling',
+         description:'次の攻撃が0,2,4倍になる。これぞ醍醐味..ってやつ？',
+         lv:{
+            1:1,
+         }
+      },
    }
 }
 
@@ -2003,7 +1985,7 @@ let Slashs = {
    'slash':{
       id:'slash',
       name:'シンプル斬り',
-      description:'必中ー倍単体刹那斬',
+      description:'必中ー倍単体刹那斬', //そのうち武士作ってこれ作りたい
       mp:0,
       lv:1,
       tcam:'players',
@@ -2099,7 +2081,7 @@ let Magics = {
       lv:1,
       process:async function(cam,tcam,me,target){
          log.textContent = humans[cam][me].name + 'はpowerを唱えた!';await delay(1000);
-         buffadd(tcam,target,'powerup',3,1);
+         await buffadd(tcam,target,'powerup',3,1);
          return 'alive';
       }
    },
@@ -2111,7 +2093,7 @@ let Magics = {
       lv:1,
       process:async function(cam,tcam,me,target){
          log.textContent = humans[cam][me].name + 'はshellを唱えた!';await delay(1000);
-         buffadd(tcam,target,'shellup',3,1);
+         await buffadd(tcam,target,'shellup',3,1);
          return 'alive';
       }
    },
@@ -2123,7 +2105,7 @@ let Magics = {
       lv:3,
       process:async function(cam,tcam,me,target){
          log.textContent = humans[cam][me].name + 'はpoisonを唱えた!';await delay(1000);
-         buffadd(tcam,target,'poison',4,1);
+         await buffadd(tcam,target,'poison',4,1);
          return 'alive';
       }
    },
@@ -2148,7 +2130,7 @@ let Magics = {
       process:async function(cam,tcam,me,target){
          log.textContent = `${humans[cam].name}はfireを唱えた！`;await delay(1000);
          let result = await humandamaged(cam,tcam,me,target,1.1,'mg',2);//火
-         buffadd(tcam,target,'burn',2,1);
+         await buffadd(tcam,target,'burn',2,1);
          return result
       }
    },
@@ -2174,7 +2156,7 @@ let Magics = {
       mp:4,
       lv:7,
       process:async function(cam,tcam,me,target){
-         buffadd(tcam,target,'luck',4,1);
+         await buffadd(tcam,target,'luck',4,1);
          log.textContent = humans[cam][me].name + 'はluckを唱えた!';await delay(1000);
          return 'alive'
       }
@@ -2198,7 +2180,7 @@ let Magics = {
       mp:8,
       lv:9,
       process:async function(cam,tcam,me,target){
-         buffadd(tcam,target,'powerup',3,2)
+         await buffadd(tcam,target,'powerup',3,2)
          log.textContent = humans[cam][me].name + 'はmore powerを唱えた!';await delay(1000);
          return 'alive'
       }
@@ -2210,7 +2192,7 @@ let Magics = {
       mp:8,
       lv:9,
       process:async function(cam,tcam,me,target){
-         buffadd(tcam,target,'shellup',3,2)
+         await buffadd(tcam,target,'shellup',3,2)
          log.textContent = humans[cam][me].name + 'はmore shellを唱えた!';await delay(1000);
          return 'alive'
       }
@@ -2222,7 +2204,7 @@ let Magics = {
       mp:12,
       lv:10,
       process:async function(cam,tcam,me,target){
-         buffadd(tcam,target,'poison',5,2);
+         await buffadd(tcam,target,'poison',5,2);
          log.textContent = humans[cam][me].name + 'はdeadly poisonを唱えた!';await delay(1000);
          return 'alive'
       }
@@ -2236,7 +2218,7 @@ let Magics = {
       process:async function(cam,tcam,me,target){
          log.textContent = humans[cam][me].name + 'はgiga fireを唱えた!';await delay(1000);
          let result = await humandamaged(cam,tcam,me,target,2.3,'mg',2);//火
-         buffadd(tcam,target,'burn',2,2);
+         await buffadd(tcam,target,'burn',2,2);
          return result
       }
    },
@@ -2262,7 +2244,7 @@ let Magics = {
       mp:12,
       lv:14,
       process:async function(cam,tcam,me,target){
-         buffadd(tcam,target,'luck',5,2);
+         await buffadd(tcam,target,'luck',5,2);
          log.textContent = humans[cam][me].name + 'はluckgreatを唱えた!';await delay(1000);
          return 'alive'
       }
@@ -2277,7 +2259,7 @@ let Magics = {
          log.textContent = humans[cam][me].name + 'はメラゾーマを唱えた!';
          await delay(1000);
          let result = await humandamaged(cam,tcam,me,target,3.5,'mg',4);//雷
-         buffadd(tcam,target,'burn',3,2);
+         await buffadd(tcam,target,'burn',3,2);
          return result
       }
    },
@@ -2497,7 +2479,7 @@ let Weapons = {
          x = Math.ceil(humans[cam][me].attack * humans[cam][me].power * 0.9 + weaponpower - humans[tcam][target].defense);
          if(x < 0){x = 0};if(x > humans[tcam][target].health){x = humans[tcam][target].health};
          humans[tcam][target].health -= x;
-         buffadd(tcam,target,'shelldown',3,1);
+         await buffadd(tcam,target,'shelldown',3,1);
          log.textContent = 'お口に合うと良いのですが..';
          await delay(1000);
          if(humans[tcam][target].health <= 0){return 'dead';}
@@ -2762,7 +2744,7 @@ let Tools = {
          x = Math.ceil(humans[cam][me].attack * 0.8)
          if(humans[tcam][target].health < x){x = humans[tcam][target].health};
          humans[tcam][target].health -= x;
-         buffadd(tcam,target,'burn',3,1);
+         await buffadd(tcam,target,'burn',3,1);
          log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';tekiou();await delay(1000);
          if(humans[tcam][target].health <= 0){log.textContent = 'レッドウィンターの問題児にしては上出来じゃない？';await delay(1000);return 'dead';}
          return 'alive';
@@ -2803,7 +2785,7 @@ let Tools = {
       description:'退場です。帰れ(スキップ)',
       num:3,
       process:async function(cam,tcam,me,target){
-         buffadd(tcam,target,'skip',1,1);
+         await buffadd(tcam,target,'skip',1,1);
          log.textContent = 'カードを仕込みました!';await delay(1000);
          return 'alive';
       }
@@ -2837,8 +2819,8 @@ let Tools = {
          rbuffs = arrayShuffle(rbuffs);
          x = rbuffs[0];
          y = rbuffs[1];
-         buffadd(tcam,target,x,3,Math.floor(Math.random()*2)+1);
-         buffadd(tcam,target,y,3,Math.floor(Math.random()*2)+1);
+         await buffadd(tcam,target,x,3,Math.floor(Math.random()*2)+1);
+         await buffadd(tcam,target,y,3,Math.floor(Math.random()*2)+1);
          log.textContent = humans[tcam][target].name+'にバフを二個つけました！！';await delay(1000);
          return 'alive';
       }
@@ -2853,7 +2835,7 @@ let Tools = {
          let rbuffs = ['powerdown','shelldown','poison','burn','freeze'];
          rbuffs = arrayShuffle(rbuffs);
          for(i = 0;i < 2;i++){
-            buffadd(tcam,target,rbuffs[i],3,Math.floor(Math.random()*2)+1);
+            await buffadd(tcam,target,rbuffs[i],3,Math.floor(Math.random()*2)+1);
          }
          log.textContent = humans[tcam][target].name+'にバフをニ個つけました！！';await delay(1000);
          return 'alive';
@@ -2921,8 +2903,8 @@ let Skills = {
                case 0:x=0;log.textContent = 'しかし不発弾だった!!';break;//これによる効果とかもあっていいかも
                case 5:x=5;log.textContent = 'Lucky! 爆弾は焼夷弾だった!!!';break;
                case 4:x=4;log.textContent = '爆弾は花火だった!';break;
-               case 3:x=3;log.textContent = '爆弾は毒ガス入りだった!!';buffadd(target[1],target[0],'poison',3,1);break; //毒ガス入りだった場合
-               case 2:x=2;log.textContent = '爆弾はスライム入りだった!!';buffadd(target[1],target[0],'onslime',2,1);break;//スライム入りだった場合
+               case 3:x=3;log.textContent = '爆弾は毒ガス入りだった!!';await buffadd(target[1],target[0],'poison',3,1);break; //毒ガス入りだった場合
+               case 2:x=2;log.textContent = '爆弾はスライム入りだった!!';await buffadd(target[1],target[0],'onslime',2,1);break;//スライム入りだった場合
                case 1:x=1;log.textContent = '爆発した..だがただの特殊な薬品だった!!';break;
             }
             await delay(1000);
@@ -2941,10 +2923,10 @@ let Skills = {
             phase = 0; disappear();
             let target = await LetsTargetSelect();
             let serifs = ['こんな大きなダイアモンド見たことないでしょ？あげるね～','あなた…それじゃあダメだよ','ちょっとは静かになさい！','私が誰だか知ってるの？']
-            document.getElementById('log').textContent = serifs[Math.floor(Math.random() * serifs.length)];//そのうち消える
+            document.querySelector('#log').textContent = serifs[Math.floor(Math.random() * serifs.length)];//そのうち消える
             await delay(1000);
             let result = await humandamaged(cam,target[1],me,target[0],1.5,'sh',4);
-            if(Math.floor(Math.random()*2) == 0){buffadd('enemydebuff','freeze',4,1)};
+            if(Math.floor(Math.random()*2) == 0){await buffadd('enemydebuff','freeze',4,1)};
             return result;
          }
       },
@@ -2959,7 +2941,7 @@ let Skills = {
             phase = 0; disappear();
             let target = await LetsTargetSelect(3);
             let result = await humandamaged(cam,target[1],me,target[0],1.5,'sh',4);
-            buffadd(target[0],target[1],'elec',2,1);
+            await buffadd(target[0],target[1],'elec',2,1);
             return result;
          }
       },
@@ -2990,7 +2972,7 @@ let Skills = {
             phase = 0; disappear();
             let target = await LetsTargetSelect();
             let result = await humandamaged(cam,target[1],me,target[0],0.75,'sh',4);
-            buffadd(target[1],target[0],'stun',1,1);
+            await buffadd(target[1],target[0],'stun',1,1);
             return result;
          }
       },
@@ -3005,8 +2987,8 @@ let Skills = {
             phase = 0; disappear();
             let target = await LetsTargetSelect();
             let result = await humandamaged(cam,target[1],me,target[0],0.5,'sh',4);
-            buffadd(target[1],target[0],'shelldown',3,1);
-            buffadd(cam,me,'powerup',3,2);
+            await buffadd(target[1],target[0],'shelldown',3,1);
+            await buffadd(cam,me,'powerup',3,2);
             return result;
          }
       },
@@ -3023,7 +3005,7 @@ let Skills = {
             let S = ['わたしはその辺の小石...','わたしのことなんて、気にしないでください...','すみません、一人にさせてください......'];
             serif = arraySelect(S)
             log.textContent = serif;
-            buffadd(target[1],target[0],'weaknessgrasp',2,1);//弱点把握状態
+            await buffadd(target[1],target[0],'weaknessgrasp',2,1);//弱点把握状態
             return 'alive';
          },
       },
@@ -3044,7 +3026,7 @@ let Skills = {
                case 1:log.textContent = '普通の爆弾だった..!';break;
                //case 1:log.textContent = '水爆弾だった！！';break;//強制終了です
                case 4:log.textContent = 'Lucky♪マグマ爆弾だった!!';break;
-               case 0:log.textContent = 'いけっ！ピカピカの実！';buffadd(target[1],target[0],'stan',2,1);break;
+               case 0:log.textContent = 'いけっ！ピカピカの実！';await buffadd(target[1],target[0],'stan',2,1);break;
             }
             let result = await humandamaged(cam,target[1],me,target[0],x,'sh',4);
             return result;
@@ -3071,7 +3053,7 @@ let Skills = {
          cool:3,
          process:async function(cam,me){
             let target = ShallTargetSelect(cam,me,'er',0);
-            buffadd(target[1],target[0],'onslime',1,1);
+            await buffadd(target[1],target[0],'onslime',1,1);
             log.textContent = humans[cam][me].name + 'にスライムが覆い被さった!';
             return 'alive';
          }
@@ -3085,7 +3067,7 @@ let Skills = {
          buyable:1,
          cool:4,
          process:async function(cam,me){
-            buffadd(cam,me,'LetsThrow',2,1);
+            await buffadd(cam,me,'LetsThrow',2,1);
             log.textContent = 'wrenchを投げる準備ができた!';
             return 'alive';
          }
@@ -3099,7 +3081,7 @@ let Skills = {
          buyable:1,
          cool:3,
          process:async function(cam,me){
-            buffadd(cam,me,'gambling',1,1);
+            await buffadd(cam,me,'gambling',1,1);
             log.textContent = 'さあ、ギャンブルの時間だ!!';
             return 'alive';
          }
@@ -3113,7 +3095,7 @@ let Skills = {
          buyable:1,
          cool:5,
          process:async function(cam,me){
-            buffadd(cam,me,'improve',4,1);
+            await buffadd(cam,me,'improve',4,1);
             log.textContent = 'パーツアップグレード。';
             return 'alive';
          }
@@ -3128,7 +3110,7 @@ let Skills = {
          cool:3,
          process:async function(cam,me){
             let target = ShallTargetSelect(cam,me,'phpl',0);
-            buffadd(target[1],target[0],'elecshield',2,1);
+            await buffadd(target[1],target[0],'elecshield',2,1);
             log.textContent = '帯電バリアを付与しました！';
             return 'alive';
          }
@@ -3143,7 +3125,7 @@ let Skills = {
          cool:4,
          process:async function(cam,me){
             disappear();
-            buffadd(cam,me,'powerup',2,2);
+            await buffadd(cam,me,'powerup',2,2);
             log.textContent = 'エレキギターで殴るぞ..ごめんここのセリフどしよ'
             let target = ShallTargetSelect(cam,me,'er',0);
             let result = await humandamaged(cam,target[1],me,target[0],2,'sh',4);
@@ -3217,43 +3199,37 @@ let Stages = {
 let Enemies = {
    '蒼白の粘液':{
       name:'蒼白の粘液',
-      hp:'+10',
-      atk:'+0',
-      def:'-10',
-      matk:'0',
-      mdef:'-20',
-      crla:'-0.01',
-      crdm:'-0.5',
-      crrs:'+0.5',
+      stage:1,
+      maxhealth:'+10',
+      attack:'+0',
+      defense:'-10',
+      maxmp:'0',
+      mattack:'0',
+      mdefense:'-20',
+      critlate:'-0.01',
+      critdmg:'-1',
+      critresist:'+1',
       speed:'40',
       acts:{
          1:{
             name:'粘液飛ばし',
+            probability:75,
             num:1,
             process:async function(cam, me){
-               log.textContent = `${humans[cam][me].name}は粘液を飛ばしてきた！`;await delay(1000);
+               await addtext(`${humans[cam][me].name}は粘液を飛ばしてきた！`);
                let selected = ShallTargetSelect(cam,me,'phph',0);
                let result = await humandamaged(cam,selected[1],me,selected[0],1,'sh',1);
                return result;
             }
          },
          2:{
-            name:'粘液飛ばし',
-            num:2,
-            process:async function(cam, me){
-               log.textContent = `${humans[cam][me].name}は粘液を飛ばしてきた！`;await delay(1000);
-               let selected = ShallTargetSelect(cam,me,'phpl',0);
-               let result = await humandamaged(cam,selected[1],me,selected[0],1,'sh',1);
-               return result;
-            }
-         },
-         3:{
             name:'粘液付与',//やばい方のスライムも作りたいね 一緒に溶けよ....? みたいな..ってちょっと癖すぎるか....?よし、技名は自己責任で表示可にしよう その場合セリフは...?
+            probability:25,
             num:3,
             process:async function(cam, me){
-               log.textContent = `${humans[cam][me].name}は粘液を絡ませてきた！`;await delay(1000);//いやこれはこれでやばいか...?いや全然捉えようによってはやばいわ
+               await addtext(`${humans[cam][me].name}は粘液を絡ませてきた！`);//いやこれはこれでやばいか...?いや全然捉えようによってはやばいわ
                let selected = ShallTargetSelect(cam,me,'phph',0);
-               buffadd(selected[1],selected[0],'stickyslime',2,1);
+               await buffadd(selected[1],selected[0],'stickyslime',2,1);
                return 'alive';
             }
          }
@@ -3261,41 +3237,35 @@ let Enemies = {
    },
    '翠嵐の風刃':{
       name:'翠嵐の風刃',
-      hp:'+10',
-      atk:'+10',
-      def:'-10',
-      matk:'+0',
-      mdef:'+0',
-      crla:'+0.3',
-      crdm:'+0.5',
-      crrs:'+0',
+      stage:1,
+      maxhealth:'+10',
+      attack:'+10',
+      defense:'-10',
+      maxmp:'0',
+      mattack:'+0',
+      mdefense:'+0',
+      critlate:'+0.3',
+      critdmg:'+0.5',
+      critresist:'+0',
       speed:'75',
       acts:{
          1:{
             name:'体当たり',
+            probability:70,
             num:1,
             process:async function(cam, me){
-               log.textContent = `${humans[cam][me].name}は体当たりを仕掛けてきた！`;await delay(1000);
-               let selected = ShallTargetSelect(cam,me,'phpl',0);
-               let result = await humandamaged(cam,selected[1],me,selected[0],1,'sh',1);
-               return result;
-            }
-         },
-         2:{
-            name:'体当たり',
-            num:2,
-            process:async function(cam, me){
-               log.textContent = `${humans[cam][me].name}は体当たりを仕掛けてきた！`;await delay(1000);
+               await addtext(`${humans[cam][me].name}は体当たりを仕掛けてきた！`);
                let selected = ShallTargetSelect(cam,me,'phpl',0);
                let result = await humandamaged(cam,selected[1],me,selected[0],1,'sh',1);
                return result;
             }
          },
          3:{
-            name:'体当たり',
+            name:'体当たり・改',
+            probability:30,
             num:3,
             process:async function(cam, me){
-               log.textContent = `${humans[cam][me].name}は回転しながら突進してきた！`;await delay(1000);
+               await addtext(`${humans[cam][me].name}は回転しながら突進してきた！`);
                let selected = ShallTargetSelect(cam,me,'phpl',0);
                let result = await humandamaged(cam,selected[1],me,selected[0],1.5,'sh',1);
                return result;
@@ -3305,32 +3275,38 @@ let Enemies = {
    },
    '黄昏の穿影':{
       name:'黄昏の穿影',
-      hp:'-10',
-      atk:'+15',
-      def:'+0',
-      matk:'+0',
-      mdef:'+0',
-      crla:'+0',
-      crdm:'+0',
-      crrs:'+0',
+      stage:1,
+      maxhealth:'-10',
+      attack:'+15',
+      defense:'+0',
+      maxmp:'0',
+      mattack:'+0',
+      mdefense:'+0',
+      critlate:'+0',
+      critdmg:'+0',
+      critresist:'+0',
       speed:'60',
       acts:{
          1:{
             name:'消滅',
+            probability:60,
+            type:'reinvisi',
             num:1,
             process:async function(cam, me){
-               log.textContent = `${humans[cam][me].name}は姿を消..あれどこ行った？`;await delay(1000);
+               await addtext(`${humans[cam][me].name}は姿を消..あれどこ行った？`)
                let selected = ShallTargetSelect(cam,me,'ec',0);
-               buffadd(selected[1],selected[0],'disappear',2,1);
+               await buffadd(selected[1],selected[0],'disappear',2,1);
                return 'alive';
             }
          },
          2:{
             name:'衝突',
+            probability:20,
+            type:'abinvisi',
             num:2,
             process:async function(cam, me){
                if(buffhas(cam,me,'disappear')){x = 2;buffremove(cam,me,'disappear');}else{x = 1};
-               log.textContent = `${humans[cam][me].name}は突進してきた！`;await delay(1000);
+               await addtext(`${humans[cam][me].name}は突進してきた！`)
                let selected = ShallTargetSelect(cam,me,'pr',0);
                let result = await humandamaged(cam,selected[1],me,selected[0],x,'sh',1);
                return result;
@@ -3338,13 +3314,14 @@ let Enemies = {
          },
          3:{
             name:'ローキック',//ロストワンの号哭の号哭使いたいけど意味が泣くことらしい
+            probability:20,
+            type:'none',
             num:3,
             process:async function(cam, me){
-               if(buffhas(cam,me,'disappear')){x = 1.5;buffremove(cam,me,'disappear')}else{x = 0.75};
-               log.textContent = `${humans[cam][me].name}はローキックしてきた！`;await delay(1000);
+               await addtext(`${humans[cam][me].name}はローキックしてきた！`)
                let selected = ShallTargetSelect(cam,me,'phpl',0);
                let result = await humandamaged(cam,selected[1],me,selected[0],x,'sh',1);
-               buffadd(selected[1],selected[0],'speeddown',2,1);
+               await buffadd(selected[1],selected[0],'speeddown',2,1);
                return result;
             }
          }
@@ -3352,43 +3329,51 @@ let Enemies = {
    },
    '燐光の妖花':{
       name:'燐光の妖花',
-      hp:'-15',
-      atk:'-10',
-      def:'+0',
-      matk:'+0',
-      mdef:'+15',
-      crla:'+0',
-      crdm:'+0.5',
-      crrs:'+0.1',
+      stage:1,
+      maxhealth:'-15',
+      attack:'-10',
+      defense:'+0',
+      maxmp:'0',
+      mattack:'+0',
+      mdefense:'+15',
+      critlate:'+0',
+      critdmg:'+0.5',
+      critresist:'+0.1',
       speed:'50',
       acts:{
          1:{
             name:'しびれごな',
+            probability:30,
+            type:'none',
             num:1,
             process:async function(cam, me){
-               log.textContent = `${humans[cam][me].name}は痺れ粉を振りかけてきた！`;await delay(1000);
+               await addtext(`${humans[cam][me].name}は痺れ粉を振りかけてきた！`)
                let selected = ShallTargetSelect(cam,me,'patkh',0);
-               buffadd(selected[1],selected[0],'palsy',2,1);
+               await buffadd(selected[1],selected[0],'palsy',2,1);
                return 'alive';
             }
          },
          2:{
             name:'どくのこな',
+            probability:30,
+            type:'none',
             num:2,
             process:async function(cam, me){
-               log.textContent = `${humans[cam][me].name}は毒の粉を振りかけてきた！`;await delay(1000);
+               await addtext(`${humans[cam][me].name}は毒の粉を振りかけてきた！`)
                let selected = ShallTargetSelect(cam,me,'phph',0);
-               buffadd(selected[1],selected[0],'poison',2,1);
+               await buffadd(selected[1],selected[0],'poison',2,1);
                return 'alive';
             }
          },
          3:{
             name:'ねむりごな',
+            probability:30,
+            type:'none',
             num:3,
             process:async function(cam, me){
-               log.textContent = `${humans[cam][me].name}は眠り粉を振りかけてきた！`;await delay(1000);
+               await addtext(`${humans[cam][me].name}は眠り粉を振りかけてきた！`)
                let selected = ShallTargetSelect(cam,me,'patkh',0);
-               buffadd(selected[1],selected[0],'sleep',1,1);
+               await buffadd(selected[1],selected[0],'sleep',1,1);
                return 'alive';
             }
          }
@@ -3402,14 +3387,15 @@ let Enemies = {
 
    '古書館の魔術師':{//ウイさん　コッペパンの"めっちゃ好きなキャラ"。ヒナタさんと仲がいい。
       name:'古書館の魔術師',
-      hp:'-10',
-      atk:'-15',
-      def:'+5',
-      matk:'+0',
-      mdef:'+20',
-      crla:'+0.05',
-      crdm:'+0',
-      crrs:'+0.1',
+      maxhealth:'-10',
+      attack:'-15',
+      defense:'+5',
+      maxmp:'0',
+      mattack:'+0',
+      mdefense:'+20',
+      critlate:'+0.05',
+      critdmg:'+0',
+      critresist:'+0.1',
       speed:'40',
       acts:{
          1:{
@@ -3446,14 +3432,15 @@ let Enemies = {
    },
    '読書マニアな司書':{ //シミコさん
       name:'読書マニアな司書',
-      hp:'+10',
-      atk:'+10',
-      def:'-10',
-      matk:'+0',
-      mdef:'+0',
-      crla:'+0.3',
-      crdm:'+0.5',
-      crrs:'+0',
+      maxhealth:'+10',
+      attack:'+10',
+      defense:'-10',
+      maxmp:'0',
+      mattack:'+0',
+      mdefense:'+0',
+      critlate:'+0.3',
+      critdmg:'+0.5',
+      critresist:'+0',
       speed:'75',
       acts:{
          1:{
@@ -3478,14 +3465,15 @@ let Enemies = {
    },
    '忍び寄るナース':{ //セリナさん
       name:'忍び寄るナース',
-      hp:'+10',
-      atk:'+0',
-      def:'+10',
-      matk:'+0',
-      mdef:'+0',
-      crla:'+0',
-      crdm:'+0',
-      crrs:'+0',
+      maxhealth:'+10',
+      attack:'+0',
+      defense:'+10',
+      maxmp:'0',
+      mattack:'+0',
+      mdefense:'+0',
+      critlate:'+0',
+      critdmg:'+0',
+      critresist:'+0',
       speed:'50',
       acts:{
          1:{
@@ -3512,14 +3500,15 @@ let Enemies = {
    },
    '「救護」のプロ':{ //ミネさん
       name:'「救護」のプロ',
-      hp:'+10',
-      atk:'+0',
-      def:'+10',
-      matk:'+0',
-      mdef:'+0',
-      crla:'+0',
-      crdm:'+0',
-      crrs:'+0',
+      maxhealth:'+10',
+      attack:'+0',
+      defense:'+10',
+      maxmp:'0',
+      mattack:'+0',
+      mdefense:'+0',
+      critlate:'+0',
+      critdmg:'+0',
+      critresist:'+0',
       speed:'50',
       acts:{
          1:{
@@ -3543,6 +3532,59 @@ let Enemies = {
       }
    }
 };
+
+let Prefixes = {
+   'furious':{
+      id:'furious',
+      name:'激昂',
+      rare:1,
+      process:function(cam,me){
+         humans[cam][me].attack  = Math.floor(humans[cam][me].attack*1.5);
+         humans[cam][me].defense = Math.floor(humans[cam][me].defense*0.75);
+         humans[cam][me].critlate = 0.05
+      },
+   },
+   'calm':{
+      id:'calm',
+      name:'冷静沈着な',
+      rare:1,
+      process:function(cam,me){
+         humans[cam][me].attack  = Math.floor(humans[cam][me].attack*0.75);
+         humans[cam][me].defense = Math.floor(humans[cam][me].defense*2.0);
+         humans[cam][me].critrate = 5
+      },
+   },
+   'gambler':{
+      id:'gambler',
+      name:'ギャンブラーな',
+      rare:1,
+      process:function(cam,me){
+         humans[cam][me].critrate += 4
+         humans[cam][me].maxhealth = Math.floor(humans[cam][me].maxhealth*2.0);
+      },
+   },
+   'defender':{
+      id:'defender',
+      name:'守りが固い',
+      rare:2,
+      process:function(cam,me){
+         humans[cam][me].critresist += 5;
+         humans[cam][me].maxhealth = Math.floor(humans[cam][me].maxhealth*1.25);
+         humans[cam][me].defense = Math.floor(humans[cam][me].defense*1.5);
+         humans[cam][me].attack = Math.floor(humans[cam][me].attack*0.3)
+      },
+   },
+   'wise':{
+      id:'wise',
+      name:'心眼持ちの',
+      rare:3,
+      process:function(cam,me){
+         humans[cam][me].critlate = 100; //確定会心人間
+         humans[cam][me].critdmg = 1.2; //さすがに弱め
+         humans[cam][me].attack = Math.floor(humans[cam][me].attack*0.3); //つまり防御力無視害悪敵ってこと
+      },
+   },
+}
 
 const AllQuests = {
    main:{
@@ -3687,12 +3729,23 @@ function tekiou(){
    //生存確認用コマンド x = [1, 2, 3, 4].every(id => {let Enemy = humans.enemies[id];return Enemy.status == 0 || Enemy.status == 2;});
    Object.keys(humans).forEach(cam => {
       Object.keys(humans[cam]).map(a => a.toString()).filter(s => humans[cam][s].status == 1 || humans[cam][s].status == 2).forEach(me => {
+         let human = humans[cam][me];
+         let humanDiv = document.querySelector(`#${cam}${me}`);
+
+         humanDiv.querySelector(`.name`).textContent = human.name;
+         humanDiv.querySelector(`.level`).textContent = `Lv.${human.level}`;
+         humanDiv.querySelector(`.health .num`).textContent = `${human.health}/${human.maxhealth}`;
+         humanDiv.querySelector(`.health .bar .inner`).style.width = `${(human.health / human.maxhealth)*100}%`;
+         humanDiv.querySelector(`.mp .num`).textContent = `${human.mp}/${human.maxmp}`;
+         humanDiv.querySelector(`.mp .bar .inner`).style.width = `${(human.mp / human.maxmp)*100}%`;
+
+         if(cam == 'players'){
+            humanDiv.querySelector('.skill .gauge').style.height = `${(human.ep / human.maxep)*100}%`;
+            if(human.ep >= human.maxep){human.ep = human.maxep; humanDiv.querySelector('.skill gauge').style.height = '100%'}
+         }
+
          let apply = buffcheck(cam,me);
-         document.getElementById(`${cam}${me}`).innerHTML = `
-         <b>${humans[cam][me].name}</b>　<i>Lv.${humans[cam][me].level}</i><br>
-         <span id="PlayerHealth">${humans[cam][me].health}</span>/<span>${humans[cam][me].maxhealth}</span><br>
-         <span id="PlayerMP">${humans[cam][me].mp}</span>/<span id="PlayerMaxMP">${humans[cam][me].maxmp}</span><br>
-         <span id="PlayerBuff">${apply.buff.join('')}</span> <span id="PlayerDebuff">${apply.debuff.join('')}</span>`;
+         humanDiv.querySelector(`.effects`).innerHTML = apply.join('');
 
          humans[cam][me].power = 1;humans[cam][me].shell = 1;
          let karix = 0;
@@ -3700,29 +3753,97 @@ function tekiou(){
 
          if(buffhas(cam,me,'powerup')){karix = buffhas(cam,me,'powerup').lv};
          if(buffhas(cam,me,'powerdown')){karix -= buffhas(cam,me,'powerdown').lv};
-         if(karix > 0){humans[cam][me].power = Buffs.powerup.lv[karix]};if(karix < 0){humans[cam][me].power = Debuffs.powerdown.lv[karix*-me]}
+         if(karix > 0){humans[cam][me].power = Effects.buffs.powerup.lv[karix]};if(karix < 0){humans[cam][me].power = Effects.debuffs.powerdown.lv[karix*-me]}
          
          if(buffhas(cam,me,'shellup')){karix = buffhas(cam,me,'shellup').lv};
          if(buffhas(cam,me,'shelldown')){karix -= buffhas(cam,me,'shelldown').lv};
-         if(karix > 0){humans[cam][me].shell = Buffs.shellup.lv[karix]};if(karix < 0){humans[cam][me].shell = Debuffs.shelldown.lv[karix*-1]}
+         if(karix > 0){humans[cam][me].shell = Effects.buffs.shellup.lv[karix]};if(karix < 0){humans[cam][me].shell = Effects.debuffs.shelldown.lv[karix*-1]}
 
          if(humans[cam][me].status == 2){
-            document.getElementById(`${cam}${me}`).style.backgroundColor = '#b2b2b2';
+            document.querySelector(`#${cam}${me}`).style.backgroundColor = '#b2b2b2';
          }
       })
    })
 
    function buffcheck(cam,me){
-      let apply = {
-         buff: [],
-         debuff: []
-      }
-      humans[cam][me].buffs.filter(a => a.type == 'buff').forEach(bu => {apply.buff.push(`<img src="assets/buffs/${bu.name}.png" width="18" height="18"> `)});
-      humans[cam][me].buffs.filter(b => b.type == 'debuff').forEach(db => {apply.debuff.push(`<img src="assets/buffs/${db.name}.png" width="18" height="18"> `)});
+      let buffs = humans[cam][me].buffs;
+
+      let apply = [];
+
+      const typeOrder = {buff: 1, debuff: 2, handle: 3, unique: 4, unknown: 5};
+      const kindOrder = {turn: 1, stack: 2};
+
+      let result =  buffs.sort((a, b) => {
+         // type（buff → debuff → handle → unique → unknown）でソート
+         if (typeOrder[a.type] !== typeOrder[b.type]) {
+            return typeOrder[a.type] - typeOrder[b.type];
+         }
+         // kind（turn → stack）でソート
+         return (kindOrder[a.kind] || 99) - (kindOrder[b.kind] || 99);
+      });
+
+      result.forEach(effect => {
+         let img = effect.name
+         //apply.push(`<img src="assets/buffs/${effect.name}.png" class="${effect.type}"> `)
+         apply.push(`
+            <div class="${effect.type}">
+            <div class=".top"></div>
+            <div class=".bottom" style="background:url('assets/buffs/${effect.img}.png') center/cover no-repeat"></div>
+         </div>
+            `)
+      })
+
       return apply
    }
 
-   //save();
+   let buffses = [
+      {
+         name:'powerup',
+         type:'buff',
+         kind:'turn',
+         lv:1,
+         time:1
+      },
+      {
+         name:'palsy',
+         type:'handle',
+         kind:'turn',
+         lv:2,
+         time:1
+      },
+      {
+         name:'enchant',
+         type:'buff',
+         kind:'turn',
+         lv:2,
+         time:3
+      },
+      {
+         name:'powerdown',
+         type:'debuff',
+         kind:'turn',
+         lv:2,
+         time:2
+      },
+      {
+         name:'anger',
+         type:'handle',
+         kind:'stack',
+         lv:2,
+         time:null
+      },
+      {
+         name:'pierce',
+         type:'buff',
+         kind:'turn',
+         lv:2,
+         time:4
+      },
+   ]
+
+   //細々とした必要なものを 略して"こまごめピペット"
+   document.querySelector('#TurnCount').textContent = turncount;
+   
 
 }
 
@@ -3736,15 +3857,6 @@ function save(){
       rp: rp,
       clearedmainquest: clearedmainquest,
       cleareddailyquest: cleareddailyquest,
-      atk: playeratk,
-      def: playerdef,
-      matk: playermatk,
-      mdef: playermdef,
-      hp: playerhp,
-      mp: playermagicpoint,
-      crla: playercrla,
-      crdm: playercrdm,
-      crrs: playercrrs,
    };
    usersRef.update(newData)
 }
@@ -3784,7 +3896,7 @@ function arrayShuffle(array) {
    return array;
 }
 function arrayGacha(array,probability){
-   if(array.length !== probability.length){throw new Error("長さがあっていないっす！先輩、ちゃんとチェックした方がいいっすよ〜？");}
+   if(array.length !== probability.length){throw new Error("長さがあってないっす！先輩、ちゃんとチェックした方がいいっすよ〜？");}
    const total = probability.reduce((sum, p) => sum + p, 0);
    let random = Math.random() * total;
    for (let i = 0; i < array.length; i++) {
@@ -3794,23 +3906,27 @@ function arrayGacha(array,probability){
       random -= probability[i];
    }
 }
+function probability(num){
+   return Math.random()*100 <= num;
+   //例:num == 20 → randomが20以内ならtrue,elseならfalseを返す
+}
  
 document.addEventListener('mousemove', (e) => {
-   const HasDescription = document.getElementById('movabledescription');
+   const HasDescription = document.querySelector('#movabledescription');
    HasDescription.style.left = `${e.clientX + 10}px`;
    HasDescription.style.top = `${e.clientY + 10}px`;
 });
 document.addEventListener('mouseover', (e) => {
    if(e.target.classList.contains('hasd')){
       const movabledescription = e.target.dataset.description;
-      document.getElementById('movabledescription').innerHTML = movabledescription;
-      document.getElementById('movabledescription').style.display = 'block';
+      document.querySelector('#movabledescription').innerHTML = movabledescription;
+      document.querySelector('#movabledescription').style.display = 'block';
    }
 });
 document.addEventListener('mouseout', (e) => {
    if(e.target.classList.contains('hasd')){
-      document.getElementById('movabledescription').innerHTML = '';
-      document.getElementById('movabledescription').style.display = 'none';
+      document.querySelector('#movabledescription').innerHTML = '';
+      document.querySelector('#movabledescription').style.display = 'none';
    }
 });
 
@@ -3825,7 +3941,7 @@ async function NicoNicoText(mes){
    color: #000000;
    font-size: 20px;
    `
-   document.getElementById('All').appendChild(newDiv);
+   document.querySelector('#body').appendChild(newDiv);
    //let speed = Math.random()*100+1;
    let speed = mes.toString().length*2 
    for(let i = 0; window.innerWidth > i*speed; i++){
@@ -3837,30 +3953,53 @@ async function NicoNicoText(mes){
 }
 
 function DesideEnemyName(target){
-   humans.enemies[target].prefixe = '';
-   let ENEMYarray = enemynamenum[stage-1].split('.');
-   let ENEMY1 = +ENEMYarray[1]+1
-   let ENEMY2 = +ENEMYarray[0]
-   humans.enemies[target].name = enemynames[Math.floor(Math.random() * ENEMY1)+ENEMY2]; // 敵の名前を決めます
-   if(Math.floor(Math.random() * 5) == 0){humans.enemies[target].prefixe = `${arraySelect(Object.keys(Prefixes))} `};
+   let names = Object.keys(Enemies).filter(a => Enemies[a].stage == stage).map(a => Enemies[a].name);
+   let enemyname = arraySelect(names);
+   let name = Enemies[enemyname];
+   let enemy = humans.enemies[target];
    
-   humans.enemies[target].attack = enemyatk;//敵の能力を決めます
-   humans.enemies[target].defense = enemydef;
-   humans.enemies[target].maxhealth = enemyhp;
-   humans.enemies[target].maxmp = enemymp;
-   humans.enemies[target].critlate = enemycrla;
-   humans.enemies[target].critdmg = enemycrdm;
-   humans.enemies[target].critresist = enemycrrs;
-   if(humans.enemies[target].prefixe !== ''){Prefixes[humans.enemies[target].prefixe]('enemies',target)};
-   humans.enemies[target].health = humans.enemies[target].maxhealth;
-   humans.enemies[target].mp = humans.enemies[target].maxmp;
-   return humans.enemies[target].name;
+   enemy.id = enemyname; //nameは表示用、idは内部処理用
+   enemy.name = enemyname;
+
+   enemy.attack = enemyatk;
+   enemy.defense = enemydef;
+   enemy.mattack = enemymatk;
+   enemy.mdefense = enemymdef;
+   enemy.maxhealth = enemyhp;
+   enemy.maxmp = enemymp;
+   enemy.critlate = enemycrla;
+   enemy.critdmg = enemycrdm;
+   enemy.critresist = enemycrrs;
+   enemy.speed = 50;
+
+   let statuses = ['attack','defense','mattack','mdefense','maxhealth','maxmp','critlate','critdmg','critresist','speed'];
+   statuses.forEach(statu => {
+      if(name[statu].startsWith('+') || name[statu].startsWith('-')){
+         let num = Number(name[statu].slice(1));
+         if(name[statu].startsWith('-')){num *= -1};
+         enemy[statu] += num;
+      }else if(name[statu].startsWith('=')){
+         let num = Number(name[statu].slice(1));
+         enemy[statu] = num;
+      }
+      //'0'なら変動無し
+   })
+
+   enemy.prefixe = '';
+   if(Math.floor(Math.random() * 5) == 0){
+      enemy.prefixe = arraySelect(Object.keys(Prefixes));
+      Prefixes[enemy.prefixe].process('enemies',target)
+   };
+
+   enemy.health = enemy.maxhealth;
+   enemy.mp = enemy.maxmp;
+   return enemy.name;
 }
 
 
 //#endregion
 //#region log&text
-let textDiv = document.getElementById('text');
+let textDiv = document.querySelector('#text');
 let autoDelay = 1;
 let skipText = false; // スキップフラグ
 let clearText = false; // テキスト消去フラグ
@@ -3972,8 +4111,8 @@ document.addEventListener('click', () => {
    setTimeout(() => skipText = false, 50); // 一時的にスキップを有効化
 });
 
-let logDiv = document.getElementById('log');
-let logOpener = document.getElementById('log-opener');
+let logDiv = document.querySelector('#log');
+let logOpener = document.querySelector('#log-opener');
 logOpener.addEventListener('click', function(){
    if(logDiv.style.right == '-300px'){
       logDiv.style.right = '0px';
@@ -3992,15 +4131,15 @@ function addlog(text){
 //#region Inventory
 let InventoryPage = 1;
 function inventoryOpen(num){
-   document.getElementById('movabledescription').textContent = '';document.getElementById('movabledescription').style.display = 'none';
+   document.querySelector('#movabledescription').textContent = '';document.querySelector('#movabledescription').style.display = 'none';
    InventoryPage = num??1;
    AllowMove = 1;
    let array = ['name','level','exp','health','maxhealth','attack','defense','maxmp','mattack','mdefense','critlate','critdmg','critresist'];
    let Status = array.map(a => `${a}: ${humans.players[InventoryPage][a]}`).join('<br>');
    array = ['maxhealth','attack','defense','maxmp','mattack','mdefense','critlate','critdmg','critresist'];
    let Sutefuri = array.map(a => `<button class="button" onclick="SuteFuri${a}">${a}</button>`).join('<br>');
-   document.getElementById('InventoryArea').style.display = 'flex';
-   document.getElementById('InventoryArea').innerHTML = `
+   document.querySelector('#InventoryArea').style.display = 'flex';
+   document.querySelector('#InventoryArea').innerHTML = `
    <div id="Iblock1">
       <div id="IStatus">${Status}</div>
       <div id="ISkills">
@@ -4036,17 +4175,17 @@ function inventoryOpen(num){
    </div>
    `;
    // let slashs = Object.keys(Slashs).map(a => Slashs[a].lv <= humans.players[InventoryPage].level ? `<span class="hasd" data-description="${Slashs[a].description}">${Slashs[a].id}</span>` : null).filter(Boolean)
-   // document.getElementById('ISlashAppearence').innerHTML = slashs.join('<br>');
+   // document.querySelector('#ISlashAppearence').innerHTML = slashs.join('<br>');
    // let magics = Object.keys(Magics).map(a => Magics[a].lv <= humans.players[InventoryPage].level ? `<span class="hasd" data-description="${Magics[a].description}">${Magics[a].id}</span>` : null).filter(Boolean)
-   // document.getElementById('IMagicAppearence').innerHTML = magics.join('<br>');
+   // document.querySelector('#IMagicAppearence').innerHTML = magics.join('<br>');
    // let weapons = Object.keys(Weapons).map(a => Weapons[a].num >= 1 && Weapons[a].num > Object.keys(humans.players).filter(b => humans.players[b].weapon.id == Weapons[a].id).length ? `<span class="hasd" data-description="${Weapons[a].description}">${Weapons[a].name} x${Weapons[a].num}</span>` : null).filter(Boolean)
-   // document.getElementById('IWeapons').innerHTML = weapons.join('<br>');
+   // document.querySelector('#IWeapons').innerHTML = weapons.join('<br>');
    // let armors = Object.keys(Armors).map(a => Armors[a].num >= 1 && Armors[a].num > Object.keys(humans.players).filter(b => humans.players[b].armor.id == Armors[a].id).length ? `<span class=" hasd" data-description="${Armors[a].description}">${Armors[a].name} x${Armors[a].num}</span>` : null).filter(Boolean)
-   // document.getElementById('IArmors').innerHTML = armors.join('<br>');
+   // document.querySelector('#IArmors').innerHTML = armors.join('<br>');
    // let tools = Object.keys(Tools).filter(a => Tools[a].num > 0).map(a => `<span class="hasd" data-description="${Tools[a].description}">${Tools[a].name} x${Tools[a].num}:</span>`).filter(Boolean)
-   // document.getElementById('IItems').innerHTML = tools.join('<br>');
+   // document.querySelector('#IItems').innerHTML = tools.join('<br>');
 
-   document.getElementById('IEquipsChangeZone').style.display = 'none';
+   document.querySelector('#IEquipsChangeZone').style.display = 'none';
 
    
    let nextpage = addEventListener('keydown', (event) => {
@@ -4072,8 +4211,8 @@ function inventoryOpen(num){
 }
 function inventoryClose(){
    AllowMove = 0;
-   document.getElementById('InventoryArea').style.display = 'none';
-   log.textContent = '';
+   document.querySelector('#InventoryArea').style.display = 'none';
+   
 };
 
 
@@ -4085,7 +4224,7 @@ function SlashChange(num){
       `<button class="button hasd" onclick="SlashChangeDecide('${slash}',${num})" data-description="${Slashs[slash].description}">${Slashs[slash].name}</button>`
   ).join(' ');
   
-  document.getElementById('SlashChangePlace').innerHTML = `
+  document.querySelector('#SlashChangePlace').innerHTML = `
       Select Slash for Slot ${num}:<br>
       ${slashSelectHTML}
   `;
@@ -4111,7 +4250,7 @@ function MagicChange(num){
       `<button class="button hasd" onclick="MagicChangeDecide('${magic}', ${num})" data-description="${Magics[magic].description}">${magic}</button>`
   ).join(' ');
   
-  document.getElementById('MagicChangePlace').innerHTML = `
+  document.querySelector('#MagicChangePlace').innerHTML = `
       <div>Select Magic for Slot ${num}:</br>
       ${magicSelectHTML}
   `;
@@ -4133,7 +4272,7 @@ function MagicChangeDecide(name,num){
 }
 
 function WeaponChange(){
-   document.getElementById('IEquipsChangeZone').innerHTML = '';document.getElementById('IEquipsChangeZone').style.display = 'block';
+   document.querySelector('#IEquipsChangeZone').innerHTML = '';document.querySelector('#IEquipsChangeZone').style.display = 'block';
    let order = Object.keys(Weapons).map(a => a.id);
    let joins = [];
    myWeapons.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
@@ -4141,7 +4280,7 @@ function WeaponChange(){
       joins.push(`<button class="button hasd" data-description="${Weapons[a.id].description}" onclick="WeaponChangeDeside('${i}')">${Weapons[a.id].name}</button>`);
    })
    if(humans.players[InventoryPage].weapon.id !== 'none'){joins.unshift(`<button class="button hasd" data-description="${Weapons.none.description}" onclick="WeaponChangeDeside('none')">none</button>`)};
-   document.getElementById('IEquipsChangeZone').innerHTML += joins.join(' ');
+   document.querySelector('#IEquipsChangeZone').innerHTML += joins.join(' ');
 }
 function WeaponChangeDeside(code){
    console.log(`${Weapons[humans.players[InventoryPage].weapon.id]?.name??'error'} => ${Weapons[myWeapons[code]?.id??'none']?.name??'error'}`);
@@ -4156,7 +4295,7 @@ function WeaponChangeDeside(code){
    inventoryOpen(InventoryPage);
 }
 function ArmorChange(){
-   document.getElementById('IEquipsChangeZone').innerHTML = '';document.getElementById('IEquipsChangeZone').style.display = 'block';
+   document.querySelector('#IEquipsChangeZone').innerHTML = '';document.querySelector('#IEquipsChangeZone').style.display = 'block';
    let order = Object.keys(Armors).map(a => a.id);
    let joins = [];
    myArmors.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id))
@@ -4164,7 +4303,7 @@ function ArmorChange(){
       joins.push(`<button class="button hasd" data-description="${Armors[a.id].description}" onclick="ArmorChangeDeside('${i}')">${Armors[a.id].name}</button>`)
    })
    if(humans.players[InventoryPage].armor.id !== 'none'){joins.unshift(`<button class="button hasd" data-description="${Armors.none.description}" onclick="ArmorChangeDeside('none')">none</button>`)};
-   document.getElementById('IEquipsChangeZone').innerHTML += joins.join(' ');
+   document.querySelector('#IEquipsChangeZone').innerHTML += joins.join(' ');
 }
 function ArmorChangeDeside(code){
    console.log(`${Armors[humans.players[InventoryPage].armor.id]?.name??'error'} => ${Armors[myArmors[code]?.id??'none']?.name??'error'}`);
@@ -4179,9 +4318,9 @@ function ArmorChangeDeside(code){
    inventoryOpen(InventoryPage);
 }
 function ToolChange(num){
-   document.getElementById('IEquipsChangeZone').innerHTML = '';document.getElementById('IEquipsChangeZone').style.display = 'block';
+   document.querySelector('#IEquipsChangeZone').innerHTML = '';document.querySelector('#IEquipsChangeZone').style.display = 'block';
    Object.keys(Tools).filter(a => Tools[a].num > 0).forEach((a,i) => {
-      document.getElementById('IEquipsChangeZone').innerHTML += `<button class="button hasd" data-description="${Tools[a].description}<br>${Tools[a].num}個所持しています" onclick="ToolChangeDeside(${num},'${a}')">${Tools[a].name}</button>`;
+      document.querySelector('#IEquipsChangeZone').innerHTML += `<button class="button hasd" data-description="${Tools[a].description}<br>${Tools[a].num}個所持しています" onclick="ToolChangeDeside(${num},'${a}')">${Tools[a].name}</button>`;
    })
 }
 function ToolChangeDeside(num,code){
@@ -4247,39 +4386,39 @@ const Notices = {
 let noticenow = 0;
 function OpenNotice(){
    sideMenu.style.left = '-250px';
-   document.getElementById('Notice-page').style.display = 'block';
-   document.getElementById('notice-honmei').style.display = 'block';
-   document.getElementById('notice-list').innerHTML = Object.keys(Notices).map(a => `<li class="notice" data-name="${a}">${Notices[a].headline}</li>`).join('');
+   document.querySelector('#Notice-page').style.display = 'block';
+   document.querySelector('#notice-honmei').style.display = 'block';
+   document.querySelector('#notice-list').innerHTML = Object.keys(Notices).map(a => `<li class="notice" data-name="${a}">${Notices[a].headline}</li>`).join('');
 }
 function CloseNotice(){
-   document.getElementById('notice-list').innerHTML = '';
-   document.getElementById('Notice-page').style.display = 'none';
+   document.querySelector('#notice-list').innerHTML = '';
+   document.querySelector('#Notice-page').style.display = 'none';
 }
 document.addEventListener('click', (event) => {
    if(event.target.classList.contains('notice')){
        let name = event.target.getAttribute('data-name');
 
-       document.getElementById('notice-honmei').style.display = 'none';
-       document.getElementById('notice-main').style.display = 'block';
+       document.querySelector('#notice-honmei').style.display = 'none';
+       document.querySelector('#notice-main').style.display = 'block';
 
        console.log(`assets/notices/${name}.txt`);
-       document.getElementById('notice-title').textContent = Notices[name].name;
+       document.querySelector('#notice-title').textContent = Notices[name].name;
        fetch(`assets/notices/${name}.txt`)
        .then(response => response.text())
-       .then(data => {document.getElementById('notice-text').innerText = data;})
+       .then(data => {document.querySelector('#notice-text').innerText = data;})
        .catch(error => console.error('Error:', error));
    }
 });
 
-document.getElementById('notice-back').addEventListener('click', () => {
-   document.getElementById('notice-title').textContent = '';
-   document.getElementById('notice-text').innerText = '';
-   document.getElementById('notice-honmei').style.display = 'block';
-   document.getElementById('notice-main').style.display = 'none';
-})
+// document.querySelector('#notice-back').addEventListener('click', () => {
+//    document.querySelector('#notice-title').textContent = '';
+//    document.querySelector('#notice-text').innerText = '';
+//    document.querySelector('#notice-honmei').style.display = 'block';
+//    document.querySelector('#notice-main').style.display = 'none';
+// })
 
-const menuToggle = document.getElementById('menuToggle');
-const sideMenu = document.getElementById('sideMenu');
+const menuToggle = document.querySelector('#menuToggle');
+const sideMenu = document.querySelector('#sideMenu');
 menuToggle.addEventListener('click', () => {
    if(sideMenu.style.left === '0px'){
          sideMenu.style.left = '-250px';
@@ -4311,7 +4450,7 @@ function MakeNewQuest(code){
    quest.main = quests.main[clearedmainquest];
 
    //クエストのリストを更新
-   const waku = document.getElementById('quest-list');
+   const waku = document.querySelector('#quest-list');
    waku.innerHTML = '';
    const br = document.createElement('br');
    //main
@@ -4412,23 +4551,35 @@ function ClearedMainQuest(code){
 }
 //#endregion
 //#region buffの動き
-function buffadd(tcam,target,buff,time,lv){//誰のバフ/デバフか,バフ/デバフの名前,効果時間,効果レベル
-   console.log(tcam, target, buff, time, lv ?? 0);
+async function buffadd(tcam,target,buff,kind,time,lv){//誰のバフ/デバフか,バフ/デバフの名前,効果時間,効果レベル
    let Time = time ?? 1;
+   let Lv = lv ?? 1;
    // 同じ効果量のバフがある場合、時間を足す
-   //let existingBuff = humans[tcam][target].buffs.find(b => b.name === buff && b.lv === lv);
-   if (humans[tcam][target].buffs.find(b => b.name === buff && b.lv === lv)) {
-      humans[tcam][target].buffs.find(b => b.name === buff && b.lv === lv).time += Time;
-   } else {
-      // 新しいバフを追加
+   if(humans[tcam][target].buffs.find(b => b.name === buff && b.lv === lv && b.kind == 'turn')){
+      humans[tcam][target].buffs.find(b => b.name === buff && b.lv === lv && b.kind == 'turn').time += Time;
+   }else if(humans[tcam][target].buffs.find(b => b.name === buff && b.kind == 'stack')){
+      humans[tcam][target].buffs.find(b => b.name === buff && b.kind == 'stack').lv += Lv;
+   }else{
+      let type = 'unknown', img = 'none'
+      Object.keys(Effects).forEach(zokusei => {
+         Object.keys(Effects[zokusei]).forEach(effect => {
+            if(Effects[zokusei][effect].name == buff){
+               type = effect.type;
+               img = effect.img;
+            }
+         })
+      })
       humans[tcam][target].buffs.push({
-         type: Buffs[buff] ? 'buff' : Debuffs[buff] ? 'debuff' : 'unknown',
+         type: type,
+         kind: kind,
          name: buff,
-         time: Time,
-         lv: lv ?? 1,
+         img: img,
+         time: kind == "stack" ? null : Time,
+         lv: Lv,
       });
    }
    tekiou();
+   await addtext(`${humans[tcam][target].name}は${buff}を${Time}受けた!`);
 }
 function buffremove(tcam,target,buff){
    //誰のバフ/デバフか,バフ/デバフの名前
@@ -4467,7 +4618,7 @@ let usersRef;
 let userData;
 
 async function GameStart(){
-   document.getElementById('HomeArea').innerHTML = `
+   document.querySelector('#HomeArea').innerHTML = `
    <div id="login-container" class="login-container">
       <form class="login-form" id="login-form">
          <input type="text" id="username" placeholder="ユーザー名" required>
@@ -4477,7 +4628,7 @@ async function GameStart(){
       </form>
    </div>
    `;
-   document.getElementById('HomeArea').style.display = 'block';
+   document.querySelector('#HomeArea').style.display = 'block';
 
    function setLocalStorage(name, value) {
       localStorage.setItem(name, value || ""); // 値が空なら空文字を入れる
@@ -4491,20 +4642,20 @@ async function GameStart(){
    if(username){
       console.log("自動ログインしました");
       usersRef = database.ref('users/'+username+'/forrpg');
-      document.getElementById('login-container').style.display = 'none';
+      document.querySelector('#login-container').style.display = 'none';
       log.textContent = 'wait for now...'
       login()
    }else{
       console.log("ログインしてください");
       
-      document.getElementById('login-form').addEventListener('submit',async function(event){
-         const loginForm = document.getElementById('login-form');
-         const loginError = document.getElementById('login-error');
-         const chatContainer = document.getElementById('chat-container');
+      document.querySelector('#login-form').addEventListener('submit',async function(event){
+         const loginForm = document.querySelector('#login-form');
+         const loginError = document.querySelector('#login-error');
+         const chatContainer = document.querySelector('#chat-container');
    
          event.preventDefault();
-         username = document.getElementById('username').value;
-         var password = document.getElementById('password').value;
+         username = document.querySelector('#username').value;
+         var password = document.querySelector('#password').value;
          usersRef = database.ref('users/'+username+'/forrpg');
    
          // データベースでユーザーが存在するか確認
@@ -4516,7 +4667,7 @@ async function GameStart(){
                   setLocalStorage("username", username); // ログイン成功時
                } else {
                   // パスワードが間違っている
-                  document.getElementById('HomeArea').innerHTML = `
+                  document.querySelector('#HomeArea').innerHTML = `
                   <div class="login-container">
                      <form class="login-form" id="login-form">
                         <input type="text" id="username" placeholder="ユーザー名" required>
@@ -4529,19 +4680,19 @@ async function GameStart(){
                   loginError.style.display = 'block';
                }
             }else{
-               document.getElementById('HomeArea').style.display = 'none';
+               document.querySelector('#HomeArea').style.display = 'none';
                usersRef.update({
                   status: 'online',
                   password: password,
                });
                setLocalStorage("username", username); // ログイン成功時
                loginForm.style.display = 'none';
-               document.getElementById('ChatTab').style.display = 'block';
+               document.querySelector('#ChatTab').style.display = 'block';
                chatContainer.style.display = 'flex';
                startChat();
-               document.getElementById('room-select').style.display = 'block';
-               document.getElementById('ChatTab').style.display = 'none';
-               document.getElementById('BattleArea').style.display = 'none';
+               document.querySelector('#room-select').style.display = 'block';
+               document.querySelector('#ChatTab').style.display = 'none';
+               document.querySelector('#BattleArea').style.display = 'none';
                
    
                AllowMove = 1;
@@ -4581,25 +4732,25 @@ async function GameStart(){
    }
 
    async function login(){
-      const loginForm = document.getElementById('login-form');
-      const loginError = document.getElementById('login-error');
-      const chatContainer = document.getElementById('chat-container');
+      const loginForm = document.querySelector('#login-form');
+      const loginError = document.querySelector('#login-error');
+      const chatContainer = document.querySelector('#chat-container');
 
       usersRef.update({
          status: 'online'
       });
       menuToggle.style.display = 'block';   
-      document.getElementById('login-container').style.display = 'none';
-      document.getElementById('ChatTab').style.display = 'block';
+      document.querySelector('#login-container').style.display = 'none';
+      document.querySelector('#ChatTab').style.display = 'block';
       chatContainer.style.display = 'flex';
       startChat();
-      document.getElementById('room-select').style.display = 'block';
-      document.getElementById('ChatTab').style.display = 'none';
+      document.querySelector('#room-select').style.display = 'block';
+      document.querySelector('#ChatTab').style.display = 'none';
 
       AllowMove = 1;
-      document.getElementById('BattleArea').style.display = 'none';
-      document.getElementById('EventArea').style.display = 'none';
-      document.getElementById('NowMap').style.display = 'none';
+      document.querySelector('#BattleArea').style.display = 'none';
+      document.querySelector('#EventArea').style.display = 'none';
+      document.querySelector('#NowMap').style.display = 'none';
 
       // データを取得する関数)
       userData = await load();
@@ -4612,15 +4763,6 @@ async function GameStart(){
       rp = userData.rp??0;
       clearedmainquest = userData.clearedmainquest??0;
       cleareddailyquest = userData.cleareddailyquest??0;
-      playerhp = userData.hp??100;
-      playeratk = userData.atk??20;
-      playerdef = userData.def??0;
-      playermatk = userData.matk??10;
-      playermdef = userData.mdef??0;
-      playermagicpoint = userData.mp??50;
-      playercrla = userData.crla??0.03;
-      playercrdm = userData.crdm??1.5;
-      playercrrs = userData.crrs??0;
       maxrpt = rank*100;
       
       Quests.main = AllQuests.main[clearedmainquest+1];
@@ -4638,18 +4780,18 @@ async function GameStart(){
    
 
    //こっからchat
-   document.getElementById('message-input').addEventListener('keypress', function(e) {
+   document.querySelector('#message-input').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
           if(!e.shiftKey){
             e.preventDefault();
-            document.getElementById('send-button').click();
+            document.querySelector('#send-button').click();
           }else{
-            document.getElementById('message-input').value += '<br>'
+            document.querySelector('#message-input').value += '<br>'
           }
       }
       });   
   function startChat() {
-      chatroom = document.getElementById('room-select').value;
+      chatroom = document.querySelector('#room-select').value;
       selectRoom();
   }
 
@@ -4658,13 +4800,13 @@ async function GameStart(){
 
 //#region chatのやつ
 function selectRoom() {
-   const roomSelect = document.getElementById('room-select');
-   const sendButton = document.getElementById('send-button');
-   const messageInput = document.getElementById('message-input');
+   const roomSelect = document.querySelector('#room-select');
+   const sendButton = document.querySelector('#send-button');
+   const messageInput = document.querySelector('#message-input');
    messagesRef.off();
    chatroom = roomSelect.value;
    messagesRef = database.ref('forrpg/rooms/'+chatroom+'/messages');
-   document.getElementById('messages').innerHTML = '';
+   document.querySelector('#messages').innerHTML = '';
 
    function formatDate(date) {
        const year = date.getFullYear();
@@ -4719,7 +4861,7 @@ function selectRoom() {
        textElement.innerHTML = messageData.text;
        messageElement.appendChild(textElement);
 
-       document.getElementById('messages').appendChild(messageElement);
+       document.querySelector('#messages').appendChild(messageElement);
 
        messagesRef.on('value', function(snapshot) {
            if (snapshot.numChildren() > 20) {
@@ -4729,7 +4871,7 @@ function selectRoom() {
        });
 
        // 最新のメッセージが見えるようにスクロール
-       document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+       document.querySelector('#messages').scrollTop = document.querySelector('#messages').scrollHeight;
    });
 
    messagesRef.once('value', function(snapshot) {
@@ -4738,9 +4880,9 @@ function selectRoom() {
 }
 
 function displayAllMessages() {
-   var roomSelect = document.getElementById('room-select');
+   var roomSelect = document.querySelector('#room-select');
    chatroom = roomSelect.value;
-   document.getElementById('messages').innerHTML = '';
+   document.querySelector('#messages').innerHTML = '';
 
    // データベースから全てのメッセージを取得
    messagesRef.once('value', function(snapshot) {
@@ -4767,7 +4909,7 @@ function displayAllMessages() {
            textElement.innerHTML = messageData.text;
            messageElement.appendChild(textElement);
 
-           document.getElementById('messages').appendChild(messageElement);
+           document.querySelector('#messages').appendChild(messageElement);
        });
 
        messagesRef.on('value', function(snapshot) {
@@ -4778,41 +4920,41 @@ function displayAllMessages() {
        });
 
        // 最新のメッセージが見えるようにスクロール
-       document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+       document.querySelector('#messages').scrollTop = document.querySelector('#messages').scrollHeight;
    });
 }
 
 // 部屋作ったりラジバンダリ
 function makeRoom() {
-   const roomSelect = document.getElementById('room-select');
-   const Loom = document.getElementById('room-make').value;
+   const roomSelect = document.querySelector('#room-select');
+   const Loom = document.querySelector('#room-make').value;
    const NowRef = database.ref('rooms/' + Loom);
-   const pass = document.getElementById('room-make-pass').value;
+   const pass = document.querySelector('#room-make-pass').value;
    NowRef.once('value').then(function(snapshot) {
        if (snapshot.exists()) { // 既存部屋の場合
            var roomData = snapshot.val();
            if (roomData.pass == pass) {
-               document.getElementById('room-select').appendChild(new Option(Loom, Loom));
+               document.querySelector('#room-select').appendChild(new Option(Loom, Loom));
                roomSelect.value = Loom;
                chatroom = Loom;
                selectRoom();
-               document.getElementById('room-make').value = '';
-               document.getElementById('room-make-pass').value = '';
+               document.querySelector('#room-make').value = '';
+               document.querySelector('#room-make-pass').value = '';
            } else {
-               document.getElementById('room-make').value = 'missed!!';
-               document.getElementById('room-make-pass').value = '';
+               document.querySelector('#room-make').value = 'missed!!';
+               document.querySelector('#room-make-pass').value = '';
            }
        } else {
-           const Pass = { pass: document.getElementById('room-make-pass').value };
-           document.getElementById('room-select').appendChild(new Option(Loom, Loom));
+           const Pass = { pass: document.querySelector('#room-make-pass').value };
+           document.querySelector('#room-select').appendChild(new Option(Loom, Loom));
            roomSelect.value = Loom;
            chatroom = Loom;
 
            NowRef.update(Pass);
 
            selectRoom();
-           document.getElementById('room-make').value = '';
-           document.getElementById('room-make-pass').value = '';
+           document.querySelector('#room-make').value = '';
+           document.querySelector('#room-make-pass').value = '';
        }
    });
 }
@@ -4839,22 +4981,24 @@ window.addEventListener('beforeunload', () => {
 
 //#region euroとrankの上のやつ
 function updateUI(){
-   document.getElementById('rank').textContent = rank;
-   document.getElementById('rpt-bar').style.width = (rpt / maxrpt) * 100 + '%';
-   document.getElementById('rpt-text').textContent = `${rpt}/${maxrpt}`;
-   document.getElementById('euro').textContent = euro+'€';
-
    if(rpt >= maxrpt){
       rank += 1;
       rpt = 0;
       maxrpt = rank*100;
       save();
    }
+
+   document.querySelector('.user .username').textContent = username;
+   document.querySelector('.user .rank').textContent = `Rank:${rank}`;
+   document.querySelector('.rpt .bar .inner').style.width = (rpt / maxrpt) * 100 + '%';
+   document.querySelector('.rpt .text').textContent = `${rpt}/${maxrpt}`;
+   document.querySelector('.euro').innerHTML = `${euro}€ <button id="GetEuro" onclick="if(afknow == 0){LetsCharge();}">+</button>`; 
+
 }
 updateUI();
 
 function LetsCharge(){
-   document.getElementById('HomeArea').innerHTML = `
+   document.querySelector('#HomeArea').innerHTML = `
    <!--<span id="BigText">チャージステーション</span><br>-->
    <button onclick="BacktoHome()">←</button> チャージステーション<br>
    <div class="row">
@@ -4886,14 +5030,14 @@ function Charge(e,m){
 //#region profileのやつ
 async function UpdateProfile(){
    let about = userData.about??'入力してね';
-   document.getElementById('ProfileTab').innerHTML = `
+   document.querySelector('#ProfileTab').innerHTML = `
    <span style="font-size: 24px; border: 1px solid #000000">${username}</span>　Rank:${rank}<br><br>
    <textarea id="about" placeholder="write about you" style="width: 255px; height: 124px;" oninput="InputAboutMe()">${about}</textarea>
    `
-   document.getElementById('about').addEventListener('change', InputAboutMe);
+   document.querySelector('#about').addEventListener('change', InputAboutMe);
 }//自己紹介とかも入れたいよね
 function InputAboutMe(){
-   const textarea = document.getElementById('about');
+   const textarea = document.querySelector('#about');
    usersRef.update({
       about: textarea.value
    });
@@ -4902,25 +5046,25 @@ function InputAboutMe(){
 //#endregion
 //#region Homeの動き達
 function OpenTab(code){
-   document.getElementById('HomeTab').style.display = 'none';
-   document.getElementById('InventoryTab').style.display = 'none';
-   document.getElementById('QuestTab').style.display = 'none';
-   document.getElementById('ChatTab').style.display = 'none';
-   document.getElementById('ProfileTab').style.display = 'none';
+   document.querySelector('#HomeTab').style.display = 'none';
+   document.querySelector('#InventoryTab').style.display = 'none';
+   document.querySelector('#QuestTab').style.display = 'none';
+   document.querySelector('#ChatTab').style.display = 'none';
+   document.querySelector('#ProfileTab').style.display = 'none';
 
    switch(code){
-      case 'H':document.getElementById('HomeTab').style.display = 'block';break;
-      case 'I':document.getElementById('InventoryTab').style.display = 'block';break;
-      case 'Q':document.getElementById('QuestTab').style.display = 'block';MakeNewQuest('x');break;
-      case 'C':document.getElementById('ChatTab').style.display = 'block';break;
-      case 'P':document.getElementById('ProfileTab').style.display = 'block';UpdateProfile();break;
+      case 'H':document.querySelector('#HomeTab').style.display = 'block';break;
+      case 'I':document.querySelector('#InventoryTab').style.display = 'block';break;
+      case 'Q':document.querySelector('#QuestTab').style.display = 'block';MakeNewQuest('x');break;
+      case 'C':document.querySelector('#ChatTab').style.display = 'block';break;
+      case 'P':document.querySelector('#ProfileTab').style.display = 'block';UpdateProfile();break;
    }
 }
 function BacktoHome(){
    save();
-   log.textContent = '';
-   document.getElementById('HomeArea').style.display = 'block';
-   document.getElementById('HomeArea').innerHTML = `
+   
+   document.querySelector('#HomeArea').style.display = 'block';
+   document.querySelector('#HomeArea').innerHTML = `
    <!--<span id="BigText">シャングリ・ラ中心街</span><br>-->
    <img src="assets/downtown.png" style="width: 600px; height: 300px;"><br>
    インタラクト<br>
@@ -4934,7 +5078,7 @@ function BacktoHome(){
 //#region rpgtoka
 function HomeMapSelect(){
    save();
-   document.getElementById('HomeArea').innerHTML = `
+   document.querySelector('#HomeArea').innerHTML = `
    <!--<span id="BigText">シャングリ・ラ中心街</span><br>-->
    <img src="assets/station.png" style="width: 600px; height: 300px;"><br>
    <button onclick="BacktoHome()">←</button> 駅<br>
@@ -4953,19 +5097,19 @@ function HomeLetsDungeon(code){
    humans.players[1].exp = 0;
    sp = 1;
    
-   document.getElementById('HomeArea').style.display = 'block';
-   document.getElementById('HomeArea').style.textAlign = 'center';
-   document.getElementById('BattleArea').style.display = 'none';
-   document.getElementById('HomeArea').innerHTML = `
+   document.querySelector('#HomeArea').style.display = 'block';
+   document.querySelector('#HomeArea').style.textAlign = 'center';
+   document.querySelector('#BattleArea').style.display = 'none';
+   document.querySelector('#HomeArea').innerHTML = `
    <button class="button" onclick="HomeGoDungeon('greenslime');">greenslime</button><button class="button" onclick="HomeGoDungeon('mechanic');">mechanic</button><button class="button" onclick="HomeGoDungeon('clown');">clown</button><button class="button" onclick="HomeGoDungeon('magodituono');">Mago Di Tuono</button><br>
    <br>
    <button class="button" onclick="HomeGoDungeon('wretch');">wretch〜持たざる者〜</button>
    `;
 }
 function HomeGoDungeon(name){
-   document.getElementById('HomeArea').style.textAlign = 'left';
-   document.getElementById('HomeArea').style.display = 'none';
-   document.getElementById('BattleArea').style.display = 'none';
+   document.querySelector('#HomeArea').style.textAlign = 'left';
+   document.querySelector('#HomeArea').style.display = 'none';
+   document.querySelector('#BattleArea').style.display = 'none';
    humans.players[1].id = name;
 
    humans.players[1].name = Charas[name].name;
@@ -4997,11 +5141,10 @@ function HomeGoDungeon(name){
    }
    
    dungeonnow = 1;
-   document.getElementById('NowMap').style.display = 'block';
-   document.getElementById('HomeArea').style.display = 'none';
-   document.getElementById('BattleArea').style.display = 'none';
-   document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button">skill</button>';
-   document.getElementById('ButtonStyle').textContent = `.button{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};cursor: pointer;}input[type="text"]:focus{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};}`;
+   document.querySelector('#NowMap').style.display = 'block';
+   document.querySelector('#HomeArea').style.display = 'none';
+   document.querySelector('#BattleArea').style.display = 'none';
+   document.querySelector('#ButtonStyle').textContent = `.button{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};cursor: pointer;}input[type="text"]:focus{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};}`;
    GoNextFloor();
 
    AllowMove = 0;
@@ -5021,15 +5164,15 @@ function HomeGoDungeon(name){
 function ExitDungeon(code){
    euro += 50*code;
    dungeonnow = 0;
-   document.getElementById('NowMap').style.display = 'none';
-   document.getElementById('BattleArea').style.display = 'none';
+   document.querySelector('#NowMap').style.display = 'none';
+   document.querySelector('#BattleArea').style.display = 'none';
    BacktoHome();
 }
 //#endregion
 //#region jobtoka
 function HomeJobSelect(){
    save();
-   document.getElementById('HomeArea').innerHTML = `
+   document.querySelector('#HomeArea').innerHTML = `
    <!--<span id="BigText">タイミー</span><br>-->
    <button onclick="BacktoHome()">←</button> お仕事一覧<br>
    <select id="Num-Select"><option value="1">01</option><option value="2">02</option><option value="3">03</option><option value="4">04</option><option value="5">05</option><option value="6">06</option><option value="7">07</option><option value="8">08</option></select><br>
@@ -5042,8 +5185,8 @@ function HomeJobSelect(){
 function HomeJobStart(name){
    save();
    afknow = 1;
-   let num = document.getElementById('Num-Select').value;
-   document.getElementById('HomeArea').innerHTML = `
+   let num = document.querySelector('#Num-Select').value;
+   document.querySelector('#HomeArea').innerHTML = `
    ーAFKタスク進行中ー<br>
    <span id="Task-log">
       <div class="task-bar-container">
@@ -5079,14 +5222,14 @@ function HomeJobStart(name){
    function afkTask(){
       completedTasks++;
       if(completedTasks < maxTasks){
-         document.getElementById('task-bar').style.width = (completedTasks/maxTasks) * 100 + '%';
-         document.getElementById('task-text').textContent = `${completedTasks}/${maxTasks}`;
-         //document.getElementById('Task-log').textContent = `${completedTasks} / ${maxTasks}`
+         document.querySelector('#task-bar').style.width = (completedTasks/maxTasks) * 100 + '%';
+         document.querySelector('#task-text').textContent = `${completedTasks}/${maxTasks}`;
+         //document.querySelector('#Task-log').textContent = `${completedTasks} / ${maxTasks}`
       }else{
          clearInterval(taskTimer);
          afknow = 0;
          switch(type){
-            case 'Euro':euro += reword;document.getElementById('euro').textContent = euro+'€'; break;
+            case 'Euro':euro += reword;document.querySelector('#euro').textContent = euro+'€'; break;
          }
          HomeJobSelect();
       }
@@ -5100,8 +5243,8 @@ function HomeJobStart(name){
 //#region bar
 function HomeBar(){
    save();
-   log.textContent = '';
-   document.getElementById('HomeArea').innerHTML = `
+   
+   document.querySelector('#HomeArea').innerHTML = `
    <button onclick="BacktoHome()">←</button> Dril's bar<br>
    <button class="HomeSButton" onclick="HomeBarRecluit()">募集</button>
    <button class="HomeSButton" onclick="HomeBarMeet()">探す</button>
@@ -5110,8 +5253,8 @@ function HomeBar(){
 
 function HomeBarRecluit(){
    save();
-   log.textContent = '';
-   document.getElementById('HomeArea').innerHTML = `
+   
+   document.querySelector('#HomeArea').innerHTML = `
    <button onclick="HomeBar()">←</button>募集<br>
    ダンジョンで一緒に戦ってくれる仲間を募集することができます！<br>
    <div class="row">
@@ -5122,12 +5265,12 @@ function HomeBarRecluit(){
 }
 
 let per1 = 0.80, per2 = 0.17, per3 = 0.03;
-const Result = document.getElementById('r-go');
+const Result = document.querySelector('#r-go');
 let result = [];
 let showresult = []
 async function HomeBarRecluitGo(num){
    save();
-   log.textContent = '';
+   
    result = [];
    for(i = 0; i < num; i++){
       let rarity = Math.random();
@@ -5152,21 +5295,21 @@ async function HomeBarRecluitGo(num){
    })
 
    
-   document.getElementById('HomeArea').innerHTML = `
+   document.querySelector('#HomeArea').innerHTML = `
    <div id="r-go">
       recluit agent is cool company<br>
       <img class='r-go-img' src="assets/system/recluit-${color}.png">
    </div>
    `;
-   document.getElementById('r-go').style.fontSize = '8px';
-   document.getElementById('r-go').addEventListener('click',HomeBarRecluitLets);
+   document.querySelector('#r-go').style.fontSize = '8px';
+   document.querySelector('#r-go').addEventListener('click',HomeBarRecluitLets);
 }
 
 function HomeBarRecluitLets(num){
-   document.getElementById('r-go').removeEventListener('click',HomeBarRecluitLets);
+   document.querySelector('#r-go').removeEventListener('click',HomeBarRecluitLets);
    log.textContent = "";
-   document.getElementById('r-go').style.fontSize = '20px';//
-   document.getElementById('r-go').innerHTML = showresult.join("<br>");
+   document.querySelector('#r-go').style.fontSize = '20px';//
+   document.querySelector('#r-go').innerHTML = showresult.join("<br>");
 }
 function HomeBarMeet(){
    save();
@@ -5177,7 +5320,7 @@ function HomeBarMeet(){
 //#region training
 function HomeTraining(){
    save();
-   document.getElementById('HomeArea').innerHTML = `
+   document.querySelector('#HomeArea').innerHTML = `
    <button onclick="BacktoHome()">←</button> 訓練場<br>
    ここではスキルツリー的に能力を伸ばせるようにする予定。<br>
    まあ...できてないんですけどね！！！！！<br>
@@ -5189,38 +5332,38 @@ function HomeTraining(){
 function HomeBank(){
    updateUI()
    save();
-   document.getElementById('HomeArea').innerHTML = `
+   document.querySelector('#HomeArea').innerHTML = `
   <button onclick="BacktoHome()">←</button> 超安心安全銀行<br>
   <span id="bank-deposit" class="bank-title">deposite</span><input type="number" id="bank-deposit-num" /><button id="bank-deposit-num-go" onclick="BankDeposite('Num')" class="bank-button">go</button><button id="bank-deposit-all" class="bank-button" onclick="BankDeposite('All')">All</button><br>
   <span id="bank-withdraw" class="bank-title">withdraw</span><input type="number" id="bank-withdraw-num" /><button id="bank-withdraw-num-go" onclick="BankWithdraw('Num')" class="bank-button">go</button><button id="bank-withdraw-all" class="bank-button" onclick="BankWithdraw('All')">All</button><br>
   <span id="BankEuro">bank account:0€</span>
    `;
-   document.getElementById('BankEuro').textContent = 'bank account:'+bankeuro+'€';
+   document.querySelector('#BankEuro').textContent = 'bank account:'+bankeuro+'€';
 }
 function BankDeposite(code){
    if(code == 'Num'){
-      let num = +document.getElementById('bank-deposit-num').value;
+      let num = +document.querySelector('#bank-deposit-num').value;
       bankeuro += num;
       euro -= num;
-      document.getElementById('bank-deposit-num').value = '';
+      document.querySelector('#bank-deposit-num').value = '';
    }else if(code == 'All'){
       bankeuro += euro;
       euro = 0;
-      document.getElementById('bank-deposit-num').value = '';
+      document.querySelector('#bank-deposit-num').value = '';
    }
    save();
    HomeBank();
 }
 function BankWithdraw(code){
    if(code == 'Num'){
-      let num = +document.getElementById('bank-withdraw-num').value;
+      let num = +document.querySelector('#bank-withdraw-num').value;
       euro += num;
       bankeuro -= num;
-      document.getElementById('bank-withdraw-num').value = '';
+      document.querySelector('#bank-withdraw-num').value = '';
    }else if(code == 'All'){
       euro += bankeuro;
       bankeuro = 0;
-      document.getElementById('bank-withdraw-num').value = '';
+      document.querySelector('#bank-withdraw-num').value = '';
    }
    save();
    HomeBank();
@@ -5236,6 +5379,7 @@ async function humandamaged(cam,tcams,me,targets,multiplier,kind,code){//矛先�
    for(let i = 0; i < tcams.length; i++){
       let tcam = tcams[i];
       let target = targets[i];
+      console.log(tcam, target)
       console.log(`${humans[cam][me].name} => ${humans[tcam][target].name}; 引数は${[cam,tcam,me,target,multiplier,kind,code]}だってよ`);
 
       switch(kind){
@@ -5257,15 +5401,15 @@ async function humandamaged(cam,tcams,me,targets,multiplier,kind,code){//矛先�
             if(buffhas(cam,me,'gambling')){
                z = clowngambling[Math.floor(Math.random() * clowngambling.length)];
                x *= z; buffremove(cam,me,'gambling');
-               log.textContent = 'ダメージは' + z + '倍になった!!'; await delay(1000);
+               await addtext('ダメージは' + z + '倍になった!!')
             };
    
             x -= (humans[tcam][target].defense * humans[tcam][target].shell);
          
-            if((Math.floor(Math.random()+ humans[cam][me].critlate)-humans[tcam][target].critresist) >= 1){
+            if(isCrit(humans[cam][me].critlate, humans[tcam][me].critresist)){
                x += (humans[tcam][target].defense * humans[tcam][target].shell);
                x *= humans[cam][me].critdmg;
-               log.textContent = '会心の一撃！';await delay(1000);
+               await addtext('会心の一撃！')
             };
             
             x = Math.ceil(x);
@@ -5278,26 +5422,18 @@ async function humandamaged(cam,tcams,me,targets,multiplier,kind,code){//矛先�
             console.log(`damage:${y}->${humans[tcam][target].health}(${x})`);
             
             if(humans[tcam][target].health < 0){humans[tcam][target].health = 0};
-            tekiou();
-            
-            log.textContent = humans[tcam][target].name + 'に' + x + 'のダメージ！';
-            if(code == 3 && humans[cam][me].ps == 'solplaceturret'){turretPlace(cam);}
             
             if(cam == 'players'){
-               x = 1;if(code == 3){x = 2};
-               switch(humans[cam][me].id){
-                  case 'wretch': humans[cam][me].cool += 10*x; break;
-                  case 'green_slime': humans[cam][me].cool += 5*x; break;
-                  case 'メカニッカ': humans[cam][me].cool += 15*x; break;
-                  case '週末の道化師': humans[cam][me].cool += 20*x; break;
-                  case 'ヘルタ': humans[cam][me].cool += 10*x; break;
-               }
-               if(humans[cam][me].cool > 100){humans[cam][me].cool = 100};
-               if(humans[cam][me].cool == 100){document.getElementById('Skillbutton').innerHTML = `<button id="SkillCoolDown" class="button" onclick="skillReserve('${cam}','${me}')">skill</button>`;}
-               else{document.getElementById("SkillCoolDown").textContent = humans[cam][me].cool + '%';};//新！クールダウン！！
+               x = 1;
+               if(code == 3){x = 2};
+               humans[cam][me].ep += Math.floor(10 * humans[cam][me].epgain * x);
             }
+
+            tekiou();
+
+            await addtext(`${humans[tcam][target].name}に${x}のダメージ！`)
+            if(code == 3 && humans[cam][me].ps == 'solplaceturret'){turretPlace(cam);}
    
-            await delay(1000);
             if(humans[tcam][target].health <= 0){let result = await killed(cam,tcam,me,target);if(result == 'end'){return 'end';}}
    
             if(Weapons[humans[cam][me].weapon.id].sp == 1){
@@ -5308,10 +5444,9 @@ async function humandamaged(cam,tcams,me,targets,multiplier,kind,code){//矛先�
             if(humans[cam][me].ps == 'enemy50%pursuit' && humans[tcam][target].health <= humans[tcam][target].maxhealth / 2 && enemy50pursuitenelgy == 1 && humans[tcam][target].health > 0){
                enemy50pursuitenelgy = 0;
                z = Math.floor(Math.random() * 2);
-               if(z == 0){log.textContent = 'くるくる～――っと';}else{log.textContent = 'くるりん～っと';}
-               await delay(1000);
+               if(z == 0){await addtext('くるくる～――っと');}else{await addtext('くるりん～っと');}
                x = (humans[cam][me].attack * humans[cam][me].power * 0.7 + weaponpower); x -= (humans[tcam][target].defense);
-               if((Math.floor(Math.random()+ humans[cam][me].critlate)) == 1){x += (humans[tcam][target].defense); x *= 3; log.textContent = '会心の一撃！'; await delay(1000);};
+               if((Math.floor(Math.random()+ humans[cam][me].critlate)) == 1){x += (humans[tcam][target].defense); x *= 3; await addtext('会心の一撃！')};
                if(buffhas(cam,me,'improve')){x *= 1.4;};
                x = Math.ceil(x);
                if(buffhas(cam,me,'LetsThrow')){x *= 2; buffremove(cam,me,'LetsThrow');};
@@ -5319,22 +5454,20 @@ async function humandamaged(cam,tcams,me,targets,multiplier,kind,code){//矛先�
                humans[tcam][target].health -= x;
                if(humans[tcam][target].health < 0){humans[tcam][target].health = 0};
                tekiou();
-               log.textContent = humans[tcam][target].name + 'に' + x + 'のダメージ!';
-               humans[cam][me].cool += 10;
-               if(humans[cam][me].cool > 100){humans[cam][me].cool = 100};if(humans[cam][me].cool == 100){document.getElementById('Skillbutton').innerHTML = `<button id="SkillCoolDown" class="button" onclick="skillReserve('${cam}','${me}')">skill</button>`;}else{document.getElementById("SkillCoolDown").textContent = humans[cam][me].cool + '%';};
+               await addtext(`${humans[tcam][target].name}に${x}のダメージ！`)
+               humans[cam][me].ep += 10;
                await delay(1000)
                if(humans[tcam][target].health <= 0){let result = await killed(cam,tcam,me,target);return result;}
             }else if(humans[cam][me].name == 'herta' && humans[tcam][target].health <= humans[tcam][target].maxhealth / 2 && humans[cam][me].level >= 10 && humans[tcam][target].health > 0){//1凸効果「弱みは付け込み」
                x = (humans[cam][me].attack * humans[cam][me].power * 0.4 + weaponpower) - (humans[tcam][target].defense);
-               if((Math.floor(Math.random()+ humans[cam][me].critlate - 0.05)) == 1){x += (humans[tcam][target].defense); x *= humans[cam][me].critdmg; log.textContent = '会心の一撃！'; await delay(1000);};
+               if((Math.floor(Math.random()+ humans[cam][me].critlate - 0.05)) == 1){x += (humans[tcam][target].defense); x *= humans[cam][me].critdmg; await addtext('会心の一撃！')};
                if(buffhas(cam,me,'improve')){x *= 1.4;};
                x = Math.ceil(x);
                if(buffhas(cam,me,'LetsThrow')){x *= 2; buffremove(cam,me,'LetsThrow');};
                if(x < 0){x = 0}; if(x > humans[tcam][target].health){x = humans[tcam][target].health};humans[tcam][target].health -= x;if(humans[tcam][target].health < 0){humans[tcam][target].health = 0};
                tekiou();
-               log.textContent = humans[tcam][target].name + 'に' + x + 'のダメージ!';
-               humans[cam][me].cool += 5;
-               if(humans[cam][me].cool > 100){humans[cam][me].cool = 100};if(humans[cam][me].cool == 100){document.getElementById('Skillbutton').innerHTML = `<button id="SkillCoolDown" class="button" onclick="skillReserve('${cam}','${me}')">skill</button>`;}else{document.getElementById("SkillCoolDown").textContent = humans[cam][me].cool + '%';};
+               await addtext(`${humans[tcam][target].name}に${x}のダメージ！`)
+               humans[cam][me].ep += 5;
                await delay(1000);
                if(humans[tcam][target].health <= 0){let result = await killed(cam,tcam,me,target);return result;}
             }
@@ -5346,23 +5479,38 @@ async function humandamaged(cam,tcams,me,targets,multiplier,kind,code){//矛先�
             x = Math.ceil(x);if(x < 0){x = 0};if(x > humans[tcam][target].health){x = humans[tcam][target].health};
             humans[tcam][target].health -= x;
             tekiou();
-            log.textContent = humans[tcam][target].name + 'に' + x + 'のダメージ!';
+            await addtext(`${humans[tcam][target].name}に${x}のダメージ！`)
             await delay(1000);
             if(humans[tcam][target].health <= 0){let result = await killed(cam,tcam,me,target);return result;}
             break;
       }
    }   
 };
+
+function isCrit(late, resist){
+   let isCritical = false;
+   if(resist == 'absolute'){
+      isCritical = false;
+      console.log('会心無効！')
+   }else if(late == 'absolute'){
+      isCritical = true;
+      console.log('確定会心！')
+   }else{
+      isCritical = Math.random() < (late - resist) / 100;
+      console.log(`${late - resist}%...結果は${isCritical}!!`)
+   }
+   return isCritical
+}
 //#endregion
 
 //#region playerturn
 function backtoplayerturn(){
    phase = 1;
-   log.textContent = 'あなたのターンです！';
-   document.getElementById('select1').textContent = 'attack';
-   document.getElementById('select2').textContent = 'magic';
-   document.getElementById('select3').textContent = 'tools';
-   document.getElementById('back').textContent = 'pass';
+   addtext('あなたのターンです！');
+   document.querySelector('#select1').textContent = 'attack';
+   document.querySelector('#select2').textContent = 'magic';
+   document.querySelector('#select3').textContent = 'tools';
+   document.querySelector('#back').textContent = 'pass';
    //errorcheck();
 }
 async function playerturn(cam,me){
@@ -5371,12 +5519,11 @@ async function playerturn(cam,me){
       await delay(1000)
    };
 
-   if(humans[cam][me].cool == 100){document.getElementById('Skillbutton').innerHTML = `<button id="SkillCoolDown" class="button" onclick="skillReserve('${cam}','${me}')">skill</button>`;}
- else{document.getElementById("SkillCoolDown").textContent = humans[cam][me].cool + '%';};
+   tekiou();
 
    phase = 1;
-   log.textContent = 'あなたのターンです！';
-   document.getElementById('sbuttons').innerHTML = `<button class="button" id="select1" onclick="select1(${me})">attack</button>  <button class="button" id="select2" onclick="select2(${me})">magic</button>  <button class="button" id="select3" onclick="select3(${me})">tools</button>  <button class="button" id="back" onclick="back(${me})">pass</button>`
+   addtext('あなたのターンです！');
+   document.querySelector('#sbuttons').innerHTML = `<button class="button" id="select1" onclick="select1(${me})">attack</button>  <button class="button" id="select2" onclick="select2(${me})">magic</button>  <button class="button" id="select3" onclick="select3(${me})">tools</button>  <button class="button" id="back" onclick="back(${me})">pass</button>`
    //errorcheck();
 };
 //#endregion
@@ -5385,112 +5532,110 @@ let nowturn = 0;
 let targetselect = 0;
 async function select1(me){
    if (phase == 1){
-      log.textContent = 'どうやって攻撃する？';
-      document.getElementById('select1').textContent = 'slash';
-      document.getElementById('select2').textContent = 'double slash';
-      document.getElementById('select3').textContent = 'slash of light';
-      document.getElementById('back').textContent = 'back';
+      document.querySelector('#select1').textContent = 'slash';
+      document.querySelector('#select2').textContent = 'double slash';
+      document.querySelector('#select3').textContent = 'slash of light';
+      document.querySelector('#back').textContent = 'back';
       phase = 2;
    } else if (phase == 2) {
       disappear()
       if(humans.players[me].slash1 !== 0){
          Slash('players',me,humans.players[me].slash1)
       }else{
-         log.textContent = 'you dont have slash...';
-         window.setTimeout(backtoplayerturn, 1000)
+         await addtext('you dont have slash...');
+         backtoplayerturn()
       }
    } else if (phase == 3) {
       disappear()
       if(humans.players[me].magic1 !== 0){
          Magic('players',me,humans.players[me].magic1)
       }else{
-         log.textContent = 'you dont have magic...';
-         window.setTimeout(backtoplayerturn, 1000)
+         await addtext('you dont have magic...');
+         backtoplayerturn()
       }
    } else if (phase == 4) {
       disappear()
       if(humans.players[me].tool1){
          Tool('players',me,humans.players[me].tool1)
       }else{
-         log.textContent = 'you dont have tool...';
-         window.setTimeout(backtoplayerturn, 1000)
+         await addtext('you dont have tool...');
+         backtoplayerturn()
       }
    }
 }
 async function select2(me){
    if (phase == 1) {
-      log.textContent = 'どうする？';
-      document.getElementById('select1').textContent = humans.players[me].magic1;
-      document.getElementById('select2').textContent = humans.players[me].magic2;
-      document.getElementById('select3').textContent = humans.players[me].magic3;
-      document.getElementById('back').textContent = 'back';
+      addtext('どうする？');
+      document.querySelector('#select1').textContent = humans.players[me].magic1;
+      document.querySelector('#select2').textContent = humans.players[me].magic2;
+      document.querySelector('#select3').textContent = humans.players[me].magic3;
+      document.querySelector('#back').textContent = 'back';
       phase = 3;
    } else if (phase == 2) {
       disappear()
       if(humans.players[me].slash2 !== 0){
-         log.textContent = `${humans.players[me].name}は${humans.players[me].slash2.name}をした！`;
+         await addtext(`${humans.players[me].name}は${humans.players[me].slash2.name}をした！`);
          Slash('players',me,humans.players[me].slash2)
       }else{
-         log.textContent = 'you dont have slash...';
-         window.setTimeout(backtoplayerturn, 1000)
+         await addtext('you dont have slash...');
+         backtoplayerturn()
       }
    } else if (phase == 3) {
       disappear()
       if(humans.players[me].magic2 !== 0){
          Magic('players',me,humans.players[me].magic2)
       }else{
-         log.textContent = 'you dont have magic...';
-         window.setTimeout(backtoplayerturn, 1000)
+         await addtext('you dont have magic...');
+         backtoplayerturn()
       }
    } else if (phase == 4) {
       disappear()
       if(humans.players[me].tool2){
          Tool('players',me,humans.players[me].tool2)
       }else{
-         log.textContent = 'you dont have tool...';
-         window.setTimeout(backtoplayerturn, 1000)
+         await addtext('you dont have tool...');
+         backtoplayerturn()
       }
       
    }
 }
 async function select3(me){
    if (phase == 1) {
-      log.textContent = '何を使う？';
-      document.getElementById('select1').textContent = humans.players[me].tool1+' x'+Tools[humans.players[me].tool1].num;
-      document.getElementById('select2').textContent = humans.players[me].tool2+' x'+Tools[humans.players[me].tool2].num;
-      document.getElementById('select3').textContent = humans.players[me].tool3+' x'+Tools[humans.players[me].tool3].num;
-      document.getElementById('back').textContent = 'back';
+      addtext('何を使う？');
+      document.querySelector('#select1').textContent = humans.players[me].tool1+' x'+Tools[humans.players[me].tool1].num;
+      document.querySelector('#select2').textContent = humans.players[me].tool2+' x'+Tools[humans.players[me].tool2].num;
+      document.querySelector('#select3').textContent = humans.players[me].tool3+' x'+Tools[humans.players[me].tool3].num;
+      document.querySelector('#back').textContent = 'back';
       phase = 4;
    } else if (phase == 2) {
       disappear()
       if(humans.players[me].slash3 !== 0){
          Slash('players',me,humans.players[me].slash3)
       }else{
-         log.textContent = 'you dont have slash...';
-         window.setTimeout(backtoplayerturn, 1000)
+         await addtext('you dont have slash...');
+         backtoplayerturn()
       }
    } else if (phase == 3) {
       disappear()
       if(humans.players[me].magic3 !== 0){
          Magic('players',me,humans.players[me].magic3)
       }else{
-         log.textContent = 'you dont have magic...';
-         window.setTimeout(backtoplayerturn, 1000)
+         await addtext('you dont have magic...');
+         backtoplayerturn()
       }
    } else if (phase == 4) {
       disappear()
       if(humans.players[me].tool3){
          Tool('players',me,humans.players[me].tool3)
       }else{
-         log.textContent = 'you dont have tool...';      
-         window.setTimeout(backtoplayerturn, 1000)
+         await addtext('you dont have tool...');
+         backtoplayerturn()
       }
    }
 }
 
 function LetsTargetSelect(one){
    let code = one??1; //1:通常(1人) 2:選んだところと左右 3:選んだ陣営全体
-   log.textContent = '誰を狙う？';
    return new Promise((resolve) => {
       let color = '#fff450';
       let pcolor = '#f7f7f7';
@@ -5551,14 +5696,12 @@ function LetsTargetSelect(one){
 async function back(me){
    if(phase == 1){
       disappear();
-      document.getElementById('BattleArea').style.display = 'none';
-      document.getElementById('NowMap').style.display = 'block';
+      document.querySelector('#BattleArea').style.display = 'none';
+      document.querySelector('#NowMap').style.display = 'block';
       
       draw()
       AllowMove = 0;
-      log.textContent = 'うまく逃げ切れた！';
-      await delay(1000);
-      log.textContent = '';
+      await addtext('うまく逃げ切れた！');
    }else if(phase == 2){
       backtoplayerturn()
    }else if(phase == 3){
@@ -5569,10 +5712,10 @@ async function back(me){
    
 }
 function disappear(){
-   document.getElementById('select1').textContent = ' ';
-   document.getElementById('select2').textContent = ' ';
-   document.getElementById('select3').textContent = ' ';
-   document.getElementById('back').textContent = '';
+   document.querySelector('#select1').textContent = ' ';
+   document.querySelector('#select2').textContent = ' ';
+   document.querySelector('#select3').textContent = ' ';
+   document.querySelector('#back').textContent = '';
    phase = 'null';
 }
 //#endregion
@@ -5581,12 +5724,12 @@ async function Slash(cam,me,name){
    if(humans.players[me].mp >= Slashs[name].mp){
       target = await LetsTargetSelect();
       humans.players[me].mp -= Slashs[name].mp;tekiou();
-      log.textContent = `${humans.players[me].name}の${Slashs[name].name}！`;await delay(1000);
+      await addtext(`${humans.players[me].name}の${Slashs[name].name}！`);
       let result = await Slashs[name].process('players',target[1],me,target[0]);
       if(result == 'dead'){let results = await killed('players',target[1],me,target[0]);return results}
-      NextTurnis('players',target[1],me,target[0]);
+      NextTurnis('players',me,target[1],target[0]);
    }else{
-      log.textContent = 'not enough mp...';
+      await addtext('not enough mp...');
       window.setTimeout(backtoplayerturn, 1000)
    }
 }
@@ -5598,9 +5741,9 @@ async function Magic(cam,me,name){
       humans.players[me].mp -= Magics[name].mp;tekiou();
       let result = await Magics[name].process('players',target[1],me,target[0]);
       if(result == 'dead'){let results = await killed('players',target[1],me,target[0]);return results}
-      NextTurnis('players',target[1],me,target[0]);
+      NextTurnis('players',me,target[1],target[0]);
    }else{
-      log.textContent = 'not enough mp...';
+      await addtext('not enough mp...');
       window.setTimeout(backtoplayerturn, 1000)
    }
 }
@@ -5610,13 +5753,13 @@ async function Magic(cam,me,name){
 async function Tool(cam,me,UseTool){
    if(Tools[UseTool].num > 0){
       target = await LetsTargetSelect();
-      log.textContent = humans.players[me].name + 'は'+Tools[UseTool].name+'を使用した!';await delay(1000);
+      await addtext(humans.players[me].name + 'は'+Tools[UseTool].name+'を使用した!');
       Tools[UseTool].num -= 1
       let result = await Tools[UseTool].process(cam,target[1],me,target[0]);
       if(result == 'dead'){let results = await killed(cam,target[1],me,target[0]);return results}
-      NextTurnis(cam,target[1],me,target[0]);
+      NextTurnis(cam,me,target[1],target[0]);
    }else{
-      log.textContent = 'not enough tool...';
+      await addtext('not enough tool...');
       window.setTimeout(backtoplayerturn, 1000)
    }
 }
@@ -5629,7 +5772,7 @@ let clowngambling = ['0','0','2','2','2','4'];
 // スキル予約関数
 let skillQueue = [];
 async function skillReserve(cam,me){
-   if(humans[cam][me].cool == 100){
+   if(humans[cam][me].ep == 100){
       x = humans[cam][me].ex;
       skillQueue.push({cam:cam,me:me,skill:x});
       skillReset(cam,me);
@@ -5651,34 +5794,30 @@ async function skillAct(cam,me,skill){
    return result;
 }
 function skillReset(cam,me){
-   humans[cam][me].cool = 0;
-   document.getElementById('Skillbutton').innerHTML = `<button id="SkillCoolDown" class="button" onclick="skillReserve('${cam}','${me}')"></button>`;
-   document.getElementById("SkillCoolDown").textContent = humans[cam][me].cool + '%';
+   humans[cam][me].ep = 0;
 }
 function Splittekiou(){
-   document.getElementById('SplitHealth').textContent = Splithealth;
-   document.getElementById('SplitMaxHealth').textContent = Splitmaxhealth;
+   document.querySelector('#SplitHealth').textContent = Splithealth;
+   document.querySelector('#SplitMaxHealth').textContent = Splitmaxhealth;
    }
-function Splitbreak(){
+async function Splitbreak(){
    buffremove(cam,me,'spliting')
    x = Math.floor(Splitmaxhealth * 0.7);
    playerhealth += x;
    if (playerhealth > playermaxhealth){playerhealth = playermaxhealth;}
-   document.getElementById('PlayerFriendFront').innerHTML = '';
+   document.querySelector('#PlayerFriendFront').innerHTML = '';
    Splitmaxhealth = 0;
    Splithealth = 0;
-   log.textContent = playername+'のコピーは倒された...';
-   humans[cam][me].cool = 0;
+   await addtext(playername+'のコピーは倒された...');
+   humans[cam][me].ep = 0;
 }
 function turretPlace(cam){
-   if(!document.getElementById(`${cam}t`)){
-      let div = document.createElement('div');
-      div.id = `${cam}t`;
-      div.className = 'players'
-      document.getElementById(cam).appendChild(div);
+   if(!document.querySelector(`#${cam}t`)){
+      let newDiv = makeNewPlayer('t')
       humans[cam].t.kazu = 0;
       humans[cam].t.maxhealth = 0;
       humans[cam].t.health = 0;
+      document.querySelector(`#${cam}`).appendChild(newDiv);
    }
    humans[cam].t.status = 1;
    humans[cam].t.kazu += 1;
@@ -5686,8 +5825,8 @@ function turretPlace(cam){
    humans[cam].t.health += 15;
    humans[cam].t.name = `Turret x${humans[cam].t.kazu}`;
    tekiou()
-   document.getElementById(`${cam}t`).style.display = 'block'
-   document.getElementById(`${cam}t`).style.backgroundColor = '#f7f7f7'
+   document.querySelector(`#${cam}t`).style.display = 'block'
+   document.querySelector(`#${cam}t`).style.backgroundColor = '#f7f7f7'
 }
 function turretBreak(cam){
    humans[cam].t.status = 0;
@@ -5696,17 +5835,17 @@ function turretBreak(cam){
       humans[cam].t.kazu = 0;
       humans[cam].t.maxhealth = 0;
       humans[cam].t.health = 0;
-      document.getElementById(`${cam}t`).remove();
+      document.querySelector(`#${cam}t`).remove();
    }
 }
 function turretAllClear(){
-   if(document.getElementById('playerst')){
-      document.getElementById('playerst').remove();
+   if(document.querySelector('#playerst')){
+      document.querySelector('#playerst').remove();
       humans.players.t.kazu = 0;
       humans.players.t.status = 0;
    };
-   if(document.getElementById('enemiest')){
-      document.getElementById('enemiest').remove();
+   if(document.querySelector('#enemiest')){
+      document.querySelector('#enemiest').remove();
       humans.enemies.t.kazu = 0;
       humans.enemies.t.status = 0
    }
@@ -5718,7 +5857,7 @@ function turretAllClear(){
 
 
 //#region prev-enemyturn
-async function NextTurnis(cam,tcam,me,target){
+async function NextTurnis(cam,me,tcam,target){
    phase = 0;
 
    //アンコールの動き
@@ -5726,8 +5865,8 @@ async function NextTurnis(cam,tcam,me,target){
       y = 1;//luck
       if(buffhas(cam,me,'luck')){y = Math.floor(Math.random() * humans[cam][me].buffs.luck.lv);}//luck
       if(y == 0){
-         log.textContent = '当たりが出たらもう一本♪';
-         await delay(1000); backtoplayerturn(); return;
+         await addtext('当たりが出たらもう一本♪');
+         backtoplayerturn(); return;
       }
 
 
@@ -5737,7 +5876,7 @@ async function NextTurnis(cam,tcam,me,target){
          humans[cam][me].health -= Math.floor(humans[cam][me].maxhealth * humans[cam][me].buffs.poison.lv);
          if(humans[cam][me].health < 0){humans[cam][me].health = 0};
          y = x - humans[cam][me].health;
-         log.textContent = humans[cam][me].name + 'は毒で' + y + 'のダメージ!';
+         await addtext(`${humans[cam][me].name}は毒で${y}のダメージ!`);
          await delay(1000);
       };
       if(buffhas(cam,me,'burn')){
@@ -5745,14 +5884,14 @@ async function NextTurnis(cam,tcam,me,target){
          humans[cam][me].health -= humans[cam][me].buffs.burn.lv;
          if(humans[cam][me].health < 0){humans[cam][me].health = 0}
          y = x - humans[cam][me].health;
-         log.textContent = humans[cam][me].name + 'は燃えて' + y + 'のダメージ!';
+         await addtext(`${humans[cam][me].name}は燃えて${y}のダメージ!`);
          await delay(1000);
       };
       tekiou();
       if(humans[cam][me].health <= 0){let result = killed(0,cam,0,me);if(result == 'end'){return 'end';}}
    
       for(const key in humans[cam][me].buffs){
-         humans[cam][n].buffs[key].time -= 1; // -1する
+         humans[cam][me].buffs[key].time -= 1; // -1する
          if (humans[cam][me].buffs[key].time <= 0){
             delete humans[cam][me].buffs[key]; // 0以下なら消し去る
          }
@@ -5767,15 +5906,15 @@ async function NextTurnis(cam,tcam,me,target){
       let me = nanka.me;
       let skill = nanka.skill;
       console.log(`${cam}${me} のスキル:"${skill}"を発動!`);
-      log.textContent = `${humans[cam][me].name}は"${Skills.ex[skill].name}"を発動した！！`;await delay(1000);
+      await addtext(`${humans[cam][me].name}は"${Skills.ex[skill].name}"を発動した！！`);
       let result = await skillAct(cam,me,skill);
       if(result == 'end'){return 'end';}
    }
 
    //こっから次のターン行く動き　ここでこの人のターンは終わるって感じだね
+
    acted += 1;
-   if(acted < bar.num.length){
-   }else{
+   if(acted >= bar.num.length){
       let cams = 0;
       if(humans.players['t'].kazu > 0){
          log.textContent = '我らのturretの攻撃!';
@@ -5836,7 +5975,7 @@ async function NextTurnis(cam,tcam,me,target){
    }
 
    if(buffhas(cam,nowturn,'onslime')){
-      if(Math.floor(Math.random() * Debuffs.onslime.lv[humans[cam][nowturn].buffs.onslime.lv]) !== 0){
+      if(Math.floor(Math.random() * Effects.debuffs.onslime.lv[humans[cam][nowturn].buffs.onslime.lv]) !== 0){
          buffremove(cam,nowturn,'onslime');
          log.textContent = 'なんとかスライムを取り払った!!';
       }else{
@@ -5844,22 +5983,22 @@ async function NextTurnis(cam,tcam,me,target){
          await delay(1000);NextTurnis(0);return;}; 
    }
    if(buffhas(cam,nowturn,'skip')){
-      log.textContent = 'はい'+humans[cam][me].name+'、お前スキップ〜〜';
-      await delay(1000); NextTurnis(cam,0,me,0); return;
+      await addtext(`はい${humans[cam][me].name}、お前スキップ〜〜`);
+      NextTurnis(cam,me,0,0); return;
    }
    if(buffhas(cam,nowturn,'stan')){
-      log.textContent = humans[cam][me].name+'はスタンした！';
-      await delay(1000); NextTurnis(cam,0,me,0); return;　
+      await addtext(`${humans[cam][me].name}はスタンした！`);
+      NextTurnis(cam,me,0,0); return;
    }
    if(buffhas(cam,nowturn,'freeze')){
-      if(!Math.floor(Math.random() * Debuffs.freeze.lv[humans[cam][nowturn].buffs.freeze.lv]) !== 0){
-         log.textContent = '氷が溶けた!'; buffremove(cam,nowturn,'freeze');
+      if(!Math.floor(Math.random() * Effects.debuffs.freeze.lv[humans[cam][nowturn].buffs.freeze.lv]) !== 0){
+         await addtext(`氷が溶けた!`); buffremove(cam,nowturn,'freeze');
       }else{
-         log.textContent = humans[cam][nowturn].name + 'は凍っている...';
-         await delay(1000); NextTurnis(cam,0,me,0); return;
+         await addtext(`${humans[cam][nowturn].name}は凍っている...`);
+         NextTurnis(cam,me,0,0); return;
       }   
    }
-   console.log(cam+''+nowturn+'、動きます！');
+   console.log(`${cam}${nowturn}こと${humans[cam][nowturn].name}、動きます！`);
 
    switch(cam){
       case 'players':
@@ -5873,6 +6012,8 @@ async function NextTurnis(cam,tcam,me,target){
 //#endregion
 //#region enemyturn
 async function enemyturn(cam,me){
+   let enemy = humans.enemies[me];
+   let enemydata = Enemies[enemy.name];
    x = Object.values(humans.enemies).filter(x => x.status == 1&& x.health > 0).map(x => x.num);
    for(i = 0; i < x.length; i++){
       let n = x[i]
@@ -5885,20 +6026,47 @@ async function enemyturn(cam,me){
    }
    tekiou();
    
-   let name = humans.enemies[me].name
-   log.textContent = name+'のターン！';await delay(1000);
-   let selected = ['players',1]
-   if(Enemies[humans.enemies[me].name]){
-      Enemies[humans.enemies[me].name].acts[Math.floor(Math.random() * Enemies[humans.enemies[me].name].acts.length)](cam,me);
+   await addtext(enemy.name+'のターン！')
+   let selected = ['players',1] //一旦のやつ。実際はShallTargetSelect(cam,me,'phpl',0);みたいなのがあるからこれの中の数値は関係ない
+
+   if(enemydata){
+      let selectedAction = enemySelectAction(me,enemydata.acts)
+      await selectedAction.process(cam, me);
    }else{
-      log.textContent = `${name}は何かで攻撃した！`;await delay(1000);
+      await addtext(`${enemy.name}は何かで攻撃した！`)
       selected = ShallTargetSelect(cam,me,'phpl',0);
       let result = await humandamaged(cam,selected[1],me,selected[0],1,'sh',1);
       if(result == 'end'){let results = killed(cam,selected[1],me,selected[0]);if(results == 'end'){return result;}}
    }
-   NextTurnis(cam,selected[1],me,selected[0]);
+   NextTurnis(cam,me,selected[1],selected[0]);
 }
-function ShallTargetSelect(cam,me,code,both){//これは敵しか使わないターゲットセレクト。だから陣営とかは考えんでいいよ
+function enemySelectAction(me, acts){
+   let enemy = humans.enemies[me];
+
+   let keys = Object.keys(acts);
+   let probabilities = keys.map(key => acts[key].probability || 1);
+
+   let lastType = enemy.lastype;
+   if(lastType){
+      //直前にreを実行していたならば、対応するab確定実行するやつ
+      let absKey = keys.find(key => key.startsWith("ab") && key.endsWith(lastType));
+      if (absKey) {
+         enemy.lastype = null;
+         return acts[absKey];
+      }
+   }
+
+   //reをするとlastypeを記録
+   let selectedKey = arrayGacha(keys, probabilities);
+   if (selectedKey.startsWith("re")) {
+      enemy.lastype = selectedKey.substring(2);//reを除いたものを保存
+   }
+
+   return acts[selectedKey];
+}
+
+function ShallTargetSelect(cam,me,code,both){
+   //これは敵しか使わないターゲットセレクト。だから陣営とかは考えんでいいよ
    //標的陣営、起動者、コード(e = enemies, p = players | m = most highest, l = most lowest,| atk = 攻撃力, def = 防御力, hp = 体力 || r = random)、両隣にも被害を与えるか0,1
    //,b => b.health//playerのhealth達を、statusが1のやつだけ、小さい順(昇順)に並べてる。
    const playerstatus = {
@@ -5917,7 +6085,7 @@ function ShallTargetSelect(cam,me,code,both){//これは敵しか使わないタ
    switch(code){
       //players
       case 'pr'://random
-         x = playerstatus.health[Math.floor(Math.random() * playerstatus.length)]
+         x = arraySelect(playerstatus.health)
          if(!x){return 'end'}
          if(both == 0){
             ret.push(x);
@@ -5943,7 +6111,7 @@ function ShallTargetSelect(cam,me,code,both){//これは敵しか使わないタ
          }
          break;
       case 'phph':
-         x = playerstatus.health[playerstatus.length - 1];
+         x = playerstatus.health[playerstatus.health.length - 1];
          if(!x){return 'end'}
          if(both == 0){
             ret.push(x);
@@ -5969,7 +6137,7 @@ function ShallTargetSelect(cam,me,code,both){//これは敵しか使わないタ
          }
          break;
       case 'patkh':
-         x = playerstatus.atk[playerstatus.length - 1]
+         x = playerstatus.atk[playerstatus.atk.length - 1]
          if(!x){return 'end'}
          if(both == 0){
             ret.push(x);
@@ -5995,7 +6163,7 @@ function ShallTargetSelect(cam,me,code,both){//これは敵しか使わないタ
          }
          break;
       case 'pdefh':
-         x = playerstatus.def[playerstatus.length - 1]
+         x = playerstatus.def[playerstatus.def.length - 1]
          if(!x){return 'end'}
          if(both == 0){
             ret.push(x);
@@ -6028,7 +6196,7 @@ function ShallTargetSelect(cam,me,code,both){//これは敵しか使わないタ
 
       //enemies
       case 'er':
-         x = enemystatus.health[Math.floor(Math.random() * enemystatus.length)]
+         x = arraySelect(enemystatus.health)
          if(!x){return 'end'}
          if(both == 0){
             ret.push(x);
@@ -6054,7 +6222,7 @@ function ShallTargetSelect(cam,me,code,both){//これは敵しか使わないタ
          }
          break;
       case 'ehph':
-         x = enemystatus.health[enemystatus.length - 1]
+         x = enemystatus.health[enemystatus.health.length - 1]
          if(!x){return 'end'}
          if(both == 0){
             ret.push(x);
@@ -6080,7 +6248,7 @@ function ShallTargetSelect(cam,me,code,both){//これは敵しか使わないタ
          }
          break;
       case 'eatkh':
-         x = enemystatus.atk[enemystatus.length - 1]
+         x = enemystatus.atk[enemystatus.atk.length - 1]
          if(!x){return 'end'}
          if(both == 0){
             ret.push(x);
@@ -6106,7 +6274,7 @@ function ShallTargetSelect(cam,me,code,both){//これは敵しか使わないタ
          }
          break;
       case 'edefh':
-         x = enemystatus.def[enemystatus.length - 1]
+         x = enemystatus.def[enemystatus.def.length - 1]
          if(!x){return 'end'}
          if(both == 0){
             ret.push(x);
@@ -6135,6 +6303,7 @@ function ShallTargetSelect(cam,me,code,both){//これは敵しか使わないタ
    if(code.startsWith('p')){ret.push('players')}
    if(code.startsWith('e')){ret.push('enemies')}
    console.log(`${cam}${me}「${ret[1]}の${ret[0]}を狙います！」`);
+   console.log(ret)
    return ret;
 }
 //#endregion
@@ -6212,9 +6381,8 @@ async function killedCheck(){
             case 3: enemydef -= 5; break;
          }}
       }
-      log.textContent = '';
-      document.getElementById('BattleArea').style.display = 'none';
-      document.getElementById('NowMap').style.display = 'block';
+      document.querySelector('#BattleArea').style.display = 'none';
+      document.querySelector('#NowMap').style.display = 'block';
       
 
       MAPx = Math.floor(SELECTx / 75);
@@ -6232,24 +6400,23 @@ async function killedCheck(){
       if(karix){
          let saydefeats = [`${humans.players[1].name}は力尽きた...残念でしたね！にはははは〜！`,'残念だったね!すごい惜しかったね!!','あ、あれ..？もう負けちゃったんですか....？','ほら、負けを認めてください？'];
          if(humans.players[1].level < 3){saydefeats = ['あはは..負けちゃいましたね....防御力を上げると楽ですよ!', 'あはは..負けちゃいましたね....double slashは運要素も少ないので強いですよ!', 'あはは..負けちゃいましたね....魔法にターン数制限はありません!いっぱい使っちゃいましょう!','あはは..負けちゃいましたね....mechanicは防御全振りで戦うと良いですよ!','あれ〜？負けちゃったんですか〜？？おにいさんよわいね〜？？'];}
-         log.textContent = arraySelect(saydefeats);
-         await delay(2000);
+         tekiou();
+         await addtext(saydefeats[Math.floor(Math.random()*saydefeats.length)]);
          Object.keys(humans.players).filter(a => humans.players[a].status == 1||humans.players[a].status == 2).forEach(nanka => {
             humans.players[nanka].status = 1;
             humans.players[nanka].health = Math.floor(humans.players[nanka].maxhealth*0.5);
          })
-         tekiou();
          bossbattlenow = 0;
          floor = 0;GoNextFloor();
 
-         document.getElementById('BattleArea').style.display = 'none';
-         document.getElementById('NowMap').style.display = 'block';
+         document.querySelector('#BattleArea').style.display = 'none';
+         document.querySelector('#NowMap').style.display = 'block';
 
          MAPx = Math.floor(SELECTx / 75);
          MAPy = Math.floor(SELECTy / 75);
          draw()
          AllowMove = 0;
-         log.textContent = '';
+         
          return 'end';
       }else{
          return 'continue';
@@ -6258,68 +6425,245 @@ async function killedCheck(){
 }   
 async function EnemyAppear(){
    AllowMove = 1;
-   document.getElementById('NowMap').style.display = 'none';
-   document.getElementById('BattleArea').style.display = 'block';
-   document.getElementById('select1').textContent = ' ';
-   document.getElementById('select2').textContent = ' ';
-   document.getElementById('select3').textContent = ' ';
-   document.getElementById('back').textContent = ' ';
-   document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown" class="button"></button>'
+   document.querySelector('#NowMap').style.display = 'none';
+   document.querySelector('#BattleArea').style.display = 'block';
+   document.querySelector('#select1').textContent = '';
+   document.querySelector('#select2').textContent = '';
+   document.querySelector('#select3').textContent = '';
+   document.querySelector('#back').textContent = '';
 
    //前までのやつの処理
-   await turretAllClear();
+   turretAllClear();
    enemy50pursuitenelgy = 1;
 
    x = Object.keys(humans.players).filter(a => humans.players[a].status == 1 || humans.players[a].status == 2).length;
    for(i = 1; i < x+1; i++){
-      let num = i-1;
-      document.getElementById(`players${i}`).style.display = 'block';
-      document.getElementById(`players${i}`).style.backgroundColor = '#f7f7f7';
-      humans.players[i].status = 1;
+      let newDiv = makeNewPlayer(i);
+      document.querySelector('#players').appendChild(newDiv);
       tekiou();
    }
    x = [1,1,1,1,2,2,3]
    x = x[Math.floor(Math.random() * x.length)];
    for(i = 1; i < x+1; i++){
-      let num = i-1;console.log(num);
-      document.getElementById(`enemies${i}`).style.display = 'block';
-      document.getElementById(`enemies${i}`).style.backgroundColor = '#f7f7f7';
       humans.enemies[i].status = 1;
-      humans.enemies[i].level = enemylv + Math.floor(Math.random() * 7)-3;if(humans.enemies[i].level < 1){humans.enemies[i].level = 1;}
+      humans.enemies[i].level = enemylv + Math.floor(Math.random() * 7)-3; 
+      if(humans.enemies[i].level < 1){humans.enemies[i].level = 1;}
       humans.enemies[i].name = DesideEnemyName(i);
-      if(humans.enemies[i].prefixe){document.getElementById(`enemies${i}`).style.backgroundColor = '#fefaff';}//ちょい強敵ってことね
+      let newDiv = makeNewEnemy(i);
+      document.querySelector('#enemies').appendChild(newDiv);
+      if(humans.enemies[i].prefixe){document.querySelector(`#enemies${i}`).style.backgroundColor = '#fefaff';}//ちょい強敵ってことね
       tekiou();
    }
    tekiou();
-   log.textContent = humans.enemies[1].name + 'が現れた!';
-
-   turncount = 1;document.getElementById('TurnCount').textContent = turncount;
+   await addtext(`${humans.enemies[1].name}が現れた!`);
+   
    // bar-create
    bar = {
       cam:[],
       num:[]
    }
+   turncount = 0;
    NextTurnis(0);
+}
+
+function makeNewPlayer(num){
+   const player = humans.players[num];
+
+   let playerDiv = document.createElement('div');
+   playerDiv.id = `players${num}`;
+   playerDiv.className = 'players';
+
+   let effects = document.createElement('div');
+   effects.className = 'effects';
+
+   let buffs = document.createElement('div');
+   buffs.className = 'buffs';
+   effects.appendChild(buffs);
+
+   let debuffs = document.createElement('div');
+   debuffs.className = 'debuffs';
+   effects.appendChild(debuffs);
+   playerDiv.appendChild(effects);
+   
+   let main = document.createElement('div');
+   main.className = 'main';
+
+   let skill = document.createElement('div');
+   skill.className = 'skill';
+
+   let skillBack = document.createElement('img');
+   skillBack.className = 'back';
+   skillBack.src = `assets/skills/${player.ex}.png`;
+   skill.appendChild(skillBack);
+
+   let skillGauge = document.createElement('div');
+   skillGauge.className = 'gauge';
+   skillGauge.style.height = `${player.ep / player.maxep * 100}%`;
+   skill.appendChild(skillGauge);
+   main.appendChild(skill);
+
+   let img = document.createElement('img');
+   img.className = 'img';
+   img.src = `assets/charas/${player.id}.png`; //長押しで詳細とか見れるようにしたい
+   main.appendChild(img);
+   playerDiv.appendChild(main);
+
+
+   let border = document.createElement('div');
+   border.className = 'border';
+
+   let row = document.createElement('div');
+   row.className = 'row';
+
+   let name = document.createElement('span');
+   name.className = 'name';
+   name.textContent = player.name;
+   row.appendChild(name);
+
+   let level = document.createElement('span');
+   level.className = 'level';
+   level.textContent = 'Lv.' + player.level;
+   row.appendChild(level);
+   border.appendChild(row);
+
+   let health = document.createElement('div');
+   health.className = 'health';
+
+   let healthNum = document.createElement('div');
+   healthNum.className = 'num';
+   healthNum.textContent = `${player.health}/${player.maxhealth}`;
+   health.appendChild(healthNum);
+
+   let healthBar = document.createElement('div');
+   healthBar.className = 'bar';
+
+   let healthBarInner = document.createElement('div');
+   healthBarInner.className = 'inner';
+   healthBarInner.style.width = `${(player.health / player.maxhealth) * 100}%`; //tekiouで色とか変えるようにしといて
+   healthBarInner.style.backgroundColor = '#ff0000';
+   healthBar.appendChild(healthBarInner);
+   health.appendChild(healthBar);
+   border.appendChild(health);
+
+   let mp = document.createElement('div');
+   mp.className = 'mp';
+
+   let mpNum = document.createElement('div');
+   mpNum.className = 'num';
+   mpNum.textContent = `${player.mp}/${player.maxmp}`;
+   mp.appendChild(mpNum);
+
+   let mpBar = document.createElement('div');
+   mpBar.className = 'bar';
+
+   let mpBarInner = document.createElement('div');
+   mpBarInner.className = 'inner';
+   mpBarInner.style.width = `${(player.mp / player.maxmp) * 100}%`; //tekiouで色とか変えるようにしといて
+   mpBar.appendChild(mpBarInner);
+   mp.appendChild(mpBar);
+   border.appendChild(mp);
+   playerDiv.appendChild(border);
+
+   return playerDiv;
+}
+function makeNewEnemy(num){
+   const enemy = humans.enemies[num];
+
+   let enemyDiv = document.createElement('div');
+   enemyDiv.id = `enemies${num}`;
+   enemyDiv.className = 'enemies';
+
+   let border = document.createElement('div');
+   border.className = 'border';
+
+   let row = document.createElement('div');
+   row.className = 'row';
+
+   let name = document.createElement('span');
+   name.className = 'name';
+   name.textContent = enemy.name;
+   row.appendChild(name);
+
+   let level = document.createElement('span');
+   level.className = 'level';
+   level.textContent = 'Lv.' + enemy.level;
+   row.appendChild(level);
+   border.appendChild(row);
+
+   let health = document.createElement('div');
+   health.className = 'health';
+
+   let healthNum = document.createElement('div');
+   healthNum.className = 'num';
+   healthNum.textContent = `${enemy.health}/${enemy.maxhealth}`;
+   health.appendChild(healthNum);
+
+   let healthBar = document.createElement('div');
+   healthBar.className = 'bar';
+
+   let healthBarInner = document.createElement('div');
+   healthBarInner.className = 'inner';
+   healthBarInner.style.width = `${(enemy.health / enemy.maxhealth) * 100}%`;
+   healthBar.appendChild(healthBarInner);
+   health.appendChild(healthBar);
+   border.appendChild(health);
+
+   let mp = document.createElement('div');
+   mp.className = 'mp';
+
+   let mpNum = document.createElement('div');
+   mpNum.className = 'num';
+   mpNum.textContent = `${enemy.mp}/${enemy.maxmp}`;
+   mp.appendChild(mpNum);
+
+   let mpBar = document.createElement('div');
+   mpBar.className = 'bar';
+
+   let mpBarInner = document.createElement('div');
+   mpBarInner.className = 'inner';
+   mpBarInner.style.width = `${(enemy.mp / enemy.maxmp) * 100}%`;
+   mpBar.appendChild(mpBarInner);
+   mp.appendChild(mpBar);
+   border.appendChild(mp);
+   enemyDiv.appendChild(border);
+
+   let img = document.createElement('img');
+   img.className = 'img';
+   img.src = `assets/enemies/${enemy.name}.png`;
+   enemyDiv.appendChild(img);
+
+   let effects = document.createElement('div');
+   effects.className = 'effects';
+
+   let buffs = document.createElement('div');
+   buffs.className = 'buffs';
+   effects.appendChild(buffs);
+
+   let debuffs = document.createElement('div');
+   debuffs.className = 'debuffs';
+   effects.appendChild(debuffs);
+   enemyDiv.appendChild(effects);
+
+   return enemyDiv;
 }
 //#endregion
 
 //#region　bossの動き
-function BossEnemyAppear(){
+async function BossEnemyAppear(){
    AllowMove = 1;
-   document.getElementById('NowMap').style.display = 'none';
-   document.getElementById('BattleArea').style.display = 'block';
+   document.querySelector('#NowMap').style.display = 'none';
+   document.querySelector('#BattleArea').style.display = 'block';
    bossbattlenow = 1;
-   document.getElementById('select1').textContent = ' ';
-   document.getElementById('select2').textContent = ' ';
-   document.getElementById('select3').textContent = ' ';
-   document.getElementById('back').textContent = ' ';
-   document.getElementById('Skillbutton').innerHTML = '<button id="SkillCoolDown"  class="button"></button>'
+   document.querySelector('#select1').textContent = ' ';
+   document.querySelector('#select2').textContent = ' ';
+   document.querySelector('#select3').textContent = ' ';
+   document.querySelector('#back').textContent = ' ';
    turncount = 0;
-   document.getElementById('TurnCount').textContent = turncount;
+   document.querySelector('#TurnCount').textContent = turncount;
    playermp = playermaxmp;
    playerpower = 1;playershell = 1;
    if(playerps == 'enemy50%pursuit'){enemy50pursuitenelgy = 1;};
-   humans.enemies[me].health = humans.enemies[me].health; document.getElementById('EnemyMaxHealth').textContent = humans.enemies[me].health; tekiou();
+   humans.enemies[me].health = humans.enemies[me].health; document.querySelector('#EnemyMaxHealth').textContent = humans.enemies[me].health; tekiou();
    if (enemylevel < 1){enemylevel = 1}
    humans.enemies[me].name = bossenemies[me].names[stage-1]; //敵の名前を決めます
    switch(humans.enemies[me].name){//ボスごとのステータスを決めます
@@ -6355,9 +6699,9 @@ function BossEnemyAppear(){
       break;
 
    }
-   document.getElementById("EnemyName").textContent = humans.enemies[me].name;
-   log.textContent = humans.enemies[me].name + 'が現れた!';
-   document.getElementById('EnemyLevel').textContent = enemylevel;
+   document.getElementById('EnemyName').textContent = humans.enemies[me].name;
+   await addtext(`${humans.enemies[me].name}が現れた!`);
+   document.querySelector('#EnemyLevel').textContent = enemylevel;
    tekiou();
    window.setTimeout(playerturn, 750);
    save();
@@ -6368,7 +6712,7 @@ async function bossenemyturn(){
       //2:攻撃(シンプル)
       //3:相手を毒に(2ターン)
       //if(max0.3>)[確定]防御力down1(討伐まで有効)
-      if(humans.enemies[me].health <= humans.enemies[me].health * 0.3){buffadd(cam,me,'shelldown',1,1);}
+      if(humans.enemies[me].health <= humans.enemies[me].health * 0.3){await buffadd(cam,me,'shelldown',1,1);}
       switch(Math.floor(Math.random()*4)+1){
          case 1:
          case 2:
@@ -6377,7 +6721,7 @@ async function bossenemyturn(){
             break;
          case 3:
             log.textContent = humans.enemies[me].name + 'は大きく息を吐いた！';
-            buffadd(cam,me,'poison',2,1);
+            await buffadd(cam,me,'poison',2,1);
             break;
       }
    }else if(humans.enemies[me].name == 'steampumker'){
@@ -6386,12 +6730,12 @@ async function bossenemyturn(){
       //タレットが3つ以上: 攻撃力の3倍のダメージで攻撃、タレットを破壊
       if(enemyturret >= 3){
          humandamaged('players',me,targetselect,enemyturret,1);
-         document.getElementById('EnemyFriendBack').innerHTML = '';
+         document.querySelector('#EnemyFriendBack').innerHTML = '';
          enemyturret = 0;
          EnemyTurrettekiou();
       }
       if((turncount % 2) == 0){
-         document.getElementById('EnemyFriendBack').innerHTML = '<br><b><font color="#DF0101">Turret</font><span id="EnemyTurret"></span></b><br><br>';
+         document.querySelector('#EnemyFriendBack').innerHTML = '<br><b><font color="#DF0101">Turret</font><span id="EnemyTurret"></span></b><br><br>';
          enemyturret += 1;
          EnemyTurrettekiou();
          log.textContent = humans.enemies[me].name+'はturretを設置した!';
@@ -6416,7 +6760,7 @@ async function bossenemyturn(){
          case 1:log.textContent = '普通の爆弾だった!!';break;//これによる効果とかもあっていいかも
          case 2:log.textContent = '爆弾は雷光弾だった!!!';break;
          case 3:log.textContent = '爆弾は焼夷弾だった!';break;
-         case 0:log.textContent = '爆弾は閃光弾だった!!';buffadd(cam,me,'stan',1,1);y = 0.5;break;
+         case 0:log.textContent = '爆弾は閃光弾だった!!';await buffadd(cam,me,'stan',1,1);y = 0.5;break;
       }
       await delay(1000);
       await humandamaged('players',me,targetselect,x*y,0);
@@ -6432,7 +6776,7 @@ async function bossenemyturn(){
 //こっから変数とか関数とか
 let enemyturret = 0;
 function EnemyTurrettekiou(){
-   document.getElementById('EnemyTurret').textContent = 'x' + enemyturret;
+   document.querySelector('#EnemyTurret').textContent = 'x' + enemyturret;
 }
 //#endregion
 
@@ -6446,10 +6790,10 @@ let Camprestper
    await delay(2000);
    log.textContent = '起きた！！！！！！！';
    await delay(1000);
-   document.getElementById('EventArea').innerHTML = '';
-   log.textContent = '';
-   document.getElementById('BattleArea').style.display = 'none';
-   document.getElementById('NowMap').style.display = 'block';
+   document.querySelector('#EventArea').innerHTML = '';
+   
+   document.querySelector('#BattleArea').style.display = 'none';
+   document.querySelector('#NowMap').style.display = 'block';
    
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
@@ -6464,25 +6808,25 @@ let Camprestper
          await delay(1000);
          nowshop = 1;
          log.textContent = 'ここにはこんなものがあるけど、どうする？';
-         document.getElementById('EventArea').innerHTML = '<iframe height="230" width="200" src="assets/shops/weapons.txt"></iframe><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopBuyButton()">Buy</button><br><br><button class="button" onclick="CampBye()">Bye</button>';
+         document.querySelector('#EventArea').innerHTML = '<iframe height="230" width="200" src="assets/shops/weapons.txt"></iframe><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopBuyButton()">Buy</button><br><br><button class="button" onclick="CampBye()">Bye</button>';
       }else if(y == 2){
          log.textContent = '防具屋に話しかけた！';
          await delay(1000);
          nowshop = 2;
          log.textContent = 'うちの店ではこんなものが売ってるよ';
-         document.getElementById('EventArea').innerHTML = '<iframe height="400" width="300" src="assets/shops/armors.txt"></iframe><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopBuyButton()">Buy</button><br><br><button class="button" onclick="CampBye()">Bye</button>';
+         document.querySelector('#EventArea').innerHTML = '<iframe height="400" width="300" src="assets/shops/armors.txt"></iframe><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopBuyButton()">Buy</button><br><br><button class="button" onclick="CampBye()">Bye</button>';
       }else if(y == 3){
          log.textContent = '道具屋に話しかけた！';
          await delay(1000);
          nowshop = 3;
          log.textContent = 'いらっしゃいませぇぇぇぇぇ？？ご注文をどうぞ！！！！';
-         document.getElementById('EventArea').innerHTML = '<iframe height="400" width="300" src="assets/shops/tools.txt"></iframe><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopBuyButton()">Buy</button><br><br><button class="button" onclick="CampBye()">Bye</button>';
+         document.querySelector('#EventArea').innerHTML = '<iframe height="400" width="300" src="assets/shops/tools.txt"></iframe><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopBuyButton()">Buy</button><br><br><button class="button" onclick="CampBye()">Bye</button>';
       }else if(y == 10){
          log.textContent = '武器屋に話しかけた！';
          await delay(1000);
          nowshop = 10;
          log.textContent = 'ほう..よく来たな。好きに見ていってくれ';
-         document.getElementById('EventArea').innerHTML = '<iframe height="400" width="300" src="assets/shops/rareweapons.txt"></iframe><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopBuyButton()">Buy</button><br><br><button class="button" onclick="CampBye()">Bye</button>';
+         document.querySelector('#EventArea').innerHTML = '<iframe height="400" width="300" src="assets/shops/rareweapons.txt"></iframe><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopBuyButton()">Buy</button><br><br><button class="button" onclick="CampBye()">Bye</button>';
 }
      
   }
@@ -6490,7 +6834,7 @@ let Camprestper
 //shop
 let nowshop = 0;
 function ShopBuyButton(){
-   const num = +document.getElementById('ShopInputText').value;
+   const num = +document.querySelector('#ShopInputText').value;
    switch(nowshop){
       case 1:
       if(haveweapons.includes(weapons.name[num])){
@@ -6545,52 +6889,52 @@ function ShopBuyButton(){
 
 
    save();
-   document.getElementById('ShopInputText').value = '';
+   document.querySelector('#ShopInputText').value = '';
 }
 function CampBye(){
    log.textContent = 'ついでに装備を変えていこうかな？';
-   document.getElementById('EventArea').innerHTML = '<button class="button"onclick="GoToEquip()">そうしよう！</button><br><button class="button"onclick="Campback()">やめとこう！</button>';
+   document.querySelector('#EventArea').innerHTML = '<button class="button"onclick="GoToEquip()">そうしよう！</button><br><button class="button"onclick="Campback()">やめとこう！</button>';
 }
 function Campback(){
-   document.getElementById('EventArea').innerHTML = '<button id="CampRest" onclick="Camprest()"></button><br><button id="CampTrade" onclick="Camptrade()"></button>'
-   document.getElementById('CampRest').textContent = '朝まで休む(' + Camprestper*100 + '%回復)';//30のときはスキルカード強化みたいなやつあってもいいかも
+   document.querySelector('#EventArea').innerHTML = '<button id="CampRest" onclick="Camprest()"></button><br><button id="CampTrade" onclick="Camptrade()"></button>'
+   document.querySelector('#CampRest').textContent = '朝まで休む(' + Camprestper*100 + '%回復)';//30のときはスキルカード強化みたいなやつあってもいいかも
    switch(y){
-      case 1: document.getElementById('CampTrade').textContent = '武器商人に話しかける';     break;
-      case 2: document.getElementById('CampTrade').textContent = '防具取扱専門家に話しかける'; break;
-      case 3: document.getElementById('CampTrade').textContent = '道具屋24に話しかける';     break;
-      case 10:document.getElementById('CampTrade').textContent = '放浪武器商人に話しかける';   break;
+      case 1: document.querySelector('#CampTrade').textContent = '武器商人に話しかける';     break;
+      case 2: document.querySelector('#CampTrade').textContent = '防具取扱専門家に話しかける'; break;
+      case 3: document.querySelector('#CampTrade').textContent = '道具屋24に話しかける';     break;
+      case 10:document.querySelector('#CampTrade').textContent = '放浪武器商人に話しかける';   break;
    }
 }
 let appearweapons = '';
 let appeararmors = '';
 let appeartools = '';
 function GoToEquip(){
-   document.getElementById('EventArea').innerHTML = '<button class="button"onclick="GoToEquipWeapon()">Equip Weapon</button>  <button class="button"onclick="GoToEquipArmor()">Equip Armor</button>  <button class="button"onclick="GoToEquipTool()">Equip Tool</button><br><br><button class="button"onclick="Campback()">Leave</button>'
+   document.querySelector('#EventArea').innerHTML = '<button class="button"onclick="GoToEquipWeapon()">Equip Weapon</button>  <button class="button"onclick="GoToEquipArmor()">Equip Armor</button>  <button class="button"onclick="GoToEquipTool()">Equip Tool</button><br><br><button class="button"onclick="Campback()">Leave</button>'
 }
 function GoToEquipWeapon(){
    nowshop = 4;
-   document.getElementById('EventArea').innerHTML = '<span id="AppearShops"></span><br><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopEquipButton()">Equip</button><br><br><button class="button" onclick="GoToEquip()">Back</button>';
+   document.querySelector('#EventArea').innerHTML = '<span id="AppearShops"></span><br><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopEquipButton()">Equip</button><br><br><button class="button" onclick="GoToEquip()">Back</button>';
    appearweapons = '';
    x = 0;
    for(let i = 0; i < haveweapons.length; i++){
       let ChildNText = document.createElement('span');
       ChildNText.innerHTML = haveweapons[i]+ ` <button class="button" onclick="ShopEquipButton('weapon',${i})">Equip</button>` + '<br>';
-      document.getElementById('AppearShops').appendChild(ChildNText);
+      document.querySelector('#AppearShops').appendChild(ChildNText);
    }
 }
 function GoToEquipArmor(){
    nowshop = 5;
-   document.getElementById('EventArea').innerHTML = '<span id="AppearShops"></span><br><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopEquipButton()">Equip</button><br><br><button class="button" onclick="GoToEquip()">Back</button>';
+   document.querySelector('#EventArea').innerHTML = '<span id="AppearShops"></span><br><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopEquipButton()">Equip</button><br><br><button class="button" onclick="GoToEquip()">Back</button>';
    appeararmors = '';
    x = 0;
    for(let i = 0; i < havearmors.length; i++){
       let ChildNText = document.createElement('span');
       ChildNText.innerHTML = havearmors[i]+ ` <button class="button" onclick="ShopEquipButton('armor',${i})">Equip</button>` + '<br>';
-      document.getElementById('AppearShops').appendChild(ChildNText);
+      document.querySelector('#AppearShops').appendChild(ChildNText);
    }
 }
 function ShopEquipButton(){
-   const Num = +document.getElementById('ShopInputText').value;
+   const Num = +document.querySelector('#ShopInputText').value;
    switch(nowshop){
       case 4:
          if(haveweapons.includes(weapons.name[Num])){
@@ -6607,22 +6951,22 @@ function ShopEquipButton(){
          }else{log.textContent = 'you dont have it!'};
       break;
    }
-   document.getElementById('ShopInputText').value = '';
+   document.querySelector('#ShopInputText').value = '';
 }
 function GoToEquipTool(){
    nowshop = 6;
    
-   document.getElementById('EventArea').innerHTML = '<iframe src="resources/appeartools.html" width="100%" height="100%" frameborder="0"></iframe><br><div id="Camptoolequip"><button id="Campequipedtool1" class="button" onclick="Campequiptool(1)"> </button>　<button id="Campequipedtool2" class="button" onclick="Campequiptool(2)"> </button>　<button id="Campequipedtool3" class="button" onclick="Campequiptool(3)"> </button></div><br><br><button class="button" onclick="GoToEquip()">Back</button>'; //持ってないやつも登録できるようにしたら処理楽かな？
-   document.getElementById('Campequipedtool1').textContent = humans.players[1].tool1.name;
-   document.getElementById('Campequipedtool2').textContent = equiptool2.name;
-   document.getElementById('Campequipedtool3').textContent = equiptool3.name;
+   document.querySelector('#EventArea').innerHTML = '<iframe src="resources/appeartools.html" width="100%" height="100%" frameborder="0"></iframe><br><div id="Camptoolequip"><button id="Campequipedtool1" class="button" onclick="Campequiptool(1)"> </button>　<button id="Campequipedtool2" class="button" onclick="Campequiptool(2)"> </button>　<button id="Campequipedtool3" class="button" onclick="Campequiptool(3)"> </button></div><br><br><button class="button" onclick="GoToEquip()">Back</button>'; //持ってないやつも登録できるようにしたら処理楽かな？
+   document.querySelector('#Campequipedtool1').textContent = humans.players[1].tool1.name;
+   document.querySelector('#Campequipedtool2').textContent = equiptool2.name;
+   document.querySelector('#Campequipedtool3').textContent = equiptool3.name;
    log.textContent = 'どうしようかな...?';
    }
 function Campequiptool(code){
    x = code;
    log.textContent = '何を持とう？';
    x = [];
-   document.getElementById('Camptoolequip').innerHTML = `
+   document.querySelector('#Camptoolequip').innerHTML = `
    <i>Item一覧</i><br>
    <div id="toolsdesuwa"></div>
    `;
@@ -6631,17 +6975,17 @@ function Campequiptool(code){
       c.textContent = Tools[nanka].name+' x'+Tools[nanka].num;
       c.classList.add('button');
       c.addEventListener('click', () => {
-         document.getElementById('toolsdesuwa').remove();
+         document.querySelector('#toolsdesuwa').remove();
          humans.players[1].tool1[code] = Tools[nanka].id;
-         document.getElementById('Camptoolequip').innerHTML = '<button id="Campequipedtool1" class="button" onclick="Campequiptool(1)"> </button>　<button id="Campequipedtool2" class="button" onclick="Campequiptool(2)"> </button>　<button id="Campequipedtool3" class="button" onclick="Campequiptool(3)"> </button>';
-         document.getElementById('Campequipedtool1').textContent = humans.players[1].tool1.name;
-         document.getElementById('Campequipedtool2').textContent = humans.players[1].tool2.name;
-         document.getElementById('Campequipedtool3').textContent = humans.players[1].tool3.name;
+         document.querySelector('#Camptoolequip').innerHTML = '<button id="Campequipedtool1" class="button" onclick="Campequiptool(1)"> </button>　<button id="Campequipedtool2" class="button" onclick="Campequiptool(2)"> </button>　<button id="Campequipedtool3" class="button" onclick="Campequiptool(3)"> </button>';
+         document.querySelector('#Campequipedtool1').textContent = humans.players[1].tool1.name;
+         document.querySelector('#Campequipedtool2').textContent = humans.players[1].tool2.name;
+         document.querySelector('#Campequipedtool3').textContent = humans.players[1].tool3.name;
          log.textContent = Tools[nanka].name+'を持つことにした！';
       })
       x.push(c);
    })
-   document.getElementById('toolsdesuwa').innerHTML = x.join('');
+   document.querySelector('#toolsdesuwa').innerHTML = x.join('');
 }
 // #endregion
 //#region skillshop
@@ -6673,13 +7017,13 @@ function Campequiptool(code){
 
   function SkillShopOpen() {
    AllowMove = 0;
-   document.getElementById('NowMap').style.display = 'none';
-   document.getElementById('EventArea').style.display = 'block';
-   document.getElementById('EventArea').innerHTML = `
+   document.querySelector('#NowMap').style.display = 'none';
+   document.querySelector('#EventArea').style.display = 'block';
+   document.querySelector('#EventArea').innerHTML = `
    <div id="skillshopcorner"></div><br>
    <button class="button" onclick="SkillShopClose()">Exit</button>
    `
-   const cardsContainer = document.getElementById('skillshopcorner');
+   const cardsContainer = document.querySelector('#skillshopcorner');
    cardsContainer.style.display = 'block';
    cardsContainer.innerHTML = ''; // 前の内容をクリアする
    const selectedItems = arrayShuffle(Allskill).slice(0, 6);
@@ -6690,9 +7034,9 @@ function Campequiptool(code){
   }
 
   function SkillShopClose() {
-   document.getElementById('skillshopcorner').innerHTML = ''; // 前の内容をクリアする
-   log.textContent = '';
-   document.getElementById('NowMap').style.display = 'block';
+   document.querySelector('#skillshopcorner').innerHTML = ''; // 前の内容をクリアする
+   
+   document.querySelector('#NowMap').style.display = 'block';
    
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
@@ -6793,15 +7137,15 @@ async function HopeButtonact(){
    if(Math.floor(Math.random() * 2) == 0){
       log.textContent = 'な、中から四葉のクローバーが...!!';
       buffclear(cam,me);
-      buffadd('players',1,'luck',2,1);
+      await buffadd('players',1,'luck',2,1);
    } else {
       log.textContent = 'ボタンが溶けて手がやられた！';
-      buffadd(cam,me,'shelldown',3,1);
-      buffadd(cam,me,'powerdown',3,2);
+      await buffadd(cam,me,'shelldown',3,1);
+      await buffadd(cam,me,'powerdown',3,2);
    }
    await delay(1000);
-   log.textContent = '';
-   document.getElementById('NowMap').style.display = 'block';
+   
+   document.querySelector('#NowMap').style.display = 'block';
    
 
    MAPx = Math.floor(SELECTx / 75);
@@ -6838,10 +7182,10 @@ async function OpenChest(code){
       }
    break;
    }
-   document.getElementById('EventArea').innerHTML = '';
-   log.textContent = '';
-   document.getElementById('BattleArea').style.display = 'none';
-   document.getElementById('NowMap').style.display = 'block';
+   document.querySelector('#EventArea').innerHTML = '';
+   
+   document.querySelector('#BattleArea').style.display = 'none';
+   document.querySelector('#NowMap').style.display = 'block';
    
 
    MAPx = Math.floor(SELECTx / 75);
@@ -6881,10 +7225,10 @@ async function Cookietake(){
    }
    log.textContent = x;
    await delay(1000);
-   document.getElementById('EventArea').innerHTML = '';
-   log.textContent = '';
-   document.getElementById('BattleArea').style.display = 'none';
-   document.getElementById('NowMap').style.display = 'block';
+   document.querySelector('#EventArea').innerHTML = '';
+   
+   document.querySelector('#BattleArea').style.display = 'none';
+   document.querySelector('#NowMap').style.display = 'block';
    
 
    MAPx = Math.floor(SELECTx / 75);
@@ -6928,22 +7272,22 @@ async function CatusAct(){
       log.textContent = 'なんか..今触ったら死にそう....'
    }
    await delay(500);
-   log.textContent = '';
+   
 }
 //#endregion
 //#region scorpion 廃止予定
 async function ScorpionAct(code){
    log.textContent = '刺された...';
    switch(code){
-      case 1:buffadd('playerbuff','poison',3,1);break;
-      case 2:buffadd('playerbuff','poison',3,2);break;
+      case 1:await buffadd('playerbuff','poison',3,1);break;
+      case 2:await buffadd('playerbuff','poison',3,2);break;
    }
    playerattack += 10*code;
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
    objMap[MAPy][MAPx] = 0;
    await delay(500);
-   log.textContent = '';
+   
 }
 //#endregion
 
@@ -6955,7 +7299,7 @@ function ZomuEvent(){//創生黎明の原野
    playerns = 'hitelec';//4の倍数のターンの時、強制的にエレキギターで殴る。攻撃力の3倍のダメージを与える。
    playerps = 'solx5but'//slashoflightを使った際、当たれば5倍だが、外れれば自分にダメージを与える。
    buttonsolid = '#000000';buttonback = '#50C878';
-   document.getElementById('ButtonStyle').textContent = `.button{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};cursor: pointer;}input[type="text"]:focus{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};}`;
+   document.querySelector('#ButtonStyle').textContent = `.button{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};cursor: pointer;}input[type="text"]:focus{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};}`;
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
    objMap[MAPy][MAPx] = 0;
@@ -6969,7 +7313,7 @@ function UtusenEvent(){
    playerns = 'ehp50%but';//3の倍数のターンの時、相手か自分の体力を半分にする。運ゲー
    playerps = 'reverseta';//逆TA(相手より体力がめちゃ低いとダメージを喰らわない)
    buttonsolid = '#4c6cb3';buttonback = '#949495';
-   document.getElementById('ButtonStyle').textContent = `.button{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};cursor: pointer;}input[type="text"]:focus{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};}`;
+   document.querySelector('#ButtonStyle').textContent = `.button{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};cursor: pointer;}input[type="text"]:focus{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};}`;
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
    objMap[MAPy][MAPx] = 0;

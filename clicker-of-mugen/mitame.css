@@ -1,7 +1,7 @@
 @font-face{font-family:comicsans;src:url('assets/fonts/comicsans.ttf');}
 @font-face{font-family:Hangyaku;src:url('assets/fonts/Hangyaku.ttf');}
 * {
-  font-family:comicsans, Hangyaku;
+  font-family:comicsans;
   box-sizing: border-box;
   scrollbar-width: none;
 }
@@ -63,10 +63,10 @@ body {
   border-radius: 5px;
   font-size: 1.2em;
   position: fixed;
-  bottom: 20px;
+  bottom: 120px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 255;
+  z-index: 10000;
 
   white-space: nowrap; /* 幅を文字数に応じて調整 */
   overflow: hidden; /* アニメーション中の表示崩れを防ぐ */
@@ -127,73 +127,76 @@ body {
   padding: 0;
 }
 
-/*notice*/
-#Notice-page{
+/* notceのやつ */
+#notice{
   display: none;
   position: fixed;
-  top: 30px;
+  top: 40px;
   left: 50%;
   transform: translateX(-50%);
   width: 500px;
   height: 700px;
-  background-color: #dfdfdf;
-  border: 2px solid #FFE500;
-  z-index: 9999;/*たしか一番上にやるやつ*/
-  font-family: Hangyaku;
-  font-size:25px;
-}
-#notice-notice{
-  font-family: Hangyaku;
-  font-size:28px;
-}
-#notice-honmei{
-  font-family: Hangyaku;
-}
-#notice-end{
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  color: #000000;
-  padding: 3px 7px;
-  font-size:37px;
-  font-family: Hangyaku;
-}
-#notice-list{
+  background-color: #def0ff;
+  color:#2b2b2b;
+  border: 2px solid #cfe9ff;
+  z-index: 1020;
   overflow-y: scroll;
-  height: 600px;
-  border:1px solid #f0f8ff;
-  text-align: left;
-  font-family: Hangyaku;
 }
-.notice{
-  text-align: left;
-  font-family: Hangyaku;
+#notice .x{
+  position: absolute;
+  right: 8px;
+  top: 0;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 1019;
 }
-#notice-main{
+#notice .list{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding-top: 20px;
+}
+#notice .list .item{
+  margin-top: 5px;
+  border: 1px solid #b5dcff;
+  padding: 2px 6px;
+  cursor: pointer;
+}
+#notice .show{
   display: none;
-  font-family: Hangyaku;
-}
-#notice-back{
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  color: #000000;
-  padding: 3px 7px;
-  font-size:43px;
-  font-family: Hangyaku;
-}
-#notice-text{
-  text-align: left;
-  font-size:18px;
-  max-height:600px;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
   overflow-y: scroll;
+  word-wrap: break-word;
+}
+#notice .show .back{
+  text-align: left;
+  font-size: 20px;
+  padding: 6px 3px;
+  cursor: pointer;
+  border-bottom: 2px solid #cfe9ff;
+}
+#notice .show .title{
+  text-align: center;
+  font-size: 24px;
+  padding: 6px 3px;
+  border-bottom: 2px solid #cfe9ff;
+}
+#notice .show .body{
+  text-align: left;
+  font-size: 18px;
+  padding: 6px 3px;
 }
 
 /*ここからrankとeuroのあれ*/
-.upperUI {
-  display: block;
-  border-bottom: 3px solid #cfe9ff;
-  background-color: #def0ff;
+#upperUI {
+  display: flex;
+  border-bottom: 3px solid #aeaeae;
+  background-color: #cecece;
   position: fixed;
   top: 0;
   left: 0;
@@ -202,22 +205,16 @@ body {
   padding: 10px;
   z-index: 997;
   align-items: center;
-  justify-content: center;
+  /* justify-content: center; */
 }
-.rank {
-  font-size: 20px;
-  position: absolute;
-  left: 10px;
-  top: 10px;
+#upperUI .euro button{
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #2b2b2b;
 }
-.euro {
-  font-size: 20px;
-  position: absolute;
-  left: 10px;
-  top: 30px;
-}
-.rpt-bar-back {
-  display: none;
+#upperUI .rpt .bar{
   position: absolute;
   width: 50%;
   height: 30px;
@@ -228,7 +225,7 @@ body {
   background-color: #d5ffd6;
   text-align: center;
 }
-.rpt-bar {
+#upperUI .rpt .bar .inner{
   position: absolute;
   width:0%;
   height: 24px;
@@ -240,14 +237,14 @@ body {
   display: inline-block;
   vertical-align: middle;
 }
-.rpt-text {
+#upperUI .rpt .text{
   position:absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
   font-size: 20px;
-  color: #f0f8ff;
+  color: #2b2b2b;
   display: inline-block;
   vertical-align: middle;
   z-index: 1000;
@@ -282,7 +279,7 @@ body {
   justify-content: center;
   gap: 20%;
   padding: 5px 5%;
-  background-color: #def0ff;
+  background-color: #dedede;
   position: fixed;
   bottom: 0;
   width: 100%;
@@ -527,7 +524,7 @@ body {
 }
 
 /* ここからchat */
-.login-container, .chat-container {
+.login-container, #chat-container {
     width: 500px;
     max-width: 100%;
     margin: 50px auto;
@@ -647,28 +644,6 @@ body {
   overflow-y: scroll;
 }
 
-#enemies{
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  height: 100%;
-  border: 1px solid #ccc;
-  padding: 10px;
-  box-sizing: border-box;
-}
-.enemies{
-  display: none;
-  width: auto;
-  height: 100px;
-  padding: 5px;
-  border: 1px solid #222;
-  border-radius: 5px;
-  overflow: hidden;
-  margin: 5px 0;
-  text-align: left;
-}
 #players{
   display: flex;
   flex-wrap: wrap;
@@ -681,16 +656,199 @@ body {
   box-sizing: border-box;
 }
 .players{
-  display: none;
-  width: auto;
-  height: 100px;
+  display: block;
+  width: 140px;
+  height: 200px;
   padding: 5px;
+  flex-direction: column;
+  overflow-x: hidden;
+  text-align: left;
+  position: relative;
+}
+/* .players .effects{} */
+.players .main{
+  display: flex;
+  flex-direction: row;
+}
+.players .main .skill{
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #5085ff; /*これは属性ごとに変わるようにしたい*/
+  background-color: #a7c0ff;
+}
+.players .main .skill .back{
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.players .main .img{
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  object-position: top;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 60%, 0% 60%);
+  opacity: 0.7;
+}
+.players .border{
+  margin-top: -40px; /*初登場！負のマージン！！*/ 
   border: 1px solid #222;
   border-radius: 5px;
-  overflow: hidden;
-  margin: 5px 0;
+  padding: 3px;
+}
+.players .border .name{
+  max-width: 100px;
+  overflow-x: scroll;
+  white-space: nowrap;
+}
+.players .border .level{
+  max-width: 40px;
+  overflow-x: scroll;
+  white-space: nowrap;
+}
+.players .border .health .num{
+  font-size:10px;
+}
+.players .border .health .bar{
+  width: 90%;
+  height: 10px;
+  background-color: #2b2b2b;
+  border: 1px solid #dedede;
+}
+.players .border .health .bar .inner{
+  width: 100%;
+  height: 100%;
+  background-color: #a3ffa3;
+}
+.players .border .mp .num{
+  font-size:10px;
+}
+.players .border .mp .bar{
+  width: 90%;
+  height: 10px;
+  background-color: #2b2b2b;
+  border: 1px solid #dedede;
+}
+.players .border .mp .bar .inner{
+  width: 100%;
+  height: 100%;
+  background-color: #799fff;
+}
+
+
+#enemies{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #ccc;
+  padding: 10px;
+  box-sizing: border-box;
+}
+.enemies{
+  display: block;
+  width: 140px;
+  max-width: 140px;
+  height: 200px;
+  max-height: 200px;
+  padding: 5px;
+  flex-direction: column;
+  overflow-x: hidden;
   text-align: left;
 }
+.enemies .border{
+  border: 1px solid #222;
+  border-radius: 5px;
+}
+.enemies .border .health .num{
+  font-size:10px;
+}
+.enemies .border .health .bar{
+  width: 90%;
+  height: 10px;
+  background-color: #2b2b2b;
+  border: 1px solid #dedede;
+}
+.enemies .border .health .bar .inner{
+  width: 100%;
+  height: 100%;
+  background-color: #a3ffa3;
+}
+.enemies .border .mp .num{
+  font-size:10px;
+}
+.enemies .border .mp .bar{
+  width: 90%;
+  height: 10px;
+  background-color: #2b2b2b;
+  border: 1px solid #dedede;
+}
+.enemies .border .mp .bar .inner{
+  width: 100%;
+  height: 100%;
+  background-color: #799fff;
+}
+.enemies .img{
+  max-width: 100%;
+  max-height: 200px;
+}
+
+
+.buff{
+  width: 50px;
+  height: 75px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.buff .top{
+  width: 0;
+  height: 0;
+  border-left: 25px solid transparent;
+  border-right: 25px solid transparent;
+  border-bottom: 25px solid #ff5858;
+}
+.buff .bottom{
+  width: 50px;
+  height: 50px;
+  background: #dedede center/cover no-repeat;
+}
+
+
+.debuff{
+  width: 50px;
+  height: 75px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.debuff .top{
+  width: 50px;
+  height: 50px;
+  background: #dedede center/cover no-repeat;
+}
+.debuff .bottom{
+  width: 0;
+  height: 0;
+  border-left: 25px solid transparent;
+  border-right: 25px solid transparent;
+  border-top: 25px solid #5858ff;
+}
+
+.handle{
+  height: 20px;
+  width: 20px;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 50% 50%);
+  background-color: #ffef74;
+}
+
+
+
 
 .turrets{
   display: block;
