@@ -1,50 +1,64 @@
 @font-face{font-family:comicsans;src:url('assets/fonts/comicsans.ttf');}
 @font-face{font-family:Hangyaku;src:url('assets/fonts/Hangyaku.ttf');}
-* {
+*{
   font-family:comicsans;
   box-sizing: border-box;
   scrollbar-width: none;
+  overflow-y: scroll;
 }
 html{
+  width: 100%;
+  background-color: #eeeeee;
   overflow: hidden;
 }
-body {  
-  color:#000000;
-  background-color: #eeeeee;
-  overflow-y: scroll;
+body{
+  max-width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
 /*こっから雑に扱ってもいい子*/
 #movabledescription {
   display: none;
-  position: fixed;  /* 画面上の絶対位置に固定 */
-  pointer-events: none;  /* マウスイベントを通過させる */
-  background-color: #363636c6;
-  color: #000000;
+  position: fixed;
+  pointer-events: none;
+  background-color: #363636e2;
+  color: #f0f8ff;
   padding: 5px 10px;
   border-radius: 5px;
-  z-index: 10000;  /* 他の要素の上に表示 */
+  z-index: 10000;
 }
 
 /*logとtext*/
-#log-opener{
-  position: absolute;
-  bottom: 230px;
-  right: 0px;
-  width: 20px;
+#log{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 320px;
   height: 200px;
-  background-color: rgba(0,0,0,0.9);
+  border: 1px solid #ffffff;
+  background-color: rgba(0,0,0,0);
+  position: fixed;
+  bottom: 150px;
+  right: -300px;
   color: #fefefe;
-  cursor: pointer;
+  overflow-y: hidden;
   transition: right 0.3s;
   z-index: 254;
 }
-#log{
-  position: absolute;
-  bottom: 230px;
-  right: -300px;
+#log .opener{
+  width: 20px;
+  height: 100%;
+  background-color: rgba(0,0,0,0.9);
+  color: #fefefe;
+  text-align: center;
+  cursor: pointer;
+  z-index: 254;
+}
+#log .log{
   width: 300px;
-  height: 200px;
+  height: 100%;
   max-height: 200px;
   overflow-x: hidden;
   overflow-y: scroll;
@@ -68,10 +82,10 @@ body {
   transform: translateX(-50%);
   z-index: 10000;
 
-  white-space: nowrap; /* 幅を文字数に応じて調整 */
-  overflow: hidden; /* アニメーション中の表示崩れを防ぐ */
+  white-space: nowrap;
+  overflow: hidden;
   width: fit-content; /* 文字の長さに応じた幅 */
-  animation: fadeIn 0.5s ease forwards; /* 表示時のフェードイン効果 */
+  animation: fadeIn 0.5s ease forwards;
 }
 
 @keyframes fadeIn {
@@ -140,7 +154,6 @@ body {
   color:#2b2b2b;
   border: 2px solid #cfe9ff;
   z-index: 1020;
-  overflow-y: scroll;
 }
 #notice .x{
   position: absolute;
@@ -170,7 +183,6 @@ body {
   width: 100%;
   height: 100%;
   overflow-x: hidden;
-  overflow-y: scroll;
   word-wrap: break-word;
 }
 #notice .show .back{
@@ -267,7 +279,6 @@ body {
   width: 100%;
   height: 100%;
   max-height: 100%;
-  overflow-y: scroll;
   margin-bottom: 65px;
 }
 
@@ -292,12 +303,11 @@ body {
 }
 #HomeTab, #InventoryTab, #QuestTab, #ChatTab, #ProfileTab {
   display: none;
-  overflow-y: scroll;
 }
 #HomeTab{
   display: block;
 }
-#BattleArea, #HomeArea, #EventArea, #NowMap {
+#BattleArea, #HomeArea, #EventArea{
   display: none;
   margin: 0 auto;
 }
@@ -373,29 +383,80 @@ body {
   height: auto;
 }
 
-/*インベントリのやつ*/
-#InventoryArea {
+/* 出発前に */
+#HomeArea #selectChara{
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  width: 60%;
+  justify-content: center;
+  margin: 0 auto;
+}
+#HomeArea #selectChara .chara{
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+#HomeArea #selectChara .chara .img{
+  width: 100px;
+  height: 100px;
+}
+#HomeArea #selectChara .chara .name{
+  width: 60px;
+  height: 16px;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.5);
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  white-space: nowrap;
+}
+#HomeArea #selectChara .chara .name .txt{
+  display: inline-block;
+  font-size: 12px;
+}
+@keyframes scroll{
+  0%{transform: translateX(0);}
+  50%{transform: translateX(-3em);}
+  100%{transform: translateX(-3em);}
+}
+
+/* overField --開放空間-- */
+#overField{
   display: none;
-  position: fixed;
+  margin: 0 auto;
+}
+
+#overField #NowMap{
+  border: 2px solid #000000;
+  position: relative;
+  text-align: center;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#overField #Inventory{
+  display: none;
+  position: absolute;
   text-align: center;
   background-color: #ddd;
-  top: 35%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 550px;
+  width: 500px;
   height: 500px;
   padding: 3px;
   gap: 5px;
 }
-#Iblock1{
+#overField #Inventory .leftside{
   width: 270px;
   height: 495px;
   border: 2px solid #000000;
-  overflow-y: scroll;
   overflow-x: hidden;
 }
-#IStatus{
-  overflow-y: scroll;
+#overField #Inventory .status{
   max-height: 180px;
   width: 260px;
   text-align: left;
@@ -404,8 +465,7 @@ body {
   white-space: normal;
   margin-bottom: 4px;
 }
-#ISkills{
-  overflow-y: scroll;
+#overField #Inventory .skills{
   max-height: 80px;
   width: 260px;
   text-align: left;
@@ -414,8 +474,7 @@ body {
   white-space: normal;
   margin-bottom: 4px;
 }
-#IEquips{
-  overflow-y: scroll;
+#overField #Inventory .equips{
   max-height: 180px;
   width: 260px;
   text-align: left;
@@ -423,8 +482,7 @@ body {
   word-wrap: break-word;
   white-space: normal;
 }
-#IEquipChangeZone{
-  overflow-y: scroll;
+#overField #Inventory .equipChange{
   max-height: 180px;
   width: 260px;
   text-align: left;
@@ -432,15 +490,13 @@ body {
   word-wrap: break-word;
   white-space: normal;
 }
-#Iblock2{
+#overField #Inventory .rightside{
   width: 270px;
   height: 495px;
   border: 2px solid #000000;
-  overflow-y: scroll;
   overflow-x: hidden;
 }
-#ISlashs{
-  overflow-y: scroll;
+#overField #Inventory .slashs{
   max-height: 150px;
   width: 260px;
   text-align: left;
@@ -448,8 +504,7 @@ body {
   word-wrap: break-word;
   white-space: normal;
 }
-#IMagics{
-  overflow-y: scroll;
+#overField #Inventory .magics{
   max-height: 150px;
   width: 260px;
   text-align: left;
@@ -457,13 +512,12 @@ body {
   word-wrap: break-word;
   white-space: normal;
 }
-#ISutefuri {
+#overField #Inventory .sutefuri{
   text-align: left!important;
   border: 1px solid #23232369;
   padding: 3px;
   margin: 0;
   width: 260px;
-  overflow-y: scroll;
   max-height: 100px;
 }
 
@@ -502,8 +556,6 @@ body {
   border: 1px solid #bbb;
   border-radius: 5px;
   padding: 6px;
-  overflow-x: auto;
-  overflow-y: auto;
   margin: 0 auto;
 }
 .quest-main{
@@ -524,7 +576,7 @@ body {
 }
 
 /* ここからchat */
-.login-container, #chat-container {
+#ChatTab #chat {
     width: 500px;
     max-width: 100%;
     margin: 50px auto;
@@ -535,72 +587,87 @@ body {
     display: none;
     flex-direction: column;
 }
-.login-container {
-    display: flex;
+/*ログインのやつ*/
+#login{
+  display: block;
+  width: 75%;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+  background-color: #def0ff;
+  border: 1px solid #b5dcff;
+  border-radius: 5px;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.5s ease; 
+  z-index: 1234;
+  user-select: none;
+  pointer-events: none;
 }
-.login-form {
-    padding: 20px;
+#login input {
+  width: calc(100% - 20px);
+  margin-bottom: 10px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #b5dcff;
 }
-.login-form input {
-    width: calc(100% - 20px);
-    margin-bottom: 10px;
-    padding: 10px;
-    font-size: 16px;
+#login button {
+  width: 100%;
+  padding: 10px;
+  background-color: #cfe9ff;
+  border: 2px solid #b5dcff;
+  color: #000000;
+  font-size: 16px;
+  cursor: pointer;
 }
-.login-form button {
-    width: 100%;
-    padding: 10px;
-    background-color: #c8c8c8;
-    color: #fff;
-    font-size: 16px;
-    cursor: pointer;
+#login button:hover {
+  background-color: #cfe9ff;
 }
-.login-form button:hover {
-    background-color: #8b8b8b;
+#logout{
+  cursor: pointer;
 }
 .messages{
-    flex: 1;
-    padding: 10px;
-    overflow-y: scroll;
-    border-bottom: 1px solid #ddd;
-    
+  flex: 1;
+  padding: 10px;
+  overflow-y: scroll;
+  border-bottom: 1px solid #ddd;
 }
 .message {
-    width: 100%;
-    margin-bottom: 10px;
-    text-align: left!important;
-    padding: 8px 12px;
-    background-color: #cecece;
-    border-radius: 5px;
-    max-width: 80%;
+  width: 100%;
+  margin-bottom: 10px;
+  text-align: left!important;
+  padding: 8px 12px;
+  background-color: #cecece;
+  border-radius: 5px;
+  max-width: 80%;
 }
 .message.username {
-    align-self: flex-end;
-    font-family: Hangyaku!important;
+  align-self: flex-end;
+  font-family: Hangyaku!important;
 }
 #message-input {
-    border: none;
-    padding: 15px;
-    flex: 1;
-    font-size: 16px;
+  border: none;
+  padding: 15px;
+  flex: 1;
+  font-size: 16px;
 }
 #send-button {
-    border: none;
-    padding: 15px;
-    background-color: #c8c8c8;
-    color: #fff;
-    font-size: 16px;
-    cursor: pointer;
+  border: none;
+  padding: 15px;
+  background-color: #c8c8c8;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
 }
 #send-button:hover {
-    background-color: #8b8b8b;
+  background-color: #8b8b8b;
 }
 #room-select {
-    display: none;
-    width: 100%;
-    height: 30px;
-    border: 1px solid #ccc;
-
+  width: 100%;
+  height: 30px;
+  border: 1px solid #ccc;
 }
 
 /* スキルショップ */
@@ -633,7 +700,6 @@ body {
 /* ここからbattle */
 .EnemyName{
   max-width: 80px;
-  overflow-x: auto;
   overflow-y: hidden;
 }
 #toolsdesuwa{
@@ -641,7 +707,6 @@ body {
   max-width: 100px;
   word-wrap: break-word;
   white-space: normal;
-  overflow-y: scroll;
 }
 
 #players{
@@ -658,7 +723,7 @@ body {
 .players{
   display: block;
   width: 140px;
-  height: 200px;
+  height: 187px;
   padding: 5px;
   flex-direction: column;
   overflow-x: hidden;
@@ -667,6 +732,7 @@ body {
 }
 /* .players .effects{} */
 .players .main{
+  margin-top: 5px;
   display: flex;
   flex-direction: row;
 }
@@ -763,6 +829,22 @@ body {
   border: 1px solid #222;
   border-radius: 5px;
 }
+.enemies .border .name{
+  max-width: 100px;
+  height: 20px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.enemies .border .name .txt{
+  display: inline-block;
+  font-size: 16px;
+  animation: scroll 10s linear infinite;
+}
+.enemies .border .level{
+  max-width: 40px;
+  overflow-x: scroll;
+  white-space: nowrap;
+}
 .enemies .border .health .num{
   font-size:10px;
 }
@@ -796,30 +878,37 @@ body {
   max-height: 200px;
 }
 
-
-.buff{
-  width: 50px;
-  height: 75px;
+.effects{
+  display: flex;
+  width: 100%;
+  height: 35px;
+  padding-bottom: 5px;
+  overflow: hidden;
+}
+.buffs{
+  width: 20px;
+  height: 30px;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-.buff .top{
+.buffs .top{
   width: 0;
   height: 0;
-  border-left: 25px solid transparent;
-  border-right: 25px solid transparent;
-  border-bottom: 25px solid #ff5858;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid #ff5858;
 }
-.buff .bottom{
-  width: 50px;
-  height: 50px;
-  background: #dedede center/cover no-repeat;
+.buffs .bottom{
+  width: 20px;
+  height: 20px;
+  background: #ff5858 center/cover no-repeat;
+  background-color: #ff5858 !important;
 }
 
 
-.debuff{
+.debuffs{
   width: 50px;
   height: 75px;
   position: relative;
@@ -827,12 +916,13 @@ body {
   flex-direction: column;
   align-items: center;
 }
-.debuff .top{
+.debuffs .top{
   width: 50px;
   height: 50px;
-  background: #dedede center/cover no-repeat;
+  background: #5858ff center/cover no-repeat;
+  background-color: #5858ff !important;
 }
-.debuff .bottom{
+.debuffs .bottom{
   width: 0;
   height: 0;
   border-left: 25px solid transparent;
@@ -840,11 +930,34 @@ body {
   border-top: 25px solid #5858ff;
 }
 
-.handle{
-  height: 20px;
-  width: 20px;
-  clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 50% 50%);
-  background-color: #ffef74;
+.handles{
+  width: 50px;
+  height: 75px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.handles .top{
+  position: absolute;
+  width: 50px;
+  height: 25px;
+  background: #ffef74;
+  transform: rotate(45deg);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+.handles .top::before {
+  content: "";
+  position: absolute;
+  width: 50px;
+  height: 25px;
+  background: #ffef74;
+  transform: rotate(90deg);
+}
+.handles .bottom{
+  width: 50px;
+  height: 50px;
+  background: #ffef74 center/cover no-repeat;
 }
 
 

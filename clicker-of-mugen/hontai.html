@@ -8,14 +8,18 @@
    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
-   <link rel="stylesheet" href="mitame.css">
    <style id="ButtonStyle"></style>
+   <link rel="stylesheet" href="mitame.css">
 </head>
 <body id="body">
    
 <div id="movabledescription"></div>
 <div id="text"></div>
-<div id="log-opener"><</div><div id="log"></div>
+<div id="log" style="right: -300px;">
+   <div class="opener"><</div>
+   <div class="log"></div>
+</div>
+<div id="qte"><div id="qte1"></div><div id="qte2"></div><div id="qte3"></div><div id="qte4"></div></div>
 
 <div id="notice">
    <div class="x">x</div>
@@ -62,6 +66,12 @@
    </div>
 </nav>
 
+<div id="login">
+   <input type="text" id="username" placeholder="username">
+   <input type="password" id="password" placeholder="password">
+   <button id="login-login">Login</button>
+</div>
+
 <div id="Tabs">
    <button id="HomeTabButton" onclick="OpenTab('H')"><img class="TabImg" src="assets/icons/home.png"></button>
    <button id="InventoryTabButton" onclick="OpenTab('I')"><img class="TabImg" src="assets/icons/inventory.png"></button>
@@ -73,18 +83,58 @@
 
 <div id="GameZone">
    <div id="HomeTab">
-      <canvas id="NowMap" width="600" height="600" style="border:1px solid #000000"></canvas>
+      <div id="overField">
+         <canvas id="NowMap" width="600" height="600"></canvas>
+         <div id="Inventory">
+            <div class="leftside">
+               <div class="status"></div>
+               <div class="skills">
+               EX:<span class="ex hasd" data-description="${Skills.ex[humans.players[InventoryPage].ex].description}">${Skills.ex[humans.players[InventoryPage].ex].name}</span><br>
+               NS:<span class="ex hasd" data-description="${Skills.ns[humans.players[InventoryPage].ns].description}">${Skills.ns[humans.players[InventoryPage].ns].name}</span><br>
+               PS:<span class="ex hasd" data-description="${Skills.ps[humans.players[InventoryPage].ps].description}">${Skills.ps[humans.players[InventoryPage].ps].name}</span>
+               </div>
+               <div class="equips">
+               weapon:<span class="weapon hasd" data-description="${Weapons[humans.players[InventoryPage].weapon.id].description}">${Weapons[humans.players[InventoryPage].weapon.id].name}</span> <button class="button" onclick="WeaponChange()">change</button><br>
+               armor:<span class="armor hasd" data-description="${Armors[humans.players[InventoryPage].armor.id].description}">${Armors[humans.players[InventoryPage].armor.id].name}</span> <button class="button" onclick="ArmorChange()">change</button><br>
+               tools;<br>
+                1:<span class="tool1 hasd" data-description="${Tools[humans.players[InventoryPage].tool1].description}<br>${Tools[humans.players[InventoryPage].tool1].num}個所持しています">${Tools[humans.players[InventoryPage].tool1].name}</span> <button class="button" onclick="ToolChange(1)">change</button><br>
+                2:<span class="tool2 hasd" data-description="${Tools[humans.players[InventoryPage].tool2].description}<br>${Tools[humans.players[InventoryPage].tool2].num}個所持しています">${Tools[humans.players[InventoryPage].tool2].name}</span> <button class="button" onclick="ToolChange(2)">change</button><br>
+                3:<span class="tool3 hasd" data-description="${Tools[humans.players[InventoryPage].tool3].description}<br>${Tools[humans.players[InventoryPage].tool3].num}個所持しています">${Tools[humans.players[InventoryPage].tool3].name}</span> <button class="button" onclick="ToolChange(3)">change</button><br>
+               </div>
+               <div class="equipsChange"></div>
+            </div>
+            <div class="rightside">
+               <div clsas="slashs">slashs<br>
+                  <span class="slash1 hasd" data-description="${Slashs[humans.players[InventoryPage].slash1].description}">1:${humans.players[InventoryPage].slash1} <button class="button" onclick="SlashChange(1)">change</button></span><br>
+                  <span class="slash2 hasd" data-description="${Slashs[humans.players[InventoryPage].slash2].description}">2:${humans.players[InventoryPage].slash2} <button class="button" onclick="SlashChange(2)">change</button></span><br>
+                  <span class="slash3 hasd" data-description="${Slashs[humans.players[InventoryPage].slash3].description}">3:${humans.players[InventoryPage].slash3} <button class="button" onclick="SlashChange(3)">change</button></span>
+               </div>
+               <div class="slashChange"></div>
+               <div clsas="magics">magics<br>
+                  <span class="magic1 hasd" data-description="${Magics[humans.players[InventoryPage].magic1].description}">1:${humans.players[InventoryPage].magic1} <button class="button" onclick="MagicChange(1)">change</button></span>
+                  <span class="magic2 hasd" data-description="${Magics[humans.players[InventoryPage].magic2].description}">2:${humans.players[InventoryPage].magic2} <button class="button" onclick="MagicChange(2)">change</button></span>
+                  <span class="magic3 hasd" data-description="${Magics[humans.players[InventoryPage].magic3].description}">3:${humans.players[InventoryPage].magic3} <button class="button" onclick="MagicChange(3)">change</button></span>
+               </div>
+               <div class="magicChange"></div>
+               <span class="sp">${humans.players[InventoryPage].sp}pt</span>
+               <div class="sutefuri">${Sutefuri}</div>
+            </div>
+         </div>
+      </div>
       <div id="HomeArea"></div>
       <div id="BattleArea">
-         <span>turn:</span><span id="TurnCount">0</span><br>
+         <div id="turn">turn:0</div>
          <div id="enemies"></div>
          <div id="players"></div>
-         
-         <div id="sbuttons"><button class="button" id="select1" onclick="select1()">attack</button>   <button class="button" id="select2" onclick="select2()">magic</button>   <button class="button" id="select3" onclick="select3()">tools</button>   <button class="button" id="back" onclick="back()">runaway</button></div><br>
+         <div id="sbuttons">
+            <button class="button" id="select1" onclick="select1()">attack</button>   
+            <button class="button" id="select2" onclick="select2()">magic</button>   
+            <button class="button" id="select3" onclick="select3()">tools</button>   
+            <button class="button" id="back" onclick="back()">runaway</button>
+         </div>
       </div>
-      <div id="InventoryArea"></div>
       <div id="EventArea"></div>
-      <br><span align="center" id="log"></span>
+      <br>
    </div>
    
    <div id="InventoryTab"></div>
@@ -94,7 +144,7 @@
    </div>
    
    <div id="ChatTab">
-      <div id="chat-container">
+      <div id="chat">
          <select id="room-select" name="room-select" onchange="selectRoom()">
             <option value="1">01</option>
             <option value="2">02</option>

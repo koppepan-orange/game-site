@@ -40,5 +40,11 @@
             "name": "確率ゲート",
             "file": "/Users/koppepanorange/orange_bread/game-site/probability/index.html"
         },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "three-test",
+            "file": "/Users/koppepanorange/orange_bread/game-site/three.html",
+        },
     ]
 }
