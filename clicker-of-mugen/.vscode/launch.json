@@ -20,7 +20,8 @@
         "description": "Select the HTML file to launch",
         "options": [
           "hontai.html",
-          "test-action.html"
+          "test.html",
+          "tesla.html"
         ]
       }
     ]

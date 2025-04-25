@@ -16,30 +16,36 @@
 <div id="movabledescription"></div>
 <div id="text"></div>
 <div id="log" style="right: -300px;">
-   <div class="opener"><</div>
+   <div class="opener">‹</div>
    <div class="log"></div>
 </div>
-<div id="qte"><div id="qte1"></div><div id="qte2"></div><div id="qte3"></div><div id="qte4"></div></div>
+<div id="qte">
+   <div id="qte1"></div>
+   <div id="qte2"></div>
+   <div id="qte3"></div>
+   <div id="qte4"></div>
+</div>
 
 <div id="notice">
-   <div class="x">x</div>
+   <div class="back"><img src="assets/icons/back.png"></div>
+   <div class="x"><img src="assets/icons/x.png"></div>
    <div class="list"></div>
    <div class="show">
-       <div class="back">←</div>
-       <div class="title"></div>
-       <div class="body"></div>
+      <div class="title"></div>
+      <div class="date"></div>
+      <div class="body"></div>
    </div>
 </div>
 
 <div id="upperUI">
    <div class="user">
-       <div class="username">no name</div>
-       <div class="rank">Rank:#ERROR!</div>
-       <div class="euro">0€ <button id="GetEuro" onclick="if(afknow == 0){LetsCharge();}">+</button></div>
+      <div class="username">no name</div>
+      <div class="rank">Rank:#ERROR!</div>
+      <div class="stone">0𐩰<button class="get" onclick="if(afknow == 0){LetsCharge();}">+</button></div>
    </div>
    <div class="rpt">
-       <div class="bar"><div class="inner"></div></div>
-       <div class="text">0/NaN</div>
+      <div class="bar"><div class="inner"></div></div>
+      <div class="text">0/NaN</div>
    </div>
    <div id="menuToggle">☰</div>
 </div>
@@ -47,13 +53,13 @@
 <nav id="sideMenu">
    <hr noshade="true">
    <ul>
-         <li><button onclick="OpenNotice()">お知らせ</button></li>
-         <li><button>チュートリアル</button></li><!-- onclick="Tutorial()" -->
-         <li><button>設定</button></li><!-- onclick="Setting()" -->
+      <li class="notice">お知らせ</li>
+      <li class="tutorial">チュートリアル</li>
+      <li class="setting">設定</li>
    </ul>
    <hr noshade="true">
    <button id="logout-button" onclick="logout()">Logout</button><br>
-   <span class="hasd" id="null" data-description="こんなもん見つけて楽しいか？">/n</span><br>
+   <span class="hasd" id="null" data-description="こんなもん見つけて楽しいか？<br>おれは楽しいと思う。">/n</span><br>
    <button class="button" onclick="humans.players[1].health = humans.players[1].maxhealth; tekiou();">回復(全)</button>
 
    <div class="buff">
@@ -67,23 +73,135 @@
 </nav>
 
 <div id="login">
-   <input type="text" id="username" placeholder="username">
-   <input type="password" id="password" placeholder="password">
-   <button id="login-login">Login</button>
+   <input type="text" class="username" placeholder="username">
+   <input type="password" class="password" placeholder="password">
+   <button class="button">Login</button>
 </div>
 
-<div id="Tabs">
-   <button id="HomeTabButton" onclick="OpenTab('H')"><img class="TabImg" src="assets/icons/home.png"></button>
-   <button id="InventoryTabButton" onclick="OpenTab('I')"><img class="TabImg" src="assets/icons/inventory.png"></button>
-   <button id="QuestTabButton" onclick="OpenTab('Q')"><img class="TabImg" src="assets/icons/quest.png"></button>
-   <button id="ChatTabButton" onclick="OpenTab('C')"><img class="TabImg" src="assets/icons/chat.png"></button>
-   <button id="ProfileTabButton" onclick="OpenTab('P')"><img class="TabImg" src="assets/icons/profile.png"></button>
+<div id="tabs">
+   <button class="goto -home" data-group=""><img class="tabImg" src="assets/icons/home.png"></button>
+   <button class="goto -inventory"><img class="tabImg" src="assets/icons/inventory.png"></button>
+   <button class="goto -quest"><img class="tabImg" src="assets/icons/quest.png"></button>
+   <button class="goto -chat"><img class="tabImg" src="assets/icons/chat.png"></button>
+   <button class="goto -profile"><img class="tabImg" src="assets/icons/profile.png"></button>
 </div>
 
 
 <div id="GameZone">
-   <div id="HomeTab">
-      <div id="overField">
+   <div id="home-tab">
+      <div id="homeArea">
+         <div class="home">
+            <!--<span id="BigText">シャングリ・ラ中心街</span><br>-->
+            <img src="assets/downtown.png" style="width: 600px; height: 300px;"><br>
+            インタラクト<br>
+            <div class="groupA row">
+               <div class="column">
+                  <button class="buttonA goto -home -home -premium">Premium Shop</button>
+                  <button class="buttonA goto -home -home -bar">酒場</button>
+                  <button class="buttonA goto -home -home -training">訓練場</button>
+                  <imput type="range" min="1" max="8"></imput>
+               </div>
+               <div class="column">
+                  <button class="buttonA goto -home -home -bank">銀行</button> (ここもうちょい追加したいね)
+               </div>
+            </div>
+            <div class="groupB">
+               <button class="buttonB goto -home -home -station">駅に行く</button>
+               <button class="buttonB goto -home -home -timy">タイミーをする</button>
+               <button class="buttonB goto -home -home -market">商店街を見に行く</button>
+            </div>
+         </div>
+         <div class="bar">
+            <div class="main">
+               <button class="goto -home -home -home">←</button> Dril's bar<br>
+               <button class="buttonA goto -home -home -bar -recruit">募集</button>
+               <button class="buttonA goto -home -home -bar -meet">探す</button>
+            </div>
+            <div class="recruit">
+               <div class="hontai">
+                  <button class="goto -home -home -bar">←</button>募集<br>
+                  ダンジョンで一緒に戦ってくれる仲間を募集することができます！<br>
+                  <div class="row">
+                     <button class="buttonA" onclick="friendRecluit(1)">1回募集/80€</button>
+                     <button class="buttonA" onclick="friendRecluit(10)">10回募集/800€</button>
+                  </div>
+               </div>
+               <div class="recruiting">
+                  <div class="start"> <!--開始時のタップのやつ。最初に登場-->
+                     recluit agent is cool company<br>
+                     <img class='push' src="assets/system/recluit-${color}.png">
+                  </div>
+                  <div class="detail"> <!--それぞれの詳細のやつ。次に登場し、タップで次の結果を見る-->
+                     <ruby class="name"><span class="txt"></span><rt class="ruby"></rt></ruby>
+                     <div class="rare"><img class="img" src="assets/system/star1.png"></div>
+                  </div>
+                  <div class="results"> <!--募集結果を載せるやつ。詳細全部やり終わったら登場-->
+
+                  </div>
+               </div>
+            </div>
+            <div class="meet">
+               <div class="list"></div>
+               <div class="detail"></div>
+            </div>
+         </div>
+         <div class="bank">
+            <button class="goto -home -home -home">←</button> 超安心安全銀行<br>
+            <span id="bank-deposit" class="bank-title">deposite</span><input type="number" id="bank-deposit-num" /><button id="bank-deposit-num-go" onclick="BankDeposite('Num')" class="bank-button">go</button><button id="bank-deposit-all" class="bank-button" onclick="BankDeposite('All')">All</button><br>
+            <span id="bank-withdraw" class="bank-title">withdraw</span><input type="number" id="bank-withdraw-num" /><button id="bank-withdraw-num-go" onclick="BankWithdraw('Num')" class="bank-button">go</button><button id="bank-withdraw-all" class="bank-button" onclick="BankWithdraw('All')">All</button><br>
+            <span id="Bankstone">bank account:0€</span>
+         </div>
+         <div class="station">
+            <div class="main">
+               <!--<span id="BigText">シャングリ・ラ中心街</span><br>-->
+               <img src="assets/station.png" style="width: 600px; height: 300px;"><br>
+               <button class="goto -home -home -home">←</button> 駅<br>
+               <button class="buttonA" onclick="HomeLetsDungeon(1)">ダンジョン</button><br>
+               <button class="buttonA">ストーリー</button>
+            </div>
+            <div class="select">
+               <div class="1"></div>
+               <div class="2"></div>
+               <div class="3"></div>
+            </div>
+
+         </div>
+         <div class="timy">
+            <div class="select">
+               <!--<span id="BigText">タイミー</span><br>-->
+               <button class="goto -home -home -home">←</button> お仕事一覧<br>
+               <select id="Num-Select"><option value="1">01</option><option value="2">02</option><option value="3">03</option><option value="4">04</option><option value="5">05</option><option value="6">06</option><option value="7">07</option><option value="8">08</option></select><br>
+               <button class="buttonA" onclick="HomeJobStart('stoneShort')">[急募][短期][面接無し]品出し(エイトイレブン)</button><br>
+               <button class="buttonA" onclick="HomeJobStart('stoneMiddle')">[高収入]仕分け、シール貼り(株式会社アイミックス)</button><br>
+               <button class="buttonA" onclick="HomeJobStart('stoneLong')">[超高収入]荷物を受け取り、運ぶだけ！</button><br>
+            </div>
+            <div class="tasking">
+               ーAFKタスク進行中ー<br>
+               <span id="Task-log">
+                  <div class="task-bar-container">
+                     <div class="task-bar" id="task-bar"></div>
+                     <div class="task-text">  <span id="task-text">wait...</span></div>
+                  </div>
+               </span>
+            </div>
+         </div>
+         <div class="charge">
+            <!--<span id="BigText">チャージステーション</span><br>-->
+            <button class="goto -home -home -home">←</button> チャージステーション<br>
+            <div class="row">
+               <button class="buttonC" onclick="Charge(90,120)">90$/120𐩰</button>
+               <button class="buttonC" onclick="Charge(300,360)">300$/360𐩰</button>
+               <button class="buttonC" onclick="Charge(860,860)">860$/860𐩰</button>
+            </div>
+            <div class="row">
+               <button class="buttonC" onclick="Charge(1280,1080)">1280$/1080𐩰</button>
+               <button class="buttonC" onclick="Charge(1840,1460)">1840$/1460𐩰</button>
+               <button class="buttonC" onclick="Charge(2640,2160)">2640$/2160𐩰</button>
+            </div>
+         </div>
+      </div>
+
+      <div id="overfieldArea">
          <canvas id="NowMap" width="600" height="600"></canvas>
          <div id="Inventory">
             <div class="leftside">
@@ -121,29 +239,30 @@
             </div>
          </div>
       </div>
-      <div id="HomeArea"></div>
-      <div id="BattleArea">
+      <div id="battleArea">
          <div id="turn">turn:0</div>
          <div id="enemies"></div>
          <div id="players"></div>
-         <div id="sbuttons">
-            <button class="button" id="select1" onclick="select1()">attack</button>   
-            <button class="button" id="select2" onclick="select2()">magic</button>   
-            <button class="button" id="select3" onclick="select3()">tools</button>   
-            <button class="button" id="back" onclick="back()">runaway</button>
+         <div class="UIs">
+            <div class="commands">
+               <button class="button select1" onclick="select1()">act</button>   
+               <button class="button select2" onclick="select2()">magic</button>   
+               <button class="button select3" onclick="select3()">tool</button>   
+               <button class="button select4" onclick="back()">run</button>
+            </div>
          </div>
       </div>
-      <div id="EventArea"></div>
+      <div id="eventArea"></div>
       <br>
    </div>
    
-   <div id="InventoryTab"></div>
+   <div id="inventory-tab"></div>
 
-   <div id="QuestTab">
+   <div id="quest-tab">
       <div id="quest-list"></div>
    </div>
    
-   <div id="ChatTab">
+   <div id="chat-tab">
       <div id="chat">
          <select id="room-select" name="room-select" onchange="selectRoom()">
             <option value="1">01</option>
@@ -158,7 +277,7 @@
       </div>
    </div>
 
-   <div id="ProfileTab"></div><!--ここは..ゲーム自体をちゃんとオンライン化したら解放で-->
+   <div id="profile-tab"></div><!--ここは..ゲーム自体をちゃんとオンライン化したら解放で-->
 </div>
 
 <script src="nakami.js" defer></script>

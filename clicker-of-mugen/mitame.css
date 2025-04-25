@@ -18,6 +18,41 @@ body{
   padding: 0;
 }
 
+.row{
+  display: flex;
+  flex-direction: row;
+}
+.column{
+  display: flex;
+  flex-direction: column;
+}
+
+input[type="range"] {
+  width: 300px;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  background: #202020;
+  border: solid 1px #9d9d9d;
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 35px;
+  background: #9d9d9d;
+  border: solid 1px #202020;
+  cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 15px;
+  height: 35px;
+  background: #9d9d9d;
+  border: solid 1px #202020;
+  cursor: pointer;
+}
+
 /*こっから雑に扱ってもいい子*/
 #movabledescription {
   display: none;
@@ -145,36 +180,48 @@ body{
 #notice{
   display: none;
   position: fixed;
-  top: 40px;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 500px;
-  height: 700px;
-  background-color: #def0ff;
-  color:#2b2b2b;
-  border: 2px solid #cfe9ff;
-  z-index: 1020;
+  width: 400px;
+  height: 70vh;
+  padding: 20px 5px 5px 5px;
+  border: 2px solid #848484;
+  border-radius: 4px;
+  background-color: rgba(67, 67, 67, 0.8);
+  z-index: 240;/*たしか一番上にやるやつ*/
 }
 #notice .x{
   position: absolute;
-  right: 8px;
-  top: 0;
-  font-size: 20px;
+  top: 1px;
+  right: 1px;
   cursor: pointer;
-  z-index: 1019;
+  text-align: center;
+  padding: 0px 6px;
+  border: 1px solid #aeaeae;
+}
+#notice .back{
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  cursor: pointer;
+  text-align: center;
+  padding: 0.5px 5px;
+  border: 1px solid #aeaeae;
 }
 #notice .list{
-  display: flex;
+  display: block;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 100%;
-  padding-top: 20px;
+  margin: 17px 0px 0px 30px;
 }
 #notice .list .item{
-  margin-top: 5px;
-  border: 1px solid #b5dcff;
+  width: calc(100% - 74px);
+  margin-bottom: 5px;
+  border: 1px solid #8f8f8f;
   padding: 2px 6px;
   cursor: pointer;
 }
@@ -182,26 +229,33 @@ body{
   display: none;
   width: 100%;
   height: 100%;
-  overflow-x: hidden;
-  word-wrap: break-word;
-}
-#notice .show .back{
   text-align: left;
-  font-size: 20px;
-  padding: 6px 3px;
-  cursor: pointer;
-  border-bottom: 2px solid #cfe9ff;
 }
 #notice .show .title{
+  font-size: 37px;
   text-align: center;
-  font-size: 24px;
-  padding: 6px 3px;
-  border-bottom: 2px solid #cfe9ff;
+  overflow-x: scroll;
+  white-space: nowrap;
+  scrollbar-width: none;
+  max-width: calc(100% - 74px);
+  padding-bottom: 3px;
+  border-bottom: 1px dashed #e1e1e1;
+  margin: 0px auto 3px auto;
+}
+#notice .show .date{
+  font-size: 17px;
+  text-align: right;
+  position: absolute;
+  right: 7px;
+  top: 51px;
 }
 #notice .show .body{
+  font-size: 24px;
   text-align: left;
-  font-size: 18px;
-  padding: 6px 3px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  word-wrap: break-word;
+  max-height: 100%;
 }
 
 /*ここからrankとeuroのあれ*/
@@ -272,6 +326,48 @@ body{
   z-index: 998;
 }
 
+/*ログインのやつ*/
+#login{
+  display: block;
+  width: 75%;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+  background-color: #def0ff;
+  border: 1px solid #b5dcff;
+  border-radius: 5px;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.5s ease; 
+  z-index: 1234;
+  user-select: none;
+  pointer-events: none;
+}
+#login input {
+  width: calc(100% - 20px);
+  margin-bottom: 10px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #b5dcff;
+}
+#login .button {
+  width: 100%;
+  padding: 10px;
+  background-color: #cfe9ff;
+  border: 2px solid #b5dcff;
+  color: #000000;
+  font-size: 16px;
+  cursor: pointer;
+}
+#login .button:hover {
+  background-color: #cfe9ff;
+}
+#logout{
+  cursor: pointer;
+}
+
 /* ゲーム全体のやつ */
 #GameZone {
   margin-top: 75px;
@@ -283,7 +379,7 @@ body{
 }
 
 /* こっからhomeとかtabとか */
-#Tabs {
+#tabs {
   display: flex;
   height: 65px;
   font-size: 45px;
@@ -297,25 +393,52 @@ body{
   box-sizing: border-box;
   z-index: 998;
 }
-.TabImg{
+.tabImg{
   width:40px;
   height:40px;
 }
-#HomeTab, #InventoryTab, #QuestTab, #ChatTab, #ProfileTab {
+#HomeTab, #inventory-tab, #quest-tab, #chat-tab, #profile-tab {
   display: none;
 }
 #HomeTab{
   display: block;
 }
-#BattleArea, #HomeArea, #EventArea{
+#battleArea, #homeArea, #eventArea{
   display: none;
   margin: 0 auto;
 }
-#HomeArea{
+
+#homeArea{
   text-align: left;
   margin: 0 auto;
 }
-.HomeButton {
+
+#inventory-tab, #quest-tab, #chat-tab, #profile-tab{
+  display: none;
+}
+#homeArea, #overfieldArea, #battleArea, #eventArea{
+  display: none;
+}
+
+/* home */
+#homeArea .home .groupA{
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 5px 0;
+}
+#homeArea .home .groupB{
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 5px 0;
+}
+#homeArea .home .groupA .row{
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
+.buttonA { /* 低くて短い */
   display: block;
   background-color: #000000;
   border: 3px solid #fffc52;
@@ -326,7 +449,7 @@ body{
   height: 50px;
   text-align: left!important;
 }
-.HomeBigButton {
+.buttonB { /* 短くて長い */
   display: block;
   background-color: #000000;
   border: 3px solid #fffc52;
@@ -337,22 +460,7 @@ body{
   height: 80px;
   text-align: left!important;
 }
-.HomeSButton {
-  background-color: #000000;
-  border: 3px solid #fffc52;
-  color: #f0f9ff;
-  padding: 5px;
-  margin: 0;
-  width: 350px;
-  height: 80px;
-  text-align: left!important;
-}
-.row{
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-}
-.HomeBButton{
+.HomeBButton{ /* 正方形で大きめ */
   display: block;
   background-color: #000000;
   border: 3px solid #fffc52;
@@ -363,8 +471,15 @@ body{
   height: 250px;
   text-align: left!important;
 }
+  
 
-/*こっから酒場*/
+/* 酒場(bar) */
+#homeArea .bar, #homeArea .bar .recruit, #homeArea .bar .recruiting, #homeArea .bar .meet{
+  display: none;
+}
+#homeArea .bar .recruit .start{
+  font-size: 8px;
+}
 .r-go{
   width: 200px;
   height: 350px;
@@ -383,8 +498,16 @@ body{
   height: auto;
 }
 
-/* 出発前に */
-#HomeArea #selectChara{
+/* 銀行(bank) */
+#homeArea .bank{
+  display: none;
+}
+
+/* 駅(station) */
+#homeArea .station{
+  display: none;
+}
+#homeArea #selectChara{
   display: flex;
   flex-direction: row;
   gap: 10px;
@@ -392,18 +515,18 @@ body{
   justify-content: center;
   margin: 0 auto;
 }
-#HomeArea #selectChara .chara{
+#homeArea #selectChara .chara{
   width: 100px;
   height: 100px;
   overflow: hidden;
   position: relative;
   cursor: pointer;
 }
-#HomeArea #selectChara .chara .img{
+#homeArea #selectChara .chara .img{
   width: 100px;
   height: 100px;
 }
-#HomeArea #selectChara .chara .name{
+#homeArea #selectChara .chara .name{
   width: 60px;
   height: 16px;
   overflow: hidden;
@@ -413,7 +536,7 @@ body{
   right: 0px;
   white-space: nowrap;
 }
-#HomeArea #selectChara .chara .name .txt{
+#homeArea #selectChara .chara .name .txt{
   display: inline-block;
   font-size: 12px;
 }
@@ -423,105 +546,11 @@ body{
   100%{transform: translateX(-3em);}
 }
 
-/* overField --開放空間-- */
-#overField{
+
+/* 仕事(timy) */
+#homeArea .timy, #homeArea .timy .select, #homeArea .timy .tasking{
   display: none;
-  margin: 0 auto;
 }
-
-#overField #NowMap{
-  border: 2px solid #000000;
-  position: relative;
-  text-align: center;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-#overField #Inventory{
-  display: none;
-  position: absolute;
-  text-align: center;
-  background-color: #ddd;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 500px;
-  height: 500px;
-  padding: 3px;
-  gap: 5px;
-}
-#overField #Inventory .leftside{
-  width: 270px;
-  height: 495px;
-  border: 2px solid #000000;
-  overflow-x: hidden;
-}
-#overField #Inventory .status{
-  max-height: 180px;
-  width: 260px;
-  text-align: left;
-  border: 1px solid #23232369;
-  word-wrap: break-word;
-  white-space: normal;
-  margin-bottom: 4px;
-}
-#overField #Inventory .skills{
-  max-height: 80px;
-  width: 260px;
-  text-align: left;
-  border: 1px solid #23232369;
-  word-wrap: break-word;
-  white-space: normal;
-  margin-bottom: 4px;
-}
-#overField #Inventory .equips{
-  max-height: 180px;
-  width: 260px;
-  text-align: left;
-  border: 1px solid #23232369;
-  word-wrap: break-word;
-  white-space: normal;
-}
-#overField #Inventory .equipChange{
-  max-height: 180px;
-  width: 260px;
-  text-align: left;
-  border: 1px solid #23232369;
-  word-wrap: break-word;
-  white-space: normal;
-}
-#overField #Inventory .rightside{
-  width: 270px;
-  height: 495px;
-  border: 2px solid #000000;
-  overflow-x: hidden;
-}
-#overField #Inventory .slashs{
-  max-height: 150px;
-  width: 260px;
-  text-align: left;
-  border: 1px solid #23232369;
-  word-wrap: break-word;
-  white-space: normal;
-}
-#overField #Inventory .magics{
-  max-height: 150px;
-  width: 260px;
-  text-align: left;
-  border: 1px solid #23232369;
-  word-wrap: break-word;
-  white-space: normal;
-}
-#overField #Inventory .sutefuri{
-  text-align: left!important;
-  border: 1px solid #23232369;
-  padding: 3px;
-  margin: 0;
-  width: 260px;
-  max-height: 100px;
-}
-
-/* ここからおしごと */
 .task-bar-container {
   position: relative;
   width: 60%;
@@ -547,6 +576,110 @@ body{
   align-items: center;
   color: white;
 }
+
+/* チャージ(charge) */
+#homeArea .charge{
+  display: none;
+}
+
+/* overfieldArea --開放空間-- */
+#overfieldArea{
+  display: none;
+  margin: 0 auto;
+}
+
+#overfieldArea #NowMap{
+  border: 2px solid #000000;
+  position: relative;
+  text-align: center;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#overfieldArea #Inventory{
+  display: none;
+  position: absolute;
+  text-align: center;
+  background-color: #ddd;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 500px;
+  padding: 3px;
+  gap: 5px;
+}
+#overfieldArea #Inventory .leftside{
+  width: 270px;
+  height: 495px;
+  border: 2px solid #000000;
+  overflow-x: hidden;
+}
+#overfieldArea #Inventory .status{
+  max-height: 180px;
+  width: 260px;
+  text-align: left;
+  border: 1px solid #23232369;
+  word-wrap: break-word;
+  white-space: normal;
+  margin-bottom: 4px;
+}
+#overfieldArea #Inventory .skills{
+  max-height: 80px;
+  width: 260px;
+  text-align: left;
+  border: 1px solid #23232369;
+  word-wrap: break-word;
+  white-space: normal;
+  margin-bottom: 4px;
+}
+#overfieldArea #Inventory .equips{
+  max-height: 180px;
+  width: 260px;
+  text-align: left;
+  border: 1px solid #23232369;
+  word-wrap: break-word;
+  white-space: normal;
+}
+#overfieldArea #Inventory .equipChange{
+  max-height: 180px;
+  width: 260px;
+  text-align: left;
+  border: 1px solid #23232369;
+  word-wrap: break-word;
+  white-space: normal;
+}
+#overfieldArea #Inventory .rightside{
+  width: 270px;
+  height: 495px;
+  border: 2px solid #000000;
+  overflow-x: hidden;
+}
+#overfieldArea #Inventory .slashs{
+  max-height: 150px;
+  width: 260px;
+  text-align: left;
+  border: 1px solid #23232369;
+  word-wrap: break-word;
+  white-space: normal;
+}
+#overfieldArea #Inventory .magics{
+  max-height: 150px;
+  width: 260px;
+  text-align: left;
+  border: 1px solid #23232369;
+  word-wrap: break-word;
+  white-space: normal;
+}
+#overfieldArea #Inventory .sutefuri{
+  text-align: left!important;
+  border: 1px solid #23232369;
+  padding: 3px;
+  margin: 0;
+  width: 260px;
+  max-height: 100px;
+}
+
 
 
 /* こっからクエスト */
@@ -576,7 +709,7 @@ body{
 }
 
 /* ここからchat */
-#ChatTab #chat {
+#chat-tab #chat {
     width: 500px;
     max-width: 100%;
     margin: 50px auto;
@@ -587,47 +720,7 @@ body{
     display: none;
     flex-direction: column;
 }
-/*ログインのやつ*/
-#login{
-  display: block;
-  width: 75%;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 20px;
-  background-color: #def0ff;
-  border: 1px solid #b5dcff;
-  border-radius: 5px;
-  overflow: hidden;
-  opacity: 0;
-  transition: opacity 0.5s ease; 
-  z-index: 1234;
-  user-select: none;
-  pointer-events: none;
-}
-#login input {
-  width: calc(100% - 20px);
-  margin-bottom: 10px;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #b5dcff;
-}
-#login button {
-  width: 100%;
-  padding: 10px;
-  background-color: #cfe9ff;
-  border: 2px solid #b5dcff;
-  color: #000000;
-  font-size: 16px;
-  cursor: pointer;
-}
-#login button:hover {
-  background-color: #cfe9ff;
-}
-#logout{
-  cursor: pointer;
-}
+
 .messages{
   flex: 1;
   padding: 10px;

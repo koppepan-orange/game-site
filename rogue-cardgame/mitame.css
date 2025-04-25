@@ -1,221 +1,316 @@
-@font-face{font-family:Hangyaku;src:url('Fhangyaku.ttf');}
-@font-face{font-family:comicsans;src:url('Fcomicsans.ttf');}
+@font-face{font-family:Hangyaku;src:url('assets/fonts/hangyaku.ttf');}
+@font-face{font-family:comicsans;src:url('assets/fonts/comicsans.ttf');}
 * {
-    font-family:Hangyaku;
-    font-size: 23px;
+  font-family:Hangyaku;
+  font-size: 23px;
 }
 body{
-    background-color: #ffffff;
-    overflow: hidden;
+  background-color: #ffffff;
+  overflow: hidden;
 }
 
 #movabledescription {
-    display: none;
-    position: fixed;  /* 画面上の絶対位置に固定 */
-    pointer-events: none;  /* マウスイベントを通過させる */
-    background-color: rgba(90, 90, 90, 0.9);
-    color: rgb(255, 255, 255);
-    padding: 5px 10px;
-    border-radius: 5px;
-    z-index: 1000;  /* 他の要素の上に表示 */
+  display: none;
+  position: fixed;
+  pointer-events: none;
+  background-color: rgba(90, 90, 90, 0.9);
+  color: rgb(255, 255, 255);
+  padding: 5px 10px;
+  border-radius: 5px;
+  z-index: 256; /*限界突破！サバイバー！！*/
+}
+  
+/*sideMenu*/
+#menuToggle{
+  position: fixed;
+  top: 2px;
+  left: 2px;
+  font-size: 40px;
+  cursor: pointer;
+  z-index: 200;
+}
+#sideMenu {
+  text-align: left;
+  position: fixed;
+  top: 0;
+  left: -265px;
+  width: 250px;
+  height: 100vh;
+  padding: 5px;
+  border-right: 5px;
+  color: #333344;
+  background-color: #cecece;
+  transition: left 0.3s;
+  z-index: 255;
+}
+#sideMenu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+#sideMenu ul li{
+  cursor: pointer;
+}
+#sideMenu ul li a {
+  color: #000000;
+  text-decoration: none;
 }
   
 /*notice*/
-#Notice-button {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    width: 40px;
-    height: 40px;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    cursor: pointer;
-    z-index: 10000;/*たしか一番上にやるやつ*/
+#notice{
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 400px;
+  height: 70vh;
+  padding: 20px 5px 5px 5px;
+  border: 2px solid #848484;
+  border-radius: 4px;
+  background-color: rgba(67, 67, 67, 0.8);
+  z-index: 240;/*たしか一番上にやるやつ*/
 }
-#Notice-button-img {
-    width: 100%;
-    height: 100%;
+#notice .x{
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  cursor: pointer;
+  text-align: center;
+  padding: 0px 6px;
+  border: 1px solid #aeaeae;
 }
-#Notice-page{
-    display: none;
-    position: fixed;
-    top: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 600px;
-    height: 900px;
-    background-color: #dfdfdf;
-    border: 2px solid #FFE500;
-    z-index: 9999;/*たしか一番上にやるやつ*/
+#notice .back{
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  cursor: pointer;
+  text-align: center;
+  padding: 0.5px 5px;
+  border: 1px solid #aeaeae;
 }
+#notice .list{
+  display: block;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  margin: 17px 0px 0px 30px;
+}
+#notice .list .item{
+  width: calc(100% - 74px);
+  margin-bottom: 5px;
+  border: 1px solid #8f8f8f;
+  padding: 2px 6px;
+  cursor: pointer;
+}
+#notice .show{
+  display: none;
+  width: 100%;
+  height: 100%;
+  text-align: left;
+}
+#notice .show .title{
+  font-size: 37px;
+  text-align: center;
+  overflow-x: scroll;
+  white-space: nowrap;
+  scrollbar-width: none;
+  max-width: calc(100% - 74px);
+  padding-bottom: 3px;
+  border-bottom: 1px dashed #e1e1e1;
+  margin: 0px auto 3px auto;
+}
+#notice .show .date{
+  font-size: 17px;
+  text-align: right;
+  position: absolute;
+  right: 7px;
+  top: 51px;
+}
+#notice .show .body{
+  font-size: 24px;
+  text-align: left;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  word-wrap: break-word;
+  max-height: 100%;
+}
+
 
 /*log & text*/
-#log-opener{
-    position: absolute;
-    bottom: 230px;
-    right: 0px;
-    width: 20px;
-    height: 200px;
-    background-color: rgba(0,0,0,0.9);
-    color: #fefefe;
-    cursor: pointer;
-    transition: right 0.3s;
-    z-index: 254;
-}
 #log{
-    position: absolute;
-    bottom: 230px;
-    right: -300px;
-    width: 300px;
-    height: 200px;
-    max-height: 200px;
-    overflow-x: hidden;
-    overflow-y: scroll;
-    background-color: rgba(0,0,0,0.8);
-    color: #fefefe;
-    text-align: left;
-    font-size: 14px;
-    transition: right 0.3s;
-    z-index: 253;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 320px;
+  height: 200px;
+  border: 1px solid #ffffff;
+  background-color: rgba(0,0,0,0);
+  position: fixed;
+  bottom: 150px;
+  right: -300px;
+  color: #fefefe;
+  overflow-y: hidden;
+  transition: right 0.3s;
+  z-index: 254;
+}
+#log .opener{
+  width: 20px;
+  height: 100%;
+  background-color: rgba(0,0,0,0.9);
+  color: #fefefe;
+  text-align: center;
+  cursor: pointer;
+  z-index: 254;
+}
+#log .log{
+  width: 300px;
+  height: 100%;
+  max-height: 200px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  background-color: rgba(0,0,0,0.8);
+  color: #fefefe;
+  text-align: left;
+  font-size: 14px;
+  transition: right 0.3s;
+  z-index: 253;
 }
 #text {
-    display: none;
-    background: rgba(0, 0, 0, 0.8);
-    color: #ffffff;
-    padding: 10px 15px;
-    border-radius: 5px;
-    font-size: 1.2em;
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 255;
-
-    white-space: nowrap; /* 幅を文字数に応じて調整 */
-    overflow: hidden; /* アニメーション中の表示崩れを防ぐ */
-    width: fit-content; /* 文字の長さに応じた幅 */
-    animation: fadeIn 0.5s ease forwards; /* 表示時のフェードイン効果 */
+  display: none;
+  background: rgba(0, 0, 0, 0.8);
+  color: #ffffff;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 1.2em;
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 255;
+  white-space: nowrap;
+  overflow: hidden;
+  width: fit-content;
+  animation: fadeIn 0.5s ease forwards;
 }
 
 @keyframes fadeIn {
-    0%{
-        opacity: 0;
-    }
-    100%{
-        opacity: 1;
-    }
+  0%{
+  opacity: 0;
+  }
+  100%{
+  opacity: 1;
+  }
 }
 
 .color-red{
-    color: #ff1919;
+  color: #ff1919;
 }
 .color-pink{
-    color: #ff56e9;
+  color: #ff56e9;
 }
 .color-blue{
-    color: #1919ff;
+  color: #1919ff;
 }
 
 #ZentaiMiruo{
-    display: block;
-    position: absolute;
-    width: 80%;
-    height: 565px;
-    top: 15px;
-    left: 50%;
-    right: 50%;
-    margin: 0 auto;
-    transform: translateX(-50%);
-    background-color: rgba(255, 255, 255, 0.301);
-    border: none;
-    opacity: 0.5;
-    pointer-events: none!important;
-    user-select: none!important;
-    z-index: 23;
+  display: contents;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  background-color: #00000000;
+  border: none;
+  opacity: 0.5;
+  pointer-events: none;
+  user-select: none;
+  z-index: 23;
 }
 #GameArea{
-    display: none;
-    position: relative; 
-    width:80%;
-    height: 550px;
-    margin: 0 auto;
-    border: 2px solid #eee;
-    background-color: rgb(255, 255, 255);
-    opacity: 1;
-    padding: 12px;
+  display: none;
+  position: relative; 
+  width:80%;
+  height: 550px;
+  margin: 0 auto;
+  border: 2px solid #eee;
+  background-color: #363636;
+  opacity: 1;
+  padding: 12px;
 
 }
 #PhaseBar {
-    width: 60%;
-    margin: 0 auto;
-    border: 2px solid #000000;
-    background-color: #fff;
-    padding: 20px;
-    padding-left: 5%;
-    padding-right:5%;
-    overflow: auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
+  width: 60%;
+  margin: 0 auto;
+  border: 2px solid #000000;
+  background-color: #fff;
+  padding: 20px;
+  padding-left: 5%;
+  padding-right:5%;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
 }
 .card {
-    width: 80px;
-    height: 100px;
-    border-radius: 8px;
-    border: 1px solid #000;
-    padding: 5px;
-    text-align: center;
-    z-index: 23;
+  width: 80px;
+  height: 100px;
+  border-radius: 8px;
+  border: 1px solid #000;
+  padding: 5px;
+  text-align: center;
+  z-index: 23;
 }
 .card-img {
-    width: 75px;
-    margin: 0 auto;
-    display: block;
-    z-index: 23;
+  width: 75px;
+  margin: 0 auto;
+  display: block;
+  z-index: 23;
 }
 #NoteCardArea{
-    width: 90%;
-    border: 1px solid #000;
-    margin:0 auto;
+  width: 90%;
+  border: 1px solid #000;
+  margin:0 auto;
 
 }
 #NoteCardA{
-    margin: 0 auto;
-    background-color: #cacaca;
-    padding: 5px;
-    overflow: auto;
-    display: flex;
-    justify-content: left;
-    align-items: left;
-    gap: 10px;
+  margin: 0 auto;
+  background-color: #cacaca;
+  padding: 5px;
+  overflow: auto;
+  display: flex;
+  justify-content: left;
+  align-items: left;
+  gap: 10px;
 }
 #NoteCardM{
-    margin: 0 auto;
-    background-color: #cacaca;
-    padding: 5px;
-    overflow: auto;
-    display: flex;
-    justify-content: left;
-    align-items: left;
-    gap: 10px;
+  margin: 0 auto;
+  background-color: #cacaca;
+  padding: 5px;
+  overflow: auto;
+  display: flex;
+  justify-content: left;
+  align-items: left;
+  gap: 10px;
 }
 .notecard {
-    width: 40px!important;
-    height: 55px;
-    border-radius: 8px;
-    border: 1px solid #000;
-    padding: 5px;
-    text-align: center;
-    font-size: 20px;
-    z-index: 23;
+  width: 40px!important;
+  height: 55px;
+  border-radius: 8px;
+  border: 1px solid #000;
+  padding: 5px;
+  text-align: center;
+  font-size: 20px;
+  z-index: 23;
 }
 .notecard-img {
-    width: 30px;
-    margin: 0 auto;
-    display: block;
-    z-index: 23;
+  width: 30px;
+  margin: 0 auto;
+  display: block;
+  z-index: 23;
 }
 .none{background-color: #ddd;}
 .G{background-color: #575757!important;}
@@ -237,111 +332,143 @@ body{
 .r9{background-color: #ff4060!important;}
 
 
-#UIzone {
-    margin: 0 auto;
-    display: flex;
-    gap: 10px;
+#PandEsUI {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 60px;
 }
-#PlayerUI{
-    width: 40%;
-    text-align: left;
-    margin: 0 auto;
-    flex: 1;
-    padding-left: 10px;
+
+#PandEsUI .human{
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+  height: 100px;
+  color: #ffffff;
 }
-#EnemyUI{
-    width: 40%;
-    text-align: right;
-    margin: 0 auto;
-    flex: 1;
-    padding-right: 10px;
+#PandEsUI .human .name{
+  font-size: 28px;
 }
-#PlayerShield,#EnemyShield{
-    border:1px solid #000;
-    border-radius: 5px;
-    padding-right: 3px;
-    padding-left: 3px;
+#PandEsUI .human .shield{
+  padding: 0px 4px;
+  border: 1px solid #4473ad;
+  border-radius: 3px;
+  font-size: 29px;
+  color: #cfe9ff;
 }
-#PlayerBuffs{
-    width: 40%;
-    text-align: center;
+#PandEsUI .human .health{
+  font-size: 40px;
+  color: #ffffff;
 }
-#EnemyBuffs{
-    width: 40%;
-    text-align: center;
+#PandEsUI .human .maxhealth{
+  font-size: 20px;
+  color: #7e7e7e;
 }
-#PlayerBuffTime,#PlayerDebuffTime,#EnemyBuffTime,#EnemyDebuffTime{
-    font-size: 25px!important;
-    padding-left:5px;
-}   
-#PlayerBuff,#EnemyBuff{
-    background-color: #fff0f0;
-    padding-top:3px;
+#PandEsUI .human .healthBar{
+  margin-top: 1px;
+  width: 95%;
+  height: 12px;
+  clip-path: polygon(3% 0%, 100% 0%, 100% 100%, 0% 100%); /*左上だけ欠けてる感じ*/
+  background-color: #151515;
 }
-#PlayerDebuff,#EnemyDebuff{
-    background-color: #f1f0ff;
-    border-left:2px solid #c9c9c9;
-    padding-top:3px;
+#PandEsUI .human .healthBar .innerBar{
+  height: 100%;
+  background-color: #d40000;
 }
-.buff{
-    width: 50%;
-    padding: 3px;
-    z-index: 23;
+#PandEsUI .human .effect{
+  margin-top: 5px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 4px;
+  position: relative;
 }
-.buff-img{
-    width: 20px;
-    margin: 0 auto;
-    padding-top: 3px;
-    z-index: 23;
+#PandEsUI .human .effect .buff, #PandEsUI .human .effect .debuff{
+  width: calc(50% - 2px);
+  height: 20px;
+  padding: 1px 2px 1px 5px;
+  border: 1px solid #cfe9ff;
+  border-radius: 3px;
+  font-size: 14px;
+  color: #555555;
+  text-align: center;
 }
+#PandEsUI .human .effect .buff .appear{
+  display: none;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #cfe9ff;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+#PandEsUI .human .effect .debuff .appear{
+  display: none;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #ffcfcf;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+#PandEsUI .human .effect .buff .appear .img, #PandEsUI .human .effect .debuff .appear .img{
+  width: 35%;
+  height: calc(100% - 2px);
+}
+#PandEsUI .human .effect .buff .appear .time, #PandEsUI .human .effect .debuff .appear .time{
+  padding-left: 1px;
+  font-size: 20px;
+}
+
 #PhaseUI{
-    text-align: center;
-    margin: 0 auto;
-    flex: 1;
+  text-align: center;
+  margin: 0 auto;
+  flex: 1;
 }
 #ShowPhase{font-size: 35px;}
 #ShowCardInfo{
-    width: 50%;
-    text-align: center;
-    position:absolute;
-    display:none;
-    height:120px;
-    left:25%;
-    right:25%;
-    background-color:#777;
-    border:2px solid #000;
-    z-index: 24;
+  width: 50%;
+  text-align: center;
+  position:absolute;
+  display:none;
+  height:120px;
+  left:25%;
+  right:25%;
+  background-color:#777;
+  border:2px solid #000;
+  z-index: 24;
 }
 .hidden {display: none !important;}
 .visible {display: block !important;}
 .cooldown{
-    opacity: 0.5;
+  opacity: 0.5;
 }
 #PhaseStart{
-    display:none;
+  display:none;
 }
 #StageButton{
-    margin: 0 auto;
-    padding: 5px;
-    display: block;
-    overflow: auto;
+  margin: 0 auto;
+  padding: 5px;
+  display: block;
+  overflow: auto;
 }
 .stagebar-big{
-    display: block;
-    width: 90%;
-    height: 50px;
-    margin: 0 auto;
-    border: 2px solid #737373;
-    background-color: #a0a0a0;
-    padding: 5px;
-    z-index: 23;
+  display: block;
+  width: 90%;
+  height: 50px;
+  margin: 0 auto;
+  border: 2px solid #737373;
+  background-color: #a0a0a0;
+  padding: 5px;
+  z-index: 23;
 }
 .stagebar-small{
-    display: block;
-    width: 40%;
-    height: 50px;
-    border: 2px solid #737373;
-    background-color: #a0a0a0;
-    padding: 5px;
-    z-index: 23;
+  display: block;
+  width: 40%;
+  height: 50px;
+  border: 2px solid #737373;
+  background-color: #a0a0a0;
+  padding: 5px;
+  z-index: 23;
 }

@@ -1,0 +1,16 @@
+<style>
+    .healthBar{
+  width: 95%;
+  height: 24px;
+  clip-path: polygon(5% 0%, 100% 0%, 100% 100%, 0% 100%); /*左上だけ欠けてる感じ*/
+  background-color: #151515;
+}
+.healthBar .innerBar{
+  height: 100%;
+  background-color: #d40000;
+}
+</style>
+
+<div class="healthBar">
+    <div class="innerBar" width="100%"></div>
+</div>

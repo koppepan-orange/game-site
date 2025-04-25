@@ -1,15 +1,7 @@
-//#region documentのやつ
-const overField = document.querySelector('#overField')
-const NowMap = document.getElementById('NowMap');
-const HomeArea = document.getElementById('HomeArea');
-const BattleArea = document.getElementById('BattleArea');
-const Select1 = document.getElementById('select1');
-const Select2 = document.getElementById('select2')
-const Select3 = document.getElementById('select3')
-const Select4 = document.getElementById('select4')
-
-//#endregion
 //#region 探索部分
+const overfieldArea = document.querySelector('#overfieldArea')
+const NowMap = document.getElementById('NowMap');
+
 const ctx = NowMap.getContext('2d');
 const backMaps = [
    [
@@ -523,7 +515,8 @@ let imageNames = {
    'maps':['a','b','c','d','e','f','g',0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26],
    'effects':['explosion_1','explosion_2','explosion_3'],
    'enemies':['翠嵐の風刃','蒼白の粘液'],
-   'charas':['greenslime','mechanic','clown','magodituono','wretch']
+   'charas':['greenslime','mechanic','clown','magodituono','wretch'],
+   'system':['star1','star2','star3'],
 }
 let totalImages = Object.keys(imageNames).map(a => imageNames[a].length).reduce((a, b) => a + b);
 
@@ -672,7 +665,7 @@ document.addEventListener('keydown', (event) => {
       draw()
       }
    }
-   if(event.key == 'e' && document.querySelector('#overField').style.display == 'block'){
+   if(event.key == 'e' && document.querySelector('#overfieldArea').style.display == 'block'){
       if(AllowMove == 0){
          AllowMove = 1;
          phase = 'null'
@@ -681,7 +674,7 @@ document.addEventListener('keydown', (event) => {
          AllowMove = 0;
          phase = 1
          window.setTimeout(inventoryClose,200)
-   }}else if(event.key == 'g' && document.querySelector('#overField').style.display == 'block'){
+   }}else if(event.key == 'g' && document.querySelector('#overfieldArea').style.display == 'block'){
       testEnemyAppear();
    }
 });
@@ -703,9 +696,9 @@ let NanigaOkirukana = {
       name:'焚き火',
       process:async function(){
          AllowMove = 1;
-         document.querySelector('#overField').style.display = 'none';
-         document.querySelector('#EventArea').style.display = 'block';
-         document.querySelector('#EventArea').innerHTML = '<button id="CampRest" onclick="Camprest()"></button><br><button id="CampTrade" onclick="Camptrade()"></button>'
+         document.querySelector('#overfieldArea').style.display = 'none';
+         document.querySelector('#eventArea').style.display = 'block';
+         document.querySelector('#eventArea').innerHTML = '<button id="CampRest" onclick="Camprest()"></button><br><button id="CampTrade" onclick="Camptrade()"></button>'
          log.textContent = '休憩できそうな場所を見つけた！';
          Camprestper = (Math.floor(Math.random() * 4)+3)/10;
          document.querySelector('#CampRest').textContent = '朝まで休む(' + Camprestper*100 + '%回復)';//30のときはスキルカード強化みたいなやつあってもいいかも
@@ -941,8 +934,8 @@ let username = 'no name';
 let rank = 1;
 let rpt = 0;
 let maxrpt = 100;
-let euro = 0;
-let bankeuro = 0;
+let stone = 0;
+let bankstone = 0;
 
 //毎ダンジョン変わるデータs
 let enemylv = 1;
@@ -1102,7 +1095,7 @@ let humans = {
             lv:1,
          },
          //ああそうさ、俺の趣味さ！！！！！"おもちゃ箱の夢"みたいなステージであることをしたくってねぇ...もしかしたら首はなくなるかも..いやまあ好きだけど解像度低いから自分でできなさそう
-         //...あれ？これ読まれたらやばくね？..まあ....いいか！！！！直接的な表現無いしだいじょぶっしょ、多分 え？なんのことかわからないって？ならdiscordのなんか..なんか。のkoppekun-uraを見るといい！！！！え？見れないって？ふっふっふ..ざまぁ♡(可愛くてごめん風)
+         //...あれ？これ読まれたらやばくね？..まあ....いいか！！！！直接的な表現無いしだいじょぶっしょ、多分 え？なんのことかわからないって？ならdiscordのなんか..なんか。のkoppekun-uraを見るといい！！！！え？見れないって？ふっふっふ..ざまぁ(可愛くてごめん風)
    
          cool:100,
          ex:'50%heal',
@@ -1534,6 +1527,7 @@ let Charas = {
 
 let Friends = {
    '飛花レイル':{
+      ruby:'ひか れいる',
       name:'飛花レイル',
       belongto:'', //所属
       rare:3,
@@ -1545,10 +1539,12 @@ let Friends = {
       P:0,
    },
    '憚羅レイル':{
+      ruby:'はばから れいる',
       name:'憚羅レイル',
       rare:3
    },
    '泡沫アリア':{
+      ruby:'うたかた ありあ',
       name:'泡沫アリア',
       belongto:'',
       rare:2,
@@ -1560,41 +1556,50 @@ let Friends = {
       P:0,
    },
    'メメント・ラメント':{
+      ruby:'めめんと らめんと',
       name:'メメント・ラメント',
       rare:3
    },
 
    '小安見ニーク':{
+      ruby:'おやすみ にーく',
       name:'小安見ニーク',
       rare:3,
    },
    '面戸ガリヤ':{
+      ruby:'めんど がりや',
       name:'面戸ガリヤ',
       rare: 2,
    },
    '伊辣キキ':{
+      ruby:'いらつ きき',
       name:'伊辣キキ',
       rare: 2,
    },
 
    '息留河鹿':{
+      ruby:'いきる かしか',
       name:'息留 河鹿',
       rare: 1
    },
    'ジャンネ マジデ':{
+      ruby:'じゃんね まじで',
       name:'ジャンネ マジデ',
       rare:1
    },
    '手斧バス':{
+      ruby:'ておの ばす',
       name:'手斧バス',
       rare:1
    },
 
    '久須田和伊男':{
-      name:'久須田和伊男',
+      ruby:'くすた わいお',
+      name:'久須田 和伊男',
       rare:1,
    },
    'ゴードン・ソージィ':{
+      ruby:'ごーどん そーじぃ',
       name:'ゴードン・ソージィ',
       rare:3
    }
@@ -1652,9 +1657,9 @@ let Effects = {
          img:'cheerup',
          description:'応援されている状態。攻撃力と速度が上がり会心率が下がる。<br>ちょっと緊張しちゃうよね、わかる',
          effect:{
-            'power':'+1.0',
-            'speed':'+20.0',
-            'crit':'-5.0'
+            'power':1.0,
+            'speed':20.0,
+            'crit':-5.0
          }
       }
    },
@@ -1681,8 +1686,11 @@ let Effects = {
          kind:'turn',
          addable:false,
          img:'poison',
-         description:'ターン終了時割合で防御貫通ダメージ。毒の苦しみもお好きなんですね',
+         description:'ターン終了時割合で防御貫通ダメージ。<br>毒の苦しみもお好きなんですね',
          //ターン終了時体力のx%のダメージ
+         effect:{
+            'poison':0.05 //"毒ダメージ"として5%削れる
+         }
       },
       'blood':{
          name:'blood',
@@ -1692,6 +1700,9 @@ let Effects = {
          img:'blood',
          description:'ターン終了時固定ダメージ、徐々に増加。<br>増加率は"2倍"<br>そのままにしとくと普通に死にます',
          //ターン終了時xダメージ
+         effect:{
+            'blood':2
+         }
       },
       'burn':{
          name:'burn',
@@ -1699,8 +1710,12 @@ let Effects = {
          kind:'turn',
          addable:false,
          img:'burn',
-         description:'ターン終了時固定ダメージ。まじでこれ嫌い...ww',
+         description:'ターン終了時固定ダメージ。ついでに攻撃力低下。<br>まじでこれ嫌い...ww',
          //ターン終了時xダメージ
+         effect:{
+            'burn':10,
+            'attack':-3
+         }
       },
       'injury':{
          name:'injury',
@@ -1709,7 +1724,10 @@ let Effects = {
          addable:false,
          img:'injury',
          description:'行動時固定ダメージ。<br>連続行動ビルドに大打撃',
-         //ターン終了時体力のx%のダメージ
+         //ターン終了時xダメージ
+         effect:{
+            'injury':12
+         }
       }
    },
    handles:{
@@ -1738,9 +1756,6 @@ let Effects = {
          addable:false,
          img:'stan',
          description:'スタンなうです。おつおつお〜',
-         lv:{
-            1:1,
-         }
       },
       'skip':{
          name:'skip',
@@ -1748,10 +1763,7 @@ let Effects = {
          kind:'turn',
          addable:false,
          img:'skip',
-         description:'はいお前スキップ〜〜ww状態です。ざまぁ',
-         lv:{
-            1:1,
-         }
+         description:'はいお前スキップ〜〜ww状態です。ぴえん超えてだっさぁ',
       },
       'sleep':{
          name:'sleep',
@@ -1824,16 +1836,16 @@ let Slashs = {
       mp:0,
       lv:1,
       tcam:'players',
-      process:async function(cam,tcam,me,target){
-         let result = await humandamaged(cam,tcam,me,target,1,'sh',1);
+      process:async function(cam,me,tcam,target){
+         let result = await humandamaged(cam,me,tcam,target,1,'sh',1);
          if(result == 'dead'){return 'dead';}
 
          if(humans[cam][me].ps == 'sthree' && Math.floor(Math.random() * 4) == 0){//1/4
             log.textContent = humans[cam][me].name+'は頑張った!';
             await delay(500)
-            result = await humandamaged(cam,tcam,me,target,1,'sh',1);
+            result = await humandamaged(cam,me,tcam,target,1,'sh',1);
             if(result == 'dead'){return 'dead';}
-            result = await humandamaged(cam,tcam,me,target,1,'sh',1);
+            result = await humandamaged(cam,me,tcam,target,1,'sh',1);
             if(result == 'dead'){return 'dead';}
          }
          return 'alive';
@@ -1846,17 +1858,17 @@ let Slashs = {
       mp:0,
       lv:1,
       tcam:'players',
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          if(Math.floor(Math.random() * 3) == 0){
             log.textContent = 'miss! ダメージを与えられない!';await delay(1000);
          }else{
-            let result = await humandamaged(cam,tcam,me,target,1,'sh',2);
+            let result = await humandamaged(cam,me,tcam,target,1,'sh',2);
             if(result == 'dead'){return 'dead';}
          }
          if(Math.floor(Math.random() * 3) == 0){
             log.textContent = 'miss! ダメージを与えられない!';await delay(1000);
          }else{
-            let result = await humandamaged(cam,tcam,me,target,1,'sh',2);
+            let result = await humandamaged(cam,me,tcam,target,1,'sh',2);
             if(result == 'dead'){return 'dead';}
          }
          return 'alive';
@@ -1869,11 +1881,11 @@ let Slashs = {
       mp:0,
       lv:1,
       tcam:'players',
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          x = Math.floor(Math.random() * 1); // 1/3です
          if(humans[cam][me].ps == 'highsol'){x = Math.floor(Math.random() * 5);}; // 1/5です。
          if(x == 0){
-            let result = await humandamaged(cam,tcam,me,target,3,'sh',3);
+            let result = await humandamaged(cam,me,tcam,target,3,'sh',3);
             if(result == 'dead'){return 'dead';}
          }else{
             if(humans[cam][me].ps !== 'solx5but'){
@@ -1899,7 +1911,7 @@ let Magics = {
       description:'体力を回復する。20%',
       mp:4,
       lv:1,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          log.textContent = humans[cam][me].name + 'はhealを唱えた!';await delay(1000);
          x = Math.round(humans[tcam][target].maxhealth * 0.2);
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
@@ -1914,7 +1926,7 @@ let Magics = {
       description:'攻撃力が1.25倍になります。やったね！',
       mp:5,
       lv:1,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          log.textContent = humans[cam][me].name + 'はpowerを唱えた!';await delay(1000);
          await buffadd(tcam,target,'powerup','turn',3,1);
          return 'alive';
@@ -1926,7 +1938,7 @@ let Magics = {
       description:'防御力が1.25倍になります！実感あんまりないけど..',
       mp:5,
       lv:1,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          log.textContent = humans[cam][me].name + 'はshellを唱えた!';await delay(1000);
          await buffadd(tcam,target,'shellup','turn',3,1);
          return 'alive';
@@ -1938,7 +1950,7 @@ let Magics = {
       description:'相手を毒にします！わーい！！',
       mp:7,
       lv:3,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          log.textContent = humans[cam][me].name + 'はpoisonを唱えた!';await delay(1000);
          await buffadd(tcam,target,'poison','turn',4,1);
          return 'alive';
@@ -1950,9 +1962,9 @@ let Magics = {
       description:'牽制に使われがち。吹っ飛び率は低め。(雷の小ダメージ)',
       mp:3,
       lv:4,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          log.textContent = humans[cam][me].name + 'はthunderを唱えた!!';await delay(1000);
-         let result = await humandamaged(cam,tcam,me,target,0.7,'mg',4);//雷
+         let result = await humandamaged(cam,me,tcam,target,0.7,'mg',4);//雷
          return result;
       }
    },
@@ -1962,9 +1974,9 @@ let Magics = {
       description:'ひらがな大好きさ(炎の小ダメージ)',
       mp:4,
       lv:4,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          log.textContent = `${humans[cam].name}はfireを唱えた！`;await delay(1000);
-         let result = await humandamaged(cam,tcam,me,target,1.1,'mg',2);//火
+         let result = await humandamaged(cam,me,tcam,target,1.1,'mg',2);//火
          await buffadd(tcam,target,'burn','turn',2,1);
          return result
       }
@@ -1972,10 +1984,10 @@ let Magics = {
    'healerthan':{
       id:'healerthan',
       name:'healer than',
-      description:'体力を40%回復します。healよりもつよい。だから比較のthanなんですね〜',
+      description:'体力を40%回復します。healよりも強い。だから比較のthanなんですね〜',
       mp:8,
       lv:6,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          log.textContent = humans[cam][me].name + 'はhealer thanを唱えた!';await delay(1000);
          x = Math.round(humans[tcam][target].maxhealth * 0.4);
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
@@ -1990,7 +2002,7 @@ let Magics = {
       description:'二回行動マンになれるかも？なやつ。lv1',
       mp:4,
       lv:7,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          await buffadd(tcam,target,'luck','turn',4,1);
          log.textContent = humans[cam][me].name + 'はluckを唱えた!';await delay(1000);
          return 'alive'
@@ -2002,9 +2014,9 @@ let Magics = {
       description:'ギガサンダー出そうとしてたまに出るやつ。そこそこつよい。(雷の中ダメージ)',
       mp:8,
       lv:8,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          log.textContent = humans[cam][me].name + 'はellthunderを唱えた!';await delay(1000);
-         humandamaged(cam,tcam,me,target,1.2,'mg',4);//雷
+         humandamaged(cam,me,tcam,target,1.2,'mg',4);//雷
          return 'alive'
       }
    },
@@ -2014,7 +2026,7 @@ let Magics = {
       description:'攻撃力が1.5倍になります。power使ってた人いるんかな',
       mp:8,
       lv:9,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          await buffadd(tcam,target,'powerup','turn',3,2)
          log.textContent = humans[cam][me].name + 'はmore powerを唱えた!';await delay(1000);
          return 'alive'
@@ -2026,7 +2038,7 @@ let Magics = {
       description:'防御力が1.5倍になります。けどあんまり実感はないよね',
       mp:8,
       lv:9,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          await buffadd(tcam,target,'shellup','turn',3,2)
          log.textContent = humans[cam][me].name + 'はmore shellを唱えた!';await delay(1000);
          return 'alive'
@@ -2038,7 +2050,7 @@ let Magics = {
       description:'敵を猛毒にします。やったね！！！',
       mp:12,
       lv:10,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          await buffadd(tcam,target,'poison','turn',5,2);
          log.textContent = humans[cam][me].name + 'はdeadly poisonを唱えた!';await delay(1000);
          return 'alive'
@@ -2050,9 +2062,9 @@ let Magics = {
       description:'激ウザ攻撃No2ですね。1はPKファイア。これの後にスマッシュするのが最高(炎の中ダメージ)',//ずっっっとルフレの話してます私 まじであの人楽しい
       mp:10,
       lv:11,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          log.textContent = humans[cam][me].name + 'はgiga fireを唱えた!';await delay(1000);
-         let result = await humandamaged(cam,tcam,me,target,2.3,'mg',2);//火
+         let result = await humandamaged(cam,me,tcam,target,2.3,'mg',2);//火
          await buffadd(tcam,target,'burn','turn',2,2);
          return result
       }
@@ -2063,7 +2075,7 @@ let Magics = {
       description:'60%回復。これ以上はない、っていう意味ですね。xyzじゃないよ',
       mp:12,
       lv:12,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          log.textContent = humans[cam][me].name + 'はthe healestを唱えた!!!';await delay(1000);
          x = Math.round(humans[tcam][target].maxhealth * 0.6);
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
@@ -2078,7 +2090,7 @@ let Magics = {
       description:'luckよりも行動しやすいです。嬉しいね',
       mp:12,
       lv:14,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          await buffadd(tcam,target,'luck','turn',5,2);
          log.textContent = humans[cam][me].name + 'はluckgreatを唱えた!';await delay(1000);
          return 'alive'
@@ -2090,10 +2102,10 @@ let Magics = {
       description:'ぬわーーっっ!!ってしてやりましょうぜ(炎の大ダメージ)',//対パパス最強にしたいね、これ
       mp:12,
       lv:12,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          log.textContent = humans[cam][me].name + 'はメラゾーマを唱えた!';
          await delay(1000);
-         let result = await humandamaged(cam,tcam,me,target,3.5,'mg',4);//雷
+         let result = await humandamaged(cam,me,tcam,target,3.5,'mg',4);//雷
          await buffadd(tcam,target,'burn','turn',3,2);
          return result
       }
@@ -2104,9 +2116,9 @@ let Magics = {
       description:'当たったらラッキー、シールドでされたら空前で追撃なつよつよ技。<br>けどギガサンダーの方が好き(雷の大ダメージ)',
       mp:20,
       lv:15,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          log.textContent = 'トロン！！！';await delay(1000);//byルフレ
-         let result = await humandamaged(cam,tcam,me,target,6,'mg',4);//雷
+         let result = await humandamaged(cam,me,tcam,target,6,'mg',4);//雷
          return result
       }
    },
@@ -2116,12 +2128,12 @@ let Magics = {
       description:'自身が覚えてる魔法からランダム(mpは5固定)。これぞ醍醐味ってやつよな',
       mp:5,
       lv:1,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          log.textContent = 'randomを唱えた.......';await delay(1000);
          x = Object.keys(Magics).map(a => Magics[a].lv <= humans[cam][me].level ? Magics[a].name : null).filter(Boolean)
          y = Math.floor(Math.random() * x.length);
          log.textContent = x[y]+'が出た！';await delay(1000);
-         x[y](cam,tcam,me,target);
+         x[y](cam,me,tcam,target);
       }
    },
 
@@ -2137,8 +2149,8 @@ let Weapons = {
       price:0,
       description:'ないです。素手とか念とか自由に解釈しておk',
       buyable:0,
-      sp:0,
-      pp:0,
+      ap:0,
+      ce:0,
    },
    'woodenstick':{
       name:'木の棒',
@@ -2148,8 +2160,9 @@ let Weapons = {
       price:10,
       description:'初期装備あるあるの武器。値段に見合わず割と強い',
       buyable:1,//購入可能かどうか
-      sp:0,//特殊能力(攻撃後)の有無
-      pp:0,//特殊能力(攻撃前)の有無
+      ap:0,
+      ce:0,
+      
    },
    'woodensword':{
       name:'木刀',
@@ -2159,8 +2172,8 @@ let Weapons = {
       price:20,
       description:'木の棒よりも強い。言うなれば気の剣。',
       buyable:1,
-      sp:0,
-      pp:0,
+      ap:0,
+      ce:0,
    },
    'bamboosword':{
       name:'竹刀',
@@ -2170,8 +2183,8 @@ let Weapons = {
       price:30,
       description:'さあ、剣道しようぜ！！',
       buyable:1,
-      sp:0,
-      pp:0,
+      ap:0,
+      ce:0,
    },
    'stone':{
       name:'石ころ',
@@ -2181,8 +2194,8 @@ let Weapons = {
       price:50,
       description:'石です。よわよわ',
       buyable:1,
-      sp:0,
-      pp:0,
+      ap:0,
+      ce:0,
    },
    'bigrock':{
       name:'大きな石',
@@ -2192,8 +2205,8 @@ let Weapons = {
       price:80,
       description:'岩です。つよつよ',
       buyable:1,
-      sp:0,
-      pp:0,
+      ap:0,
+      ce:0,
    },
    'brick':{
       name:'レンガ',
@@ -2203,8 +2216,8 @@ let Weapons = {
       price:100,
       description:'岩にセメントつけたら強くなるのって意味わからなくね？',
       buyable:1,
-      sp:0,
-      pp:0,
+      ap:0,
+      ce:0,
    },
    'thinpaper':{
       name:'薄めの紙',
@@ -2214,17 +2227,10 @@ let Weapons = {
       price:5,
       description:'薄い紙です。すって相手に切り付けて｢いたっ..｣ってさせる用です',
       buyable:1,
-      sp:0,
-      pp:1,
-      pprocess:function(cam,tcam,me,target,num){
-         if(num == 0){//攻撃前
-            humans[cam][me].critlate += 0.7;
-            humans[cam][me].critlate *= 100;humans[cam][me].critlate = Math.round(humans[cam][me].critlate);humans[cam][me].critlate /= 100;
-         }
-    else if(num == 1){//攻撃後
-            humans[cam][me].critlate -= 0.7;
-            humans[cam][me].critlate *= 100;humans[cam][me].critlate = Math.round(humans[cam][me].critlate);humans[cam][me].critlate /= 100;
-         }
+      ap:0,
+      ce:1,
+      combatEffect:{ //攻撃前の効果
+         critlate: 70,
       }
    },
    'card':{
@@ -2235,8 +2241,8 @@ let Weapons = {
       price:7,
       description:'ちょっとした運要素。攻撃方法は切り付けなのでよわい(つよい)',
       buyable:1,
-      sp:0,
-      pp:0,
+      ap:0,
+      ce:0,
    },
    'scissors':{
       name:'はさみ',
@@ -2246,18 +2252,11 @@ let Weapons = {
       price:200,
       description:'持って｢近づいたら*すよ..?｣っていう用。実際*せない',
       buyable:1,
-      sp:0,
-      pp:1,
-      pprocess:function(cam,tcam,me,target,num){
-         if(num == 0){//攻撃前
-            humans[cam][me].critdmg += 0.4;
-            humans[cam][me].critdmg *= 100;humans[cam][me].critdmg = Math.round(humans[cam][me].critdmg);humans[cam][me].critdmg /= 100;
-         }
-    else if(num == 1){//攻撃後
-            humans[cam][me].critdmg -= 0.4;
-            humans[cam][me].critdmg *= 100;humans[cam][me].critdmg = Math.round(humans[cam][me].critdmg);humans[cam][me].critdmg /= 100;
-         }
-      },
+      ap:0,
+      ce:1,
+      combatEffect:{
+         critdmg: 4.0,
+      }
    },
    'knife':{
       name:'ほんもののナイフ',
@@ -2265,20 +2264,13 @@ let Weapons = {
       num:0,
       power:40,
       price:300,
-      description:'わりとつよい。花や骨に向かって振り回しましょう。',
+      description:'つよつよ武器。花や骨に向かって振り回しましょう',
       buyable:1,
-      sp:0,
-      pp:1,
-      pprocess:function(cam,tcam,me,target,num){
-         if(num == 0){//攻撃前
-            humans[cam][me].critlate += 0.1;
-            humans[cam][me].critlate *= 100;humans[cam][me].critlate = Math.round(humans[cam][me].critlate);humans[cam][me].critlate /= 100;
-         }
-    else if(num == 1){//攻撃後
-            humans[cam][me].critlate -= 0.1;
-            humans[cam][me].critlate *= 100;humans[cam][me].critlate = Math.round(humans[cam][me].critlate);humans[cam][me].critlate /= 100;
-         }
-      },
+      ap:0,
+      ce:1,
+      combatEffect:{
+         critlate: 10,
+      }
    },
 
    'blooddagger':{
@@ -2287,18 +2279,19 @@ let Weapons = {
       num:0,
       power:0,
       price:150,
-      description:'名前意味わからんランキング第1位',
+      description:'名前意味わからんランキング第1位。<br>攻撃時相手の体力を吸い回復する。<br>変換効率は80%..水力発電と同じくらい',
       buyable:1,
-      sp:1,
-      sprocess:async function(cam,tcam,me,target,multiplier,kind,code){
-         log.textContent = '血を吸った！';await delay(1000);
-         x = Math.ceil(humans[tcam][target].health*0.1);
+      ap:1,
+      afterProcess:async function(cam,me,tcam,target,rate,kind,attributes,damage){
+         x = (damage * 0.80).toFixed(0);
          humans[cam][me].health += x;
          if(humans[cam][me].health > humans[cam][me].maxhealth){humans[cam][me].health = humans[cam][me].maxhealth;}
-         log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000);
+         addtext('血を吸った！');
+         tekiou();
+         addtext(`体力が${x}回復した!`);
          return 'alive';
       },
-      pp:0,
+      ce:0,
    },
    'timeontarget':{
       name:'time on target',
@@ -2306,32 +2299,31 @@ let Weapons = {
       num:0,
       power:10,
       price:150,
-      description:'まじでナギサさんの手良くない.....??',
+      description:'ナギサ様の手好き',
       buyable:1,
-      sp:1,
-      sprocess:async function(cam,tcam,me,target,multiplier,kind,code){
-         log.textContent = 'トリニティの砲撃術は優秀ですから。';await delay(1000);
-         x = Math.ceil(humans[cam][me].attack * humans[cam][me].power * 0.9 + weaponpower - humans[tcam][target].defense);
-         if(x < 0){x = 0};if(x > humans[tcam][target].health){x = humans[tcam][target].health};
-         humans[tcam][target].health -= x;
+      ap:1,
+      afterProcess:async function(cam,me,tcam,target,rate,kind,attributes,damage){
+         addtext(arraySelect(['トリニティの砲撃術は優秀ですから。','お口に合うと良いのですが..']));
+         let result = await humandamaged(cam,me,tcam,target,0.4,kind,['unpursuit']);
+         if(result == 'end'){return 'end';}
          await buffadd(tcam,target,'shelldown','turn',3,1);
-         log.textContent = 'お口に合うと良いのですが..';
-         await delay(1000);
-         if(humans[tcam][target].health <= 0){return 'dead';}
-         else{return 'alive';}
+         return 'alive';
       },
-      pp:0,
+      ce:0,
    },
    'biggamble':{
       name:'大博打',
       id:'biggamble',
       num:0,
-      power:'Math.floor(Math.random()*100)+1',
+      power:0,
       price:150,
       description:'大勝負..ってやつ？まじで賭け。がんばえ',
       buyable:1,
-      sp:0,
-      pp:0,
+      ap:0,
+      ce:1,
+      combatEffect:{
+         attack: Math.floor(Math.random()*100)+1,
+      }
    },
    'contrarian':{
       name:'天邪鬼',
@@ -2341,8 +2333,11 @@ let Weapons = {
       price:150,
       description:'名前変更予定。',
       buyable:0,
-      sp:0,
-      pp:0,
+      ap:0,
+      ce:1,
+      combatEffect:{
+         critlate: 60
+      }
    }
 }
 
@@ -2452,17 +2447,18 @@ let Armors = {
 
 let Tools = {
    'aspirin':{
-      name:'アスピリン',
       id:'aspirin',
+      name:'アスピリン',
       price:20,
       description:'頭痛薬らしいですね、これ。痛み止め薬とか耐えればいらんくね？とかいったら炎上するかな',
       num:5,
-      process:async function(cam,tcam,me,target){
-         log.textContent = `おや、頭が痛いって？痛みに効くのはアスピリン！`;await delay(1000);
+      process:async function(cam,me,tcam,target){
+         await addtext(`おや、頭が痛いって？痛みに効くのはアスピリン！`);
          x = Math.round(humans[tcam][target].maxhealth * 0.2);
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
          humans[tcam][target].health += x;
-         log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000);
+         tekiou()
+         await addtext(`体力が${x}回復した!`);
          return 'alive';
       }
    },
@@ -2470,14 +2466,15 @@ let Tools = {
       name:'パブロン',
       id:'pablon',
       price:40,
-      description:'風邪薬。大人とかむけらしいね',
+      description:'風邪薬。大人とか向けらしいね',
       num:2,
-      process:async function(cam,tcam,me,target){
-         log.textContent = `早めのパブロン♪`;await delay(1000);
+      process:async function(cam,me,tcam,target){
+         await addtext(`早めのパブロン♪`);
          x = Math.round(humans[tcam][target].maxhealth * 0.4);
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
          humans[tcam][target].health += x;
-         log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000);
+         tekiou();
+         await addtext(`体力が${x}回復した!`);
          return 'alive';
       }
    },
@@ -2487,12 +2484,13 @@ let Tools = {
       price:60,
       description:'タンパク質を分解し、アミノ酸にする働きのある消化酵素。所属事務所は膵臓。',
       num:0,
-      process:async function(cam,tcam,me,target){
-         log.textContent = `トリプシンを飲んだ！！え？これは薬じゃないって？`;await delay(1000);
+      process:async function(cam,me,tcam,target){
+         await addtext(`トリプシンを飲んだ！！え？これは薬じゃないって？`);
          x = Math.round(humans[tcam][target].maxhealth * 0.6);
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
          humans[tcam][target].health += x;
-         log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000);
+         tekiou();
+         await addtext(`体力が${x}回復した!`);
          return 'alive';
       }
    },
@@ -2502,12 +2500,13 @@ let Tools = {
       price:80,
       description:'sick sickな頭痛薬。毒が流るルルですね。',
       num:0,
-      process:async function(cam,tcam,me,target){
-         log.textContent = `求愛性 孤独 ドク 流るルル♪`;await delay(1000);
+      process:async function(cam,me,tcam,target){
+         await addtext(`求愛性 孤独 ドク 流るルル♪`)
          x = Math.round(humans[tcam][target].maxhealth * 0.8);
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
          humans[tcam][target].health += x;
-         log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000);
+         tekiou();
+         await addtext(`体力が${x}回復した!`);
          return 'alive';
       }
    },
@@ -2517,12 +2516,13 @@ let Tools = {
       price:100,
       description:'投げつけたい。敵に',
       num:0,
-      process:async function(cam,tcam,me,target){
-         log.textContent = `なんか一番しょうもないよね、これ あ、全回復です`;await delay(1000);
+      process:async function(cam,me,tcam,target){
+         await addtext(`なんか一番しょうもないよね、これ<br>あ、全回復です`)
          x = Math.round(humans[tcam][target].maxhealth);
          if((x + humans[tcam][target].health) > humans[tcam][target].maxhealth){x = humans[tcam][target].maxhealth - humans[tcam][target].health;};
          humans[tcam][target].health += x;
-         log.textContent = `体力が${x}回復した!`;tekiou();await delay(1000);
+         tekiou();
+         await addtext(`体力が${x}回復した!`);
          return 'alive';
       }
    },
@@ -2530,15 +2530,15 @@ let Tools = {
       name:'投げナイフ',
       id:'throwknife',
       price:20,
-      description:'シンプルに20%ダメージ。十六夜(じゅうろくや)さんが投げるあれ',
+      description:'シンプルに20%ダメージ。十六夜さんが投げるあれ',
       num:5,
-      process:async function(cam,tcam,me,target){
-         log.textContent = 'では、ナイフの錆にしてあげましょう';await delay(1000);
+      process:async function(cam,me,tcam,target){
+         await addtext('では、ナイフの錆にしてあげましょう');
          x = Math.ceil(humans[tcam][target].health*0.2);
-         if(humans[tcam][target].health < x){x = humans[tcam][target].health};
-         humans[tcam][target].health -= x
-         log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';tekiou();await delay(1000);
-         if(humans.enemies[target].health <= 0){return 'dead';}
+         let result = await humandamaged(cam,me,tcam,target,x,'sh',['unpursuit','fixed'])
+         tekiou();
+         await addtext(`${humans[tcam][target].name}に${x}のダメージ！`);
+         if(result == 'end'){return 'end'};
          return 'alive';
       }
    },
@@ -2546,25 +2546,23 @@ let Tools = {
       name:'トリッキーな変数',
       id:'trickyvariables',
       price:40,
-      description:'黒崎コユキ、きちゃいました！！なんか面白いことないですか？(10%,25%,40%からランダム)',
+      description:'黒崎コユキ、きちゃいました！！なんか面白いことないですか？<br>(10%,25%,40%からランダム)',
       num:1,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          x = Math.floor(Math.random() * 3) + 1;
          switch(x){
             case 1:
-               log.textContent = 'ま、これでいいですよね？';
-               x = Math.ceil(humans[tcam][target].health*0.10);break;
+               await addtext('ま、これでいいですよね？');
+               x = Math.floor(humans[tcam][target].health*0.10);break;
             case 2:
-               log.textContent = '結果良ければすべてオッケー！ってね？';
-               x = Math.ceil(humans[tcam][target].health*0.25);break;
+               await addtext('結果良ければすべてオッケー！ってね？');
+               x = Math.floor(humans[tcam][target].health*0.25);break;
             case 3:
-               log.textContent = 'これぞ醍醐味、ってやつ？';
-               x = Math.ceil(humans[tcam][target].health*0.40);break;
-         };await delay(1000);
-         if(humans[tcam][target].health < x){x = humans[tcam][target].health};
-         humans[tcam][target].health -= x;
-         log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';tekiou();await delay(1000);
-         if(humans[tcam][target].health <= 0){log.textContent = 'ちょろい、ちょろい。BANG！';await delay(1000);return 'dead';}
+               await addtext('これぞ醍醐味、ってやつ？');
+               x = Math.floor(humans[tcam][target].health*0.40);break;
+         };
+         let result = await humandamaged(cam,me,tcam,target,x,'sh',['unpursuit','fixed'])
+         if(result == 'end'){return 'end'};
          return 'alive';
       }
    },
@@ -2572,16 +2570,16 @@ let Tools = {
       name:'ボトルグレネード',
       id:'bottlegrenade',
       price:60,
-      description:'殴るついでに燃やす。まじでつよい レッドウィンターの問題児にしては上出来すぎる',
+      description:'殴るついでに燃やす。まじでつよい<br>レッドウィンターの問題児にしては上出来すぎる',
       num:0,
-      process:async function(cam,tcam,me,target){
-         log.textContent = 'これはちょっと、スパイシーなやつだよ';await delay(1000);
-         x = Math.ceil(humans[cam][me].attack * 0.8)
-         if(humans[tcam][target].health < x){x = humans[tcam][target].health};
-         humans[tcam][target].health -= x;
+      process:async function(cam,me,tcam,target){
+         await addtext('これはちょっと、スパイシーなやつだよ');
+         let result = await humandamaged(cam,me,tcam,target,0.8,'mg',['unpursuit'])
+         if(result == 'end'){
+            await addtext('レッドウィンターの問題児にしては上出来じゃない？');
+            return 'dead';
+         };
          await buffadd(tcam,target,'burn','turn',3,1);
-         log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';tekiou();await delay(1000);
-         if(humans[tcam][target].health <= 0){log.textContent = 'レッドウィンターの問題児にしては上出来じゃない？';await delay(1000);return 'dead';}
          return 'alive';
       }
    },
@@ -2591,7 +2589,7 @@ let Tools = {
       price:80,
       description:'ダメージ与える。ゴミ箱に隠れてる人。',
       num:0,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          log.textContent = 'え、援護します...';await delay(1000);
          x = Math.ceil(humans[cam][me].attack * 2.2);
          if(humans[tcam][target].health < x){x = humans[tcam][target].health};
@@ -2607,7 +2605,7 @@ let Tools = {
       price:100,
       description:'エクスプローージョン！！！',
       num:1,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          humans[tcam][target].health = 0;tekiou();
          log.textContent = '爆発オチなんてサイテー！！';await delay(1000);
          return 'dead';
@@ -2619,7 +2617,7 @@ let Tools = {
       price:35,
       description:'退場です。帰れ(スキップ)',
       num:3,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          await buffadd(tcam,target,'skip','turn',1,1);
          log.textContent = 'カードを仕込みました!';await delay(1000);
          return 'alive';
@@ -2631,7 +2629,7 @@ let Tools = {
       price:35,
       description:'リバースを召喚！このカードは相手と自分の体力を交換する！！割合だ！！！！',
       num:0,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          x = humans.players[me].health/humans.players[me].maxhealth*humans.enemies[target].health;//割合交換(そのうちゲージにする時用)
          y = humans.enemies[target].health/humans.enemies[target].health*humans.players[me].maxhealth;
          humans.enemies[target].health = x;
@@ -2649,7 +2647,7 @@ let Tools = {
       price:35,
       description:'バフを2個ランダムでつける。つよい',
       num:0,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          let rbuffs = ['powerup','shellup','luck'];
          rbuffs = arrayShuffle(rbuffs);
          x = rbuffs[0];
@@ -2666,7 +2664,7 @@ let Tools = {
       price:35,
       description:'デバフを2個つける。割とつよい',
       num:0,
-      process:async function(cam,tcam,me,target){
+      process:async function(cam,me,tcam,target){
          let rbuffs = ['powerdown','shelldown','poison','burn','freeze'];
          rbuffs = arrayShuffle(rbuffs);
          for(i = 0;i < 2;i++){
@@ -2682,8 +2680,8 @@ let Tools = {
       price:35,
       description:'「大人のカード」を取り出す。...プレ先ではないぞ',
       num:0,
-      process:async function(cam,tcam,me,target){
-         euro += 120;updateUI()
+      process:async function(cam,me,tcam,target){
+         stone += 120;updateUI()
          log.textContent = '大人のカードを割りました！粉々になりました';await delay(1000);
          return 'alive';
       }
@@ -3693,11 +3691,13 @@ function tekiou(){
 
 }
 
+
+
 function save(){
    updateUI();
    const newData = {
-      euro: euro,
-      bankeuro: bankeuro,
+      stone: stone,
+      bankstone: bankstone,
       rank: rank,
       rpt: rpt,
       rp: rp,
@@ -3822,7 +3822,27 @@ async function NicoNicoText(mes){
 
 
 //#endregion
+//#region オブザーバー
+function observeDisplayChangeBlock(targetSelector, callback){ //style="display:block;" を検知するやつ。
+   const targetNode = document.querySelector(targetSelector);
+   if (!targetNode) return;
+
+   const observer = new MutationObserver((mutationsList) => {
+      for (let mutation of mutationsList) {
+         if (mutation.attributeName == "style") {
+            const displayValue = window.getComputedStyle(targetNode).display;
+            if (displayValue == "block"){
+               callback();
+            }
+         }
+      }
+   });
+
+   observer.observe(targetNode, { attributes: true, attributeFilter: ["style"] });
+}
+//#endregion
 //#region log&text
+
 let textDiv = document.querySelector('#text');
 let autoDelay = 1;
 let skipText = false; // スキップフラグ
@@ -3954,43 +3974,105 @@ function addlog(text){
 //#endregion
 
 //#region Inventory
+let Inventory = document.querySelector('#Inventory');
 let Sutefuris = {
    'maxhealth':{
-      name:'maxhealth',
+      name:'最大体力',
+      id:'maxhealth',
       added:0, //実績用にします？
-      description:'最大体力を20増やし、体力を20回復する<br>ピンチな時にぜひ<br>筋肉は全てを解決する'
+      value:20,
+      description:'最大体力を20増やし、体力を20回復する<br>ピンチな時にぜひ<br>筋肉は全てを解決する',
    },
    'attack':{
-      name:'attack',
+      name:'攻撃力',
+      id:'attack',
       added:0,
+      value:5,
       description:'攻撃力を5増加させる。腕立て伏せかな'
    },
    'defense':{
-      name:'defense',
+      name:'防御力',
+      id:'defense',
       added:0,
+      value:5,
       description:'防御力を5増加させる。腹筋とかかな'
    },
    'maxmp':{
-      name:'maxmp',
+      name:'最大魔素',
+      id:'maxmp',
       added:0,
+      value:10,
       description:'最大魔素保有量を10増加。けど圧縮してる感じ<br>筋肉でも解決できないことはある'
    },
    'mattack':{
-      name:'mattack',
+      name:'魔法攻撃力',
+      id:'mattack',
       added:0,
-      description:'魔法攻撃力を5増加。'
+      value:5,
+      description:'魔法攻撃力を5増加。おそらく変換機の改良'
+   },
+   'mdefense':{
+      name:'魔法抵抗力',
+      id:'mdefense',
+      added:0,
+      value:5,
+      description:'魔法防御力を5増加。おそらく気合い'
+   },
+   'critlate':{
+      name:'会心率',
+      id:'critlate',
+      added:0,
+      value:2,
+      description:'会心率を2上昇する。つまりは2%上昇。<br>相手の弱点を見抜く力は大事',
+   },
+   'critdmg':{
+      name:'会心倍率',
+      id:'critdmg',
+      added:0,
+      value:0.1,
+      description:'会心時の倍率を10%上昇する。つまりは倍率が+0.1',
+   },
+   'critresist':{
+      name:'会心抵抗',
+      id:'critresist',
+      added:0,
+      value:2,
+      description:'会心抵抗を2上昇する。つまりは2%分会心されにくい<br>どこまでが本体かわからないような服着てるのかな'
+   },
+   'speed':{
+      name:'速度',
+      id:'speed',
+      added:0,
+      value:5,
+      description:'速度を5上昇させる。あまり上げる意味はない<br>こうそくいどうがなんだかんだめちゃ強なんすわ'
+   },
+   'dodge':{
+      name:'回避率',
+      id:'dodge',
+      added:0,
+      value:2,
+      description:'回避率を2上昇させる。つまりは2%。<br>速度と一緒やろ！！って思った人は帰れ'
+   },
+   'targe':{
+      name:'命中率',
+      id:'targe',
+      added:0,
+      value:2,
+      description:'命中率を2上昇させる。つまりは2%。<br>回避率に対抗するか命中が下げられたかでもないと基本上げない'
    }
 }
 let InventoryPage = 1;
 function inventoryOpen(num){
-   document.querySelector('#movabledescription').textContent = '';document.querySelector('#movabledescription').style.display = 'none';
+   document.querySelector('#movabledescription').textContent = '';
+   document.querySelector('#movabledescription').style.display = 'none';
+
    InventoryPage = num??1;
    AllowMove = 1;
    let array = ['name','level','exp','health','maxhealth','attack','defense','maxmp','mattack','mdefense','critlate','critdmg','critresist'];
    let Status = array.map(a => `${a}: ${humans.players[InventoryPage][a]}`).join('<br>');
    
-   let Sutefuri = Object.key(Sutefuris).map(a => `<button class=" button" onclick="suteFuri${a}">${a}</button>`).join('<br>');
-   document.querySelector('#InventoryArea').style.display = 'flex';
+   let Sutefuri = Object.key(Sutefuris).map(a => `<button class="button" data-description="${Sutefuris[a].description}" onclick="suteFuri${a}">${a}</button>`).join('<br>');
+   Inventory.style.display = 'flex';
    
 
    // let slashs = Object.keys(Slashs).map(a => Slashs[a].lv <= humans.players[InventoryPage].level ? `<span class="hasd" data-description="${Slashs[a].description}">${Slashs[a].id}</span>` : null).filter(Boolean)
@@ -4030,7 +4112,7 @@ function inventoryOpen(num){
 }
 function inventoryClose(){
    AllowMove = 0;
-   document.querySelector('#InventoryArea').style.display = 'none';
+   Inventory.style.display = 'none';
    
 };
 
@@ -4201,92 +4283,65 @@ function suteFuri(me,code){
 }
 
 //#endregion
-//#region Notice
-const Notices = {
-   'introduction':{
-      txt:'introduction',//txtのファイル名
-      headline:'このお知らせ機能について',//見出し
-      name:'お知らせ機能！ついに登場〜☆',//タイトル
-   },
-   '1.200-1.205':{
-      txt:'1.200-1.205',
-      headline:'1.200~1.205',
-      name:'1.200~1.205までの更新のお話',
-   },
-   '1.206':{
-      txt:'1.206',
-      headline:'1.206',
-      name:'1.206の更新内容のお話',
-   },
-   '1.207':{
-      txt:'1.207',
-      headline:'1.207',
-      name:'1.207の更新内容のお話',
-   },
-   '1.208':{
-      txt:'1.208',
-      headline:'1.208',
-      name:'1.208の更新内容のお話',
-   },
-   '最近更新できてない件について':{
-      txt:'最近更新できてない件について',
-      headline:'最近更新できてない件について',
-      name:'振り返って見ると最近更新できてない件',
-   },
-   'todo':{
-      txt:'todo',
-      headline:'todoリストとか',
-      name:'something to do for me'
-   },
-   '1.300..?!':{
-      txt:'1.300..?!',
-      headline:'1.300..?!',
-      name:'1.300..?!(まだ)'
-   }
-}
-let noticenow = 0;
-function OpenNotice(){
-   sideMenu.style.left = '-250px';
-   document.querySelector('#Notice-page').style.display = 'block';
-   document.querySelector('#notice-honmei').style.display = 'block';
-   document.querySelector('#notice-list').innerHTML = Object.keys(Notices).map(a => `<li class="notice" data-name="${a}">${Notices[a].headline}</li>`).join('');
-}
-function CloseNotice(){
-   document.querySelector('#notice-list').innerHTML = '';
-   document.querySelector('#Notice-page').style.display = 'none';
-}
-document.addEventListener('click', (event) => {
-   if(event.target.classList.contains('notice')){
-       let name = event.target.getAttribute('data-name');
 
-       document.querySelector('#notice-honmei').style.display = 'none';
-       document.querySelector('#notice-main').style.display = 'block';
 
-       console.log(`assets/notices/${name}.txt`);
-       document.querySelector('#notice-title').textContent = Notices[name].name;
-       fetch(`assets/notices/${name}.txt`)
-       .then(response => response.text())
-       .then(data => {document.querySelector('#notice-text').innerText = data;})
-       .catch(error => console.error('Error:', error));
-   }
-});
-
-// document.querySelector('#notice-back').addEventListener('click', () => {
-//    document.querySelector('#notice-title').textContent = '';
-//    document.querySelector('#notice-text').innerText = '';
-//    document.querySelector('#notice-honmei').style.display = 'block';
-//    document.querySelector('#notice-main').style.display = 'none';
-// })
-
+//#region sideMenu
 const menuToggle = document.querySelector('#menuToggle');
 const sideMenu = document.querySelector('#sideMenu');
 menuToggle.addEventListener('click', () => {
    if(sideMenu.style.left === '0px'){
-         sideMenu.style.left = '-250px';
+      sideMenu.style.left = '-250px';
    }else{
-         sideMenu.style.left = '0px';
+      sideMenu.style.left = '0px';
    }
 });
+//#endregion
+//#region notice
+const noticeButton = document.querySelector('#sideMenu .notice');
+const noticeMain = document.querySelector('#notice');
+const noticeList = document.querySelector('#notice .list');
+const noticeShow = document.querySelector('#notice .show');
+const noticeShowX = document.querySelector('#notice .x');
+const noticeShowBack = document.querySelector('#notice .back');
+const noticeShowTitle = document.querySelector('#notice .show .title');
+const noticeShowDate = document.querySelector('#notice .show .date');
+const noticeShowBody = document.querySelector('#notice .show .body');
+let noticeNow = 0;
+
+noticeButton.addEventListener('click', event => {
+   noticeNow = 1;
+   noticeMain.style.display = 'block';
+   sideMenu.style.left = '-250px';
+
+   noticeList.innerHTML = '';
+   Object.keys(noticeData).forEach(key => {
+      let item = document.createElement('div');
+      item.className = 'item';
+      item.innerText = noticeData[key].title;
+      item.setAttribute('data-id', key);
+      item.addEventListener('click', () => {
+         noticeShowTitle.innerText = noticeData[key].title;
+         noticeShowDate.innerText = noticeData[key].date;
+         noticeShowBody.innerText = noticeData[key].body;
+         noticeList.style.display = 'none';
+         noticeShow.style.display = 'block';
+      })
+    noticeList.appendChild(item);
+  });
+})
+noticeShowX.addEventListener('click', event => {
+  noticeMain.style.display = 'none';
+  noticeNow = 0;
+});
+noticeShowBack.addEventListener('click', event => {
+  noticeShow.style.display = 'none';
+  noticeList.style.display = 'block';
+});
+
+//#endregion
+//#region tutorial
+//#endregion
+//#region setting
 //#endregion
 //#region Questの動き
 
@@ -4341,7 +4396,7 @@ function MakeNewQuest(code){
 
 function ClearedMainQuest(code){
    if(code == 'M'&&quest.main.num == quest.main.nom){
-      euro += quest.main.rewards;
+      stone += quest.main.rewards;
       rpt += 20;
       clearedmainquest += 1;
       MakeNewQuest('x');
@@ -4349,7 +4404,7 @@ function ClearedMainQuest(code){
    switch(code){
       case 0:
          if(quest.daily[0].num == quest.daily[0].nom){
-         euro += quest.daily[0].rewards;
+         stone += quest.daily[0].rewards;
          quest.daily[0].id = 0;
          quest.daily[0].description = 'end';
          quest.daily[0].rewards = 0;
@@ -4361,7 +4416,7 @@ function ClearedMainQuest(code){
          break;
       case 1:
          if(quest.daily[1].num == quest.daily[1].nom){
-         euro += quest.daily[1].rewards;
+         stone += quest.daily[1].rewards;
          quest.daily[1].id = 0;
          quest.daily[1].description = 'end';
          quest.daily[1].rewards = 0;
@@ -4373,7 +4428,7 @@ function ClearedMainQuest(code){
          break;
       case 2:
          if(quest.daily[2].num == quest.daily[2].nom){
-         euro += quest.daily[2].rewards;
+         stone += quest.daily[2].rewards;
          quest.daily[2].id = 0;
          quest.daily[2].description = 'end';
          quest.daily[2].rewards = 0;
@@ -4385,7 +4440,7 @@ function ClearedMainQuest(code){
          break;
       case 3:
          if(quest.daily[3].num == quest.daily[3].nom){            
-         euro += quest.daily[3].rewards;
+         stone += quest.daily[3].rewards;
          quest.daily[3].id = 0;
          quest.daily[3].description = 'end';
          quest.daily[3].rewards = 0;
@@ -4397,7 +4452,7 @@ function ClearedMainQuest(code){
          break;
       case 4:
          if(quest.daily[4].num == quest.daily[4].nom){
-         euro += quest.daily[4].rewards;
+         stone += quest.daily[4].rewards;
          quest.daily[4].id = 0;
          quest.daily[4].description = 'end';
          quest.daily[4].rewards = 0;
@@ -4409,104 +4464,6 @@ function ClearedMainQuest(code){
          break;
    }
    save();
-}
-//#endregion
-//#region buffの動き
-async function buffadd(tcam,target,buff,time,val){//誰のバフ/デバフか,バフ/デバフの名前,効果時間,効果量
-   if(!buff || !time || !val){console.error('要素が足りないぜ！！！');}
-   let buffData = [...Object.values(Effects.buffs), ...Object.values(Effects.debuffs), ...Object.values(Effects.handles), ...Object.values(Effects.uniques)].find(e => e.name === buff);
-   let defender = humans[tcam][target];
-
-   console.log(`${defender.name}に${val}の${buff}を${time}付与します！！`);
-
-   let newbuff = {};
-
-   switch(buffData.kind){
-      case 'turn':{
-         //すでにある場合の処理
-         let hasbuffIndex = defender.buffs.findIndex(e => e.name == buff && e.value == val);
-         if(hasbuffIndex >= 0){
-            newbuff = defender.buffs[hasbuffIndex];
-            defender.buffs.splice(hasbuffIndex,1);
-            newbuff.time += time;
-         }else{
-            newbuff = {
-               type: buffData.type,
-               kind: buffData.kind,
-               name: buff,
-               time: time,
-              value: val,
-               data: buffData,
-            };
-         }
-      };
-      tekiou();
-      await addtext(`${defender.name}は${buff}を${time}turn受けた!`);
-      break;
-
-      case 'stack':{
-         let hasbuffIndex = defender.buffs.findIndex(e => e.name == buff);
-         if(hasbuffIndex >= 0){
-            defender.buffs[hasbuffIndex].time += time;
-            defender.buffs[hasbuffIndex].value = buffData.lv[time];
-         }else{
-            newbuff = {
-               type: buffData.type,
-               kind: buffData.kind,
-               name: buff,
-               time: time, // (stack)
-              value: buffData.lv[time],
-               data: buffData,
-            };
-         }
-      };
-      tekiou();
-      await addtext(`${defender.name}は${buff}を${time}stack受けた!`);
-      break;
-   }
-
-   
-   
-}
-function buffremove(tcam,target,buff){
-   //誰のバフ/デバフか,バフ/デバフの名前
-   let defender = humans[tcam][target];
-   let i = defender.buffs.findIndex(e => e.name == buff)
-   defender.buffs.splice(i,1);
-   tekiou();
-}
-function buffclear(tcam,target,code){
-   let defender = humans[tcam][target];
-   switch(code){
-      case 'all':
-         defender.buffs = [];
-         break;
-      case 'turn':
-         defender.buffs = defender.buffs.filter(e => e.kind != 'turn');
-         break;
-      case 'stack':
-         defender.buffs = defender.buffs.filter(e => e.kind != 'stack');
-         break;
-      case 'buffs':
-         defender.buffs = defender.buffs.filter(e => e.type == 'buffs');
-         break;
-      case 'debuffs':
-         defender.buffs = defender.buffs.filter(e => e.type == 'debuffs');
-         break;
-      case 'handles':
-         defender.buffs = defender.buffs.filter(e => e.type == 'handles');
-         break;
-      case 'uniques':
-         defender.buffs = defender.buffs.filter(e => e.type == 'uniques');
-         break;
-      default:
-         console.console('codeが違ったからとりあえず同名消したけど、よかった？');
-         defender.buffs = defender.buffs.filter(e => e.name == code);
-   }
-   tekiou();
-}
-function buffhas(tcam,target,buff){
-   return humans[tcam][target].buffs.find(b => b.name === buff);
 }
 //#endregion
 
@@ -4521,7 +4478,6 @@ const firebaseConfig = {
    appId: "1:730150198097:web:076a074a3d406053155170",
    measurementId: "G-MYKJWD203Z"
 };
-// Firebaseの初期化
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 let chatroom = 1;
@@ -4531,7 +4487,7 @@ let userData;
 
 async function GameStart(){
    const Login = document.querySelector('#login');
-   document.querySelector('#HomeArea').style.display = 'block';
+   document.querySelector('#homeArea').style.display = 'block';
 
    //autoLogin
    username = getLocalStorage("username"); // ログイン時
@@ -4544,11 +4500,11 @@ async function GameStart(){
       console.log("ログインしてください");
       Login.style.display = 'block';
 
-      document.querySelector('#login-login').addEventListener('click', async function(event){
+      document.querySelector('#login .button').addEventListener('click', async function(event){
    
          event.preventDefault();
-         username = document.querySelector('#username').value;
-         var password = document.querySelector('#password').value;
+         username = document.querySelector('#login .username').value;
+         var password = document.querySelector('#login .password').value;
          let kariusersRef = database.ref('users/'+username+'/forrpg');
    
          // データベースでユーザーが存在するか確認
@@ -4566,8 +4522,8 @@ async function GameStart(){
                   password: password,
                });
                
-               euro = 0;
-               bankeuro = 0;
+               stone = 0;
+               bankstone = 0;
                rank = 1;
                rpt = 0;
                rp = 0;
@@ -4599,7 +4555,7 @@ async function GameStart(){
       });
       menuToggle.style.display = 'block';
       Login.style.display = 'none';
-      document.querySelector('#ChatTab #chat').style.display = 'flex';
+      document.querySelector('#chat-tab #chat').style.display = 'flex';
       startChat();
 
       AllowMove = 1;
@@ -4608,8 +4564,8 @@ async function GameStart(){
       userData = await load();
       await delay(500)
 
-      euro = userData.euro??0;
-      bankeuro = userData.bankeuro??0;
+      stone = userData.stone??0;
+      bankstone = userData.bankstone??0;
       rank = userData.rank??1;
       rpt = userData.rpt??0;
       rp = userData.rp??0;
@@ -4627,7 +4583,8 @@ async function GameStart(){
       }
 
       await delay(500);
-      BacktoHome()
+      console.log('最初のロードのcd')
+      cd('home','home','home')
    }
 
    
@@ -4647,7 +4604,6 @@ async function GameStart(){
       chatroom = document.querySelector('#room-select').value;
       selectRoom();
   }
-
 }
 //#endregion
 
@@ -4832,7 +4788,7 @@ window.addEventListener('beforeunload', () => {
 
 //#endregion
 
-//#region euroとrankの上のやつ
+//#region stoneとrankの上のやつ
 function updateUI(){
    if(rpt >= maxrpt){
       rank += 1;
@@ -4845,36 +4801,36 @@ function updateUI(){
    document.querySelector('.user .rank').textContent = `Rank:${rank}`;
    document.querySelector('.rpt .bar .inner').style.width = (rpt / maxrpt) * 100 + '%';
    document.querySelector('.rpt .text').textContent = `${rpt}/${maxrpt}`;
-   document.querySelector('.euro').innerHTML = `${euro}€ <button id="GetEuro" onclick="if(afknow == 0){LetsCharge();}">+</button>`; 
+   document.querySelector('#upperUI .stone').innerHTML = `${stone}𐩰   <button class="get" onclick="if(afknow == 0){LetsCharge();}">+</button>`; 
 
 }
 updateUI();
 
 function LetsCharge(){
-   document.querySelector('#HomeArea').innerHTML = `
+   document.querySelector('#homeArea').innerHTML = `
    <!--<span id="BigText">チャージステーション</span><br>-->
-   <button onclick="BacktoHome()">←</button> チャージステーション<br>
+   <button class="backtoHome">←</button> チャージステーション<br>
    <div class="row">
-   <button class="HomeBButton" onclick="Charge(90,120)">90€/120$</button>
-   <button class="HomeBButton" onclick="Charge(300,360)">300€/360$</button>
-   <button class="HomeBButton" onclick="Charge(300,360)">720€/860$</button>
+   <button class="buttonC" onclick="Charge(90,120)">90$/120€</button>
+   <button class="buttonC" onclick="Charge(300,360)">300$/360€</button>
+   <button class="buttonC" onclick="Charge(860,860)">860$/860€</button>
    </div>
    <div class="row">
-   <button class="HomeBButton" onclick="Charge(900,1080)">960€/1080$</button>
-   <button class="HomeBButton" onclick="Charge(300,360)">1340€/1460$</button>
-   <button class="HomeBButton" onclick="Charge(300,360)">1980€/2160$</button>
+   <button class="buttonC" onclick="Charge(1280,1080)">1280$/1080€</button>
+   <button class="buttonC" onclick="Charge(1840,1460)">1840$/1460€</button>
+   <button class="buttonC" onclick="Charge(2640,2160)">2640$/2160€</button>
    </div>
    `;
 }
 function Charge(e,m){
    load();
-   if(userData.money??0 >= m){
-      euro += e;
+   if(userData.stone??0 >= m){
+      stone += e;
       usersRef.update({
-         money: userData.money??m - m
+         stone: userData.stone??m - m
       });
       save();
-      NicoNicoText(`${m}$払い、${e}€チャージ完了、です！`);
+      NicoNicoText(`${m}€払い、${e}$チャージ完了、です！`);
    }else{
       NicoNicoText('お金が足りません...');
    }
@@ -4883,7 +4839,7 @@ function Charge(e,m){
 //#region profileのやつ
 async function UpdateProfile(){
    let about = userData.about??'入力してね';
-   document.querySelector('#ProfileTab').innerHTML = `
+   document.querySelector('#profile-tab').innerHTML = `
    <span style="font-size: 24px; border: 1px solid #000000">${username}</span>　Rank:${rank}<br><br>
    <textarea id="about" placeholder="write about you" style="width: 255px; height: 124px;" oninput="InputAboutMe()">${about}</textarea>
    `
@@ -4898,46 +4854,69 @@ function InputAboutMe(){
 }
 //#endregion
 //#region Homeの動き達
-function OpenTab(code){
-   document.querySelector('#HomeTab').style.display = 'none';
-   document.querySelector('#InventoryTab').style.display = 'none';
-   document.querySelector('#QuestTab').style.display = 'none';
-   document.querySelector('#ChatTab').style.display = 'none';
-   document.querySelector('#ProfileTab').style.display = 'none';
+const homeArea = document.querySelector('#homeArea');
+let nowPlace = {
+   tab: 'home', //home-tab
+   area: 'home', //homeArea
+   selection: 'home', //home
+   detail1: null,
+   detail2: null,
+   detail3: null,
+}
+function cd(tab, area, selection, detail1, detail2, detail3){
+   console.log(`tab:${tab} area:${area} selection:${selection} detail1:${detail1} detail2:${detail2} detail3:${detail3}に移動します！！`);
+   document.querySelector(`#${nowPlace.tab}-tab${nowPlace.area ? ` #${nowPlace.area}Area` : ''}${nowPlace.selection ? ` .${nowPlace.selection}` : ''}${nowPlace.detail1 ? ` .${nowPlace.detail1}` : ''}${nowPlace.detail2 ? ` .${nowPlace.detail2}` : ''}${detail3 ? ` .${detail3}` : ''}`).style.display = 'none';
+   document.querySelector(`#${tab}-tab${area ? ` #${area}Area` : ''}${selection ? ` .${selection}` : ''}${detail1 ? ` .${detail1}` : ''}${detail2 ? ` .${detail2}` : ''}${detail3 ? ` .${detail3}` : ''}`).style.display = 'block';
+   nowPlace = {
+      tab: tab,
+      area: area,
+      selection: selection,
+      detail1: detail1,
+      detail2: detail2,
+      detail3: detail3
+   } 
+}
+//MakeNewQuest('x');
+//UpdateProfile();
 
-   switch(code){
-      case 'H':document.querySelector('#HomeTab').style.display = 'block';break;
-      case 'I':document.querySelector('#InventoryTab').style.display = 'block';break;
-      case 'Q':document.querySelector('#QuestTab').style.display = 'block';MakeNewQuest('x');break;
-      case 'C':document.querySelector('#ChatTab').style.display = 'block';break;
-      case 'P':document.querySelector('#ProfileTab').style.display = 'block';UpdateProfile();break;
-   }
-}
-function BacktoHome(){
-   save();
-   
-   document.querySelector('#HomeArea').style.display = 'block';
-   document.querySelector('#HomeArea').innerHTML = `
-   <!--<span id="BigText">シャングリ・ラ中心街</span><br>-->
-   <img src="assets/downtown.png" style="width: 600px; height: 300px;"><br>
-   インタラクト<br>
-   <div class="row"><button class="HomeButton" onclick="LetsCharge()">Premium Shop</button> <button class="HomeButton" onclick="HomeBar()">酒場</button> <button class="HomeButton" onclick="HomeTraining()">訓練場</button></div>
-   <button class="HomeButton" onclick="HomeBank()">銀行</button> (ここもうちょい追加したいね)<br><br>
-   <button class="HomeBigButton" onclick="HomeMapSelect()">駅に行く</button>
-   <button class="HomeBigButton" onclick="HomeJobSelect()">タイミーをする</button>
-   <button class="HomeBigButton" onclick="HomeMarket()">商店街を見に行く</button>
-   `;
-}
+document.querySelectorAll('.goto').forEach(el => {
+   el.addEventListener('click', () => {
+      const classList = el.className.split(' ');
+
+      // "goto" より後ろのクラス名だけ抽出
+      const index = classList.indexOf('goto');
+      const args = classList.slice(index + 1);
+
+      // "-" を取り除く処理
+      const cleanArgs = args.map(arg => arg.replace(/-/g, ''));
+
+      // 最大4つまでに制限しておく（足りなければnull）
+      const [tab, area, selection, detail1, detail2, detail3] = [...cleanArgs, null, null, null, null, null, null];
+
+      // console.log(el)
+      // console.log('↑が押された時のcd')
+      cd(tab, area, selection, detail1, detail2, detail3);
+   });
+});
+
+let Tabs = document.getElementById('tabs');
+let tabs = Array.from(Tabs.children);
+tabs.forEach(tab => {
+   tab.addEventListener('click', el => {
+      
+   })
+})
+
 //#region rpgtoka
 function HomeMapSelect(){
    save();
-   document.querySelector('#HomeArea').innerHTML = `
+   document.querySelector('#homeArea').innerHTML = `
    <!--<span id="BigText">シャングリ・ラ中心街</span><br>-->
    <img src="assets/station.png" style="width: 600px; height: 300px;"><br>
-   <button onclick="BacktoHome()">←</button> 駅<br>
-   <button class="HomeSButton" onclick="HomeLetsDungeon(1)">創世黎明の原野</button><br>
-   <button class="HomeSButton" onclick="HomeLetsDungeon(2)">ガチェンレイゲスドゥールラート</button><br>
-   <button class="HomeSButton" onclick="">アビドス高等学校((</button><br>
+   <button class="backtoHome">←</button> 駅<br>
+   <button class="buttonB" onclick="HomeLetsDungeon(1)">創世黎明の原野</button><br>
+   <button class="buttonB" onclick="HomeLetsDungeon(2)">ガチェンレイゲスドゥールラート</button><br>
+   <button class="buttonB" onclick="">アビドス高等学校((</button><br>
    `;
 }
 async function HomeLetsDungeon(code){
@@ -4950,11 +4929,10 @@ async function HomeLetsDungeon(code){
    humans.players[1].exp = 0;
    sp = 1;
    
-   document.querySelector('#HomeArea').style.display = 'block';
-   document.querySelector('#HomeArea').style.textAlign = 'center';
-   document.querySelector('#BattleArea').style.display = 'none';
-   document.querySelector('#HomeArea').innerHTML = '<div id="selectChara"></div>';
-   //document.querySelector('#selectChara').style.display = 'none';
+   document.querySelector('#homeArea').style.display = 'block';
+   document.querySelector('#homeArea').style.textAlign = 'center';
+   document.querySelector('#battleArea').style.display = 'none';
+   document.querySelector('#homeArea').innerHTML = '<div id="selectChara"></div>';
    for(let id of Object.keys(Charas)){
       let chara = Charas[id];
       let newDiv = document.createElement('div');
@@ -4979,7 +4957,7 @@ async function HomeLetsDungeon(code){
       name.appendChild(span);
       newDiv.appendChild(name);
       
-      document.querySelector('#selectChara').appendChild(newDiv);
+      document.querySelector('#homeArea .station .select .1').appendChild(newDiv);
 
       //後付けハードディスク
       let spanScrollWidth = span.scrollWidth
@@ -4999,13 +4977,12 @@ async function HomeLetsDungeon(code){
          span.style.animation = `scroll-${chara.id}ver ${fixedTime * 2 + moveTime}s linear infinite`;
       }
    }
-   //document.querySelector('#selectChara').style.display = 'flex';
 
 }
 function HomeGoDungeon(name){
-   document.querySelector('#HomeArea').style.textAlign = 'left';
-   document.querySelector('#HomeArea').style.display = 'none';
-   document.querySelector('#BattleArea').style.display = 'none';
+   document.querySelector('#homeArea').style.textAlign = 'left';
+   document.querySelector('#homeArea').style.display = 'none';
+   document.querySelector('#battleArea').style.display = 'none';
    let player = humans.players[1]
    player.id = name;
 
@@ -5051,8 +5028,8 @@ function HomeGoDungeon(name){
    logOOmoto.style.display = 'flex';
    logOOmoto.style.right = '-300px';
    logOpener.textContent = '<';
-   document.querySelector('#overField').style.display = 'block';
-   document.querySelector('#HomeArea').style.display = 'none';
+   document.querySelector('#overfieldArea').style.display = 'block';
+   document.querySelector('#homeArea').style.display = 'none';
    GoNextFloor();
 
    AllowMove = 0;
@@ -5070,61 +5047,43 @@ function HomeGoDungeon(name){
 }
 
 function ExitDungeon(code){
-   euro += 50*code;
+   stone += 50*code;
    dungeonnow = 0;
-   document.querySelector('#overField').style.display = 'none';
-   document.querySelector('#BattleArea').style.display = 'none';
-   BacktoHome();
+   document.querySelector('#overfieldArea').style.display = 'none';
+   document.querySelector('#battleArea').style.display = 'none';
+   console.log('ダンジョン出た時ののcd')
+   cd('home','home','home')
 }
 //#endregion
 //#region jobtoka
-function HomeJobSelect(){
-   save();
-   document.querySelector('#HomeArea').innerHTML = `
-   <!--<span id="BigText">タイミー</span><br>-->
-   <button onclick="BacktoHome()">←</button> お仕事一覧<br>
-   <select id="Num-Select"><option value="1">01</option><option value="2">02</option><option value="3">03</option><option value="4">04</option><option value="5">05</option><option value="6">06</option><option value="7">07</option><option value="8">08</option></select><br>
-   <button class="HomeSButton" onclick="HomeJobStart('EuroShort')">[急募][短期][面接無し]品出し(エイトイレブン)</button><br>
-   <button class="HomeSButton" onclick="HomeJobStart('EuroMiddle')">[高収入]仕分け、シール貼り(株式会社アイミックス)</button><br>
-   <button class="HomeSButton" onclick="HomeJobStart('EuroLong')">[超高収入]荷物を受け取り、運ぶだけ！</button><br>
-   `;
-}
-
 function HomeJobStart(name){
    save();
    afknow = 1;
-   let num = document.querySelector('#Num-Select').value;
-   document.querySelector('#HomeArea').innerHTML = `
-   ーAFKタスク進行中ー<br>
-   <span id="Task-log">
-      <div class="task-bar-container">
-         <div class="task-bar" id="task-bar"></div>
-         <div class="task-text">  <span id="task-text">wait...</span></div>
-      </div>
-   </span>
+   let num = document.querySelector('#homeArea .job .num').value;
+   document.querySelector('#homeArea').innerHTML = `
    `;
    let reword = 0;
    let time = 0;
    let type = 0;
    switch(name){
-      case 'EuroShort':
-         type = 'Euro'
+      case 'stoneShort':
+         type = 'stone'
          reword = num*10;
          time = 5
          break;
-      case 'EuroMiddle':
-         type = 'Euro';
+      case 'stoneMiddle':
+         type = 'stone';
          reword = num*50;
          time = 15;
          break;
-      case 'EuroLong':
-         type = 'Euro'; 
+      case 'stoneLong':
+         type = 'stone'; 
          reword = num*100
          time = 30;  
          break;
    }
    let maxTasks = num*time*60;
-   let taskInterval = 1000; // 15分 (ミリ秒に変換)
+   let taskInterval = 1000;
    let completedTasks = 0;
    let taskTimer;
    function afkTask(){
@@ -5137,7 +5096,7 @@ function HomeJobStart(name){
          clearInterval(taskTimer);
          afknow = 0;
          switch(type){
-            case 'Euro':euro += reword;document.querySelector('#euro').textContent = euro+'€'; break;
+            case 'stone':stone += reword;document.querySelector('#stone').textContent = stone+'€'; break;
          }
          HomeJobSelect();
       }
@@ -5149,34 +5108,18 @@ function HomeJobStart(name){
 //#endregion
 
 //#region bar
-function HomeBar(){
-   save();
-   
-   document.querySelector('#HomeArea').innerHTML = `
-   <button onclick="BacktoHome()">←</button> Dril's bar<br>
-   <button class="HomeSButton" onclick="HomeBarRecluit()">募集</button>
-   <button class="HomeSButton" onclick="HomeBarMeet()">探す</button>
-   `;
-}
 
-function HomeBarRecluit(){
-   save();
-   
-   document.querySelector('#HomeArea').innerHTML = `
-   <button onclick="HomeBar()">←</button>募集<br>
-   ダンジョンで一緒に戦ってくれる仲間を募集することができます！<br>
-   <div class="row">
-   <button class="HomeSButton" onclick="HomeBarRecluitGo(1)">1回募集/80€</button>
-   <button class="HomeSButton" onclick="HomeBarRecluitGo(10)">10回募集/800€</button>
-   </div>
-   `;
-}
+async function friendRecluit(num, code){ //numは回数、codeは"3"で
+   let per1 = 0.80, per2 = 0.17, per3 = 0.03;
 
-let per1 = 0.80, per2 = 0.17, per3 = 0.03;
-const Result = document.querySelector('#r-go');
-let result = [];
-let showresult = []
-async function HomeBarRecluitGo(num){
+   const Recruiting = document.querySelector('#homeArea .bar .recluit .recruiting');
+   const Start = Recruiting.querySelector('.start');
+   const Detail = Recruiting.querySelector('.detail');
+   const Results = Recruiting.querySelector('.results');
+
+   let result = [];
+   let resultName = []
+
    save();
    
    result = [];
@@ -5199,25 +5142,44 @@ async function HomeBarRecluitGo(num){
 
    result.forEach(atai => {
       let person = arraySelect(Object.keys(Friends).filter(a => Friends[a].rare == atai));
-      showresult.push(person)
-   })
+      resultName.push(person)
+   });
 
-   
-   document.querySelector('#HomeArea').innerHTML = `
-   <div id="r-go">
-      recluit agent is cool company<br>
-      <img class='r-go-img' src="assets/system/recluit-${color}.png">
-   </div>
-   `;
-   document.querySelector('#r-go').style.fontSize = '8px';
-   document.querySelector('#r-go').addEventListener('click',HomeBarRecluitLets);
+   Start.querySelector('.push').addEventListener('click', async function(){
+      Start.style.display = 'none';
+      Results.style.display = 'block';
+      resultName.forEach(i => {
+         let friend = Friends[resultName[i]];
+
+         let newDiv = document.createElement('div');
+         newDiv.className = 'result';
+         newDiv.dataset.num = i;
+         newDiv.innerHTML = `
+         <div class="img">
+            <img class="inner" src="${images[Friends[i].id].src}">
+         </div>
+         <div class="rare">
+            <img class="inner" src="${images[`star${Friends[i].rare}`].src}" alt="">
+         </div>
+         `;
+
+         newDiv.addEventListener('click', async function(){
+            Results.style.display = 'none';
+            Detail.style.display = 'block';
+
+            Detail.querySelector('.name .ruby').textContent = friend.ruby;
+            Detail.querySelector('.name .txt').textContent = friend.name;
+            Detail.querySelector('.rare .img').src = images[`star${friend.rare}`].src;
+         })
+      })
+   });
 }
 
 function HomeBarRecluitLets(num){
    document.querySelector('#r-go').removeEventListener('click',HomeBarRecluitLets);
    log.textContent = "";
-   document.querySelector('#r-go').style.fontSize = '20px';//
-   document.querySelector('#r-go').innerHTML = showresult.join("<br>");
+   document.querySelector('#r-go').style.fontSize = '20px';
+   document.querySelector('#r-go').innerHTML = resultName.join("<br>");
 }
 function HomeBarMeet(){
    save();
@@ -5228,7 +5190,7 @@ function HomeBarMeet(){
 //#region training
 function HomeTraining(){
    save();
-   document.querySelector('#HomeArea').innerHTML = `
+   document.querySelector('#homeArea').innerHTML = `
    <button onclick="BacktoHome()">←</button> 訓練場<br>
    ここではスキルツリー的に能力を伸ばせるようにする予定。<br>
    まあ...できてないんですけどね！！！！！<br>
@@ -5240,23 +5202,23 @@ function HomeTraining(){
 function HomeBank(){
    updateUI()
    save();
-   document.querySelector('#HomeArea').innerHTML = `
+   document.querySelector('#homeArea').innerHTML = `
   <button onclick="BacktoHome()">←</button> 超安心安全銀行<br>
   <span id="bank-deposit" class="bank-title">deposite</span><input type="number" id="bank-deposit-num" /><button id="bank-deposit-num-go" onclick="BankDeposite('Num')" class="bank-button">go</button><button id="bank-deposit-all" class="bank-button" onclick="BankDeposite('All')">All</button><br>
   <span id="bank-withdraw" class="bank-title">withdraw</span><input type="number" id="bank-withdraw-num" /><button id="bank-withdraw-num-go" onclick="BankWithdraw('Num')" class="bank-button">go</button><button id="bank-withdraw-all" class="bank-button" onclick="BankWithdraw('All')">All</button><br>
-  <span id="BankEuro">bank account:0€</span>
+  <span id="Bankstone">bank account:0€</span>
    `;
-   document.querySelector('#BankEuro').textContent = 'bank account:'+bankeuro+'€';
+   document.querySelector('#Bankstone').textContent = 'bank account:'+bankstone+'€';
 }
 function BankDeposite(code){
    if(code == 'Num'){
       let num = +document.querySelector('#bank-deposit-num').value;
-      bankeuro += num;
-      euro -= num;
+      bankstone += num;
+      stone -= num;
       document.querySelector('#bank-deposit-num').value = '';
    }else if(code == 'All'){
-      bankeuro += euro;
-      euro = 0;
+      bankstone += stone;
+      stone = 0;
       document.querySelector('#bank-deposit-num').value = '';
    }
    save();
@@ -5265,12 +5227,12 @@ function BankDeposite(code){
 function BankWithdraw(code){
    if(code == 'Num'){
       let num = +document.querySelector('#bank-withdraw-num').value;
-      euro += num;
-      bankeuro -= num;
+      stone += num;
+      bankstone -= num;
       document.querySelector('#bank-withdraw-num').value = '';
    }else if(code == 'All'){
-      euro += bankeuro;
-      bankeuro = 0;
+      stone += bankstone;
+      bankstone = 0;
       document.querySelector('#bank-withdraw-num').value = '';
    }
    save();
@@ -5281,7 +5243,7 @@ function BankWithdraw(code){
 //#endregion
 
 //#region 非ダメ時モーション(?)
-async function humandamaged(cam,tcams,me,targets,multiplier,kind,code){//矛先の陣営、攻撃タイプ(物理||魔法)、自分、矛先、倍率、コード(PS用)
+async function humandamaged(cam,tcams,me,targets,rate,kind,code){//矛先の陣営、攻撃タイプ(物理||魔法)、自分、矛先、倍率、コード(PS用)
    if(!Array.isArray(tcams)){tcams = [tcams];}
    if(!Array.isArray(targets)){targets = [targets];}
    for(let i = 0; i < tcams.length; i++){
@@ -5291,21 +5253,21 @@ async function humandamaged(cam,tcams,me,targets,multiplier,kind,code){//矛先�
       let attacker = humans[cam][me];
       let defender = humans[tcam][target];
 
-      console.log(`${attacker.name} => ${defender.name}; 倍率は${multiplier}で、種類は${kind}でコードは${code}だってよ`);
-      console.log(`ついでに言うと攻撃力は${attacker.attack}で、防御力は${defender.defense}だから計算上ダメージは${(attacker.attack * attacker.power * multiplier) - (defender.defense * defender.shell)}になるはずだよ`)
+      console.log(`${attacker.name} => ${defender.name}; 倍率は${rate}で、種類は${kind}でコードは${code}だってよ`);
+      console.log(`ついでに言うと攻撃力は${attacker.attack}で、防御力は${defender.defense}だから計算上ダメージは${(attacker.attack * attacker.power * rate) - (defender.defense * defender.shell)}になるはずだよ`)
 
       switch(kind){
          case 'sh':
             //codeは基本0。sは1、dsは2、solは3、スキルなら's'、アイテムなら'i'(ない)
    
             if(Weapons[attacker.weapon.id].pp = 0){
-               Weapons[attacker.weapon.id].process(cam,tcam,me,target,multiplier,kind,code,1);
+               Weapons[attacker.weapon.id].process(cam,me,tcam,target,rate,kind,code,1);
             }
    
             x = Weapons[attacker.weapon.id].power;
             if(typeof x == 'string'){x = eval(x);};
             
-            x = (attacker.attack * attacker.power * multiplier + x);
+            x = (attacker.attack * attacker.power * rate + x);
             if(code == 3 && attacker.ps == 'highsol'){x *= 3};
             if(code == 3 && attacker.ps == 'solx5but'){x *= 5};
             if(buffhas(cam,me,'improve')){x *= 1.4;};
@@ -5343,54 +5305,21 @@ async function humandamaged(cam,tcams,me,targets,multiplier,kind,code){//矛先�
             await addtext(`${defender.name}に${x}のダメージ！`)
             if(code == 3 && attacker.ps == 'solplaceturret'){turretPlace(cam);}
    
-            if(defender.health <= 0){let result = await killed(cam,tcam,me,target);if(result == 'end'){return 'end';}}
+            if(defender.health <= 0){let result = await killed(cam,me,tcam,target);if(result == 'end'){return 'end';}}
    
-            if(Weapons[attacker.weapon.id].sp == 1){
-               Weapons[attacker.weapon.id].sprocess(cam,tcam,me,target,multiplier,kind,code);
-            }
          
-            //追撃ゾーン　ここどしよ
-            if(attacker.ps == 'enemy50%pursuit' && defender.health <= defender.maxhealth / 2 && enemy50pursuitenelgy == 1 && defender.health > 0){
-               enemy50pursuitenelgy = 0;
-               z = Math.floor(Math.random() * 2);
-               if(z == 0){await addtext('くるくる～――っと');}else{await addtext('くるりん～っと');}
-               x = (attacker.attack * attacker.power * 0.7 + weaponpower); x -= (defender.defense);
-               if((Math.floor(Math.random()+ attacker.critlate)) == 1){x += (defender.defense); x *= 3; await addtext('会心の一撃！')};
-               if(buffhas(cam,me,'improve')){x *= 1.4;};
-               x = Math.ceil(x);
-               if(buffhas(cam,me,'letsthrow')){x *= 2; buffremove(cam,me,'letsthrow');};
-               if(x < 0){x = 0}; if(x > defender.health){x = defender.health};
-               defender.health -= x;
-               if(defender.health < 0){defender.health = 0};
-               tekiou();
-               await addtext(`${defender.name}に${x}のダメージ！`)
-               attacker.ep += 10;
-               await delay(1000)
-               if(defender.health <= 0){let result = await killed(cam,tcam,me,target);return result;}
-            }else if(attacker.name == 'herta' && defender.health <= defender.maxhealth / 2 && attacker.level >= 10 && defender.health > 0){//1凸効果「弱みは付け込み」
-               x = (attacker.attack * attacker.power * 0.4 + weaponpower) - (defender.defense);
-               if((Math.floor(Math.random()+ attacker.critlate - 0.05)) == 1){x += (defender.defense); x *= attacker.critdmg; await addtext('会心の一撃！')};
-               if(buffhas(cam,me,'improve')){x *= 1.4;};
-               x = Math.ceil(x);
-               if(buffhas(cam,me,'letsthrow')){x *= 2; buffremove(cam,me,'letsthrow');};
-               if(x < 0){x = 0}; if(x > defender.health){x = defender.health};defender.health -= x;if(defender.health < 0){defender.health = 0};
-               tekiou();
-               await addtext(`${defender.name}に${x}のダメージ！`)
-               attacker.ep += 5;
-               await delay(1000);
-               if(defender.health <= 0){let result = await killed(cam,tcam,me,target);return result;}
-            }
+            
             break;
          case 'mg':
             //codeは基本0。sは1、dsは2、solは3、スキルなら's'、アイテムなら'i'(ない)
-            x = (attacker.mattack * attacker.power * multiplier);
+            x = (attacker.mattack * attacker.power * rate);
             x -= (defender.mdefense * defender.shell);
             x = Math.ceil(x);if(x < 0){x = 0};if(x > defender.health){x = defender.health};
             defender.health -= x;
             tekiou();
             await addtext(`${defender.name}に${x}のダメージ！`)
             await delay(1000);
-            if(defender.health <= 0){let result = await killed(cam,tcam,me,target);return result;}
+            if(defender.health <= 0){let result = await killed(cam,me,tcam,target);return result;}
             break;
       }
    }   
@@ -5411,21 +5340,69 @@ function isCrit(late, resist){
    return isCritical
 }
 
-async function humandamagedSimple(cam,me,tcam,target,multiplier,kind){
-   let attacker = humans[cam][me];
-   let defender = humans[tcam][target]
+async function humandamagedSimple(cam, me, tcam, target, rate, kind, attributes){
+   //書き殴り 攻撃x回復o = heal 確定会心 = crit 攻撃+攻撃者回復 = absorb 
+   console.log(attributes.includes('fixed') ? `${humans[cam][me].name}=>${humans[tcam][target].name} ${kind}で${rate}ダメージの予定！ ${attributes}` :`${humans[cam][me].name}=>${humans[tcam][target].name} ${kind}で攻撃力の${rate}倍 ${attributes}`);
+
+   let attackerOriginal = humans[cam][me];
+   let defenderOriginal = humans[tcam][target]
+
+   let attacker = {};
+   stats.forEach(stat => {
+      attacker[stat] = attackerOriginal[stat];
+   });
+
+   let defender = {};
+   stats.forEach(stat => {
+      defender[stat] = defenderOriginal[stat];
+   });
+
+   const stats = [
+      'attack', 'defense',
+      'power', 'shell', 'mattack', 'mdefense',
+      'critlate', 'critdmg', 'critresist'
+   ];
+
+   stats.forEach(stat => {
+      Object.values(attacker.buffs).forEach(buff => {
+         if(buff.data.addable == false){
+            if(buff.data.effect.hasOwnProperty(stat)){
+               attacker[stat] += buff.data.effect[stat].value;
+            }
+         }else{
+            if(buff.data.effect.hasOwnProperty(stat)){
+               attacker[stat] += buff.value
+            }
+         }
+      });
+      ['weapon','armor','ear','ring','neck'].forEach(bui => {Object.values(attacker[bui]).forEach(buff => {
+         
+      })})
+
+      Object.values(defender.buffs).forEach(buff => {
+         if(buff.data.addable == false){
+            if(buff.data.effect.hasOwnProperty(stat)){
+               defender[stat] += buff.data.effect[stat].value;
+            }
+         }else{
+            if(buff.data.effect.hasOwnProperty(stat)){
+               defender[stat] += buff.value
+            }
+         }
+      })
+   });
 
    //攻撃力
-   let damage = kind == 'sh' ? (attacker.attack * attacker.power * multiplier) : (attacker.mattack * attacker.power * multiplier);
+   let damage = kind == 'sh' ? (attacker.attack * attacker.power * rate) : (attacker.mattack * attacker.power * rate);
 
    //防御力
-   damage -= (defender.defense * defender.shell)
+   damage -= kind == 'sh' ? (defender.defense * defender.shell) : (defender.mdefense * defender.shell)
 
    //会心
    if(isCrit(attacker.critlate, defender.critresist)){
       damage += (defender.defense * defender.shell);
       damage *= attacker.critdmg;
-      await addtext('会心の一撃！')
+      await addtext('かいしんのいちげき！')
    };
 
    //整え
@@ -5436,6 +5413,8 @@ async function humandamagedSimple(cam,me,tcam,target,multiplier,kind){
    //実装
    defender.health -= damage;
 
+   //回復
+
    //ep
    if(cam == 'players') humans[cam][me].ep += Math.floor(10 * humans[cam][me].epgain);
 
@@ -5443,8 +5422,140 @@ async function humandamagedSimple(cam,me,tcam,target,multiplier,kind){
    await addtext(`${defender.name}に${damage}のダメージ！`)
 
    //その後
-   if(defender.health <= 0){let result = await killed(cam,tcam,me,target);return result;}
+   if(defender.health <= 0){let result = await killed(cam,me,tcam,target);return result;}
+
+   //追撃ゾーン　ここどしよ
+   if(!attributes.includes('unpursuit')){
+      if(Weapons[attacker.weapon.id].ap){
+         let res = await Weapons[attacker.weapon.id].afterProcess(cam,me,tcam,target,rate,kind,attributes);
+         if(res == 'end'){return 'end'};
+      }
+
+      if(attacker.ps == 'enemy50%pursuit' && defender.health <= defender.maxhealth / 2 && enemy50pursuitenelgy == 1 && defender.health > 0){
+         enemy50pursuitenelgy = 0;
+         await addtext(arraySelect(['くるくる〜っと','くるりん〜っと']));
+         let res = humandamagedSimple(cam,me,tcam,target,0.5,'sh',['unpursuit']);
+         if(res == 'end'){return 'end'};
+      }else if(attacker.name == 'herta' && defender.health <= defender.maxhealth / 2 && attacker.level >= 10 && defender.health > 0){//1凸効果「弱みは付け込み」
+         let res = humandamagedSimple(cam,me,tcam,target,0.2,'sh',['unpursuit']);
+         if(res == 'end'){return 'end'};
+      }
+   }
+
    return 'alive';
+}
+
+async function humandamagedFixed(cam,me,tcam,target,num,kind){
+   let attacker = humans[cam][me];
+   let defender = humans[tcam][target]
+   
+   let damage = num;
+
+   defender.health -= damage;
+
+   tekiou()
+   await addtext(`${defender.name}に${damage}のダメージ！`)
+
+   if(defender.health <= 0){let result = await killed(cam,me,tcam,target);return result;}
+   return 'alive';
+}
+//#endregion
+//#region buffの動き
+async function buffadd(tcam,target,buff,time,val){//誰のバフ/デバフか,バフ/デバフの名前,効果時間,効果量
+   if(!buff || !time || !val){console.error('要素が足りないぜ！！！');}
+   let buffData = [...Object.values(Effects.buffs), ...Object.values(Effects.debuffs), ...Object.values(Effects.handles), ...Object.values(Effects.uniques)].find(e => e.name === buff);
+   let defender = humans[tcam][target];
+
+   console.log(`${defender.name}に${val}の${buff}を${time}付与します！！`);
+
+   let newbuff = {};
+
+   switch(buffData.kind){
+      case 'turn':{
+         //すでにある場合の処理
+         let hasbuffIndex = defender.buffs.findIndex(e => e.name == buff && e.value == val);
+         if(hasbuffIndex >= 0){
+            newbuff = defender.buffs[hasbuffIndex];
+            defender.buffs.splice(hasbuffIndex,1);
+            newbuff.time += time;
+         }else{
+            newbuff = {
+               type: buffData.type,
+               kind: buffData.kind,
+               name: buff,
+               time: time,
+              value: val,
+               data: buffData,
+            };
+         }
+      };
+      tekiou();
+      await addtext(`${defender.name}は${buff}を${time}turn受けた!`);
+      break;
+
+      case 'stack':{
+         let hasbuffIndex = defender.buffs.findIndex(e => e.name == buff);
+         if(hasbuffIndex >= 0){
+            defender.buffs[hasbuffIndex].time += time;
+            defender.buffs[hasbuffIndex].value = buffData.lv[time];
+         }else{
+            newbuff = {
+               type: buffData.type,
+               kind: buffData.kind,
+               name: buff,
+               time: time, // (stack)
+              value: buffData.lv[time],
+               data: buffData,
+            };
+         }
+      };
+      tekiou();
+      await addtext(`${defender.name}は${buff}を${time}stack受けた!`);
+      break;
+   }
+
+   
+   
+}
+function buffremove(tcam,target,buff){
+   //誰のバフ/デバフか,バフ/デバフの名前
+   let defender = humans[tcam][target];
+   let i = defender.buffs.findIndex(e => e.name == buff)
+   defender.buffs.splice(i,1);
+   tekiou();
+}
+function buffclear(tcam,target,code){
+   let defender = humans[tcam][target];
+   switch(code){
+      case 'all':
+         defender.buffs = [];
+         break;
+      case 'turn':
+         defender.buffs = defender.buffs.filter(e => e.kind != 'turn');
+         break;
+      case 'stack':
+         defender.buffs = defender.buffs.filter(e => e.kind != 'stack');
+         break;
+      case 'buffs':
+         defender.buffs = defender.buffs.filter(e => e.type == 'buffs');
+         break;
+      case 'debuffs':
+         defender.buffs = defender.buffs.filter(e => e.type == 'debuffs');
+         break;
+      case 'handles':
+         defender.buffs = defender.buffs.filter(e => e.type == 'handles');
+         break;
+      case 'uniques':
+         defender.buffs = defender.buffs.filter(e => e.type == 'uniques');
+         break;
+      default:
+         console.console('codeが違ったからとりあえず同名消したけど、よかった？');
+         defender.buffs = defender.buffs.filter(e => e.name == code);
+   }
+   tekiou();
+}
+function buffhas(tcam,target,buff){
+   return humans[tcam][target].buffs.find(b => b.name === buff);
 }
 //#endregion
 //#region QTEのやつ
@@ -5485,10 +5596,10 @@ async function qte(keyLeft, keyRight, limit) {
 //#region playerturn
 function backtoplayerturn(){
    phase = 1;
-   document.querySelector('#select1').textContent = 'attack';
-   document.querySelector('#select2').textContent = 'magic';
-   document.querySelector('#select3').textContent = 'tools';
-   document.querySelector('#back').textContent = 'pass';
+   select1.textContent = 'act';
+   select2.textContent = 'magic';
+   select3.textContent = 'tools';
+   select4.textContent = 'run';
    //errorcheck();
 }
 async function playerturn(cam,me){
@@ -5501,119 +5612,165 @@ async function playerturn(cam,me){
 
    phase = 1;
    addtext('あなたのターンです！');
-   document.querySelector('#sbuttons').innerHTML = `
-   <button class="button" id="select1" onclick="select1(${me})">attack</button>  
-   <button class="button" id="select2" onclick="select2(${me})">magic</button>  
-   <button class="button" id="select3" onclick="select3(${me})">tools</button>  
-   <button class="button" id="back" onclick="back(${me})">pass</button>`
-   //errorcheck();
+   backtoplayerturn();
 };
 //#endregion
 //#region playerの選択
 let nowturn = 0;
 let targetselect = 0;
-async function select1(me){
-   if (phase == 1){
-      document.querySelector('#select1').textContent = 'slash';
-      document.querySelector('#select2').textContent = 'double slash';
-      document.querySelector('#select3').textContent = 'slash of light';
-      document.querySelector('#back').textContent = 'back';
-      phase = 2;
-   } else if (phase == 2) {
-      disappear()
-      if(humans.players[me].slash1 !== 0){
-         Slash('players',me,humans.players[me].slash1)
-      }else{
-         await addtext('you dont have slash...');
-         backtoplayerturn()
-      }
-   } else if (phase == 3) {
-      disappear()
-      if(humans.players[me].magic1 !== 0){
-         Magic('players',me,humans.players[me].magic1)
-      }else{
-         await addtext('you dont have magic...');
-         backtoplayerturn()
-      }
-   } else if (phase == 4) {
-      disappear()
-      if(humans.players[me].tool1){
-         Tool('players',me,humans.players[me].tool1)
-      }else{
-         await addtext('you dont have tool...');
-         backtoplayerturn()
-      }
+
+const battleArea = document.querySelector('#battleArea');
+const battleCommands = battleArea.querySelector('.UIs .commands');
+const select1 = battleCommands.querySelector('.select1');
+const select2 = battleCommands.querySelector('.select2');
+const select3 = battleCommands.querySelector('.select3');
+const select4 = battleCommands.querySelector('.select4');
+
+select1.addEventListener('click', async function(){
+   let me = turn[0]
+   switch(phase){
+      case 1:
+         phase = 2;
+         select1.textContent = humans[1].slash1.name;
+         select2.textContent = humans[1].slash2.name;
+         select3.textContent = humans[1].slash3.name;
+         select4.textContent = 'back';
+         break;
+      case 2:
+         disappear()
+         if(humans.players[me].slash1 !== 0){
+            Slash('players',me,humans.players[me].slash1)
+         }else{
+            await addtext('you dont have slash...');
+            backtoplayerturn()
+         }
+         break;
+      case 3:
+         disappear()
+         if(humans.players[me].magic1 !== 0){
+            Magic('players', me, humans.players[me].magic1)
+         }else{
+            await addtext('you dont have magic...');
+            backtoplayerturn()
+         }
+         break;
+      case 4:
+         disappear()
+         if(humans.players[me].tool1){
+            Tool('players',me,humans.players[me].tool1)
+         }else{
+            await addtext('you dont have tool...');
+            backtoplayerturn()
+         }
+         break;
    }
-}
-async function select2(me){
-   if (phase == 1) {
-      addtext('どうする？');
-      document.querySelector('#select1').textContent = humans.players[me].magic1;
-      document.querySelector('#select2').textContent = humans.players[me].magic2;
-      document.querySelector('#select3').textContent = humans.players[me].magic3;
-      document.querySelector('#back').textContent = 'back';
-      phase = 3;
-   } else if (phase == 2) {
-      disappear()
-      if(humans.players[me].slash2 !== 0){
-         await addtext(`${humans.players[me].name}は${humans.players[me].slash2}をした！`);
-         Slash('players',me,humans.players[me].slash2)
-      }else{
-         await addtext('you dont have slash...');
-         backtoplayerturn()
-      }
-   } else if (phase == 3) {
-      disappear()
-      if(humans.players[me].magic2 !== 0){
-         Magic('players',me,humans.players[me].magic2)
-      }else{
-         await addtext('you dont have magic...');
-         backtoplayerturn()
-      }
-   } else if (phase == 4) {
-      disappear()
-      if(humans.players[me].tool2){
-         Tool('players',me,humans.players[me].tool2)
-      }else{
-         await addtext('you dont have tool...');
-         backtoplayerturn()
-      }
-      
+})
+
+select2.addEventListener('click', async function(){
+   switch(phase){
+      case 1:
+         phase = 2;
+         battleCommands.querySelector('.select1').textContent = humans[1].magic1.name;
+         select2.textContent = humans[1].magic2.name;
+         select3.textContent = humans[1].magic3.name;
+         select4.textContent = 'back';
+         break;
+      case 2:
+         disappear()
+         if(humans.players[me].slash2 !== 0){
+            await addtext(`${humans.players[me].name}は${humans.players[me].slash2}をした！`);
+            Slash('players',me,humans.players[me].slash2)
+         }else{
+            await addtext('you dont have slash...');
+            backtoplayerturn()
+         }
+         break;
+      case 3:
+         disappear()
+         if(humans.players[me].magic2 !== 0){
+            Magic('players',me,humans.players[me].magic2)
+         }else{
+            await addtext('you dont have magic...');
+            backtoplayerturn()
+         }
+         break;
+      case 4:
+         disappear()
+         if(humans.players[me].tool2){
+            Tool('players',me,humans.players[me].tool2)
+         }else{
+            await addtext('you dont have tool...');
+            backtoplayerturn()
+         }
+         break;
    }
-}
-async function select3(me){
-   if (phase == 1) {
-      addtext('何を使う？');
-      document.querySelector('#select1').textContent = humans.players[me].tool1+' x'+Tools[humans.players[me].tool1].num;
-      document.querySelector('#select2').textContent = humans.players[me].tool2+' x'+Tools[humans.players[me].tool2].num;
-      document.querySelector('#select3').textContent = humans.players[me].tool3+' x'+Tools[humans.players[me].tool3].num;
-      document.querySelector('#back').textContent = 'back';
-      phase = 4;
-   } else if (phase == 2) {
-      disappear()
-      if(humans.players[me].slash3 !== 0){
-         Slash('players',me,humans.players[me].slash3)
-      }else{
-         await addtext('you dont have slash...');
-         backtoplayerturn()
-      }
-   } else if (phase == 3) {
-      disappear()
-      if(humans.players[me].magic3 !== 0){
-         Magic('players',me,humans.players[me].magic3)
-      }else{
-         await addtext('you dont have magic...');
-         backtoplayerturn()
-      }
-   } else if (phase == 4) {
-      disappear()
-      if(humans.players[me].tool3){
-         Tool('players',me,humans.players[me].tool3)
-      }else{
-         await addtext('you dont have tool...');
-         backtoplayerturn()
-      }
+})
+
+select3.addEventListener('click', async function(){
+   switch(phase){
+      case 1:
+         phase = 2;
+         select1.textContent = humans[1].tool1.name;
+         select2.textContent = humans[1].tool2.name;
+         select3.textContent = humans[1].tool3.name;
+         select4.textContent = 'back';
+         break;
+      case 2:
+         disappear()
+         if(humans.players[me].slash3 !== 0){
+            await addtext(`${humans.players[me].name}は${humans.players[me].slash3}をした！`);
+            Slash('players',me,humans.players[me].slash3)
+         }else{
+            await addtext('you dont have slash...');
+            backtoplayerturn()
+         }
+         break;
+      case 3:
+         disappear()
+         if(humans.players[me].magic3 !== 0){
+            Magic('players',me,humans.players[me].magic3)
+         }else{
+            await addtext('you dont have magic...');
+            backtoplayerturn()
+         }
+         break;
+      case 4:
+         disappear()
+         if(humans.players[me].tool3){
+            Tool('players',me,humans.players[me].tool3)
+         }else{
+            await addtext('you dont have tool...');
+            backtoplayerturn()
+         }
+         break;
    }
+})
+
+select4.addEventListener('click', async function(){
+   switch(phase){
+      case 1:
+         disappear();
+         battleArea.style.display = 'none';
+         document.querySelector('#overfieldArea').style.display = 'block';
+         
+         draw()
+         AllowMove = 0;
+         await addtext('うまく逃げ切れた！');
+         break;
+      case 2:
+      case 3:
+      case 4:
+         backtoplayerturn()
+         break;
+   } 
+})
+
+function disappear(){
+   phase = 0;
+   select1.textContent = ' ';
+   select2.textContent = ' ';
+   select3.textContent = ' ';
+   select4.textContent = ' ';
 }
 
 function LetsTargetSelect(one){
@@ -5674,32 +5831,8 @@ function LetsTargetSelect(one){
    });
 }
  
-//一個選択肢を戻るやつ
-async function back(me){
-   if(phase == 1){
-      disappear();
-      document.querySelector('#BattleArea').style.display = 'none';
-      document.querySelector('#overField').style.display = 'block';
-      
-      draw()
-      AllowMove = 0;
-      await addtext('うまく逃げ切れた！');
-   }else if(phase == 2){
-      backtoplayerturn()
-   }else if(phase == 3){
-      backtoplayerturn()
-   }else if(phase == 4){
-      backtoplayerturn()
-   }
-   
-}
-function disappear(){
-   document.querySelector('#select1').textContent = ' ';
-   document.querySelector('#select2').textContent = ' ';
-   document.querySelector('#select3').textContent = ' ';
-   document.querySelector('#back').textContent = '';
-   phase = 'null';
-}
+
+
 //#endregion
 //#region playerの斬撃
 async function Slash(cam,me,name){
@@ -5707,8 +5840,8 @@ async function Slash(cam,me,name){
       target = await LetsTargetSelect();
       humans.players[me].mp -= Slashs[name].mp;tekiou();
       await addtext(`${humans.players[me].name}の${Slashs[name].name}！`);
-      let result = await Slashs[name].process('players',target[1],me,target[0]);
-      if(result == 'dead'){let results = await killed('players',target[1],me,target[0]);return results}
+      let result = await Slashs[name].process('players',me,target[1],target[0]);
+      if(result == 'dead'){let results = await killed('players',me,target[1],target[0]);return results}
       NextTurnis('players',me,target[1],target[0]);
    }else{
       await addtext('not enough mp...');
@@ -5721,8 +5854,8 @@ async function Magic(cam,me,name){
    if(humans.players[me].mp >= Magics[name].mp){
       target = await LetsTargetSelect();
       humans.players[me].mp -= Magics[name].mp;tekiou();
-      let result = await Magics[name].process('players',target[1],me,target[0]);
-      if(result == 'dead'){let results = await killed('players',target[1],me,target[0]);return results}
+      let result = await Magics[name].process('players',me,target[1],target[0]);
+      if(result == 'dead'){let results = await killed('players',me,target[1],target[0]);return results}
       NextTurnis('players',me,target[1],target[0]);
    }else{
       await addtext('not enough mp...');
@@ -5737,8 +5870,8 @@ async function Tool(cam,me,UseTool){
       target = await LetsTargetSelect();
       await addtext(humans.players[me].name + 'は'+Tools[UseTool].name+'を使用した!');
       Tools[UseTool].num -= 1
-      let result = await Tools[UseTool].process(cam,target[1],me,target[0]);
-      if(result == 'dead'){let results = await killed(cam,target[1],me,target[0]);return results};
+      let result = await Tools[UseTool].process(cam,me,target[1],target[0]);
+      if(result == 'dead'){let results = await killed(cam,me,target[1],target[0]);return results};
       NextTurnis(cam,me,target[1],target[0]);
    }else{
       await addtext('not enough tool...');
@@ -5868,7 +6001,7 @@ async function NextTurnis(cam,me,tcam,target){
          await addtext(`${humans[cam][me].name}は燃えて${x}のダメージ!`);
       };
       tekiou();
-      if(humans[cam][me].health <= 0){let result = killed(0,cam,0,me);if(result !== 'continue'){return result;}}
+      if(humans[cam][me].health <= 0){let result = killed(0,0,cam,me);if(result !== 'continue'){return result;}}
    
       for(const key in humans[cam][me].buffs){
          humans[cam][me].buffs[key].time -= 1; // -1する
@@ -5907,7 +6040,7 @@ async function NextTurnis(cam,me,tcam,target){
          if(x < 0){x = 0};if(x > humans[tcams][targets].health){x = humans[tcams][targets].health};
          humans[tcams][targets].health -= x;tekiou();
          log.textContent = `${humans[tcams][targets].name}に${x}のダメージ！`;
-         if(humans[tcams][targets].health <= 0){let result = killed(cams,tcams,1,targets);if(result !== 'continue'){return result;}};
+         if(humans[tcams][targets].health <= 0){let result = killed(cams,1,tcams,targets);if(result !== 'continue'){return result;}};
          await delay(1000);
       }
       if(humans.enemies['t']?.kazu || 0 > 0 && x == false){
@@ -5920,7 +6053,7 @@ async function NextTurnis(cam,me,tcam,target){
          if(x < 0){x = 0};if(x > humans[tcams][targets].health){x = humans[tcams][targets].health};
          humans[tcams][targets].health -= x;tekiou();
          log.textContent = `${humans[tcams][targets].name}に${x}のダメージ！`;
-         if(humans[tcams][targets].health <= 0){let result = killed(cams,tcams,1,targets);if(result !== 'continue'){return result;}};
+         if(humans[tcams][targets].health <= 0){let result = killed(cams,1,tcams,targets);if(result !== 'continue'){return result;}};
          await delay(1000);
       }
 
@@ -6016,7 +6149,7 @@ async function enemyturn(cam,me){
       await addtext(`${enemy.name}は何かで攻撃した！`)
       selected = ShallTargetSelect(cam,me,'phpl',0);
       let result = await humandamaged(cam,selected[1],me,selected[0],1,'sh',1);
-      if(result == 'end'){let results = killed(cam,selected[1],me,selected[0]);if(results !== 'continue'){return results;}}
+      if(result == 'end'){let results = killed(cam,me,selected[1],selected[0]);if(results !== 'continue'){return results;}}
    }
    NextTurnis(cam,me,selected[1],selected[0]);
 }
@@ -6288,7 +6421,7 @@ function ShallTargetSelect(cam,me,code,both){
 //#endregion
 
 //#region 勝利/負けの動き
-async function killed(cam,tcam,me,target){//殺った側cam,meと殺された側tcam,target
+async function killed(cam,me,tcam,target){//殺った側cam,meと殺された側tcam,target
    humans[tcam][target].health = 0;
    humans[tcam][target].status = 2;
    buffclear(tcam,target,'all');tekiou();
@@ -6321,7 +6454,7 @@ async function killedCheck(){
    if(karix){
       //敵全滅
       karix = (Math.floor(Math.random() *11)+5)*numberofenemy;
-      euro += karix;
+      stone += karix;
       karix = Object.keys(humans.enemies).filter(a => humans.enemies[a].status >= 1).reduce((sum, id) => {
          let Enemy = humans.enemies[id];
          return sum + (Enemy.level||0);
@@ -6360,8 +6493,8 @@ async function killedCheck(){
             case 3: enemydef -= 5; break;
          }}
       }
-      document.querySelector('#BattleArea').style.display = 'none';
-      document.querySelector('#overField').style.display = 'block';
+      document.querySelector('#battleArea').style.display = 'none';
+      document.querySelector('#overfieldArea').style.display = 'block';
       
 
       MAPx = Math.floor(SELECTx / 75);
@@ -6388,8 +6521,8 @@ async function killedCheck(){
          bossbattlenow = 0;
          floor = 0;GoNextFloor();
 
-         document.querySelector('#BattleArea').style.display = 'none';
-         document.querySelector('#overField').style.display = 'block';
+         document.querySelector('#battleArea').style.display = 'none';
+         document.querySelector('#overfieldArea').style.display = 'block';
 
          MAPx = Math.floor(SELECTx / 75);
          MAPy = Math.floor(SELECTy / 75);
@@ -6404,12 +6537,12 @@ async function killedCheck(){
 }   
 async function EnemyAppear(){
    AllowMove = 1;
-   document.querySelector('#overField').style.display = 'none';
-   document.querySelector('#BattleArea').style.display = 'block';
-   document.querySelector('#select1').textContent = '';
-   document.querySelector('#select2').textContent = '';
-   document.querySelector('#select3').textContent = '';
-   document.querySelector('#back').textContent = '';
+   document.querySelector('#overfieldArea').style.display = 'none';
+   document.querySelector('#battleArea').style.display = 'block';
+   select1.textContent = '';
+   select2.textContent = '';
+   select3.textContent = '';
+   select4.textContent = '';
 
    //前までのやつの処理
    turretAllClear();
@@ -6514,12 +6647,12 @@ function DesideEnemyName(target){
 
 async function testEnemyAppear(){
    AllowMove = 1;
-   document.querySelector('#overField').style.display = 'none';
-   document.querySelector('#BattleArea').style.display = 'block';
-   document.querySelector('#select1').textContent = '';
-   document.querySelector('#select2').textContent = '';
-   document.querySelector('#select3').textContent = '';
-   document.querySelector('#back').textContent = '';
+   document.querySelector('#overfieldArea').style.display = 'none';
+   document.querySelector('#battleArea').style.display = 'block';
+   select1.textContent = '';
+   select2.textContent = '';
+   select3.textContent = '';
+   select4.textContent = '';
 
    //前までのやつの処理
    turretAllClear();
@@ -6849,13 +6982,13 @@ function makeNewEnemy(num){
 //#region　bossの動き
 async function BossEnemyAppear(){
    AllowMove = 1;
-   document.querySelector('#overField').style.display = 'none';
-   document.querySelector('#BattleArea').style.display = 'block';
+   document.querySelector('#overfieldArea').style.display = 'none';
+   document.querySelector('#battleArea').style.display = 'block';
    bossbattlenow = 1;
-   document.querySelector('#select1').textContent = ' ';
-   document.querySelector('#select2').textContent = ' ';
-   document.querySelector('#select3').textContent = ' ';
-   document.querySelector('#back').textContent = ' ';
+   select1.textContent = ' ';
+   select2.textContent = ' ';
+   select3.textContent = ' ';
+   select4.textContent = ' ';
    turncount = 0;
    document.querySelector('#TurnCount').textContent = turncount;
    playermp = playermaxmp;
@@ -6990,10 +7123,10 @@ let Camprestper
    await delay(2000);
    log.textContent = '起きた！！！！！！！';
    await delay(1000);
-   document.querySelector('#EventArea').innerHTML = '';
+   document.querySelector('#eventArea').innerHTML = '';
    
-   document.querySelector('#BattleArea').style.display = 'none';
-   document.querySelector('#overField').style.display = 'block';
+   document.querySelector('#battleArea').style.display = 'none';
+   document.querySelector('#overfieldArea').style.display = 'block';
    
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
@@ -7008,25 +7141,25 @@ let Camprestper
          await delay(1000);
          nowshop = 1;
          log.textContent = 'ここにはこんなものがあるけど、どうする？';
-         document.querySelector('#EventArea').innerHTML = '<iframe height="230" width="200" src="assets/shops/weapons.txt"></iframe><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopBuyButton()">Buy</button><br><br><button class="button" onclick="CampBye()">Bye</button>';
+         document.querySelector('#eventArea').innerHTML = '<iframe height="230" width="200" src="assets/shops/weapons.txt"></iframe><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopBuyButton()">Buy</button><br><br><button class="button" onclick="CampBye()">Bye</button>';
       }else if(y == 2){
          log.textContent = '防具屋に話しかけた！';
          await delay(1000);
          nowshop = 2;
          log.textContent = 'うちの店ではこんなものが売ってるよ';
-         document.querySelector('#EventArea').innerHTML = '<iframe height="400" width="300" src="assets/shops/armors.txt"></iframe><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopBuyButton()">Buy</button><br><br><button class="button" onclick="CampBye()">Bye</button>';
+         document.querySelector('#eventArea').innerHTML = '<iframe height="400" width="300" src="assets/shops/armors.txt"></iframe><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopBuyButton()">Buy</button><br><br><button class="button" onclick="CampBye()">Bye</button>';
       }else if(y == 3){
          log.textContent = '道具屋に話しかけた！';
          await delay(1000);
          nowshop = 3;
          log.textContent = 'いらっしゃいませぇぇぇぇぇ？？ご注文をどうぞ！！！！';
-         document.querySelector('#EventArea').innerHTML = '<iframe height="400" width="300" src="assets/shops/tools.txt"></iframe><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopBuyButton()">Buy</button><br><br><button class="button" onclick="CampBye()">Bye</button>';
+         document.querySelector('#eventArea').innerHTML = '<iframe height="400" width="300" src="assets/shops/tools.txt"></iframe><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopBuyButton()">Buy</button><br><br><button class="button" onclick="CampBye()">Bye</button>';
       }else if(y == 10){
          log.textContent = '武器屋に話しかけた！';
          await delay(1000);
          nowshop = 10;
          log.textContent = 'ほう..よく来たな。好きに見ていってくれ';
-         document.querySelector('#EventArea').innerHTML = '<iframe height="400" width="300" src="assets/shops/rareweapons.txt"></iframe><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopBuyButton()">Buy</button><br><br><button class="button" onclick="CampBye()">Bye</button>';
+         document.querySelector('#eventArea').innerHTML = '<iframe height="400" width="300" src="assets/shops/rareweapons.txt"></iframe><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopBuyButton()">Buy</button><br><br><button class="button" onclick="CampBye()">Bye</button>';
 }
      
   }
@@ -7040,12 +7173,12 @@ function ShopBuyButton(){
       if(haveweapons.includes(weapons.name[num])){
          log.textContent = 'you already have a it!';
       }else{
-         if(euro >= weapons.price[num]){
-            euro -= weapons.price[num];
+         if(stone >= weapons.price[num]){
+            stone -= weapons.price[num];
             haveweapons.push(weapons.name[num]);
             log.textContent = weapons.name[num]+'を購入しました!';
          }else{
-            log.textContent = 'not enough euro..';
+            log.textContent = 'not enough stone..';
          };
       }
       break;
@@ -7053,12 +7186,12 @@ function ShopBuyButton(){
       if(haveweapons.includes(rareweapons.name[num])){
          log.textContent = 'you already have a it!';
       }else{
-         if(euro >= rareweapons.price[num]){
-            euro -= rareweapons.price[num];
+         if(stone >= rareweapons.price[num]){
+            stone -= rareweapons.price[num];
             haveweapons.push(rareweapons.name[num]);
             log.textContent = rareweapons.name[num]+'を購入しました!';
          }else{
-            log.textContent = 'not enough euro..';
+            log.textContent = 'not enough stone..';
          };
       }
       break;
@@ -7066,22 +7199,22 @@ function ShopBuyButton(){
       if(havearmors.includes(armors.name[num])){
          log.textContent = 'you already have a it!';
       }else{
-         if(euro >= armors.price[num]){
-            euro -= armors.price[num];
+         if(stone >= armors.price[num]){
+            stone -= armors.price[num];
             havearmors.push(armors.name[num]);
             log.textContent = armors.name[num]+'を購入しました!';
          }else{
-            log.textContent = 'not enough euro..';
+            log.textContent = 'not enough stone..';
          };
       }
       break;
       case 3:
-      if(euro >= tools.price[num]){
-         euro -= tools.price[num];
+      if(stone >= tools.price[num]){
+         stone -= tools.price[num];
          eval(tools.id[num]).num++;
          log.textContent = tools.name[num]+'を購入しました!';
       }else{
-         log.textContent = 'not enough euro..';
+         log.textContent = 'not enough stone..';
       };
       break;
    }
@@ -7093,10 +7226,10 @@ function ShopBuyButton(){
 }
 function CampBye(){
    log.textContent = 'ついでに装備を変えていこうかな？';
-   document.querySelector('#EventArea').innerHTML = '<button class="button"onclick="GoToEquip()">そうしよう！</button><br><button class="button"onclick="Campback()">やめとこう！</button>';
+   document.querySelector('#eventArea').innerHTML = '<button class="button"onclick="GoToEquip()">そうしよう！</button><br><button class="button"onclick="Campback()">やめとこう！</button>';
 }
 function Campback(){
-   document.querySelector('#EventArea').innerHTML = '<button id="CampRest" onclick="Camprest()"></button><br><button id="CampTrade" onclick="Camptrade()"></button>'
+   document.querySelector('#eventArea').innerHTML = '<button id="CampRest" onclick="Camprest()"></button><br><button id="CampTrade" onclick="Camptrade()"></button>'
    document.querySelector('#CampRest').textContent = '朝まで休む(' + Camprestper*100 + '%回復)';//30のときはスキルカード強化みたいなやつあってもいいかも
    switch(y){
       case 1: document.querySelector('#CampTrade').textContent = '武器商人に話しかける';     break;
@@ -7109,11 +7242,11 @@ let appearweapons = '';
 let appeararmors = '';
 let appeartools = '';
 function GoToEquip(){
-   document.querySelector('#EventArea').innerHTML = '<button class="button"onclick="GoToEquipWeapon()">Equip Weapon</button>  <button class="button"onclick="GoToEquipArmor()">Equip Armor</button>  <button class="button"onclick="GoToEquipTool()">Equip Tool</button><br><br><button class="button"onclick="Campback()">Leave</button>'
+   document.querySelector('#eventArea').innerHTML = '<button class="button"onclick="GoToEquipWeapon()">Equip Weapon</button>  <button class="button"onclick="GoToEquipArmor()">Equip Armor</button>  <button class="button"onclick="GoToEquipTool()">Equip Tool</button><br><br><button class="button"onclick="Campback()">Leave</button>'
 }
 function GoToEquipWeapon(){
    nowshop = 4;
-   document.querySelector('#EventArea').innerHTML = '<span id="AppearShops"></span><br><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopEquipButton()">Equip</button><br><br><button class="button" onclick="GoToEquip()">Back</button>';
+   document.querySelector('#eventArea').innerHTML = '<span id="AppearShops"></span><br><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopEquipButton()">Equip</button><br><br><button class="button" onclick="GoToEquip()">Back</button>';
    appearweapons = '';
    x = 0;
    for(let i = 0; i < haveweapons.length; i++){
@@ -7124,7 +7257,7 @@ function GoToEquipWeapon(){
 }
 function GoToEquipArmor(){
    nowshop = 5;
-   document.querySelector('#EventArea').innerHTML = '<span id="AppearShops"></span><br><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopEquipButton()">Equip</button><br><br><button class="button" onclick="GoToEquip()">Back</button>';
+   document.querySelector('#eventArea').innerHTML = '<span id="AppearShops"></span><br><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopEquipButton()">Equip</button><br><br><button class="button" onclick="GoToEquip()">Back</button>';
    appeararmors = '';
    x = 0;
    for(let i = 0; i < havearmors.length; i++){
@@ -7156,7 +7289,7 @@ function ShopEquipButton(){
 function GoToEquipTool(){
    nowshop = 6;
    
-   document.querySelector('#EventArea').innerHTML = '<iframe src="resources/appeartools.html" width="100%" height="100%" frameborder="0"></iframe><br><div id="Camptoolequip"><button id="Campequipedtool1" class="button" onclick="Campequiptool(1)"> </button>　<button id="Campequipedtool2" class="button" onclick="Campequiptool(2)"> </button>　<button id="Campequipedtool3" class="button" onclick="Campequiptool(3)"> </button></div><br><br><button class="button" onclick="GoToEquip()">Back</button>'; //持ってないやつも登録できるようにしたら処理楽かな？
+   document.querySelector('#eventArea').innerHTML = '<iframe src="resources/appeartools.html" width="100%" height="100%" frameborder="0"></iframe><br><div id="Camptoolequip"><button id="Campequipedtool1" class="button" onclick="Campequiptool(1)"> </button>　<button id="Campequipedtool2" class="button" onclick="Campequiptool(2)"> </button>　<button id="Campequipedtool3" class="button" onclick="Campequiptool(3)"> </button></div><br><br><button class="button" onclick="GoToEquip()">Back</button>'; //持ってないやつも登録できるようにしたら処理楽かな？
    document.querySelector('#Campequipedtool1').textContent = humans.players[1].tool1.name;
    document.querySelector('#Campequipedtool2').textContent = equiptool2.name;
    document.querySelector('#Campequipedtool3').textContent = equiptool3.name;
@@ -7217,9 +7350,9 @@ function Campequiptool(code){
 
   function SkillShopOpen() {
    AllowMove = 0;
-   document.querySelector('#overField').style.display = 'none';
-   document.querySelector('#EventArea').style.display = 'block';
-   document.querySelector('#EventArea').innerHTML = `
+   document.querySelector('#overfieldArea').style.display = 'none';
+   document.querySelector('#eventArea').style.display = 'block';
+   document.querySelector('#eventArea').innerHTML = `
    <div id="skillshopcorner"></div><br>
    <button class="button" onclick="SkillShopClose()">Exit</button>
    `
@@ -7236,7 +7369,7 @@ function Campequiptool(code){
   function SkillShopClose() {
    document.querySelector('#skillshopcorner').innerHTML = ''; // 前の内容をクリアする
    
-   document.querySelector('#overField').style.display = 'block';
+   document.querySelector('#overfieldArea').style.display = 'block';
    
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
@@ -7246,12 +7379,12 @@ function Campequiptool(code){
   }
 
   function BuyItem(type,id,name,price) {
-   if(euro >= price){
-     euro -= price;
+   if(stone >= price){
+     stone -= price;
      humans.players[1][type][id] = id;
      log.textContent = name + 'を購入しました！';
    }else{
-     log.textContent = 'not enough euro...';
+     log.textContent = 'not enough stone...';
    }
    updateUI();
   }
@@ -7345,7 +7478,7 @@ async function HopeButtonact(){
    }
    await delay(1000);
    
-   document.querySelector('#overField').style.display = 'block';
+   document.querySelector('#overfieldArea').style.display = 'block';
    
 
    MAPx = Math.floor(SELECTx / 75);
@@ -7382,10 +7515,10 @@ async function OpenChest(code){
       }
    break;
    }
-   document.querySelector('#EventArea').innerHTML = '';
+   document.querySelector('#eventArea').innerHTML = '';
    
-   document.querySelector('#BattleArea').style.display = 'none';
-   document.querySelector('#overField').style.display = 'block';
+   document.querySelector('#battleArea').style.display = 'none';
+   document.querySelector('#overfieldArea').style.display = 'block';
    
 
    MAPx = Math.floor(SELECTx / 75);
@@ -7425,10 +7558,10 @@ async function Cookietake(){
    }
    log.textContent = x;
    await delay(1000);
-   document.querySelector('#EventArea').innerHTML = '';
+   document.querySelector('#eventArea').innerHTML = '';
    
-   document.querySelector('#BattleArea').style.display = 'none';
-   document.querySelector('#overField').style.display = 'block';
+   document.querySelector('#battleArea').style.display = 'none';
+   document.querySelector('#overfieldArea').style.display = 'block';
    
 
    MAPx = Math.floor(SELECTx / 75);
