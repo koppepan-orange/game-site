@@ -7,8 +7,8 @@
         {
             "type": "chrome",
             "request": "launch",
-            "name": "test",
-            "file": "/Users/koppepanorange/orange_bread/game-site/clicker-of-mugen/test.html"
+            "name": "Scuro_e_Nero_Soldato",
+            "file": "/Users/koppepanorange/orange_bread/game-site/Scuro_e_Nero_Soldato/index.html"
         },
         {
             "type": "chrome",
@@ -50,7 +50,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "three-test",
-            "file": "/Users/koppepanorange/orange_bread/game-site/three.html",
+            "file": "/Users/koppepanorange/orange_bread/game-site/three/three.html",
         },
     ]
 }

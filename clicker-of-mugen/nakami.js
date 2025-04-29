@@ -2579,7 +2579,7 @@ let Tools = {
             await addtext('レッドウィンターの問題児にしては上出来じゃない？');
             return 'dead';
          };
-         await buffadd(tcam,target,'burn','turn',3,1);
+         await buffadd(tcam,target,'burn',3,1);
          return 'alive';
       }
    },
@@ -2590,12 +2590,13 @@ let Tools = {
       description:'ダメージ与える。ゴミ箱に隠れてる人。',
       num:0,
       process:async function(cam,me,tcam,target){
-         log.textContent = 'え、援護します...';await delay(1000);
-         x = Math.ceil(humans[cam][me].attack * 2.2);
-         if(humans[tcam][target].health < x){x = humans[tcam][target].health};
-         humans[tcam][target].health -= x
-         log.textContent = humans[tcam][target].name+'に'+x+'のダメージ！';tekiou();await delay(1000);
-         if(humans[tcam][target].health <= 0){log.textContent = 'わ、私のことはお気になさらずに...';await delay(1000);return 'dead';}
+         await addtext('え、援護します...');
+         let x = Math.ceil(humans[tcam][target].health*0.6);
+         let result = await humandamaged(cam,me,tcam,target,x,'mg',['unpursuit','fixed']);
+         if(result == 'end'){
+            await addtext('わ、私のことはお気になさらずに...');
+            return 'dead';
+         }
          return 'alive';
       }
    },
@@ -2603,11 +2604,12 @@ let Tools = {
       name:'爆弾',
       id:'bomb',
       price:100,
-      description:'エクスプローージョン！！！',
+      description:'エクスプローージョン！！！<br>敵を確殺します。嬉しいね',
       num:1,
       process:async function(cam,me,tcam,target){
-         humans[tcam][target].health = 0;tekiou();
-         log.textContent = '爆発オチなんてサイテー！！';await delay(1000);
+         let x = humans[tcam][target].health;
+         let result = await humandamaged(cam,me,tcam,target,x,'mg',['unpursuit',"fixed","penetrate"]);
+         await addtext('爆発オチなんてサイテー！！');
          return 'dead';
       }
    },
@@ -2618,8 +2620,8 @@ let Tools = {
       description:'退場です。帰れ(スキップ)',
       num:3,
       process:async function(cam,me,tcam,target){
-         await buffadd(tcam,target,'skip','turn',1,1);
-         log.textContent = 'カードを仕込みました!';await delay(1000);
+         await buffadd(tcam,target,'skip',1,1);
+         await addtext('カードを仕込みました!')
          return 'alive';
       }
    },
@@ -2630,14 +2632,16 @@ let Tools = {
       description:'リバースを召喚！このカードは相手と自分の体力を交換する！！割合だ！！！！',
       num:0,
       process:async function(cam,me,tcam,target){
-         x = humans.players[me].health/humans.players[me].maxhealth*humans.enemies[target].health;//割合交換(そのうちゲージにする時用)
-         y = humans.enemies[target].health/humans.enemies[target].health*humans.players[me].maxhealth;
-         humans.enemies[target].health = x;
-         if(humans.enemies[target].health < humans.enemies[target].health){humans.enemies[target].health = humans.enemies[target].health;}
-         humans.players[me].health = y;
-         if(humans.players[me].maxhealth < humans.players[me].health){humans.players[me].health = humans.players[me].maxhealth;}
+         let attacker = humans[cam][me];
+         let defender = humans[tcam][target]
+         x = attacker.health/attacker.maxhealth*defender.health;//割合交換(そのうちゲージにする時用)
+         y = defender.health/defender.health*attacker.maxhealth;
+         defender.health = x;
+         if(defender.health < defender.health){defender.health = defender.health;}
+         attacker.health = y;
+         if(attacker.maxhealth < attacker.health){attacker.health = humans.players[me].maxhealth;}
          tekiou();
-         log.textContent = 'これはリバースのモニュメントか？';await delay(1000);
+         await addtext('これはリバースのモニュメントか？');
          return 'alive';
       }
    },
@@ -2650,11 +2654,11 @@ let Tools = {
       process:async function(cam,me,tcam,target){
          let rbuffs = ['powerup','shellup','luck'];
          rbuffs = arrayShuffle(rbuffs);
-         x = rbuffs[0];
-         y = rbuffs[1];
-         await buffadd(tcam,target,x,'turn',3,Math.floor(Math.random()*2)+1);
-         await buffadd(tcam,target,y,'turn',3,Math.floor(Math.random()*2)+1);
-         log.textContent = humans[tcam][target].name+'にバフを二個つけました！！';await delay(1000);
+         let buff1 = rbuffs[0];
+         let buff2 = rbuffs[1];
+         await buffadd(tcam,target,x,3,Math.floor(Math.random()*2)+1);
+         await buffadd(tcam,target,y,3,Math.floor(Math.random()*2)+1);
+         await addtext(`${humans[tcam][target].name}にバフを二個つけました！！`);
          return 'alive';
       }
    },
@@ -2668,24 +2672,12 @@ let Tools = {
          let rbuffs = ['powerdown','shelldown','poison','burn','freeze'];
          rbuffs = arrayShuffle(rbuffs);
          for(i = 0;i < 2;i++){
-            await buffadd(tcam,target,rbuffs[i],'turn',3,Math.floor(Math.random()*2)+1);
+            await buffadd(tcam,target,rbuffs[i],3,Math.floor(Math.random()*2)+1);
          }
          log.textContent = humans[tcam][target].name+'にバフをニ個つけました！！';await delay(1000);
          return 'alive';
       }
    },
-   'gentlecard':{
-      name:'大人のカード',
-      id:'gentlecard',
-      price:35,
-      description:'「大人のカード」を取り出す。...プレ先ではないぞ',
-      num:0,
-      process:async function(cam,me,tcam,target){
-         stone += 120;updateUI()
-         log.textContent = '大人のカードを割りました！粉々になりました';await delay(1000);
-         return 'alive';
-      }
-   }
 }
 
 let Skills = {
@@ -2707,6 +2699,7 @@ let Skills = {
          buyable:1,
          process:async function(cam,me){
             console.log('slimeのex発動ですわ〜〜〜')
+            return 'alive';
          }
       },
       'placeturret':{
@@ -2731,18 +2724,18 @@ let Skills = {
          process:async function(cam,me){
             phase = 0; disappear();
             let target = await LetsTargetSelect();
-            log.textContent = humans[cam][me].name+'は爆弾を投げた...';
+            await addtext(`${humans[cam][me].name}は爆弾を投げた...`);
             switch(Math.floor(Math.random() * 6)){
-               case 0:x=0;log.textContent = 'しかし不発弾だった!!';break;//これによる効果とかもあっていいかも
-               case 5:x=5;log.textContent = 'Lucky! 爆弾は焼夷弾だった!!!';break;
-               case 4:x=4;log.textContent = '爆弾は花火だった!';break;
-               case 3:x=3;log.textContent = '爆弾は毒ガス入りだった!!';await buffadd(target[1],target[0],'poison','turn',3,1);break; //毒ガス入りだった場合
-               case 2:x=2;log.textContent = '爆弾はスライム入りだった!!';await buffadd(target[1],target[0],'onslime','turn',2,1);break;//スライム入りだった場合
-               case 1:x=1;log.textContent = '爆発した..だがただの特殊な薬品だった!!';break;
+               case 0:x=0;await addtext('しかし不発弾だった!!');break;//これによる効果とかもあっていいかも
+               case 5:x=5;await addtext('Lucky! 爆弾は焼夷弾だった!!!');break;
+               case 4:x=4;await addtext('爆弾は花火だった!');break;
+               case 3:x=3;await addtext('爆弾は毒ガス入りだった!!');await buffadd(target[1],target[0],'poison',3,1);break; //毒ガス入りだった場合
+               case 2:x=2;await addtext('爆弾はスライム入りだった!!');await buffadd(target[1],target[0],'onslime',2,1);break;//スライム入りだった場合
+               case 1:x=1;await addtext('爆発した..だがただの特殊な薬品だった!!');break;
             }
-            await delay(1000);
-            let result = await humandamaged(cam,target[1],me,target[0],x,'sh',4);
-            return result;
+            let result = await humandamaged(cam,me,target[1],target[0],x,'sh',4);
+            if(result == 'end'){return 'end';}
+            return 'alive';
          }
       },
       'bigdiamond':{
@@ -2755,12 +2748,11 @@ let Skills = {
          process:async function(cam,me){
             phase = 0; disappear();
             let target = await LetsTargetSelect();
-            let serifs = ['こんな大きなダイアモンド見たことないでしょ？あげるね～','あなた…それじゃあダメだよ','ちょっとは静かになさい！','私が誰だか知ってるの？']
-            document.querySelector('#log').textContent = serifs[Math.floor(Math.random() * serifs.length)];//そのうち消える
-            await delay(1000);
-            let result = await humandamaged(cam,target[1],me,target[0],1.5,'sh',4);
-            if(Math.floor(Math.random()*2) == 0){await buffadd('enemydebuff','freeze','turn',4,1)};
-            return result;
+            await addtext(arraySelect(['こんな大きなダイアモンド見たことないでしょ？あげるね～','あなた…それじゃあダメだよ','ちょっとは静かになさい！','私が誰だか知ってるの？']))
+            let result = await humandamaged(cam,me,target[1],target[0],1.5,'sh',4);
+            if(result == 'end'){return 'end';}
+            if(Math.floor(Math.random()*2)) await buffadd(target[1],target[0],'freeze',4,1)
+            return 'alive';
          }
       },
       'lightningstorm':{
@@ -2773,9 +2765,10 @@ let Skills = {
          process:async function(cam,me){
             phase = 0; disappear();
             let target = await LetsTargetSelect(3);
-            let result = await humandamaged(cam,target[1],me,target[0],1.5,'sh',4);
-            await buffadd(target[0],target[1],'elec','turn',2,1);
-            return result;
+            let result = await humandamaged(cam,me,target[1],target[0],1.5,'sh',4);
+            if(result == 'end'){return 'end';}
+            await buffadd(target[1],target[0],'elec',2,1);
+            return 'alive';
          }
       },
       'kylieeleison':{
@@ -2789,9 +2782,10 @@ let Skills = {
             phase = 0; disappear();
             let target = await LetsTargetSelect();
             x = 2;
-            if(humans[target[1]][target[0]].health > humans[target[1]][target[0]].maxhealth * 0.7){x = 4;}
-            let result = await humandamaged(cam,target[1],me,target[0],x,'sh',4);
-            return result;
+            if(humans[target[1]][target[0]].health > humans[target[1]][target[0]].maxhealth * 0.7) x = 4;
+            let result = await humandamaged(cam,me,target[1],target[0],x,'sh',4);
+            if(result == 'end'){return 'end';}
+            return 'alive';
          }
       },
       'standrone':{
@@ -2804,9 +2798,10 @@ let Skills = {
          process:async function(cam,me){
             phase = 0; disappear();
             let target = await LetsTargetSelect();
-            let result = await humandamaged(cam,target[1],me,target[0],0.75,'sh',4);
-            await buffadd(target[1],target[0],'stun','turn',1,1);
-            return result;
+            let result = await humandamaged(cam,me,target[1],target[0],0.75,'sh',4);
+            if(result == 'end'){return 'end';}
+            await buffadd(target[1],target[0],'stun',1,1);
+            return 'alive';
          }
       },
       'recievechallenge':{//仲間にした方がいいかも
@@ -2818,11 +2813,12 @@ let Skills = {
          buyable:1,
          process:async function(cam,me){
             phase = 0; disappear();
-            let target = await LetsTargetSelect();
-            let result = await humandamaged(cam,target[1],me,target[0],0.5,'sh',4);
-            await buffadd(target[1],target[0],'shelldown','turn',3,1);
-            await buffadd(cam,me,'powerup','turn',3,2);
-            return result;
+            let [tcam,target] = await LetsTargetSelect();
+            let result = await humandamaged(cam,me,tcam,target,0.2,'sh',4);
+            if(result == 'end'){return 'end';}
+            await buffadd(tcam,target,'shelldown',3,1);
+            await buffadd(cam,me,'powerup',3,2);
+            return 'alive';
          }
       },
       'timedpursuit':{//上に同じく
@@ -2834,37 +2830,13 @@ let Skills = {
          buyable:1,
          process:async function(cam,me){
             phase = 0; disappear();
-            let target = await LetsTargetSelect();
-            let S = ['わたしはその辺の小石...','わたしのことなんて、気にしないでください...','すみません、一人にさせてください......'];
-            serif = arraySelect(S)
-            log.textContent = serif;
-            await buffadd(target[1],target[0],'weaknessgrasp','turn',2,1);//弱点把握状態
+            let [tcam,target] = await LetsTargetSelect();
+            await addtext(arraySelect(['わたしはその辺の小石...','わたしのことなんて、気にしないでください...','すみません、一人にさせてください......']));
+            await buffadd(tcam,target,'weaknessgrasp',2,1);//弱点把握状態
             return 'alive';
          },
       },
-      'bombe':{
-         type:'ex',
-         id:'bombe',
-         name:'ボマー',
-         price:80,
-         buyable:1,
-         process:async function(cam,me){
-            phase = 0; disappear();
-            let target = await LetsTargetSelect();
-            log.textContent = humans.players[me].name+'は爆弾を投げた...';
-            await delay(1000);//普通　水　マグマ　閃光弾
-            const bombetype = [3,6,0];
-            x = bombetype[Math.floor(Math.random()*4)]
-            switch(x){
-               case 1:log.textContent = '普通の爆弾だった..!';break;
-               //case 1:log.textContent = '水爆弾だった！！';break;//強制終了です
-               case 4:log.textContent = 'Lucky♪マグマ爆弾だった!!';break;
-               case 0:log.textContent = 'いけっ！ピカピカの実！';await buffadd(target[1],target[0],'stan','turn',2,1);break;
-            }
-            let result = await humandamaged(cam,target[1],me,target[0],x,'sh',4);
-            return result;
-         }
-      }
+      //bombeはしんだよ
    },
    ns:{
       'null':{
@@ -2885,9 +2857,9 @@ let Skills = {
          buyable:1,
          cool:3,
          process:async function(cam,me){
-            let target = ShallTargetSelect(cam,me,'er',0);
-            await buffadd(target[1],target[0],'onslime','turn',1,1);
-            log.textContent = humans[cam][me].name + 'にスライムが覆い被さった!';
+            let [tcam,target] = ShallTargetSelect(cam,me,'er',0);
+            await buffadd(tcam,target,'onslime',1,1);
+            await addtext(`${humans[tcam][target].name}にスライムが覆い被さった!`);
             return 'alive';
          }
       },
@@ -2900,8 +2872,8 @@ let Skills = {
          buyable:1,
          cool:4,
          process:async function(cam,me){
-            await buffadd(cam,me,'letsthrow','turn',2,1);
-            log.textContent = 'wrenchを投げる準備ができた!';
+            await buffadd(cam,me,'letsthrow',2,1);
+            await addtext('wrenchを投げる準備ができた!');
             return 'alive';
          }
       },
@@ -2914,8 +2886,8 @@ let Skills = {
          buyable:1,
          cool:3,
          process:async function(cam,me){
-            await buffadd(cam,me,'gambling','turn',1,1);
-            log.textContent = 'さあ、ギャンブルの時間だ!!';
+            await buffadd(cam,me,'gambling',1,1);
+            addtext('さあ、ギャンブルの時間だ!!');
             return 'alive';
          }
       },
@@ -2924,12 +2896,12 @@ let Skills = {
          id:'improve',
          name:'改善が必要だよ',
          description:'攻撃力を1.4倍に上昇させる',//変更予定,
-         price:30,
+         price:30, //"負荷"みたいにして、stackのbuffをつけて、攻撃力を上げさせる〜とかどう？
          buyable:1,
          cool:5,
          process:async function(cam,me){
-            await buffadd(cam,me,'improve','turn',4,1);
-            log.textContent = 'パーツアップグレード。';
+            await buffadd(cam,me,'improve',4,1);
+            await addtext('パーツアップグレード。');
             return 'alive';
          }
       },
@@ -2937,33 +2909,15 @@ let Skills = {
          type:'ns',
          id:'elecbarrier',
          name:'エレクトリックバリア',
-         description:'帯電バリアを付与する。<br>帯電バリア:被攻撃時相手に帯電を付与する<br>帯電:自身の行動時自傷ダメージが入る',
+         description:'体力が最も低い味方に帯電バリアを付与する。<br>帯電バリア:被攻撃時相手に帯電を付与する<br>帯電:自身の行動時自傷ダメージが入る',
          price:70,
          buyable:1,
          cool:3,
          process:async function(cam,me){
-            let target = ShallTargetSelect(cam,me,'phpl',0);
-            await buffadd(target[1],target[0],'elecshield','turn',2,1);
-            log.textContent = '帯電バリアを付与しました！';
+            let [tcam,target] = ShallTargetSelect(cam,me,'phpl',0);
+            await buffadd(tcam,target,'elecshield',2,1);
+            await addtext('帯電バリアを付与しました！');
             return 'alive';
-         }
-      },
-      'hitelec':{
-         type:'ns',
-         id:'hitelec',
-         name:'エレキギター殴り',
-         description:'エレキギターで殴ります',
-         price:50,
-         buyable:1,
-         cool:4,
-         process:async function(cam,me){
-            disappear();
-            await buffadd(cam,me,'powerup','turn',2,2);
-            log.textContent = 'エレキギターで殴るぞ..ごめんここのセリフどしよ'
-            let target = ShallTargetSelect(cam,me,'er',0);
-            let result = await humandamaged(cam,target[1],me,target[0],2,'sh',4);
-            log.textContent = 'かまってぇや、マジで';
-            return result;
          }
       },
    },
@@ -3050,9 +3004,10 @@ let Enemies = {
             num:1,
             process:async function(cam, me){
                await addtext(`${humans[cam][me].name}は粘液を飛ばしてきた！`);
-               let selected = ShallTargetSelect(cam,me,'phph',0);
-               let result = await humandamaged(cam,selected[1],me,selected[0],1,'sh',1);
-               return result;
+               let [tcam,target] = ShallTargetSelect(cam,me,'phph',0);
+               let result = await humandamaged(cam,me,tcam,target,1,'sh',1);
+               if(result == 'end')return 'end';
+               return 'alive';
             }
          },
          2:{
@@ -3061,8 +3016,8 @@ let Enemies = {
             num:3,
             process:async function(cam, me){
                await addtext(`${humans[cam][me].name}は粘液を絡ませてきた！`);//いやこれはこれでやばいか...?いや全然捉えようによってはやばいわ
-               let selected = ShallTargetSelect(cam,me,'phph',0);
-               await buffadd(selected[1],selected[0],'stickyslime','turn',2,1);
+               let [tcam,target] = ShallTargetSelect(cam,me,'phph',0);
+               await buffadd(tcam,target,'stickyslime',2,1);
                return 'alive';
             }
          }
@@ -3088,9 +3043,10 @@ let Enemies = {
             num:1,
             process:async function(cam, me){
                await addtext(`${humans[cam][me].name}は体当たりを仕掛けてきた！`);
-               let selected = ShallTargetSelect(cam,me,'phpl',0);
-               let result = await humandamaged(cam,selected[1],me,selected[0],1,'sh',1);
-               return result;
+               let [tcam,target] = ShallTargetSelect(cam,me,'phpl',0);
+               let result = await humandamaged(cam,me,tcam,target,1,'sh',1);
+               if(result == 'end')return 'end';
+               return 'alive';
             }
          },
          3:{
@@ -3099,9 +3055,10 @@ let Enemies = {
             num:3,
             process:async function(cam, me){
                await addtext(`${humans[cam][me].name}は回転しながら突進してきた！`);
-               let selected = ShallTargetSelect(cam,me,'phpl',0);
-               let result = await humandamaged(cam,selected[1],me,selected[0],1.5,'sh',1);
-               return result;
+               let [tcam,target] = ShallTargetSelect(cam,me,'phpl',0);
+               let result = await humandamaged(cam,me,tcam,target,1.5,'sh',1);
+               if(result == 'end')return 'end';
+               return 'alive';
             }
          }
       }
@@ -3126,10 +3083,9 @@ let Enemies = {
             type:'reinvisi',
             num:1,
             process:async function(cam, me){
-               await addtext(`${humans[cam][me].name}は姿を消..あれどこ行った？`)
-               let selected = ShallTargetSelect(cam,me,'ec',0);
-               console.log(`多分これだけバグってるので原因解明すっかり探偵団 ${cam}${me}`)
-               await buffadd(selected[1],selected[0],'disappear','turn',2,1);
+               await addtext(`${humans[cam][me].name}は姿を消..あれどこ行った？`);
+               let [tcam,target] = ShallTargetSelect(cam,me,'ec',0);
+               await buffadd(tcam,target,'disappear',2,1);
                return 'alive';
             }
          },
@@ -3139,10 +3095,10 @@ let Enemies = {
             type:'abinvisi',
             num:2,
             process:async function(cam, me){
-               if(buffhas(cam,me,'disappear')){x = 2;buffclear(cam,me,'disappear');}else{x = 1};
-               await addtext(`${humans[cam][me].name}は突進してきた！`)
-               let selected = ShallTargetSelect(cam,me,'pr',0);
-               let result = await humandamaged(cam,selected[1],me,selected[0],x,'sh',1);
+               let x = buffhas(cam, me, 'disappear') ? (buffclear(cam, me, 'disappear'), 2) : 1;
+               await addtext(`${humans[cam][me].name}は突進してきた！`);
+               let [tcam,target] = ShallTargetSelect(cam,me,'pr',0);
+               let result = await humandamaged(cam,me,tcam,target,x,'sh',1);
                return result;
             }
          },
@@ -5340,108 +5296,116 @@ function isCrit(late, resist){
    return isCritical
 }
 
-async function humandamagedSimple(cam, me, tcam, target, rate, kind, attributes){
-   //書き殴り 攻撃x回復o = heal 確定会心 = crit 攻撃+攻撃者回復 = absorb 
-   console.log(attributes.includes('fixed') ? `${humans[cam][me].name}=>${humans[tcam][target].name} ${kind}で${rate}ダメージの予定！ ${attributes}` :`${humans[cam][me].name}=>${humans[tcam][target].name} ${kind}で攻撃力の${rate}倍 ${attributes}`);
+async function humandamaged(cam, me, tcams, targets, rate, kind, attributes){
+   if(!Array.isArray(tcams)){tcams = [tcams];}
+   if(!Array.isArray(targets)){targets = [targets];}
+   for(let i = 0; i < tcams.length; i++){
+      let tcam = tcams[i];
+      let target = targets[i];
+      //攻撃x回復o = heal 攻撃+攻撃者与ダメ回復 = absorb
+      //防御無視 = penetrate 確定会心 = crit 会心無効 = nocrit
+      //固定値 = fixed
+      console.log(attributes.includes('fixed') ? `${humans[cam][me].name}=>${humans[tcam][target].name} ${kind}で${rate}ダメージの予定！ ${attributes}` :`${humans[cam][me].name}=>${humans[tcam][target].name} ${kind}で攻撃力の${rate}倍 ${attributes}`);
 
-   let attackerOriginal = humans[cam][me];
-   let defenderOriginal = humans[tcam][target]
+      let attackerOriginal = humans[cam][me];
+      let defenderOriginal = humans[tcam][target]
 
-   let attacker = {};
-   stats.forEach(stat => {
-      attacker[stat] = attackerOriginal[stat];
-   });
-
-   let defender = {};
-   stats.forEach(stat => {
-      defender[stat] = defenderOriginal[stat];
-   });
-
-   const stats = [
-      'attack', 'defense',
-      'power', 'shell', 'mattack', 'mdefense',
-      'critlate', 'critdmg', 'critresist'
-   ];
-
-   stats.forEach(stat => {
-      Object.values(attacker.buffs).forEach(buff => {
-         if(buff.data.addable == false){
-            if(buff.data.effect.hasOwnProperty(stat)){
-               attacker[stat] += buff.data.effect[stat].value;
-            }
-         }else{
-            if(buff.data.effect.hasOwnProperty(stat)){
-               attacker[stat] += buff.value
-            }
-         }
+      let attacker = {};
+      stats.forEach(stat => {
+         attacker[stat] = attackerOriginal[stat];
       });
-      ['weapon','armor','ear','ring','neck'].forEach(bui => {Object.values(attacker[bui]).forEach(buff => {
-         
-      })})
 
-      Object.values(defender.buffs).forEach(buff => {
-         if(buff.data.addable == false){
-            if(buff.data.effect.hasOwnProperty(stat)){
-               defender[stat] += buff.data.effect[stat].value;
+      let defender = {};
+      stats.forEach(stat => {
+         defender[stat] = defenderOriginal[stat];
+      });
+
+      const stats = [
+         'attack', 'defense',
+         'power', 'shell', 'mattack', 'mdefense',
+         'critlate', 'critdmg', 'critresist'
+      ];
+
+      stats.forEach(stat => {
+         Object.values(attacker.buffs).forEach(buff => {
+            if(buff.data.addable == false){
+               if(buff.data.effect.hasOwnProperty(stat)){
+                  attacker[stat] += buff.data.effect[stat].value;
+               }
+            }else{
+               if(buff.data.effect.hasOwnProperty(stat)){
+                  attacker[stat] += buff.value
+               }
             }
-         }else{
-            if(buff.data.effect.hasOwnProperty(stat)){
-               defender[stat] += buff.value
+         });
+         ['weapon','armor','ear','ring','neck'].forEach(bui => {Object.values(attacker[bui]).forEach(buff => {
+            
+         })})
+
+         Object.values(defender.buffs).forEach(buff => {
+            if(buff.data.addable == false){
+               if(buff.data.effect.hasOwnProperty(stat)){
+                  defender[stat] += buff.data.effect[stat].value;
+               }
+            }else{
+               if(buff.data.effect.hasOwnProperty(stat)){
+                  defender[stat] += buff.value
+               }
             }
+         })
+      });
+
+      //攻撃力
+      let damage = kind == 'sh' ? (attacker.attack * attacker.power * rate) : (attacker.mattack * attacker.power * rate);
+      if(attributes.includes('fixed')) damage = rate;
+
+      //防御力
+      if(!attributes.includes('penetrate')) damage -= kind == 'sh' ? (defender.defense * defender.shell) : (defender.mdefense * defender.shell)
+
+      //会心
+      if(isCrit(attacker.critlate, defender.critresist) && !attributes.includes('nocrit') || attributes.includes('crit')){
+         damage += (defender.defense * defender.shell);
+         damage *= attacker.critdmg;
+         await addtext('かいしんのいちげき！')
+      };
+
+      //整え
+      damage = Math.floor(damage);
+      if(defender.health < damage) damage = defender.health;
+      console.log(`${defender.health} => ${defender.health - damage} | damage:${damage}`);
+
+      //実装
+      if(!attributes.includes('heal'))
+         defender.health -= damage;
+      else defender.health += damage;
+
+      //ep
+      if(cam == 'players') humans[cam][me].ep += Math.floor(10 * humans[cam][me].epgain);
+
+      tekiou()
+      await addtext(`${defender.name}に${damage}のダメージ！`)
+
+      //その後
+      if(defender.health <= 0){let result = await killed(cam,me,tcam,target);return result;}
+
+      //追撃ゾーン　ここどしよ
+      if(!attributes.includes('unpursuit')){
+         if(Weapons[attacker.weapon.id].ap){
+            let res = await Weapons[attacker.weapon.id].afterProcess(cam,me,tcam,target,rate,kind,attributes);
+            if(res == 'end'){return 'end'};
          }
-      })
-   });
 
-   //攻撃力
-   let damage = kind == 'sh' ? (attacker.attack * attacker.power * rate) : (attacker.mattack * attacker.power * rate);
-
-   //防御力
-   damage -= kind == 'sh' ? (defender.defense * defender.shell) : (defender.mdefense * defender.shell)
-
-   //会心
-   if(isCrit(attacker.critlate, defender.critresist)){
-      damage += (defender.defense * defender.shell);
-      damage *= attacker.critdmg;
-      await addtext('かいしんのいちげき！')
-   };
-
-   //整え
-   damage = Math.floor(damage);
-   if(defender.health < damage) damage = defender.health;
-   console.log(`${defender.health} => ${defender.health - damage} | damage:${damage}`);
-
-   //実装
-   defender.health -= damage;
-
-   //回復
-
-   //ep
-   if(cam == 'players') humans[cam][me].ep += Math.floor(10 * humans[cam][me].epgain);
-
-   tekiou()
-   await addtext(`${defender.name}に${damage}のダメージ！`)
-
-   //その後
-   if(defender.health <= 0){let result = await killed(cam,me,tcam,target);return result;}
-
-   //追撃ゾーン　ここどしよ
-   if(!attributes.includes('unpursuit')){
-      if(Weapons[attacker.weapon.id].ap){
-         let res = await Weapons[attacker.weapon.id].afterProcess(cam,me,tcam,target,rate,kind,attributes);
-         if(res == 'end'){return 'end'};
-      }
-
-      if(attacker.ps == 'enemy50%pursuit' && defender.health <= defender.maxhealth / 2 && enemy50pursuitenelgy == 1 && defender.health > 0){
-         enemy50pursuitenelgy = 0;
-         await addtext(arraySelect(['くるくる〜っと','くるりん〜っと']));
-         let res = humandamagedSimple(cam,me,tcam,target,0.5,'sh',['unpursuit']);
-         if(res == 'end'){return 'end'};
-      }else if(attacker.name == 'herta' && defender.health <= defender.maxhealth / 2 && attacker.level >= 10 && defender.health > 0){//1凸効果「弱みは付け込み」
-         let res = humandamagedSimple(cam,me,tcam,target,0.2,'sh',['unpursuit']);
-         if(res == 'end'){return 'end'};
+         if(attacker.ps == 'enemy50%pursuit' && defender.health <= defender.maxhealth / 2 && enemy50pursuitenelgy == 1 && defender.health > 0){
+            enemy50pursuitenelgy = 0;
+            await addtext(arraySelect(['くるくる〜っと','くるりん〜っと']));
+            let res = humandamaged(cam,me,tcam,target,0.5,'sh',['unpursuit']);
+            if(res == 'end'){return 'end'};
+         }else if(attacker.name == 'herta' && defender.health <= defender.maxhealth / 2 && attacker.level >= 10 && defender.health > 0){//1凸効果「弱みは付け込み」
+            let res = humandamaged(cam,me,tcam,target,0.2,'sh',['unpursuit']);
+            if(res == 'end'){return 'end'};
+         }
       }
    }
-
    return 'alive';
 }
 
@@ -5818,6 +5782,7 @@ function LetsTargetSelect(one){
             ];
          }
 
+         // 基本、[me,cam]の並びになるはず
          console.log(`？？？「${target[1]}${target[0]}を狙います！」`);
          resolve(target);
       }
@@ -6148,7 +6113,7 @@ async function enemyturn(cam,me){
    }else{
       await addtext(`${enemy.name}は何かで攻撃した！`)
       selected = ShallTargetSelect(cam,me,'phpl',0);
-      let result = await humandamaged(cam,selected[1],me,selected[0],1,'sh',1);
+      let result = await humandamaged(cam,me,selected[1],selected[0],1,'sh',1);
       if(result == 'end'){let results = killed(cam,me,selected[1],selected[0]);if(results !== 'continue'){return results;}}
    }
    NextTurnis(cam,me,selected[1],selected[0]);
