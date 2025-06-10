@@ -45,60 +45,22 @@
     flex-wrap: nowrap;
     align-items: center;
     gap: 30px;
+    width: 400px;
     height: 130px;
     background-color: #d9eeff69;
     border-radius: 50px;
     margin: 10px;
 }
 #buttons .hit, #buttons .stand{
-    height: 90px;
-    width: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 140px;
+    height: 65px;
     border: 4px solid #cfe9ff;
     background-color: #def0ff;
+    font-size: 30px;
 }
-#betZone{
-    margin-top: 10px;
-    display: block;
-    height: 130px;
-    background-color: #d9eeff69;
-    border-radius: 50px;
-    margin: 10px;
-}
-#betZone input[type="range"] {
-    width: 300px;
-    appearance: none;
-    height: 8px;
-    margin-top: 26px;
-    background: #cfe9ff;
-    border: solid 2px #b5dcff;
-    outline: none;
-}
-#betZone input[type="range"]::-webkit-slider-thumb { /*肴*/
-    -webkit-appearance: none;
-    appearance: none;
-    width: 12px;
-    height: 30px;
-    background: #cfe9ff;
-    border: solid 2px #9ec7eb;
-    cursor: pointer;
-}
-
-#betZone input[type="range"]::-moz-range-thumb {
-    width: 15px;
-    height: 35px;
-    cursor: pointer;
-}
-
-#betZone .button{
-    width: 125px;
-    height: 45px;
-    font-size: 38px;
-    color: #243e5f;
-    text-align: center;
-    margin: 18px auto;
-    border: 2px solid #cfe9ff;
-}
-
 
 #cardPlaces{
     display: flex;
