@@ -47,6 +47,7 @@
       <div class="bar"><div class="inner"></div></div>
       <div class="text">0/NaN</div>
    </div>
+   <div class="login">login</div>
    <div id="menuToggle">☰</div>
 </div>
 
@@ -59,7 +60,7 @@
    </ul>
    <hr noshade="true">
    <button id="logout-button" onclick="logout()">Logout</button><br>
-   <span class="hasd" id="null" data-description="こんなもん見つけて楽しいか？<br>おれは楽しいと思う。">/n</span><br>
+   <span id="null" data-description="こんなもん見つけて楽しいか？<br>おれは楽しいと思う。">/n</span><br>
    <button class="button" onclick="humans.players[1].health = humans.players[1].maxhealth; tekiou();">回復(全)</button>
 
    <div class="buff">
@@ -207,31 +208,31 @@
             <div class="leftside">
                <div class="status"></div>
                <div class="skills">
-               EX:<span class="ex hasd" data-description="${Skills.ex[humans.players[InventoryPage].ex].description}">${Skills.ex[humans.players[InventoryPage].ex].name}</span><br>
-               NS:<span class="ex hasd" data-description="${Skills.ns[humans.players[InventoryPage].ns].description}">${Skills.ns[humans.players[InventoryPage].ns].name}</span><br>
-               PS:<span class="ex hasd" data-description="${Skills.ps[humans.players[InventoryPage].ps].description}">${Skills.ps[humans.players[InventoryPage].ps].name}</span>
+               EX:<span class="ex" data-description="${Skills.ex[humans.players[InventoryPage].ex].description}">${Skills.ex[humans.players[InventoryPage].ex].name}</span><br>
+               NS:<span class="ex" data-description="${Skills.ns[humans.players[InventoryPage].ns].description}">${Skills.ns[humans.players[InventoryPage].ns].name}</span><br>
+               PS:<span class="ex" data-description="${Skills.ps[humans.players[InventoryPage].ps].description}">${Skills.ps[humans.players[InventoryPage].ps].name}</span>
                </div>
                <div class="equips">
-               weapon:<span class="weapon hasd" data-description="${Weapons[humans.players[InventoryPage].weapon.id].description}">${Weapons[humans.players[InventoryPage].weapon.id].name}</span> <button class="button" onclick="WeaponChange()">change</button><br>
-               armor:<span class="armor hasd" data-description="${Armors[humans.players[InventoryPage].armor.id].description}">${Armors[humans.players[InventoryPage].armor.id].name}</span> <button class="button" onclick="ArmorChange()">change</button><br>
+               weapon:<span class="weapon" data-description="${Weapons[humans.players[InventoryPage].weapon.id].description}">${Weapons[humans.players[InventoryPage].weapon.id].name}</span> <button class="button" onclick="WeaponChange()">change</button><br>
+               armor:<span class="armor" data-description="${Armors[humans.players[InventoryPage].armor.id].description}">${Armors[humans.players[InventoryPage].armor.id].name}</span> <button class="button" onclick="ArmorChange()">change</button><br>
                tools;<br>
-                1:<span class="tool1 hasd" data-description="${Tools[humans.players[InventoryPage].tool1].description}<br>${Tools[humans.players[InventoryPage].tool1].num}個所持しています">${Tools[humans.players[InventoryPage].tool1].name}</span> <button class="button" onclick="ToolChange(1)">change</button><br>
-                2:<span class="tool2 hasd" data-description="${Tools[humans.players[InventoryPage].tool2].description}<br>${Tools[humans.players[InventoryPage].tool2].num}個所持しています">${Tools[humans.players[InventoryPage].tool2].name}</span> <button class="button" onclick="ToolChange(2)">change</button><br>
-                3:<span class="tool3 hasd" data-description="${Tools[humans.players[InventoryPage].tool3].description}<br>${Tools[humans.players[InventoryPage].tool3].num}個所持しています">${Tools[humans.players[InventoryPage].tool3].name}</span> <button class="button" onclick="ToolChange(3)">change</button><br>
+                1:<span class="tool1" data-description="${Tools[humans.players[InventoryPage].tool1].description}<br>${Tools[humans.players[InventoryPage].tool1].num}個所持しています">${Tools[humans.players[InventoryPage].tool1].name}</span> <button class="button" onclick="ToolChange(1)">change</button><br>
+                2:<span class="tool2" data-description="${Tools[humans.players[InventoryPage].tool2].description}<br>${Tools[humans.players[InventoryPage].tool2].num}個所持しています">${Tools[humans.players[InventoryPage].tool2].name}</span> <button class="button" onclick="ToolChange(2)">change</button><br>
+                3:<span class="tool3" data-description="${Tools[humans.players[InventoryPage].tool3].description}<br>${Tools[humans.players[InventoryPage].tool3].num}個所持しています">${Tools[humans.players[InventoryPage].tool3].name}</span> <button class="button" onclick="ToolChange(3)">change</button><br>
                </div>
                <div class="equipsChange"></div>
             </div>
             <div class="rightside">
                <div clsas="slashs">slashs<br>
-                  <span class="slash1 hasd" data-description="${Slashs[humans.players[InventoryPage].slash1].description}">1:${humans.players[InventoryPage].slash1} <button class="button" onclick="SlashChange(1)">change</button></span><br>
-                  <span class="slash2 hasd" data-description="${Slashs[humans.players[InventoryPage].slash2].description}">2:${humans.players[InventoryPage].slash2} <button class="button" onclick="SlashChange(2)">change</button></span><br>
-                  <span class="slash3 hasd" data-description="${Slashs[humans.players[InventoryPage].slash3].description}">3:${humans.players[InventoryPage].slash3} <button class="button" onclick="SlashChange(3)">change</button></span>
+                  <span class="slash1" data-description="${Slashs[humans.players[InventoryPage].slash1].description}">1:${humans.players[InventoryPage].slash1} <button class="button" onclick="SlashChange(1)">change</button></span><br>
+                  <span class="slash2" data-description="${Slashs[humans.players[InventoryPage].slash2].description}">2:${humans.players[InventoryPage].slash2} <button class="button" onclick="SlashChange(2)">change</button></span><br>
+                  <span class="slash3" data-description="${Slashs[humans.players[InventoryPage].slash3].description}">3:${humans.players[InventoryPage].slash3} <button class="button" onclick="SlashChange(3)">change</button></span>
                </div>
                <div class="slashChange"></div>
                <div clsas="magics">magics<br>
-                  <span class="magic1 hasd" data-description="${Magics[humans.players[InventoryPage].magic1].description}">1:${humans.players[InventoryPage].magic1} <button class="button" onclick="MagicChange(1)">change</button></span>
-                  <span class="magic2 hasd" data-description="${Magics[humans.players[InventoryPage].magic2].description}">2:${humans.players[InventoryPage].magic2} <button class="button" onclick="MagicChange(2)">change</button></span>
-                  <span class="magic3 hasd" data-description="${Magics[humans.players[InventoryPage].magic3].description}">3:${humans.players[InventoryPage].magic3} <button class="button" onclick="MagicChange(3)">change</button></span>
+                  <span class="magic1" data-description="${Magics[humans.players[InventoryPage].magic1].description}">1:${humans.players[InventoryPage].magic1} <button class="button" onclick="MagicChange(1)">change</button></span>
+                  <span class="magic2" data-description="${Magics[humans.players[InventoryPage].magic2].description}">2:${humans.players[InventoryPage].magic2} <button class="button" onclick="MagicChange(2)">change</button></span>
+                  <span class="magic3" data-description="${Magics[humans.players[InventoryPage].magic3].description}">3:${humans.players[InventoryPage].magic3} <button class="button" onclick="MagicChange(3)">change</button></span>
                </div>
                <div class="magicChange"></div>
                <span class="sp">${humans.players[InventoryPage].sp}pt</span>
@@ -280,6 +281,7 @@
    <div id="profile-tab"></div><!--ここは..ゲーム自体をちゃんとオンライン化したら解放で-->
 </div>
 
+<script src="data.js" defer></script>
 <script src="nakami.js" defer></script>
 </body>
 </html>

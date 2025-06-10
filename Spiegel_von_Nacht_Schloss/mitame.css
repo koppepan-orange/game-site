@@ -195,7 +195,6 @@ body{
   width: fit-content;
   animation: fadeIn 0.5s ease forwards;
 }
-
 @keyframes fadeIn {
   0%{
   opacity: 0;
@@ -204,7 +203,6 @@ body{
   opacity: 1;
   }
 }
-
 .color-red{
   color: #ff1919;
 }
@@ -255,6 +253,7 @@ body{
   align-items: center;
   gap: 20px;
 }
+
 .card {
   width: 80px;
   height: 100px;

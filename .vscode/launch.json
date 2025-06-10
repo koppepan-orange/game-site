@@ -6,9 +6,9 @@
     "configurations": [
         {
             "type": "chrome",
+            "name": "from now on(html)",
             "request": "launch",
-            "name": "Scuro_e_Nero_Soldato",
-            "file": "/Users/koppepanorange/orange_bread/game-site/Scuro_e_Nero_Soldato/index.html"
+            "file": "${file}",
         },
         {
             "type": "chrome",
@@ -52,5 +52,11 @@
             "name": "three-test",
             "file": "/Users/koppepanorange/orange_bread/game-site/three/three.html",
         },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "clicker of mugen_win",
+            "file": "n:\\koppepan_orange\\game-site\\clicker-of-mugen\\index.html"
+        }
     ]
 }

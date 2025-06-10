@@ -315,6 +315,20 @@ input[type="range"]::-moz-range-thumb {
   vertical-align: middle;
   z-index: 1000;
 }
+#upperUI .login{
+  display: block;
+  width: 55px;
+  height: 35px;
+  position: absolute;
+  top: 50%;
+  right: 13%;
+  transform: translateY(-50%);
+  border: 2px solid #abcde8;
+  background: linear-gradient(to right, #fcb3b7, #fad5cd, #d6e5dc, #aee1dd);
+  padding: 5px;
+  text-align: center;
+  font-size: 20px;
+}
 #menuToggle {
   display: block;
   position: absolute;
