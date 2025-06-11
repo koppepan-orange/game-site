@@ -60,17 +60,6 @@
    </ul>
    <hr noshade="true">
    <button id="logout-button" onclick="logout()">Logout</button><br>
-   <span id="null" data-description="こんなもん見つけて楽しいか？<br>おれは楽しいと思う。">/n</span><br>
-   <button class="button" onclick="humans.players[1].health = humans.players[1].maxhealth; tekiou();">回復(全)</button>
-
-   <div class="buff">
-      <div class="top"></div>
-      <div class="bottom" style="background:url('assets/buffs/powerup.png') center/cover no-repeat"></div>
-   </div>
-   <div class="debuff">
-      <div class="top" style="background:url('assets/buffs/powerdown.png') center/cover no-repeat"></div>
-      <div class="bottom"></div>
-   </div>
 </nav>
 
 <div id="login">
@@ -80,11 +69,11 @@
 </div>
 
 <div id="tabs">
-   <button class="goto -home" data-group=""><img class="tabImg" src="assets/icons/home.png"></button>
-   <button class="goto -inventory"><img class="tabImg" src="assets/icons/inventory.png"></button>
-   <button class="goto -quest"><img class="tabImg" src="assets/icons/quest.png"></button>
-   <button class="goto -chat"><img class="tabImg" src="assets/icons/chat.png"></button>
-   <button class="goto -profile"><img class="tabImg" src="assets/icons/profile.png"></button>
+   <button data-goto="home home home"><img class="tabImg" src="assets/icons/home.png"></button>
+   <button data-goto="inventory"><img class="tabImg" src="assets/icons/inventory.png"></button>
+   <button data-goto="quest"><img class="tabImg" src="assets/icons/quest.png"></button>
+   <button data-goto="chat"><img class="tabImg" src="assets/icons/chat.png"></button>
+   <button data-goto="profile"><img class="tabImg" src="assets/icons/profile.png"></button>
 </div>
 
 
@@ -97,30 +86,30 @@
             インタラクト<br>
             <div class="groupA row">
                <div class="column">
-                  <button class="buttonA goto -home -home -premium">Premium Shop</button>
-                  <button class="buttonA goto -home -home -bar">酒場</button>
-                  <button class="buttonA goto -home -home -training">訓練場</button>
+                  <button class="buttonA" data-goto="home home premium">Premium Shop</button>
+                  <button class="buttonA" data-goto="home home bar">酒場</button>
+                  <button class="buttonA" data-goto="home home training">訓練場</button>
                   <imput type="range" min="1" max="8"></imput>
                </div>
                <div class="column">
-                  <button class="buttonA goto -home -home -bank">銀行</button> (ここもうちょい追加したいね)
+                  <button class="buttonA" data-goto="home home bank">銀行</button> (ここもうちょい追加したいね)
                </div>
             </div>
             <div class="groupB">
-               <button class="buttonB goto -home -home -station">駅に行く</button>
-               <button class="buttonB goto -home -home -timy">タイミーをする</button>
-               <button class="buttonB goto -home -home -market">商店街を見に行く</button>
+               <button class="buttonB" data-goto="home home station">駅に行く</button>
+               <button class="buttonB" data-goto="timy">タイミーをする</button>
+               <button class="buttonB" data-goto="market">商店街を見に行く</button>
             </div>
          </div>
          <div class="bar">
             <div class="main">
-               <button class="goto -home -home -home">←</button> Dril's bar<br>
-               <button class="buttonA goto -home -home -bar -recruit">募集</button>
-               <button class="buttonA goto -home -home -bar -meet">探す</button>
+               <button data-goto="home home home">←</button> Dril's bar<br>
+               <button class="buttonA" data-goto="home home bar recruit">募集</button>
+               <button class="buttonA" data-goto="home home bar meet">探す</button>
             </div>
             <div class="recruit">
                <div class="hontai">
-                  <button class="goto -home -home -bar">←</button>募集<br>
+                  <button data-goto="home home bar">←</button>募集<br>
                   ダンジョンで一緒に戦ってくれる仲間を募集することができます！<br>
                   <div class="row">
                      <button class="buttonA" onclick="friendRecluit(1)">1回募集/80€</button>
@@ -142,12 +131,18 @@
                </div>
             </div>
             <div class="meet">
+               <button data-goto="home home bar">←</button>
                <div class="list"></div>
                <div class="detail"></div>
             </div>
          </div>
+         <div class="training">
+            <button data-goto="home home home">←</button> 修練場<br>
+            ...やべぇここ何に使おう<br>
+            戦闘訓練場、ってことにする？
+         </div>
          <div class="bank">
-            <button class="goto -home -home -home">←</button> 超安心安全銀行<br>
+            <button data-goto="home home home">←</button> 超安心安全銀行<br>
             <span id="bank-deposit" class="bank-title">deposite</span><input type="number" id="bank-deposit-num" /><button id="bank-deposit-num-go" onclick="BankDeposite('Num')" class="bank-button">go</button><button id="bank-deposit-all" class="bank-button" onclick="BankDeposite('All')">All</button><br>
             <span id="bank-withdraw" class="bank-title">withdraw</span><input type="number" id="bank-withdraw-num" /><button id="bank-withdraw-num-go" onclick="BankWithdraw('Num')" class="bank-button">go</button><button id="bank-withdraw-all" class="bank-button" onclick="BankWithdraw('All')">All</button><br>
             <span id="Bankstone">bank account:0€</span>
@@ -156,7 +151,7 @@
             <div class="main">
                <!--<span id="BigText">シャングリ・ラ中心街</span><br>-->
                <img src="assets/station.png" style="width: 600px; height: 300px;"><br>
-               <button class="goto -home -home -home">←</button> 駅<br>
+               <button data-goto="home home home">←</button> 駅<br>
                <button class="buttonA" onclick="HomeLetsDungeon(1)">ダンジョン</button><br>
                <button class="buttonA">ストーリー</button>
             </div>
@@ -170,7 +165,7 @@
          <div class="timy">
             <div class="select">
                <!--<span id="BigText">タイミー</span><br>-->
-               <button class="goto -home -home -home">←</button> お仕事一覧<br>
+               <button data-goto="home home home">←</button> お仕事一覧<br>
                <select id="Num-Select"><option value="1">01</option><option value="2">02</option><option value="3">03</option><option value="4">04</option><option value="5">05</option><option value="6">06</option><option value="7">07</option><option value="8">08</option></select><br>
                <button class="buttonA" onclick="HomeJobStart('stoneShort')">[急募][短期][面接無し]品出し(エイトイレブン)</button><br>
                <button class="buttonA" onclick="HomeJobStart('stoneMiddle')">[高収入]仕分け、シール貼り(株式会社アイミックス)</button><br>
@@ -186,18 +181,18 @@
                </span>
             </div>
          </div>
-         <div class="charge">
+         <div class="premium">
             <!--<span id="BigText">チャージステーション</span><br>-->
-            <button class="goto -home -home -home">←</button> チャージステーション<br>
+            <button data-goto="home home home">←</button> <span data-description="これが海の底にあったら..いいよね">宝石"箱"屋</span><br>
             <div class="row">
-               <button class="buttonC" onclick="Charge(90,120)">90$/120𐩰</button>
-               <button class="buttonC" onclick="Charge(300,360)">300$/360𐩰</button>
-               <button class="buttonC" onclick="Charge(860,860)">860$/860𐩰</button>
+               <button class="c" onclick="Charge(90,120)">90$/120𐩰</button>
+               <button class="c" onclick="Charge(300,360)">300$/360𐩰</button>
+               <button class="c" onclick="Charge(860,860)">860$/860𐩰</button>
             </div>
             <div class="row">
-               <button class="buttonC" onclick="Charge(1280,1080)">1280$/1080𐩰</button>
-               <button class="buttonC" onclick="Charge(1840,1460)">1840$/1460𐩰</button>
-               <button class="buttonC" onclick="Charge(2640,2160)">2640$/2160𐩰</button>
+               <button class="c" onclick="Charge(1280,1080)">1280$/1080𐩰</button>
+               <button class="c" onclick="Charge(1840,1460)">1840$/1460𐩰</button>
+               <button class="c" onclick="Charge(2640,2160)">2640$/2160𐩰</button>
             </div>
          </div>
       </div>

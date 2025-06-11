@@ -3,19 +3,11 @@
 *{
   font-family:comicsans;
   box-sizing: border-box;
-  scrollbar-width: none;
-  overflow-y: scroll;
 }
 html{
-  width: 100%;
-  background-color: #eeeeee;
-  overflow: hidden;
-}
-body{
-  max-width: 100%;
-  height: 100vh;
-  margin: 0;
+  margin: -8px;
   padding: 0;
+  overflow-y: hidden;
 }
 
 .row{
@@ -53,7 +45,19 @@ input[type="range"]::-moz-range-thumb {
   cursor: pointer;
 }
 
-/*こっから雑に扱ってもいい子*/
+/* ゲーム全体のやつ */
+#GameZone {
+  margin-top: 75px;
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  user-select: none;
+  background-color: #eeeeee;
+  overflow-y: scroll;
+  margin-bottom: 65px;
+}
+
+/*ずっと粘着してくる説明したガリヤ*/
 #movabledescription {
   display: none;
   position: fixed;
@@ -63,6 +67,16 @@ input[type="range"]::-moz-range-thumb {
   padding: 5px 10px;
   border-radius: 5px;
   z-index: 10000;
+}
+
+.nicotext{
+  position: absolute;
+  top: 0vh;
+  right: 0;
+  background-color: rgba(228, 249, 255, 0.563);
+  color: #000000;
+  font-size: 20px;
+  z-index: 200;
 }
 
 /*logとtext*/
@@ -316,7 +330,7 @@ input[type="range"]::-moz-range-thumb {
   z-index: 1000;
 }
 #upperUI .login{
-  display: block;
+  display: none;
   width: 55px;
   height: 35px;
   position: absolute;
@@ -342,7 +356,7 @@ input[type="range"]::-moz-range-thumb {
 
 /*ログインのやつ*/
 #login{
-  display: block;
+  display: none;
   width: 75%;
   position: fixed;
   top: 50%;
@@ -352,12 +366,9 @@ input[type="range"]::-moz-range-thumb {
   background-color: #def0ff;
   border: 1px solid #b5dcff;
   border-radius: 5px;
-  overflow: hidden;
-  opacity: 0;
-  transition: opacity 0.5s ease; 
-  z-index: 1234;
+  overflow: hidden; 
+  z-index: 255;
   user-select: none;
-  pointer-events: none;
 }
 #login input {
   width: calc(100% - 20px);
@@ -382,15 +393,6 @@ input[type="range"]::-moz-range-thumb {
   cursor: pointer;
 }
 
-/* ゲーム全体のやつ */
-#GameZone {
-  margin-top: 75px;
-  display: block;
-  width: 100%;
-  height: 100%;
-  max-height: 100%;
-  margin-bottom: 65px;
-}
 
 /* こっからhomeとかtabとか */
 #tabs {
@@ -474,7 +476,7 @@ input[type="range"]::-moz-range-thumb {
   height: 80px;
   text-align: left!important;
 }
-.HomeBButton{ /* 正方形で大きめ */
+.buttonC{ /* 正方形で大きめ */
   display: block;
   background-color: #000000;
   border: 3px solid #fffc52;
@@ -512,12 +514,10 @@ input[type="range"]::-moz-range-thumb {
   height: auto;
 }
 
-/* 銀行(bank) */
 #homeArea .bank{
   display: none;
 }
 
-/* 駅(station) */
 #homeArea .station{
   display: none;
 }
@@ -560,8 +560,10 @@ input[type="range"]::-moz-range-thumb {
   100%{transform: translateX(-3em);}
 }
 
+#homeArea .training{
+  display: none;
+}
 
-/* 仕事(timy) */
 #homeArea .timy, #homeArea .timy .select, #homeArea .timy .tasking{
   display: none;
 }
@@ -591,9 +593,20 @@ input[type="range"]::-moz-range-thumb {
   color: white;
 }
 
-/* チャージ(charge) */
-#homeArea .charge{
+#homeArea .premium{
   display: none;
+  width: 100%;
+  aspect-ratio: 1;
+}
+#homeArea .premium .row{
+  margin-top: 2.5%;
+  align-items: center;
+  gap: 2.5%;
+  padding: 0 2.5%;
+}
+#homeArea .premium .c{
+  width: 30%;
+  aspect-ratio: 1;
 }
 
 /* overfieldArea --開放空間-- */

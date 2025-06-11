@@ -906,27 +906,21 @@ function NextStage(){
 function delay(ms){
    return new Promise(resolve=>setTimeout(resolve,ms));
 };
-async function NicoNicoText(mes){
-    const newDiv = document.createElement('div');
-    newDiv.textContent = mes;
-    newDiv.style = `
-    position: absolute;
-    top: ${Math.random()*100}vh;
-    right: 0;
-    background-color: rgba(228, 249, 255, 0.563);
-    color: #000000;
-    font-size: 50px;
-    `
-    document.querySelector('body').appendChild(newDiv);
-    //let speed = (Math.random()*100+1)*0.1;
-    //let speed = mes.toString().length*2 
-    speed = 2;
-    for(let i = 0; window.innerWidth > i*speed; i++){
-        let val = i*speed;
-        newDiv.style.right = `${val}px`
-        await delay(5);
-    }
-    newDiv.remove();
+async function nicoText(mes){
+   const newDiv = document.createElement('div');
+   newDiv.textContent = mes;
+   newDiv.className = 'nicotext';
+   newDiv.style.top = `calc(${random(0,100)}vh - 20px)`
+   body.appendChild(newDiv);
+   //let speed = (Math.random()*100+1)*0.1;
+   //let speed = mes.toString().length*2 
+   let speed = 2;
+   for(let i = 0; window.innerWidth > i*speed; i++){
+      let val = i*speed;
+      newDiv.style.right = `${val}px`
+      await delay(5);
+   }
+   newDiv.remove();
 };
 function arraySelect(array){
     let select = Math.floor(Math.random()*array.length);
@@ -993,9 +987,8 @@ function getLocalStorage(name) {
 //#endregion
 //#region 変数達
 let w,x,y,z;//こいつらは計算
-let t = 't';
 
-let fun = Math.floor(Math.random() * 100)+1;
+let fun = random(1,100);
 
 let turn = ['players', 1];//今誰のターンか
 let turncount = 0;//今のターン数
@@ -1450,7 +1443,7 @@ let humans = {
          ps:'null',
       },
    }
-}
+};
 
 let quests = {
    main:{
@@ -1462,53 +1455,54 @@ let quests = {
       act:1,
       acted:1
    },
-   daily1:{
-      num:1,
-      description:"敵を3体倒す",
-      rewards: 20,
-      type:'k',
-      term:[0],
-      act:3,
-      acted:0
-   },
-   daily2:{
-      num:2,
-      description:"ダンジョンを一回クリアする",
-      rewards: 20,
-      type:'dc',
-      term:[0],
-      act:1,
-      acted:0
-   },
-   daily3:{
-      num:3,
-      description:"敵を5体倒す",
-      rewards: 20,
-      type:'k',
-      term:[0],
-      act:5,
-      acted:0
-   },
-   daily4:{
-      num:4,
-      description:"敵を7体倒す",
-      rewards: 20,
-      type:'k',
-      term:[0],
-      act:7,
-      acted:0
-   },
-   daily5:{
-      num:5,
-      description:"ダンジョンを1回クリアする",
-      rewards: 20,
-      type:'dc',
-      term:[0],
-      act:1,
-      acted:0
+   daily:{
+      1:{
+         num:1,
+         description:"敵を3体倒す",
+         rewards: 20,
+         type:'k',
+         term:[0],
+         act:3,
+         acted:0
+      },
+      2:{
+         num:2,
+         description:"ダンジョンを一回クリアする",
+         rewards: 20,
+         type:'dc',
+         term:[0],
+         act:1,
+         acted:0
+      },
+      3:{
+         num:3,
+         description:"敵を5体倒す",
+         rewards: 20,
+         type:'k',
+         term:[0],
+         act:5,
+         acted:0
+      },
+      4:{
+         num:4,
+         description:"敵を7体倒す",
+         rewards: 20,
+         type:'k',
+         term:[0],
+         act:7,
+         acted:0
+      },
+      5:{
+         num:5,
+         description:"ダンジョンを1回クリアする",
+         rewards: 20,
+         type:'dc',
+         term:[0],
+         act:1,
+         acted:0
+      }
    }
-}
-
+};
 
 function tekiou(){
    //存在確認用コマンド Object.keys(humans).forEach(cam => {Object.keys(humans[cam]).map(a => a.toString()).filter(s => humans[cam][s].status == 1 || humans[cam][s].status == 2).forEach(me => {console.log(`${cam}${me}`)})})
@@ -2081,7 +2075,7 @@ function ToolChangeDeside(num,code){
 
 function suteFuri(me,code){
    if(sp < 1){
-      NicoNicoText('spがないのぜ');
+      nicoText('spがないのぜ');
       return;
    };
    switch(code){
@@ -2324,7 +2318,8 @@ let chatroom = 1;
 let messagesRef = database.ref('forrpg/rooms/'+chatroom+'/messages');
 let usersRef;
 let userData;
-const Login = document.querySelector('#login');
+let loginDiv = document.querySelector('#login');
+let loginAbleto = document.querySelector('#upperUI .login');
 
 async function GameStart(){
    document.querySelector('#homeArea').style.display = 'block';
@@ -2334,39 +2329,19 @@ async function GameStart(){
    if(username){
       console.log("自動ログインしました");
       usersRef = database.ref(`users/${username}/forrpg`);
-      NicoNicoText('wait for now...')
+      nicoText('wait for now...')
       login();
    }else{
       console.log("ログインしてください");
-      Login.style.display = 'block';
-
+      loginAbleto.style.display = 'block'
    }
-
-
-   
-
-   //こっからchat
-   document.querySelector('#message-input').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-          if(!e.shiftKey){
-            e.preventDefault();
-            document.querySelector('#send-button').click();
-          }else{
-            document.querySelector('#message-input').value += '<br>'
-          }
-      }
-      });   
-  function startChat() {
-      chatroom = document.querySelector('#room-select').value;
-      selectRoom();
-  }
 }
 
-document.querySelector('#upperUI .login').addEventListener('click', () =>  {
-   event.preventDefault();
-   Login.style.display = 'block'
+loginAbleto.addEventListener('click', () =>  {
+   loginDiv.style.display = 'block';
 })
-document.querySelector('#login .button').addEventListener('click', async function(event){
+
+loginDiv.querySelector('.button').addEventListener('click', async function(event){
    event.preventDefault();
    username = document.querySelector('#login .username').value;
    var password = document.querySelector('#login .password').value;
@@ -2377,10 +2352,11 @@ document.querySelector('#login .button').addEventListener('click', async functio
       if(snapshot.exists()){
          userData = snapshot.val();
          if(userData.password === password){
+            console.log('success!!!!!!!!!!!!!!!')
             login();
             setLocalStorage("username", username); // ログイン成功時
          } else {
-            NicoNicoText('パスワードが間違っています');
+            nicoText('パスワードが間違っています');
          }
       }else{
          usersRef.update({
@@ -2397,12 +2373,13 @@ document.querySelector('#login .button').addEventListener('click', async functio
          quest.main = quests.main[0];
          quest.daily = [];
          for(i = 0;i < 5;i++){
-            let newquest = quests.daily[random(1,quests.daily.length)];
+            let newquest = arraySelect(quests.daily)
             newquest.id = i+1;
             quest.daily.push(newquest);
          }
 
          save()
+         console.log('maked!!!!!!!!!!!!!!!!!!!!!')
          login();
          setLocalStorage("username", username);
       }
@@ -2410,14 +2387,24 @@ document.querySelector('#login .button').addEventListener('click', async functio
    
 });
 
+// function questMake(code){
+//    if(code == 'daily'){
+//       for(i = 0;i < 5;i++){
+//          let newquest = arraySelect(quests.daily)
+//          newquest.id = i+1;
+//          quest.daily.push(newquest);
+//       };
+//    };
+// };
+
 async function login(){
 
    usersRef.update({
       status: 'online'
    });
-   Login.style.display = 'none';
+   loginDiv.style.display = 'none';
    document.querySelector('#chat-tab #chat').style.display = 'flex';
-   startChat();
+   selectRoom( )
 
    AllowMove = 1;
 
@@ -2466,6 +2453,19 @@ function selectRoom() {
        const minutes = String(date.getMinutes()).padStart(2, '0');
        return `${year}/${month}/${day} ${hours}:${minutes}`;
    }
+
+   
+   //こっからchat
+   document.querySelector('#message-input').addEventListener('keypress', function(e) {
+      if (e.key == 'Enter') {
+         if(!e.shiftKey){
+            e.preventDefault();
+            document.querySelector('#send-button').click();
+         }else{
+            document.querySelector('#message-input').value += '<br>'
+         }
+      }
+   });
 
    // メッセージ送信
    sendButton.addEventListener('click', function() {
@@ -2525,53 +2525,49 @@ function selectRoom() {
    });
 
    messagesRef.once('value', function(snapshot) {
-      displayAllMessages();  // 一回だけ全メッセージを表示
+      displayAllMessages(snapshot);  // 一回だけ全メッセージを表示
    });
 }
 
-function displayAllMessages() {
+function displayAllMessages(snapshot){
    var roomSelect = document.querySelector('#room-select');
    chatroom = roomSelect.value;
    document.querySelector('#messages').innerHTML = '';
 
    // データベースから全てのメッセージを取得
-   messagesRef.once('value', function(snapshot) {
-       snapshot.forEach(function(childSnapshot) {
-           var messageData = childSnapshot.val();
-           var messageElement = document.createElement('div');
-           messageElement.className = 'message';
-           messageElement.setAttribute('data-id', childSnapshot.key);
+   snapshot.forEach(function(childSnapshot){
+      var messageData = childSnapshot.val();
+      var messageElement = document.createElement('div');
+      messageElement.className = 'message';
+      messageElement.setAttribute('data-id', childSnapshot.key);
 
-           var usernameElement = document.createElement('span');
-           usernameElement.className = 'username';
-           usernameElement.textContent = messageData.username;
-           messageElement.appendChild(usernameElement);
+      var usernameElement = document.createElement('span');
+      usernameElement.className = 'username';
+      usernameElement.textContent = messageData.username;
+      messageElement.appendChild(usernameElement);
 
-           var timestampElement = document.createElement('span');
-           timestampElement.className = 'timestamp';
-           timestampElement.textContent = '  —' + messageData.timestamp;
-           messageElement.appendChild(timestampElement);
+      var timestampElement = document.createElement('span');
+      timestampElement.className = 'timestamp';
+      timestampElement.textContent = '  —' + messageData.timestamp;
+      messageElement.appendChild(timestampElement);
 
-           var brElement = document.createElement('br');
-           messageElement.appendChild(brElement);
+      var brElement = document.createElement('br');
+      messageElement.appendChild(brElement);
 
-           var textElement = document.createElement('div');
-           textElement.innerHTML = messageData.text;
-           messageElement.appendChild(textElement);
+      var textElement = document.createElement('div');
+      textElement.innerHTML = messageData.text;
+      messageElement.appendChild(textElement);
 
-           document.querySelector('#messages').appendChild(messageElement);
-       });
-
-       messagesRef.on('value', function(snapshot) {
-           if (snapshot.numChildren() > 20) {
-               var firstMessageKey = Object.keys(snapshot.val())[0];
-               messagesRef.child(firstMessageKey).remove();
-           }
-       });
-
-       // 最新のメッセージが見えるようにスクロール
-       document.querySelector('#messages').scrollTop = document.querySelector('#messages').scrollHeight;
+      document.querySelector('#messages').appendChild(messageElement);
    });
+
+   if (snapshot.numChildren() > 30) {
+      var firstMessageKey = Object.keys(snapshot.val())[0];
+      messagesRef.child(firstMessageKey).remove();
+   }
+
+   // 最新のメッセージが見えるようにスクロール
+   document.querySelector('#messages').scrollTop = document.querySelector('#messages').scrollHeight;
 }
 
 // 部屋作ったりラジバンダリ
@@ -2671,9 +2667,9 @@ function Charge(e,m){
          stone: userData.stone??m - m
       });
       save();
-      NicoNicoText(`${m}€払い、${e}$チャージ完了、です！`);
+      nicoText(`${m}€払い、${e}$チャージ完了、です！`);
    }else{
-      NicoNicoText('お金が足りません...');
+      nicoText('お金が足りません...');
    }
 }
 //#endregion
@@ -2706,6 +2702,7 @@ let nowPlace = {
 }
 function cd(tab, area, selection, detail1, detail2, detail3){
    console.log(`tab:${tab} area:${area} selection:${selection} detail1:${detail1} detail2:${detail2} detail3:${detail3}に移動します！！`);
+   console.log((`#${tab}-tab${area ? ` #${area}Area` : ''}${selection ? ` .${selection}` : ''}${detail1 ? ` .${detail1}` : ''}${detail2 ? ` .${detail2}` : ''}${detail3 ? ` .${detail3}` : ''}`))
    document.querySelector(`#${nowPlace.tab}-tab${nowPlace.area ? ` #${nowPlace.area}Area` : ''}${nowPlace.selection ? ` .${nowPlace.selection}` : ''}${nowPlace.detail1 ? ` .${nowPlace.detail1}` : ''}${nowPlace.detail2 ? ` .${nowPlace.detail2}` : ''}${detail3 ? ` .${detail3}` : ''}`).style.display = 'none';
    document.querySelector(`#${tab}-tab${area ? ` #${area}Area` : ''}${selection ? ` .${selection}` : ''}${detail1 ? ` .${detail1}` : ''}${detail2 ? ` .${detail2}` : ''}${detail3 ? ` .${detail3}` : ''}`).style.display = 'block';
    nowPlace = {
@@ -2715,37 +2712,17 @@ function cd(tab, area, selection, detail1, detail2, detail3){
       detail1: detail1,
       detail2: detail2,
       detail3: detail3
-   } 
+   };
 }
-//MakeNewQuest('x');
-//UpdateProfile();
 
-document.querySelectorAll('.goto').forEach(el => {
-   el.addEventListener('click', () => {
-      const classList = el.className.split(' ');
-
-      // "goto" より後ろのクラス名だけ抽出
-      const index = classList.indexOf('goto');
-      const args = classList.slice(index + 1);
-
-      // "-" を取り除く処理
-      const cleanArgs = args.map(arg => arg.replace(/-/g, ''));
-
-      // 最大4つまでに制限しておく（足りなければnull）
-      const [tab, area, selection, detail1, detail2, detail3] = [...cleanArgs, null, null, null, null, null, null];
-
-      // console.log(el)
-      // console.log('↑が押された時のcd')
+document.addEventListener('click', e => {
+   const gotoTarget = e.target.closest('[data-goto]');
+   if(gotoTarget){
+      const reach = gotoTarget.dataset.goto;
+      const goList = reach.split(' ');
+      const [tab, area, selection, detail1, detail2, detail3] = [...goList, null, null, null, null, null, null];
       cd(tab, area, selection, detail1, detail2, detail3);
-   });
-});
-
-let Tabs = document.getElementById('tabs');
-let tabs = Array.from(Tabs.children);
-tabs.forEach(tab => {
-   tab.addEventListener('click', el => {
-      
-   })
+   };
 })
 
 //#region rpgtoka
@@ -3750,7 +3727,7 @@ async function skillReserve(cam,me){
          if(result == 'end'){return 'end';}
       }
    }else{
-      NicoNicoText('まだクールダウン中ですわ〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜');
+      nicoText('まだクールダウン中ですわ〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜');
    }
 }
 async function skillAct(cam,me,skill){
