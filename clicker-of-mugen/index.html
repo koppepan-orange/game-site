@@ -12,7 +12,7 @@
    <link rel="stylesheet" href="mitame.css">
 </head>
 <body id="body">
-   
+
 <div id="movabledescription"></div>
 <div id="text"></div>
 <div id="log" style="right: -300px;">
@@ -51,16 +51,12 @@
    <div id="menuToggle">☰</div>
 </div>
 
-<nav id="sideMenu">
-   <hr noshade="true">
-   <ul>
-      <li class="notice">お知らせ</li>
-      <li class="tutorial">チュートリアル</li>
-      <li class="setting">設定</li>
-   </ul>
-   <hr noshade="true">
-   <button id="logout-button" onclick="logout()">Logout</button><br>
-</nav>
+<div id="smartMenu">
+   <div class="item hidden notice">n</div>
+   <div class="item hidden logbo">l</div>
+   <!-- <div class="item hidden" data-goto="">h</div> -->
+   <div class="item main">:</div>
+</div>
 
 <div id="login">
    <input type="text" class="username" placeholder="username">
@@ -156,9 +152,9 @@
                <button class="buttonA">ストーリー</button>
             </div>
             <div class="select">
-               <div class="1"></div>
-               <div class="2"></div>
-               <div class="3"></div>
+               <div class="chara"></div>
+               <div class="two"></div>
+               <div class="three"></div>
             </div>
 
          </div>

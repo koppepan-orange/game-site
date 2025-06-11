@@ -14,7 +14,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "clicker(rpg)",
-            "file": "/Users/koppepanorange/orange_bread/game-site/clicker-of-mugen/hontai.html"
+            "file": "/Users/koppepanorange/orange_bread/game-site/clicker-of-mugen/index.html"
         },
         {
             "type": "chrome",

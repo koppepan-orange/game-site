@@ -2118,20 +2118,16 @@ function suteFuri(me,code){
 
 //#endregion
 
-
-//#region sideMenu
-const menuToggle = document.querySelector('#menuToggle');
-const sideMenu = document.querySelector('#sideMenu');
-menuToggle.addEventListener('click', () => {
-   if(sideMenu.style.left === '0px'){
-      sideMenu.style.left = '-250px';
-   }else{
-      sideMenu.style.left = '0px';
-   }
+let smartMenu = document.querySelector("#smartMenu");
+let smartPhone = smartMenu.querySelector(".main");
+smartPhone.addEventListener("click", () => {
+   smartMenu.querySelectorAll(".item:not(.main)").forEach(item => {
+      item.classList.toggle("hidden");
+   });
 });
-//#endregion
+
 //#region notice
-const noticeButton = document.querySelector('#sideMenu .notice');
+const noticeButton = document.querySelector('#smartMenu .notice');
 const noticeMain = document.querySelector('#notice');
 const noticeList = document.querySelector('#notice .list');
 const noticeShow = document.querySelector('#notice .show');
@@ -2142,7 +2138,7 @@ const noticeShowDate = document.querySelector('#notice .show .date');
 const noticeShowBody = document.querySelector('#notice .show .body');
 let noticeNow = 0;
 
-noticeButton.addEventListener('click', event => {
+noticeButton.addEventListener('click', () => {
    noticeNow = 1;
    noticeMain.style.display = 'block';
    sideMenu.style.left = '-250px';
@@ -2410,7 +2406,7 @@ async function login(){
 
    // データを取得する関数)
    userData = await load();
-   await delay(500)
+   await delay(50)
 
    stone = userData.stone??0;
    bankstone = userData.bankstone??0;
@@ -2419,6 +2415,8 @@ async function login(){
    clearedmainquest = userData.clearedmainquest??0;
    cleareddailyquest = userData.cleareddailyquest??0;
    maxrpt = rank*100;
+
+   updateUI();
    
    quests.main = Quests.main[clearedmainquest+1];
    if(userData && checkLastLogin(userData?.lastact??0)){
@@ -2429,7 +2427,7 @@ async function login(){
       });
    }
 
-   await delay(500);
+   await delay(50);
    console.log('最初のロードのcd')
    cd('home','home','home')
 }
@@ -2726,17 +2724,6 @@ document.addEventListener('click', e => {
 })
 
 //#region rpgtoka
-function HomeMapSelect(){
-   save();
-   document.querySelector('#homeArea').innerHTML = `
-   <!--<span id="BigText">シャングリ・ラ中心街</span><br>-->
-   <img src="assets/station.png" style="width: 600px; height: 300px;"><br>
-   <button class="backtoHome">←</button> 駅<br>
-   <button class="buttonB" onclick="HomeLetsDungeon(1)">創世黎明の原野</button><br>
-   <button class="buttonB" onclick="HomeLetsDungeon(2)">ガチェンレイゲスドゥールラート</button><br>
-   <button class="buttonB" onclick="">アビドス高等学校((</button><br>
-   `;
-}
 async function HomeLetsDungeon(code){
    save();
    fun = Math.floor(Math.random() * 100)+1;//毎回変更されるのぜ
@@ -2747,21 +2734,17 @@ async function HomeLetsDungeon(code){
    humans.players[1].exp = 0;
    sp = 1;
    
-   document.querySelector('#homeArea').style.display = 'block';
-   document.querySelector('#homeArea').style.textAlign = 'center';
-   document.querySelector('#battleArea').style.display = 'none';
-   document.querySelector('#homeArea').innerHTML = '<div id="selectChara"></div>';
    for(let id of Object.keys(Charas)){
       let chara = Charas[id];
       let newDiv = document.createElement('div');
-      newDiv.className = 'chara';
+      newDiv.className = 'item';
       newDiv.id = chara.name;
       newDiv.addEventListener('click', function(){
          HomeGoDungeon(chara.id);
       })
       
       let img = document.createElement('img');
-      img.className = 'img hasd';
+      img.className = 'img';
       img.setAttribute('data-description', chara.description);
       img.src = `assets/charas/${chara.id}.png`;
       newDiv.appendChild(img);
@@ -2775,7 +2758,7 @@ async function HomeLetsDungeon(code){
       name.appendChild(span);
       newDiv.appendChild(name);
       
-      document.querySelector('#homeArea .station .select .1').appendChild(newDiv);
+      document.querySelector('#homeArea .station .select .chara').appendChild(newDiv);
 
       //後付けハードディスク
       let spanScrollWidth = span.scrollWidth
@@ -2798,9 +2781,6 @@ async function HomeLetsDungeon(code){
 
 }
 function HomeGoDungeon(name){
-   document.querySelector('#homeArea').style.textAlign = 'left';
-   document.querySelector('#homeArea').style.display = 'none';
-   document.querySelector('#battleArea').style.display = 'none';
    let player = humans.players[1]
    player.id = name;
 
@@ -2841,13 +2821,12 @@ function HomeGoDungeon(name){
    enemycrdm = 1.5;
    enemycrrs = 0;
    
-   
    dungeonnow = 1;
    logOOmoto.style.display = 'flex';
    logOOmoto.style.right = '-300px';
    logOpener.textContent = '<';
-   document.querySelector('#overfieldArea').style.display = 'block';
    document.querySelector('#homeArea').style.display = 'none';
+   document.querySelector('#overfieldArea').style.display = 'block';
    GoNextFloor();
 
    AllowMove = 0;
