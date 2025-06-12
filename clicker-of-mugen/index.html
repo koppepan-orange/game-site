@@ -41,7 +41,7 @@
    <div class="user">
       <div class="username">no name</div>
       <div class="rank">Rank:#ERROR!</div>
-      <div class="stone">0𐩰<button class="get" onclick="if(afknow == 0){LetsCharge();}">+</button></div>
+      <div class="stone">0𐩰</div>
    </div>
    <div class="rpt">
       <div class="bar"><div class="inner"></div></div>
@@ -52,10 +52,10 @@
 </div>
 
 <div id="smartMenu">
-   <div class="item hidden notice">n</div>
-   <div class="item hidden logbo">l</div>
+   <div class="item hidden notice"><img src="assets/system/notice_w.png"></div>
+   <div class="item hidden logbo"><img src="assets/system/logbo_w.png"></div>
    <!-- <div class="item hidden" data-goto="">h</div> -->
-   <div class="item main">:</div>
+   <div class="item main"><img src="assets/system/phone.png"></div>
 </div>
 
 <div id="login">
@@ -65,11 +65,11 @@
 </div>
 
 <div id="tabs">
-   <button data-goto="home home home"><img class="tabImg" src="assets/icons/home.png"></button>
-   <button data-goto="inventory"><img class="tabImg" src="assets/icons/inventory.png"></button>
-   <button data-goto="quest"><img class="tabImg" src="assets/icons/quest.png"></button>
-   <button data-goto="chat"><img class="tabImg" src="assets/icons/chat.png"></button>
-   <button data-goto="profile"><img class="tabImg" src="assets/icons/profile.png"></button>
+   <button class="tab" data-goto="home home home"><img src="assets/icons/home.png"></button>
+   <button class="tab" data-goto="inventory"><img src="assets/icons/inventory.png"></button>
+   <button class="tab" data-goto="quest"><img src="assets/icons/quest.png"></button>
+   <button class="tab" data-goto="chat"><img src="assets/icons/chat.png"></button>
+   <button class="tab" data-goto="profile"><img src="assets/icons/profile.png"></button>
 </div>
 
 
@@ -78,7 +78,7 @@
       <div id="homeArea">
          <div class="home">
             <!--<span id="BigText">シャングリ・ラ中心街</span><br>-->
-            <img src="assets/downtown.png" style="width: 600px; height: 300px;"><br>
+            <img src="assets/downtown.png" class="bigImg"><br>
             インタラクト<br>
             <div class="groupA row">
                <div class="column">
@@ -92,7 +92,7 @@
                </div>
             </div>
             <div class="groupB">
-               <button class="buttonB" data-goto="home home station">駅に行く</button>
+               <button class="buttonB" data-goto="home home station main">駅に行く</button>
                <button class="buttonB" data-goto="timy">タイミーをする</button>
                <button class="buttonB" data-goto="market">商店街を見に行く</button>
             </div>
@@ -146,9 +146,9 @@
          <div class="station">
             <div class="main">
                <!--<span id="BigText">シャングリ・ラ中心街</span><br>-->
-               <img src="assets/station.png" style="width: 600px; height: 300px;"><br>
+               <img src="assets/station.png" class="bigImg"><br>
                <button data-goto="home home home">←</button> 駅<br>
-               <button class="buttonA" onclick="HomeLetsDungeon(1)">ダンジョン</button><br>
+               <button class="buttonA" onclick="HomeLetsDungeon()">ダンジョン</button>
                <button class="buttonA">ストーリー</button>
             </div>
             <div class="select">

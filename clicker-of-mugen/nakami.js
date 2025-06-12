@@ -1445,65 +1445,6 @@ let humans = {
    }
 };
 
-let quests = {
-   main:{
-      num:1,
-      description:"このゲームを見つけてくれてありがと！！！",
-      rewards: 200,
-      type:0,
-      term:[0],
-      act:1,
-      acted:1
-   },
-   daily:{
-      1:{
-         num:1,
-         description:"敵を3体倒す",
-         rewards: 20,
-         type:'k',
-         term:[0],
-         act:3,
-         acted:0
-      },
-      2:{
-         num:2,
-         description:"ダンジョンを一回クリアする",
-         rewards: 20,
-         type:'dc',
-         term:[0],
-         act:1,
-         acted:0
-      },
-      3:{
-         num:3,
-         description:"敵を5体倒す",
-         rewards: 20,
-         type:'k',
-         term:[0],
-         act:5,
-         acted:0
-      },
-      4:{
-         num:4,
-         description:"敵を7体倒す",
-         rewards: 20,
-         type:'k',
-         term:[0],
-         act:7,
-         acted:0
-      },
-      5:{
-         num:5,
-         description:"ダンジョンを1回クリアする",
-         rewards: 20,
-         type:'dc',
-         term:[0],
-         act:1,
-         acted:0
-      }
-   }
-};
-
 function tekiou(){
    //存在確認用コマンド Object.keys(humans).forEach(cam => {Object.keys(humans[cam]).map(a => a.toString()).filter(s => humans[cam][s].status == 1 || humans[cam][s].status == 2).forEach(me => {console.log(`${cam}${me}`)})})
    //生存確認用コマンド x = [1, 2, 3, 4].every(id => {let Enemy = humans.enemies[id];return Enemy.status == 0 || Enemy.status == 2;});
@@ -2173,8 +2114,7 @@ noticeShowBack.addEventListener('click', event => {
 //#endregion
 //#region setting
 //#endregion
-//#region Questの動き
-
+//#region questの動き
 let quest = {
    main:{},
    daily:[
@@ -2193,7 +2133,7 @@ let cleareddailyquest= 0;
 
 
 function MakeNewQuest(code){
-   quest.main = quests.main[clearedmainquest];
+   quest.main = quest.main[clearedmainquest];
 
    //クエストのリストを更新
    const waku = document.querySelector('#quest-list');
@@ -2366,10 +2306,10 @@ loginDiv.querySelector('.button').addEventListener('click', async function(event
          clearedmainquest = 0;
          clearedmainquest = 0;
 
-         quest.main = quests.main[0];
+         quest.main = quest.main[0];
          quest.daily = [];
          for(i = 0;i < 5;i++){
-            let newquest = arraySelect(quests.daily)
+            let newquest = arraySelect(quest.daily)
             newquest.id = i+1;
             quest.daily.push(newquest);
          }
@@ -2386,7 +2326,7 @@ loginDiv.querySelector('.button').addEventListener('click', async function(event
 // function questMake(code){
 //    if(code == 'daily'){
 //       for(i = 0;i < 5;i++){
-//          let newquest = arraySelect(quests.daily)
+//          let newquest = arraySelect(quest.daily)
 //          newquest.id = i+1;
 //          quest.daily.push(newquest);
 //       };
@@ -2418,12 +2358,12 @@ async function login(){
 
    updateUI();
    
-   quests.main = Quests.main[clearedmainquest+1];
+   quest.main = Quests.main[clearedmainquest+1];
    if(userData && checkLastLogin(userData?.lastact??0)){
       cleareddailyquest = 0;
-      Object.keys(quests).filter(a => a.kind == 'daily').forEach(nanka => {
-         quests[nanka] = arraySelect(Quests);
-         quests[nanka].id = eval(nanka.slice(5));
+      Object.keys(quest).filter(a => a.kind == 'daily').forEach(nanka => {
+         quest[nanka] = arraySelect(Quests);
+         quest[nanka].id = eval(nanka.slice(5));
       });
    }
 
@@ -2636,7 +2576,7 @@ function updateUI(){
    document.querySelector('.user .rank').textContent = `Rank:${rank}`;
    document.querySelector('.rpt .bar .inner').style.width = (rpt / maxrpt) * 100 + '%';
    document.querySelector('.rpt .text').textContent = `${rpt}/${maxrpt}`;
-   document.querySelector('#upperUI .stone').innerHTML = `${stone}𐩰   <button class="get" onclick="if(afknow == 0){LetsCharge();}">+</button>`; 
+   document.querySelector('#upperUI .stone').innerHTML = `${stone}𐩰`; 
 
 }
 updateUI();
@@ -2701,6 +2641,7 @@ let nowPlace = {
 function cd(tab, area, selection, detail1, detail2, detail3){
    console.log(`tab:${tab} area:${area} selection:${selection} detail1:${detail1} detail2:${detail2} detail3:${detail3}に移動します！！`);
    console.log((`#${tab}-tab${area ? ` #${area}Area` : ''}${selection ? ` .${selection}` : ''}${detail1 ? ` .${detail1}` : ''}${detail2 ? ` .${detail2}` : ''}${detail3 ? ` .${detail3}` : ''}`))
+   
    document.querySelector(`#${nowPlace.tab}-tab${nowPlace.area ? ` #${nowPlace.area}Area` : ''}${nowPlace.selection ? ` .${nowPlace.selection}` : ''}${nowPlace.detail1 ? ` .${nowPlace.detail1}` : ''}${nowPlace.detail2 ? ` .${nowPlace.detail2}` : ''}${detail3 ? ` .${detail3}` : ''}`).style.display = 'none';
    document.querySelector(`#${tab}-tab${area ? ` #${area}Area` : ''}${selection ? ` .${selection}` : ''}${detail1 ? ` .${detail1}` : ''}${detail2 ? ` .${detail2}` : ''}${detail3 ? ` .${detail3}` : ''}`).style.display = 'block';
    nowPlace = {
@@ -2724,10 +2665,12 @@ document.addEventListener('click', e => {
 })
 
 //#region rpgtoka
-async function HomeLetsDungeon(code){
+async function HomeLetsDungeon(){
+   document.querySelector('#home-tab #homeArea .station .main').style.display = 'none';
+   document.querySelector('#home-tab #homeArea .station .chara').style.display = 'block';
    save();
-   fun = Math.floor(Math.random() * 100)+1;//毎回変更されるのぜ
-   stage = code;
+   fun = random(1,100);//毎回変更されるのぜ
+   stage = 1;
    floor = 0;
 
    humans.players[1].level = 1;
@@ -3776,7 +3719,6 @@ function turretAllClear(){
 //#region charaのturn
 //#endregion
 
-
 //#region next-turn
 async function NextTurnis(cam,me,tcam,target){
    phase = 0;
@@ -3929,6 +3871,7 @@ async function NextTurnis(cam,me,tcam,target){
    }
 }
 //#endregion
+
 //#region enemyturn
 async function enemyturn(cam,me){
    let enemy = humans.enemies[me];
@@ -4238,11 +4181,11 @@ async function killed(cam,me,tcam,target){//殺った側cam,meと殺された側
    bar.cam.splice(karix,1);bar.num.splice(karix,1);
    
    //クエストの動
-   Object.keys(quests).filter(a => quests[a].type == 'k' && quests[a].term.includes(0) || quests[a].term.includes(stage) && tcam == 'enemies').forEach(nanka => {
-      quests[nanka].acted += 1;
-      if(quests[nanka].acted >= quests[nanka].act){
-         quests[nanka].acted = quests[nanka].act;
-         quests[nanka].type =  '';
+   Object.keys(quest).filter(a => quest[a].type == 'k' && quest[a].term.includes(0) || quest[a].term.includes(stage) && tcam == 'enemies').forEach(nanka => {
+      quest[nanka].acted += 1;
+      if(quest[nanka].acted >= quest[nanka].act){
+         quest[nanka].acted = quest[nanka].act;
+         quest[nanka].type =  '';
       }
    })
 

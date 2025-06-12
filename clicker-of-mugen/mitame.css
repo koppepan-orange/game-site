@@ -1,4 +1,7 @@
-@font-face{font-family:comicsans;src:url('assets/fonts/comicsans.ttf');}
+@font-face{
+  font-family: comicsans;
+  src: url('assets/fonts/comicsans.ttf');
+}
 @font-face{font-family:Hangyaku;src:url('assets/fonts/Hangyaku.ttf');}
 *{
   font-family:comicsans;
@@ -7,7 +10,15 @@
 html{
   margin: -8px;
   padding: 0;
-  overflow-y: hidden;
+  overflow-x: hidden;
+}
+::-webkit-scrollbar {
+  display: none;
+}
+
+body{
+  background-color: #eeeeee;
+  user-select: none;
 }
 
 .row{
@@ -51,10 +62,7 @@ input[type="range"]::-moz-range-thumb {
   display: block;
   width: 100vw;
   height: 100vh;
-  user-select: none;
-  background-color: #eeeeee;
-  overflow-y: scroll;
-  margin-bottom: 65px;
+  margin-bottom: 85px;
 }
 
 /*ずっと粘着してくる説明したガリヤ*/
@@ -89,7 +97,7 @@ input[type="range"]::-moz-range-thumb {
   border: 1px solid #ffffff;
   background-color: rgba(0,0,0,0);
   position: fixed;
-  bottom: 150px;
+  top: 150px;
   right: -300px;
   color: #fefefe;
   overflow-y: hidden;
@@ -173,6 +181,7 @@ input[type="range"]::-moz-range-thumb {
   color: #ffffff;
   display: flex;
   justify-content: center;
+  align-items: center;
   cursor: pointer;
   margin: 5px 0;
   transition: transform 0.3s ease, opacity 0.3s ease;
@@ -180,13 +189,17 @@ input[type="range"]::-moz-range-thumb {
   pointer-events: all;
 }
 #smartMenu .item.hidden{
-  transform: translateY(20px);
+  transform: translateY(65px);
   opacity: 0;
   pointer-events: none;
 }
 #smartMenu .item.main{
   background-color: #4473ad;
   pointer-events: all;
+}
+#smartMenu .item img{
+  width: 100%;
+  aspect-ratio: 1;
 }
 
 /* notceのやつ */
@@ -397,20 +410,31 @@ input[type="range"]::-moz-range-thumb {
 #tabs {
   display: flex;
   height: 65px;
-  font-size: 45px;
-  justify-content: center;
-  gap: 20%;
-  padding: 5px 5%;
+  gap: 15%;
+  padding: 5px 10%;
   background-color: #dedede;
   position: fixed;
   bottom: 0;
-  width: 100%;
-  box-sizing: border-box;
+  width: 100vw;
   z-index: 998;
+  align-content: center;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
-.tabImg{
-  width:40px;
-  height:40px;
+#tabs .tab{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  aspect-ratio: 1;
+  padding: 0px;
+}
+#tabs .tab img{
+  width: 100%;
+  aspect-ratio: 1;
+  /* height: 100%; */
 }
 #HomeTab, #inventory-tab, #quest-tab, #chat-tab, #profile-tab {
   display: none;
@@ -436,6 +460,10 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* home */
+#homeArea .bigImg{
+  width: 600px;
+  height: 300px;
+}
 #homeArea .home .groupA{
   justify-content: left;
   gap: 20px;
@@ -515,6 +543,12 @@ input[type="range"]::-moz-range-thumb {
 }
 
 #homeArea .station{
+  display: none;
+}
+#homeArea .station .main{
+  display: block;
+}
+#homeArea .station .select{
   display: none;
 }
 #homeArea .station .select .chara{
@@ -603,6 +637,7 @@ input[type="range"]::-moz-range-thumb {
 #homeArea .premium .c{
   width: 30%;
   aspect-ratio: 1;
+  cursor: pointer;
 }
 
 /* overfieldArea --開放空間-- */
