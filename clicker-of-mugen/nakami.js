@@ -568,72 +568,181 @@ let IMGselect = 0;
 IMGselect = new Image();
 IMGselect.src = 'assets/maps/select.png';
 
-let AllowMove = 0;
+let movable = 0;
 
 let SELECTx = 0; // x座標
 let SELECTy = 0; // y座標
 let MAPx,MAPy;
 
-let speed = 5;
+
 const keys = {};
-document.addEventListener("keydown", (e) => keys[e.key] = true);
-document.addEventListener("keyup", (e) => keys[e.key] = false);
+document.addEventListener("keydown", (e) => {
+   let key = e.key
+   if(key == ' ') key = 'space'
+   keys[key] = true
+});
+document.addEventListener("keyup", (e) => {
+   let key = e.key
+   if(key == ' ') key = 'space'
+   keys[e.key] = false
+});
 
-let updatestop = 0;
-function update() {
-   if(AllowMove == 0){
-      let moved = false;
-      let newX = SELECTx, newY = SELECTy;
-
-      if (keys["w"] || keys["ArrowUp"]) {
-         newY -= speed;
-         if(newY < 0){newY = 0};
-         moved = true;
-      }
-      if (keys["a"] || keys["ArrowLeft"]) {
-         newX -= speed;
-         if(newX < 0){newX = 0};
-         moved = true;
-      }
-      if (keys["s"] || keys["ArrowDown"]) {
-         newY += speed;
-         if(newY > 575){newY = 575};
-         moved = true;
-      }
-      if (keys["d"] || keys["ArrowRight"]) {
-         newX += speed;
-         if(newX > 575){newX = 575};
-         moved = true;
-      }
-
-      draw();
-
-      if (newMAPx >= 0 && newMAPx <= 8 && newMAPy >= 0 && newMAPy <= 8) {
-         if (objMap[newMAPy][newMAPx] !== undefined && objMap[newMAPy][newMAPx] !== 18){
-            SELECTx = newX;
-            SELECTy = newY;
-
-            //触れた時の挙動あればここに
-         }
-      }
-   }
+// キーが押されたときの...やつ
+document.addEventListener('keydown', async function(event) {
+   if(!movable) return;
+   let moved = 0;
 
    draw();
-   if(updatestop == 0){requestAnimationFrame(update);}
-}
+
+   karix = SELECTx;
+   kariy = SELECTy;
+   
+   let speed = 75;
+   switch(event.key) {
+      case 'w':
+      case 'ArrowUp': // 上
+         event.preventDefault();
+         kariy -= speed;
+         break;
+      case 'a':
+      case 'ArrowLeft': // 左
+         event.preventDefault();
+         karix -= speed;
+         moved = 1;
+         break;
+      case 's':
+      case 'ArrowDown': // 下
+         event.preventDefault();
+         kariy += speed;
+         moved = 1;
+         break;
+      case 'd':
+      case 'ArrowRight': // 右
+         event.preventDefault();
+         karix += speed;
+         moved = 1;
+         break;
+   }
+
+   if(objMap[MAPy][MAPx] != undefined || objMap[MAPy][MAPx] != 18){
+      SELECTx = karix;
+      SELECTy = kariy;
+   }
+
+   draw()
+
+   if(MAPx < 0 || 8 < MAPx || MAPy < 0 || 8 < MAPy){
+      addtext('errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
+      await delay(2000);
+      window.open('about:blank', '_self').close();
+   }
+   
+
+   // ここに爆弾　一旦廃止してます
+   // if(moved == 1){
+   // if(objMap.some(row => row.includes(15))){
+   //    bombtimer--;
+   //    if(bombtimer <= 0){
+   //       triggerExplosion(PlacedBombx, PlacedBomby);
+   //    }
+   // }}
+   // function triggerExplosion(centerX, centerY) {
+   //    let explosionStage = 0;
+   //    const stageDelay = 100; //エフェクトの処理速度
+   
+   //    function drawExplosion(){
+   //       let img;
+   //       if (explosionStage === 0) {
+   //          img = explosion1;//なんか最初だけ白くなってる もうちょい調整いる
+   //       } else if (explosionStage === 1) {
+   //          img = explosion2;
+   //       } else if (explosionStage === 2) {
+   //          img = explosion3;
+   //       }
+
+   //       //MAPx = Math.floor(SELECTx / 75);
+   //       //MAPy = Math.floor(SELECTy / 75);
+   //       //objMap[MAPy][MAPx] = 15;
+   //       //bombtimer = 5;
+   //       //PlacedBombx = MAPx;
+   //       //PlacedBomby = MAPy;
+   
+   //       // 爆発のエフェクトを十字に描画する
+   //       for (let i = 0; i < 4; i++) {
+   //          let explosionCoords = [
+   //             [centerX + i, centerY],
+   //             [centerX - i, centerY],
+   //             [centerX, centerY + i],
+   //             [centerX, centerY - i]
+   //          ];
+   
+   //          explosionCoords.forEach(([x, y]) => {
+   //             ctx.clearRect(x * 75, y * 75, 75, 75); // 前のフレームを消去
+   //             ctx.drawImage(img, x * 75, y * 75, 75, 75); // 新しいフレームを描画
+   //             //DrawBackground();
+   //             //ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+   //          });
+   //       }
+   
+   //       explosionStage++;
+   
+   //       if (explosionStage < 3) {
+   //          setTimeout(drawExplosion, stageDelay);
+   //       } else {
+   //          clearExplosion(centerX, centerY);
+   //       }
+   //    }
+   
+   //    // 爆発アニメーションを開始
+   //    drawExplosion();
+
+   
+
+   //    function clearExplosion(centerX, centerY) {
+   //       for (let i = 0; i < 4; i++) {
+   //          let explosionCoords = [
+   //             [centerX + i, centerY],
+   //             [centerX - i, centerY],
+   //             [centerX, centerY + i],
+   //             [centerX, centerY - i]
+   //          ];
+      
+   //          explosionCoords.forEach(([x, y]) => {
+   //             if (x >= 0 && x < objMap[0].length && y >= 0 && y < objMap.length) {
+   //                // 座標がマップ範囲内なら0にする
+   //                objMap[y][x] = 0;
+   //             }
+   //          });
+   //       }
+   //       objMap[PlacedBomby][PlacedBombx] = 0;
+   //       ctx.clearRect(0, 0, 600, 600); 
+   //       DrawBackground();
+   //       ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+   //    }
+
+   // }
+   
+
+});
+
 
 function draw() {
+   if(SELECTx<0) SELECTx=0;
+   if(SELECTy<0) SELECTy=0;
+   if(SELECTx>525) SELECTx=525;
+   if(SELECTy>525) SELECTy=525;
+
    MAPx = Math.floor(SELECTx / 75);
    MAPy = Math.floor(SELECTy / 75);
+
    ctx.clearRect(0, 0, 600,600);
    DrawBackground();
-   ctx.drawImage(IMGselect, SELECTx, SELECTy, 25, 25);
+   ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
 }
 
 document.addEventListener('keydown', (event) => {
-   if(AllowMove == 0 && dungeonnow == 1 && textShowing == 0){
+   if(movable == 1 && dungeonnow == 1 && textShowing == 0){
       if(event.key == 'Enter'||event.key == 'z'){
-      if(SELECTx<0){SELECTx=0};if(SELECTy<0){SELECTy=0};if(SELECTx>525){SELECTx=525};if(SELECTy>525){SELECTy=525};
 
       draw()
 
@@ -641,177 +750,21 @@ document.addEventListener('keydown', (event) => {
       if(MAPy >= 0 && MAPy < objMap.length && MAPx >= 0 && MAPx < objMap[MAPy].length){
          NanigaOkirukana[objMap[MAPy][MAPx]].process();
       }
+      
       draw()
       }
    }
    if(event.key == 'e' && document.querySelector('#overfieldArea').style.display == 'block'){
-      if(AllowMove == 0){
-         AllowMove = 1;
-         phase = 'null'
+      if(movable){
+         movable = 0;
          window.setTimeout(inventoryOpen,200)
       }else{
-         AllowMove = 0;
-         phase = 1
+         movable = 1;
          window.setTimeout(inventoryClose,200)
    }}else if(event.key == 'g' && document.querySelector('#overfieldArea').style.display == 'block'){
       testEnemyAppear();
    }
 });
-
-let NanigaOkirukana = {
-   1:{
-      name:'階段',
-      process:async function(){
-         GoNextFloor();
-      },
-   },
-   2:{
-      name:'敵',
-      process:async function(){
-         EnemyAppear();
-      },
-   },
-   3:{
-      name:'焚き火',
-      process:async function(){
-         AllowMove = 1;
-         document.querySelector('#overfieldArea').style.display = 'none';
-         document.querySelector('#eventArea').style.display = 'block';
-         document.querySelector('#eventArea').innerHTML = '<button id="CampRest" onclick="Camprest()"></button><br><button id="CampTrade" onclick="Camptrade()"></button>'
-         log.textContent = '休憩できそうな場所を見つけた！';
-         Camprestper = (Math.floor(Math.random() * 4)+3)/10;
-         document.querySelector('#CampRest').textContent = '朝まで休む(' + Camprestper*100 + '%回復)';//30のときはスキルカード強化みたいなやつあってもいいかも
-         switch(Math.floor(Math.random() * 3)+1){
-            case 1:
-            if(Math.floor(Math.random() * 3)+1){
-                  y = 10;document.querySelector('#CampTrade').textContent = '放浪武器商人に話しかける';
-            }else{  y = 1; document.querySelector('#CampTrade').textContent = '武器商人に話しかける';}
-            break;
-            case 2: y = 2; document.querySelector('#CampTrade').textContent = '防具取扱専門家に話しかける'; break;
-            case 3: y = 3; document.querySelector('#CampTrade').textContent = '道具屋24に話しかける'; break;
-         }
-      }
-   },
-   4:{
-      name:'焚き火跡',
-      process:async function(){
-         await addtext(arrayGacha( //この重複感好き
-            ['この焚き火はもう木炭になっている','まだ温かい..この辺りに誰かいるようだ'],
-            [85,15]
-         ));
-      }
-   },
-   5:{
-      name:'スキルショップ',
-      process:async function(){
-         SkillShopOpen();
-      }
-   },
-   6:{
-      name:'宝箱',
-      process:async function(){
-         if(!objMap.some(row => row.includes(2))){OpenChest(1);}
-      }
-   },
-   7:{
-      name:'レア宝箱',
-      process:async function(){
-         if(!objMap.some(row => row.includes(2))){OpenChest(2);}
-      }
-   },
-   8:{
-      name:'救いのボタン',
-      process:async function(){
-         HopeButtonact();
-      },
-   },
-   9:{
-      name:'none',
-      process:async function(){
-         addtext('まだ用意できていないのです...')
-      }
-   },
-   10:{
-      name:'あめ置き場',
-      process:async function(){
-         Candytake();
-      }
-   },
-   11:{
-      name:'クッキー置き場',
-      process:async function(){
-         Cookietake();
-      }
-   },
-   12:{
-      name:'zom_mzyb',
-      process:async function(){
-         ZomuEvent();
-      }
-   },
-   13:{
-      name:'boss',
-      process:async function(){
-         BossEnemyAppear();
-      }
-   },
-   14:{
-      name:'door',
-      process:async function(){
-         if(!objMap.some(row => row.includes(13))){NextStage();}
-      }
-   },
-   16:{
-      name:'chest',
-      process:async function(){
-         if(!objMap.some(row => row.includes(2))){OpenChest(1);}
-      }
-   },
-   17:{
-      name:'rarechest',
-      process:async function(){
-         if(!objMap.some(row => row.includes(2))){OpenChest(2);}
-      }
-   },
-   19:{
-      name:'サソリさん',
-      process:async function(){
-         ScorpionAct(1);
-      }
-   },
-   20:{
-      name:'サボテン', //ついに動いたサボテン
-      process:async function(){
-         CatusAct();
-      }
-   },
-   21:{
-      name:'オアシス',
-      process:async function(){
-         OasisAct();
-      }
-   },
-   22:{
-      name:'砂嵐',
-      process:async function(){
-         console.log('これはなんもないよ')
-      }
-   },
-   23:{
-      name:'サソリさんⅡ',
-      process:async function(){
-         ScorpionAct(2);
-      }
-   },
-   24:{
-      name:'utu_mzyb',
-      process:async function(){
-         UtusenEvent();
-      }
-   }
-
-}
-
 
 
 function weightedRandomSelect(items, count) {
@@ -837,6 +790,7 @@ function weightedRandomSelect(items, count) {
 function GoNextFloor(){
    floor += 1;
    candybar = [];
+
    MAPx = backMapnum[stage-1].split('.');
    MAPy = +MAPx[1]+1
    MAPx = +MAPx[0]
@@ -845,41 +799,41 @@ function GoNextFloor(){
    MAPx = objMapnum[stage-1].split('.');
    MAPy = +MAPx[1]+1
    MAPx = +MAPx[0]
-   objMap = objMaps[Math.floor(Math.random() * MAPy)+MAPx];
+   objMap = objMaps[Math.floor(Math.random() *   MAPy)+MAPx];
    objMap = JSON.parse(JSON.stringify(objMaps[Math.floor(Math.random() * MAPy) + MAPx]));
 
    if(stage == 1){
-      if(fun == 23 && Math.floor(Math.random()*10)==0){
+      if(fun == 23 && probability(10)){
          backMap = backMaps[4];
          objMap = objMaps[6];
-      }else if(fun <= 50 && Math.floor(Math.random()*10)==0){
+      }else if(fun <= 50 && probability(10)){
          backMap = backMaps[5];
          objMap = objMaps[7];
       };
    }else if(stage == 2){
-      if(fun == 68 && Math.floor(Math.random()*10)==0){
+      if(fun == 68 && probability(10)){
          backMap = backMaps[11];
          objMap = objMaps[14];
          objMap = JSON.parse(JSON.stringify(objMaps[Math.floor(Math.random() * MAPy) + MAPx]));
-      }else if(fun <= 50 && Math.floor(Math.random()*10)==0){
+      }else if(fun <= 50 && probability(10)){
          backMap = backMaps[19];
          objMap = objMaps[23];
          objMap = JSON.parse(JSON.stringify(objMaps[Math.floor(Math.random() * MAPy) + MAPx]));
       };
    }else if(stage == 3){
-      if(fun == 68 && Math.floor(Math.random()*10)==0){
+      if(fun == 68 && probability(10)){
          backMap = backMaps[18];
          objMap = objMaps[22];
          objMap = JSON.parse(JSON.stringify(objMaps[Math.floor(Math.random() * MAPy) + MAPx]));
-      }else if(fun <= 50 && Math.floor(Math.random()*10)==0){
+      }else if(fun <= 50 && probability(10)){
          backMap = backMaps[19];
          objMap = objMaps[23];
          objMap = JSON.parse(JSON.stringify(objMaps[Math.floor(Math.random() * MAPy) + MAPx]));
       };
    }
-   if(stage == 1 && floor >= 10){SELECTx = 150;SELECTy = 525;backMap = backMaps[6];objMap = objMaps[8];}//創生黎明の原野
-   else if(stage == 2 && floor >= 7 ){SELECTx = 150;SELECTy = 525;backMap = backMaps[13];objMap = objMaps[16];}//ガチェンレイゲスドゥールラート(昼)
-   else if(stage == 3 && floor >= 3 ){SELECTx = 150;SELECTy = 525;backMap = backMaps[20];objMap = objMaps[24];}//ガチェンレイゲスドゥールラート(夜)
+   if(stage == 1 && floor >= 10){SELECTx = 150;SELECTy = 525;backMap = backMaps[6];objMap = objMaps[8]}; //創生黎明の原野
+   if(stage == 2 && floor >= 7 ){SELECTx = 150;SELECTy = 525;backMap = backMaps[13];objMap = objMaps[16]}; //ガチェンレイゲスドゥールラート(昼)
+   if(stage == 3 && floor >= 3 ){SELECTx = 150;SELECTy = 525;backMap = backMaps[20];objMap = objMaps[24]}; //ガチェンレイゲスドゥールラート(夜)
 
    draw()
 }
@@ -1842,7 +1796,6 @@ function inventoryOpen(num){
    document.querySelector('#movabledescription').style.display = 'none';
 
    InventoryPage = num??1;
-   AllowMove = 1;
    let array = ['name','level','exp','health','maxhealth','attack','defense','maxmp','mattack','mdefense','critlate','critdmg','critresist'];
    let Status = array.map(a => `${a}: ${humans.players[InventoryPage][a]}`).join('<br>');
    
@@ -1886,9 +1839,8 @@ function inventoryOpen(num){
    });
 }
 function inventoryClose(){
-   AllowMove = 0;
+   movable = 1;
    Inventory.style.display = 'none';
-   
 };
 
 
@@ -2342,7 +2294,6 @@ async function login(){
    document.querySelector('#chat-tab #chat').style.display = 'flex';
    selectRoom( )
 
-   AllowMove = 1;
 
    // データを取得する関数)
    userData = await load();
@@ -2638,12 +2589,27 @@ let nowPlace = {
    detail2: null,
    detail3: null,
 }
-function cd(tab, area, selection, detail1, detail2, detail3){
+async function cd(tab, area, selection, detail1, detail2, detail3){
    console.log(`tab:${tab} area:${area} selection:${selection} detail1:${detail1} detail2:${detail2} detail3:${detail3}に移動します！！`);
    console.log((`#${tab}-tab${area ? ` #${area}Area` : ''}${selection ? ` .${selection}` : ''}${detail1 ? ` .${detail1}` : ''}${detail2 ? ` .${detail2}` : ''}${detail3 ? ` .${detail3}` : ''}`))
    
-   document.querySelector(`#${nowPlace.tab}-tab${nowPlace.area ? ` #${nowPlace.area}Area` : ''}${nowPlace.selection ? ` .${nowPlace.selection}` : ''}${nowPlace.detail1 ? ` .${nowPlace.detail1}` : ''}${nowPlace.detail2 ? ` .${nowPlace.detail2}` : ''}${detail3 ? ` .${detail3}` : ''}`).style.display = 'none';
-   document.querySelector(`#${tab}-tab${area ? ` #${area}Area` : ''}${selection ? ` .${selection}` : ''}${detail1 ? ` .${detail1}` : ''}${detail2 ? ` .${detail2}` : ''}${detail3 ? ` .${detail3}` : ''}`).style.display = 'block';
+   // document.querySelector(`#${nowPlace.tab}-tab${nowPlace.area ? ` #${nowPlace.area}Area` : ''}${nowPlace.selection ? ` .${nowPlace.selection}` : ''}${nowPlace.detail1 ? ` .${nowPlace.detail1}` : ''}${nowPlace.detail2 ? ` .${nowPlace.detail2}` : ''}${detail3 ? ` .${detail3}` : ''}`).style.display = 'none';
+   if(nowPlace.tab) document.querySelector(`#${nowPlace.tab}-tab`).style.display = 'none';
+   if(nowPlace.area) document.querySelector(`#${nowPlace.tab}-tab #${nowPlace.area}Area`).style.display = 'none';
+   if(nowPlace.selection) document.querySelector(`#${nowPlace.tab}-tab #${nowPlace.area}Area .${nowPlace.selection}`).style.display = 'none';
+   if(nowPlace.detail1) document.querySelector(`#${nowPlace.tab}-tab #${nowPlace.area}Area .${nowPlace.selection} .${nowPlace.detail1}`).style.display = 'none';
+   if(nowPlace.detail2) document.querySelector(`#${nowPlace.tab}-tab #${nowPlace.area}Area .${nowPlace.selection} .${nowPlace.detail1} .${nowPlace.detail2}`).style.display = 'none';
+   if(nowPlace.detail3) document.querySelector(`#${nowPlace.tab}-tab #${nowPlace.area}Area .${nowPlace.selection} .${nowPlace.detail1} .${nowPlace.detail2} .${nowPlace.detail3}`).style.display = 'none';
+
+   // document.querySelector(`#${tab}-tab${area ? ` #${area}Area` : ''}${selection ? ` .${selection}` : ''}${detail1 ? ` .${detail1}` : ''}${detail2 ? ` .${detail2}` : ''}${detail3 ? ` .${detail3}` : ''}`).style.display = 'block';
+   if(tab) document.querySelector(`#${tab}-tab`).style.display = 'block';
+   if(area) document.querySelector(`#${tab}-tab #${area}Area`).style.display = 'block';
+   if(selection) document.querySelector(`#${tab}-tab #${area}Area .${selection}`).style.display = 'block';
+   if(detail1) document.querySelector(`#${tab}-tab #${area}Area .${selection} .${detail1}`).style.display = 'block';
+   if(detail2) document.querySelector(`#${tab}-tab #${area}Area .${selection} .${detail1} .${detail2}`).style.display = 'block';
+   if(detail3) document.querySelector(`#${tab}-tab #${area}Area .${selection} .${detail1} .${detail2} .${detail3}`).style.display = 'block';
+
+
    nowPlace = {
       tab: tab,
       area: area,
@@ -2666,9 +2632,11 @@ document.addEventListener('click', e => {
 
 //#region rpgtoka
 async function HomeLetsDungeon(){
-   document.querySelector('#home-tab #homeArea .station .main').style.display = 'none';
-   document.querySelector('#home-tab #homeArea .station .chara').style.display = 'block';
    save();
+
+   cd('home', 'home', 'station', 'select');
+   document.querySelector('#home-tab #homeArea .station .select .chara').style.display = 'flex';
+
    fun = random(1,100);//毎回変更されるのぜ
    stage = 1;
    floor = 0;
@@ -2772,18 +2740,15 @@ function HomeGoDungeon(name){
    document.querySelector('#overfieldArea').style.display = 'block';
    GoNextFloor();
 
-   AllowMove = 0;
+   movable = 0;
 
    IMGselect = new Image();
    IMGselect.src = images[humans['players'][1].id].src
 
-   SELECTx = 35;
-   SELECTy = 35;
-   MAPx = Math.floor(SELECTx / 100);
-   MAPy = Math.floor(SELECTy / 100);
+   SELECTx = 0;
+   SELECTy = 0;
    draw()
-   updatestop = 0;
-   update();
+   movable = 1;
 }
 
 function ExitDungeon(code){
@@ -3502,7 +3467,7 @@ select4.addEventListener('click', async function(){
          document.querySelector('#overfieldArea').style.display = 'block';
          
          draw()
-         AllowMove = 0;
+         movable = 1;
          await addtext('うまく逃げ切れた！');
          break;
       case 2:
@@ -4246,12 +4211,9 @@ async function killedCheck(){
       document.querySelector('#battleArea').style.display = 'none';
       document.querySelector('#overfieldArea').style.display = 'block';
       
-
-      MAPx = Math.floor(SELECTx / 75);
-      MAPy = Math.floor(SELECTy / 75);
       objMap[MAPy][MAPx] = 0;//戦利品的な何かにしてもいいかも..いやなし
       draw()
-      AllowMove = 0;
+      movable = 1;
       return 'end';
    }else{
       let isZemetu = [1,2,3,4].every(id => {
@@ -4277,7 +4239,7 @@ async function killedCheck(){
          document.querySelector('#overfieldArea').style.display = 'block';
 
          draw()
-         AllowMove = 0;
+         movable = 1;
          
          return 'end';
       }else{
@@ -4286,7 +4248,7 @@ async function killedCheck(){
    }
 }   
 async function EnemyAppear(){
-   AllowMove = 1;
+   movable = 0;
    document.querySelector('#overfieldArea').style.display = 'none';
    document.querySelector('#battleArea').style.display = 'block';
    select1.textContent = '';
@@ -4396,7 +4358,7 @@ function DesideEnemyName(target){
 }
 
 async function testEnemyAppear(){
-   AllowMove = 1;
+   movable = 0;
    document.querySelector('#overfieldArea').style.display = 'none';
    document.querySelector('#battleArea').style.display = 'block';
    select1.textContent = '';
@@ -4731,7 +4693,7 @@ function makeNewEnemy(num){
 
 //#region　bossの動き
 async function BossEnemyAppear(){
-   AllowMove = 1;
+   movable = 0;
    document.querySelector('#overfieldArea').style.display = 'none';
    document.querySelector('#battleArea').style.display = 'block';
    bossbattlenow = 1;
@@ -4869,7 +4831,7 @@ let Camprestper
    playerhealth += playermaxhealth * Camprestper;
    playerhealth = Math.floor(playerhealth);
    if(playerhealth > playermaxhealth){playerhealth = playermaxhealth;};
-   log.textContent = '寝ることにした....';//睡眠阻害イベント...はさすがにやめようか..wちょっと隠しイベント多すぎる
+   log.textContent = '寝ることにした....';//睡眠阻害イベント..とかありでは？
    await delay(2000);
    log.textContent = '起きた！！！！！！！';
    await delay(1000);
@@ -4880,7 +4842,7 @@ let Camprestper
    
    objMap[MAPy][MAPx] = 4;
    draw()
-   AllowMove = 0;
+   movable = 1;
   }
   async function Camptrade(){
       save();
@@ -5097,7 +5059,7 @@ function Campequiptool(code){
   }
 
   function SkillShopOpen() {
-   AllowMove = 0;
+   movable = 0;
    document.querySelector('#overfieldArea').style.display = 'none';
    document.querySelector('#eventArea').style.display = 'block';
    document.querySelector('#eventArea').innerHTML = `
@@ -5121,7 +5083,7 @@ function Campequiptool(code){
    
    objMap[MAPy][MAPx] = 0;
    draw()
-   AllowMove = 0;
+   movable = 1;
   }
 
   function BuyItem(type,id,name,price) {
@@ -5210,7 +5172,7 @@ async function Candytake(){
 // #endregion
 //#region hopeful-button  廃止予定
 async function HopeButtonact(){
-   AllowMove = 1;
+   movable = 0;
    log.textContent = 'ボタンを押した....';
    await delay(1000);
    if(Math.floor(Math.random() * 2) == 0){
@@ -5228,14 +5190,14 @@ async function HopeButtonact(){
    
    objMap[MAPy][MAPx] = 0;
    draw()
-   AllowMove = 0;
+   movable = 1;
 }
 // #endregion
 //#region chest
 const inchestTool = ['aspirin','pablon','trypsin','throwknife','trickyvariable','bottlegrenade','redcard','bluecard','greencard'];
 const inchestRareTool = ['lulu','potion','cdveringfire','bomb','blackcard'];
 async function OpenChest(code){
-   AllowMove = 1;
+   movable = 0;
    switch(code){
    case 1:
       log.textContent = 'チェストを開けた...';
@@ -5265,12 +5227,12 @@ async function OpenChest(code){
    
    objMap[MAPy][MAPx] = 0;
    draw()
-   AllowMove = 0;
+   movable = 1;
 }
 // #endregion
 //#region Cookietake
 async function Cookietake(){
-   AllowMove = 1;
+   movable = 0;
    log.textContent = 'クッキーを食べてみた...';//これはお助け的イベントだから上昇量は少なめ
    await delay(1000);
    switch(Math.floor(Math.random()*3)+1){
@@ -5305,7 +5267,7 @@ async function Cookietake(){
    
    objMap[MAPy][MAPx] = 0;
    draw()
-   AllowMove = 0;
+   movable = 1;
 }
 // #endregion
 //#region placebomb
@@ -5366,7 +5328,7 @@ function ZomuEvent(){//創生黎明の原野
    document.querySelector('#ButtonStyle').textContent = `.button{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};cursor: pointer;}input[type="text"]:focus{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};}`;
    objMap[MAPy][MAPx] = 0;
    draw()
-   AllowMove = 0;
+   movable = 1;
 }
 function UtusenEvent(){
    log.textContent = 'はいどうも〜、僕です';
@@ -5378,7 +5340,7 @@ function UtusenEvent(){
    document.querySelector('#ButtonStyle').textContent = `.button{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};cursor: pointer;}input[type="text"]:focus{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};}`;
    objMap[MAPy][MAPx] = 0;
    draw()
-   AllowMove = 0;
+   movable = 1;
 }
 // #endregion      
 

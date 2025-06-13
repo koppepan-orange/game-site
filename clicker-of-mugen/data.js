@@ -2042,3 +2042,158 @@ let noticeData = [
       body: "おちゃめ機能つってね\nガハハ\n笑え\n\nえ？ここから出してって？\n助けて！って？\n....右上のxを押したらどうです？\nあ赤いのじゃないですよ？？\n黒いのです、黒いの"
     },
 ]
+
+
+let NanigaOkirukana = {
+  1:{
+      name:'階段',
+      process:async function(){
+        GoNextFloor();
+      },
+  },
+  2:{
+      name:'敵',
+      process:async function(){
+        EnemyAppear();
+      },
+  },
+  3:{
+      name:'焚き火',
+      process:async function(){
+        movable = 1;
+        document.querySelector('#overfieldArea').style.display = 'none';
+        document.querySelector('#eventArea').style.display = 'block';
+        document.querySelector('#eventArea').innerHTML = '<button id="CampRest" onclick="Camprest()"></button><br><button id="CampTrade" onclick="Camptrade()"></button>'
+        log.textContent = '休憩できそうな場所を見つけた！';
+        Camprestper = (Math.floor(Math.random() * 4)+3)/10;
+        document.querySelector('#CampRest').textContent = '朝まで休む(' + Camprestper*100 + '%回復)';//30のときはスキルカード強化みたいなやつあってもいいかも
+        switch(Math.floor(Math.random() * 3)+1){
+            case 1:
+            if(Math.floor(Math.random() * 3)+1){
+                  y = 10;document.querySelector('#CampTrade').textContent = '放浪武器商人に話しかける';
+            }else{  y = 1; document.querySelector('#CampTrade').textContent = '武器商人に話しかける';}
+            break;
+            case 2: y = 2; document.querySelector('#CampTrade').textContent = '防具取扱専門家に話しかける'; break;
+            case 3: y = 3; document.querySelector('#CampTrade').textContent = '道具屋24に話しかける'; break;
+        }
+      }
+  },
+  4:{
+      name:'焚き火跡',
+      process:async function(){
+        await addtext(arrayGacha( //この重複感好き
+            ['この焚き火はもう木炭になっている','まだ温かい..この辺りに誰かいるようだ'],
+            [85,15]
+        ));
+      }
+  },
+  5:{
+      name:'スキルショップ',
+      process:async function(){
+        SkillShopOpen();
+      }
+  },
+  6:{
+      name:'宝箱',
+      process:async function(){
+        if(!objMap.some(row => row.includes(2))){OpenChest(1);}
+      }
+  },
+  7:{
+      name:'レア宝箱',
+      process:async function(){
+        if(!objMap.some(row => row.includes(2))){OpenChest(2);}
+      }
+  },
+  8:{
+      name:'救いのボタン',
+      process:async function(){
+        HopeButtonact();
+      },
+  },
+  9:{
+      name:'none',
+      process:async function(){
+        addtext('まだ用意できていないのです...')
+      }
+  },
+  10:{
+      name:'あめ置き場',
+      process:async function(){
+        Candytake();
+      }
+  },
+  11:{
+      name:'クッキー置き場',
+      process:async function(){
+        Cookietake();
+      }
+  },
+  12:{
+      name:'zom_mzyb',
+      process:async function(){
+        ZomuEvent();
+      }
+  },
+  13:{
+      name:'boss',
+      process:async function(){
+        BossEnemyAppear();
+      }
+  },
+  14:{
+      name:'door',
+      process:async function(){
+        if(!objMap.some(row => row.includes(13))){NextStage();}
+      }
+  },
+  16:{
+      name:'chest',
+      process:async function(){
+        if(!objMap.some(row => row.includes(2))){OpenChest(1);}
+      }
+  },
+  17:{
+      name:'rarechest',
+      process:async function(){
+        if(!objMap.some(row => row.includes(2))){OpenChest(2);}
+      }
+  },
+  19:{
+      name:'サソリさん',
+      process:async function(){
+        ScorpionAct(1);
+      }
+  },
+  20:{
+      name:'サボテン', //ついに動いたサボテン
+      process:async function(){
+        CatusAct();
+      }
+  },
+  21:{
+      name:'オアシス',
+      process:async function(){
+        OasisAct();
+      }
+  },
+  22:{
+      name:'砂嵐',
+      process:async function(){
+        console.log('これはなんもないよ')
+      }
+  },
+  23:{
+      name:'サソリさんⅡ',
+      process:async function(){
+        ScorpionAct(2);
+      }
+  },
+  24:{
+      name:'utu_mzyb',
+      process:async function(){
+        UtusenEvent();
+      }
+  }
+
+}
