@@ -924,16 +924,16 @@ input[type="range"]::-moz-range-thumb {
   overflow-x: scroll;
   white-space: nowrap;
 }
-.players .border .health .num{
+.players .border .hp .num{
   font-size:10px;
 }
-.players .border .health .bar{
+.players .border .hp .bar{
   width: 90%;
   height: 10px;
   background-color: #2b2b2b;
   border: 1px solid #dedede;
 }
-.players .border .health .bar .inner{
+.players .border .hp .bar .inner{
   width: 100%;
   height: 100%;
   background-color: #a3ffa3;
@@ -996,16 +996,16 @@ input[type="range"]::-moz-range-thumb {
   overflow-x: scroll;
   white-space: nowrap;
 }
-.enemies .border .health .num{
+.enemies .border .hp .num{
   font-size:10px;
 }
-.enemies .border .health .bar{
+.enemies .border .hp .bar{
   width: 90%;
   height: 10px;
   background-color: #2b2b2b;
   border: 1px solid #dedede;
 }
-.enemies .border .health .bar .inner{
+.enemies .border .hp .bar .inner{
   width: 100%;
   height: 100%;
   background-color: #a3ffa3;

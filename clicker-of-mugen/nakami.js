@@ -3,7 +3,8 @@ const overfieldArea = document.querySelector('#overfieldArea')
 const NowMap = document.getElementById('NowMap');
 
 const ctx = NowMap.getContext('2d');
-const backMaps = [
+const mapSize = 8;
+const backmaps = [
    [
       ['b','b','b','b','b','b','b','b'],
       ['b','a','b','b','b','b','a','a'],
@@ -216,7 +217,7 @@ const backMaps = [
    ],//bossroom
 
 ]
-let backMap = [
+let backmap = [
    ['a','b','c','d','e','a','a','a'],
    ['a','a','a','a','a','a','a','a'],
    ['a','a','a','a','a','a','a','a'],
@@ -226,9 +227,9 @@ let backMap = [
    ['a','a','a','a','a','a','a','a'],
    ['a','a','a','a','a','a','a','a'],
 ];
-const backMapnum = ['0.3','7.3','14.3'];//開始位置.そっから終了位置までの差
+const backmapnum = ['0.3','7.3','14.3'];//開始位置.そっから終了位置までの差
 
-const objMaps = [
+const objmaps = [
    [
       [0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0],
@@ -481,8 +482,8 @@ const objMaps = [
    ]//boss
 
 ];
-const objsAll = [
-   [
+const obsAll = {
+   '草原':[
       {id:2,type:'e',name:'蒼白の粘液',p:35,strong:0},
       {id:2,type:'e',name:'翠嵐の風刃',p:35,strong:0},
       {id:2,type:'e',name:'燐光の妖花',p:35,strong:0},
@@ -491,10 +492,9 @@ const objsAll = [
       
       {id:3,type:'o',name:'焚き火',p:25,rare:0,},//このrareは生成時に決めちゃってもいいかも
       {id:5,type:'0',name:'スキルショップ',p:25},
-      
-   ]
-]
-let objMap = [
+   ],
+}
+let objmap = [
    [0, 0, 0, 0, 0, 0, 0, 0],
    [0, 0, 0, 0, 0, 0, 0, 0],
    [0, 0, 0, 0, 0, 0, 0, 0],
@@ -504,60 +504,92 @@ let objMap = [
    [0, 0, 0, 0, 0, 0, 0, 0],
    [0, 0, 0, 0, 0, 0, 0, 0]
 ];
-const objMapnum = ['0.5','9.4','17.4'];
+const objmapnum = ['0.5','9.4','17.4'];
 let stage = 1;
 let floor = 0;
 
 //#region 画像とかをロードする機構
-let imagesLoaded = 0;
+let imageNamesL = 0;
 let images = {};
 let imageNames = {
-   'maps':['a','b','c','d','e','f','g',0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26],
+   'maps':['a','b','c','d','e','f','g'],
    'effects':['explosion_1','explosion_2','explosion_3'],
    'enemies':['翠嵐の風刃','蒼白の粘液'],
    'charas':['greenslime','mechanic','clown','magodituono','wretch'],
    'system':['star1','star2','star3'],
 }
-let totalImages = Object.keys(imageNames).map(a => imageNames[a].length).reduce((a, b) => a + b);
-
+let imageNamesT = Object.keys(imageNames).map(a => imageNames[a].length).reduce((a, b) => a + b);
 Object.keys(imageNames).forEach(belong => {
    imageNames[belong].forEach(num => {
       let img = new Image();
       img.src = `assets/${belong}/${num}.png`;
       img.onload = () => {
-         imagesLoaded++;
-         if(imagesLoaded === totalImages){
-            GameStart();
+         imageNamesL++;
+         if(imageNamesL === imageNamesT){
+            waitForGameStart();
          }
       };
       img.onerror = () => {
-         console.error(`Image ${num} failed to load.`);
+         console.error(`Image ${belong}/${num} failed to load.`);
       };
-      images[num] = img;
+      if(!images[belong]) images[belong] = {};
+      images[belong][num] = img;
    });
 });
+
+let detailmapNamesL = 0;
+let detailmapNames = {
+   '草原':['a','b',0,'stair','fire_on','fire_off','shop','chest_n','chest_r','candy','cookie','door']
+}
+let detailmapNamesT = Object.keys(detailmapNames).map(a => detailmapNames[a].length).reduce((a, b) => a + b);
+Object.keys(detailmapNames).forEach(belong => {
+   detailmapNames[belong].forEach(num => {
+      let img = new Image();
+      img.src = `assets/maps/${belong}/${num}.png`;
+      img.onload = () => {
+         detailmapNamesL++;
+         if(detailmapNamesL === detailmapNamesT){
+            waitForGameStart();
+         }
+      };
+      img.onerror = () => {
+         console.error(`Image maps/${belong}/${num} failed to load.`);
+      };
+      if(!images[belong]) images[belong] = {};
+      images[belong][num] = img;
+   });
+});
+
+let waitfornowforgamestart = 0;
+function waitForGameStart(){
+   waitfornowforgamestart++;
+   if(2 <= waitfornowforgamestart){
+      GameStart();
+   }
+}
+
 //#endregion
 
 function DrawBackground(){
    //background、そのまま背景
-   for(let yy = 0; yy < 8; yy++){
-     for(let xx = 0; xx < 8; xx++){
-      let img = images[backMap[yy][xx]];
+   for(let yy = 0; yy < mapSize; yy++){
+     for(let xx = 0; xx < mapSize; xx++){
+      let img = images['maps'][backmap[yy][xx]];
       if(img){
         ctx.drawImage(img, xx * 75, yy * 75, 75, 75);
       }else{
-        console.error(`Image for background value ${backMap[yy][xx]} not found.`);
+        console.error(`Image for background value ${backmap[yy][xx]} not found.`);
       }
      }
    }
    //object、仕掛けとか
-   for(let y = 0; y < objMap.length; y++) {
-     for(let x = 0; x < objMap[y].length; x++) {
-      let img = images[objMap[y][x]];
+   for(let y = 0; y < objmap.length; y++) {
+     for(let x = 0; x < objmap[y].length; x++) {
+      let img = images[stage][objmap[y][x]];
       if(img){
         ctx.drawImage(img, x * 75, y * 75, 75, 75);
       }else{
-        console.error(`Image for object value ${objMap[y][x]} not found.`);
+        console.error(`Image for object value ${objmap[y][x]} not found.`);
       }
      }
    }
@@ -588,7 +620,7 @@ document.addEventListener("keyup", (e) => {
 });
 
 // キーが押されたときの...やつ
-document.addEventListener('keydown', async function(event) {
+document.addEventListener('keydown', function(event) {
    if(!movable) return;
    let moved = 0;
 
@@ -603,6 +635,7 @@ document.addEventListener('keydown', async function(event) {
       case 'ArrowUp': // 上
          event.preventDefault();
          kariy -= speed;
+         moved = 1;
          break;
       case 'a':
       case 'ArrowLeft': // 左
@@ -624,23 +657,21 @@ document.addEventListener('keydown', async function(event) {
          break;
    }
 
-   if(objMap[MAPy][MAPx] != undefined || objMap[MAPy][MAPx] != 18){
+   if(objmap[MAPy][MAPx] != undefined || objmap[MAPy][MAPx] != 18){
       SELECTx = karix;
       SELECTy = kariy;
    }
 
    draw()
 
-   if(MAPx < 0 || 8 < MAPx || MAPy < 0 || 8 < MAPy){
-      addtext('errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
-      await delay(2000);
-      window.open('about:blank', '_self').close();
+   if(MAPx < 0 || mapSize < MAPx || MAPy < 0 || mapSize < MAPy){
+      error()
    }
    
 
    // ここに爆弾　一旦廃止してます
    // if(moved == 1){
-   // if(objMap.some(row => row.includes(15))){
+   // if(objmap.some(row => row.includes(15))){
    //    bombtimer--;
    //    if(bombtimer <= 0){
    //       triggerExplosion(PlacedBombx, PlacedBomby);
@@ -662,7 +693,7 @@ document.addEventListener('keydown', async function(event) {
 
    //       //MAPx = Math.floor(SELECTx / 75);
    //       //MAPy = Math.floor(SELECTy / 75);
-   //       //objMap[MAPy][MAPx] = 15;
+   //       //objmap[MAPy][MAPx] = 15;
    //       //bombtimer = 5;
    //       //PlacedBombx = MAPx;
    //       //PlacedBomby = MAPy;
@@ -708,13 +739,13 @@ document.addEventListener('keydown', async function(event) {
    //          ];
       
    //          explosionCoords.forEach(([x, y]) => {
-   //             if (x >= 0 && x < objMap[0].length && y >= 0 && y < objMap.length) {
+   //             if (x >= 0 && x < objmap[0].length && y >= 0 && y < objmap.length) {
    //                // 座標がマップ範囲内なら0にする
-   //                objMap[y][x] = 0;
+   //                objmap[y][x] = 0;
    //             }
    //          });
    //       }
-   //       objMap[PlacedBomby][PlacedBombx] = 0;
+   //       objmap[PlacedBomby][PlacedBombx] = 0;
    //       ctx.clearRect(0, 0, 600, 600); 
    //       DrawBackground();
    //       ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
@@ -741,17 +772,14 @@ function draw() {
 }
 
 document.addEventListener('keydown', (event) => {
-   if(movable == 1 && dungeonnow == 1 && textShowing == 0){
-      if(event.key == 'Enter'||event.key == 'z'){
+   if(movable && dungeonnow && textShowing == 0){
+      if(event.key == 'Enter'|| event.key == 'z'){
 
-      draw()
+         draw()
 
-      // マップの値をチェック
-      if(MAPy >= 0 && MAPy < objMap.length && MAPx >= 0 && MAPx < objMap[MAPy].length){
-         NanigaOkirukana[objMap[MAPy][MAPx]].process();
-      }
-      
-      draw()
+         NanigaOkirukana[objmap[MAPy][MAPx]].process();
+         
+         draw()
       }
    }
    if(event.key == 'e' && document.querySelector('#overfieldArea').style.display == 'block'){
@@ -767,76 +795,96 @@ document.addEventListener('keydown', (event) => {
 });
 
 
-function weightedRandomSelect(items, count) {
-   let pool = [...items]; // 配列をコピーして元のデータを壊さないようにする
-   let result = [];
-   
-   while (result.length < count && pool.length > 0) {
-       const totalWeight = pool.reduce((sum, item) => sum + item.p, 0);
-       let random = Math.random() * totalWeight;
-       
-       for (let i = 0; i < pool.length; i++) {
-           if (random < pool[i].p) {
-               result.push(pool[i]);
-               pool.splice(i, 1); // 選ばれた要素をリストから削除
-               break;
-           }
-           random -= pool[i].p;
-       }
-   }
-   return result;
-}
-
 function GoNextFloor(){
    floor += 1;
    candybar = [];
 
-   MAPx = backMapnum[stage-1].split('.');
-   MAPy = +MAPx[1]+1
-   MAPx = +MAPx[0]
-   backMap = backMaps[Math.floor(Math.random() * MAPy)+MAPx];
-
-   MAPx = objMapnum[stage-1].split('.');
-   MAPy = +MAPx[1]+1
-   MAPx = +MAPx[0]
-   objMap = objMaps[Math.floor(Math.random() *   MAPy)+MAPx];
-   objMap = JSON.parse(JSON.stringify(objMaps[Math.floor(Math.random() * MAPy) + MAPx]));
-
-   if(stage == 1){
-      if(fun == 23 && probability(10)){
-         backMap = backMaps[4];
-         objMap = objMaps[6];
-      }else if(fun <= 50 && probability(10)){
-         backMap = backMaps[5];
-         objMap = objMaps[7];
-      };
-   }else if(stage == 2){
-      if(fun == 68 && probability(10)){
-         backMap = backMaps[11];
-         objMap = objMaps[14];
-         objMap = JSON.parse(JSON.stringify(objMaps[Math.floor(Math.random() * MAPy) + MAPx]));
-      }else if(fun <= 50 && probability(10)){
-         backMap = backMaps[19];
-         objMap = objMaps[23];
-         objMap = JSON.parse(JSON.stringify(objMaps[Math.floor(Math.random() * MAPy) + MAPx]));
-      };
-   }else if(stage == 3){
-      if(fun == 68 && probability(10)){
-         backMap = backMaps[18];
-         objMap = objMaps[22];
-         objMap = JSON.parse(JSON.stringify(objMaps[Math.floor(Math.random() * MAPy) + MAPx]));
-      }else if(fun <= 50 && probability(10)){
-         backMap = backMaps[19];
-         objMap = objMaps[23];
-         objMap = JSON.parse(JSON.stringify(objMaps[Math.floor(Math.random() * MAPy) + MAPx]));
-      };
-   }
-   if(stage == 1 && floor >= 10){SELECTx = 150;SELECTy = 525;backMap = backMaps[6];objMap = objMaps[8]}; //創生黎明の原野
-   if(stage == 2 && floor >= 7 ){SELECTx = 150;SELECTy = 525;backMap = backMaps[13];objMap = objMaps[16]}; //ガチェンレイゲスドゥールラート(昼)
-   if(stage == 3 && floor >= 3 ){SELECTx = 150;SELECTy = 525;backMap = backMaps[20];objMap = objMaps[24]}; //ガチェンレイゲスドゥールラート(夜)
+   mapmake();
 
    draw()
 }
+
+function mapmake(code){
+   let mts = stage; //moto stage
+
+   while(mts == stage){
+      // 1~3の間でランダムにステージを決定
+      stage = arraySelect(Object.keys(Stages));
+   }
+
+   for(let i = 0; i < mapSize; i++){
+      backmap[i] = [];
+
+      for(let j = 0; j < mapSize; j++){
+         let basescore = 10, bonus = 40;
+         let scores = {};
+
+         // 各タイルの初期スコアをセット
+         Stages[stage].tiles.forEach(type => scores[type] = basescore);
+
+         // 左と上のマスに同じタイルがあったらスコア加算
+         if (j > 0) scores[backmap[i][j - 1]] += bonus;
+         if (i > 0) scores[backmap[i - 1][j]] += bonus;
+
+         function weightedRandom(weightMap) {
+            let total = Object.values(weightMap).reduce((a, b) => a + b, 0);
+            let r = Math.random() * total;
+            for (let key in weightMap) {
+               r -= weightMap[key];
+               if (r < 0) return key;
+            }
+         }
+
+         // 重み付きランダム選択
+         let chosen = weightedRandom(scores);
+
+         backmap[i][j] = chosen;
+         //ctx.drawImage(images.maps[chosen], j * mass, i * mass, mass, mass);
+      }
+   }
+
+   //次ここから
+
+   MAPx = objmapnum[stage-1].split('.');
+   MAPy = +MAPx[1]+1
+   MAPx = +MAPx[0]
+   objmap = objmaps[Math.floor(Math.random() *   MAPy)+MAPx];
+   objmap = JSON.parse(JSON.stringify(objmaps[Math.floor(Math.random() * MAPy) + MAPx]));
+
+   if(stage == 1){
+      if(fun == 23 && probability(10)){
+         backmap = backmaps[4];
+         objmap = objmaps[6];
+      }else if(fun <= 50 && probability(10)){
+         backmap = backmaps[5];
+         objmap = objmaps[7];
+      };
+   }else if(stage == 2){
+      if(fun == 68 && probability(10)){
+         backmap = backmaps[11];
+         objmap = objmaps[14];
+         objmap = JSON.parse(JSON.stringify(objmaps[Math.floor(Math.random() * MAPy) + MAPx]));
+      }else if(fun <= 50 && probability(10)){
+         backmap = backmaps[19];
+         objmap = objmaps[23];
+         objmap = JSON.parse(JSON.stringify(objmaps[Math.floor(Math.random() * MAPy) + MAPx]));
+      };
+   }else if(stage == 3){
+      if(fun == 68 && probability(10)){
+         backmap = backmaps[18];
+         objmap = objmaps[22];
+         objmap = JSON.parse(JSON.stringify(objmaps[Math.floor(Math.random() * MAPy) + MAPx]));
+      }else if(fun <= 50 && probability(10)){
+         backmap = backmaps[19];
+         objmap = objmaps[23];
+         objmap = JSON.parse(JSON.stringify(objmaps[Math.floor(Math.random() * MAPy) + MAPx]));
+      };
+   }
+   if(stage == 1 && floor >= 10){SELECTx = 150;SELECTy = 525;backmap = backmaps[6];objmap = objmaps[8]}; //創生黎明の原野
+   if(stage == 2 && floor >= 7 ){SELECTx = 150;SELECTy = 525;backmap = backmaps[13];objmap = objmaps[16]}; //ガチェンレイゲスドゥールラート(昼)
+   if(stage == 3 && floor >= 3 ){SELECTx = 150;SELECTy = 525;backmap = backmaps[20];objmap = objmaps[24]}; //ガチェンレイゲスドゥールラート(夜)
+}
+
 function NextStage(){
    floor = 0;
    candybar = [];
@@ -938,7 +986,13 @@ function setLocalStorage(name, value) {
 function getLocalStorage(name) {
    return localStorage.getItem(name);
 }
+async function error(){
+   addtext('errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
+   await delay(2000);
+   window.open('about:blank', '_self').close();
+}
 //#endregion
+
 //#region 変数達
 let w,x,y,z;//こいつらは計算
 
@@ -953,8 +1007,8 @@ let username = 'no name';
 let rank = 1;
 let rpt = 0;
 let maxrpt = 100;
-let stone = 0;
-let bankstone = 0;
+let valorimar = 0;
+let bankvalorimar = 0;
 
 //毎ダンジョン変わるデータs 固有値というか規定値。接頭辞によってこっから変動させたりできるようにする用
 let enemylv = 1;
@@ -1018,19 +1072,19 @@ document.addEventListener('touchend', function (e) {
 
 
 let humans = {
-   players:{
-      1:{
+   players:[
+      {
          status:1,//0 = none, 1 = alive, 2 = dead
          cam:'players',
          num:1,
-         name:'players',
+         name:'player',
          level:1,
          exp:0,
          sp:0,
    
          speed:10,
-         health:0,
-         maxhealth:0,
+         hp:0,
+         maxhp:0,
          attack:0,
          defense:0,
          power:1,
@@ -1080,273 +1134,14 @@ let humans = {
          //ああそうさ、俺の趣味さ！！！！！"おもちゃ箱の夢"みたいなステージであることをしたくってねぇ...もしかしたら首はなくなるかも..いやまあ好きだけど解像度低いから自分でできなさそう
          //...あれ？これ読まれたらやばくね？..まあ....いいか！！！！直接的な表現無いしだいじょぶっしょ、多分 え？なんのことかわからないって？ならdiscordのなんか..なんか。のkoppekun-uraを見るといい！！！！え？見れないって？ふっふっふ..ざまぁ(可愛くてごめん風)
    
-         cool:100,
+         ep:100,
          ex:'50%heal',
          ns:'5%heal',
          ps:'null',
       },
-      2:{
-         status:0,
-         cam:'players',
-         num:2,
-         name:'friend1',
-         level:1,
-         exp:0,
-         sp:0,
-   
-         speed:1,
-         health:0,
-         maxhealth:0,
-         attack:0,
-         defense:0,
-         power:1,
-         shell:1,
-         mp:0,
-         maxmp:10,
-         mattack:0,
-         mdefense:0,
-         critlate:0.03,
-         critdmg:3,
-         critresist:0,
-   
-         buffs:[],
-   
-         slash1:'slash',
-         slash2:'double slash',
-         slash3:'slash of light',
-
-         magic1:0,
-         magic2:0,
-         magic3:0,
-
-         tool1:'aspirin',
-         tool2:'throwknife',
-         tool3:'redcard',
-   
-         weapon:{
-            id:'none',
-            lv:1,
-         },
-         armor:{
-            id:'none',
-            lv:1,
-         },
-         ear:{
-            id:'none',
-            lv:1,
-         },
-         ring:{
-            id:'none',
-            lv:1,
-         },
-         neck:{
-            id:'none',
-            lv:1,
-         },
-
-         cool:100,
-         ex:'null',
-         ns:'null',
-         ps:'null',
-      },
-      3:{
-         status:0,
-         cam:'players',
-         num:3,
-         name:'friend2',
-         level:1,
-         exp:0,
-         sp:0,
-   
-         speed:1,
-         health:0,
-         maxhealth:0,
-         attack:0,
-         defense:0,
-         power:1,
-         shell:1,
-         mp:0,
-         maxmp:10,
-         mattack:0,
-         mdefense:0,
-         critlate:0.03,
-         critdmg:3,
-         critresist:0,
-   
-         buffs:[],
-   
-         slash1:'slash',
-         slash2:'double slash',
-         slash3:'slash of light',
-
-         magic1:0,
-         magic2:0,
-         magic3:0,
-
-         tool1:'aspirin',
-         tool2:'throwknife',
-         tool3:'redcard',
-   
-         weapon:{
-            id:'none',
-            lv:1,
-         },
-         armor:{
-            id:'none',
-            lv:1,
-         },
-         ear:{
-            id:'none',
-            lv:1,
-         },
-         ring:{
-            id:'none',
-            lv:1,
-         },
-         neck:{
-            id:'none',
-            lv:1,
-         },
-
-         cool:100,
-         ex:'null',
-         ns:'null',
-         ps:'null',
-      },
-      4:{
-         status:0,
-         cam:'players',
-         num:4,
-         name:'friend3',
-         level:1,
-         exp:0,
-         sp:0,
-   
-         speed:1,
-         health:0,
-         maxhealth:0,
-         attack:0,
-         defense:0,
-         power:1,
-         shell:1,
-         mp:0,
-         maxmp:10,
-         mattack:0,
-         mdefense:0,
-         critlate:0.03,
-         critdmg:3,
-         critresist:0,
-   
-         buffs:[],
-   
-         slash1:'slash',
-         slash2:'double slash',
-         slash3:'slash of light',
-
-         magic1:0,
-         magic2:0,
-         magic3:0,
-
-         tool1:'aspirin',
-         tool2:'throwknife',
-         tool3:'redcard',
-   
-         weapon:{
-            id:'none',
-            lv:1,
-         },
-         armor:{
-            id:'none',
-            lv:1,
-         },
-         ear:{
-            id:'none',
-            lv:1,
-         },
-         ring:{
-            id:'none',
-            lv:1,
-         },
-         neck:{
-            id:'none',
-            lv:1,
-         },
-
-         cool:100,
-         ex:'null',
-         ns:'null',
-         ps:'null',
-      },
-      't':{
-         status:0,
-         cam:'players',
-         num:'t',
-         name:'Turret',
-         level:1,
-         exp:0,
-         sp:0,
-   
-         speed:20,
-
-         kazu:0,
-         attack:5,
-         health:15,
-         maxhealth:15,
-
-         defense:0,
-         power:1,
-         shell:1,
-         mp:0,
-         maxmp:10,
-         mattack:0,
-         mdefense:0,
-         critlate:0,
-         critdmg:10,
-         critresist:0,
-   
-         buffs:[],
-   
-         slash1:'slash',
-         slash2:'double slash',
-         slash3:'slash of light',
-
-         magic1:0,
-         magic2:0,
-         magic3:0,
-
-         tool1:'aspirin',
-         tool2:'throwknife',
-         tool3:'redcard',
-   
-         weapon:{
-            id:'none',
-            lv:1,
-         },
-         armor:{
-            id:'none',
-            lv:1,
-         },
-         ear:{
-            id:'none',
-            lv:1,
-         },
-         ring:{
-            id:'none',
-            lv:1,
-         },
-         neck:{
-            id:'none',
-            lv:1,
-         },
-
-         cool:100,
-         ex:'null',
-         ns:'null',
-         ps:'null',
-      }
-   },
-   enemies:{
-      1:{
+   ],
+   enemies:[
+      {
          status:0,//存在の有無
          cam:'enemies',
          num:1,
@@ -1355,8 +1150,8 @@ let humans = {
          prefixe:'',
 
          speed:1,
-         health:100,
-         maxhealth:100,
+         hp:100,
+         maxhp:100,
          attack:10,
          defense:10,
          mattack:5,
@@ -1391,12 +1186,12 @@ let humans = {
             lv:1,
          },
 
-         cool:100,
+         ep:100,
          ex:'null',
          ns:'null',
          ps:'null',
       },
-   }
+   ]
 };
 
 function tekiou(){
@@ -1411,8 +1206,8 @@ function tekiou(){
 
          humanDiv.querySelector(`.name`).textContent = name;
          humanDiv.querySelector(`.level`).textContent = `Lv.${human.level}`;
-         humanDiv.querySelector(`.health .num`).textContent = `${human.health}/${human.maxhealth}`;
-         humanDiv.querySelector(`.health .bar .inner`).style.width = `${(human.health / human.maxhealth)*100}%`;
+         humanDiv.querySelector(`.hp .num`).textContent = `${human.hp}/${human.maxhp}`;
+         humanDiv.querySelector(`.hp .bar .inner`).style.width = `${(human.hp / human.maxhp)*100}%`;
          humanDiv.querySelector(`.mp .num`).textContent = `${human.mp}/${human.maxmp}`;
          humanDiv.querySelector(`.mp .bar .inner`).style.width = `${(human.mp / human.maxmp)*100}%`;
 
@@ -1535,8 +1330,8 @@ function tekiou(){
 function save(){
    updateUI();
    const newData = {
-      stone: stone,
-      bankstone: bankstone,
+      valorimar: valorimar,
+      bankvalorimar: bankvalorimar,
       rank: rank,
       rpt: rpt,
       clearedmainquest: clearedmainquest,
@@ -1552,26 +1347,26 @@ function load(){
 }
 
 //#region オブザーバー
-function observeDisplayChangeBlock(targetSelector, callback){ //style="display:block;" を検知するやつ。
-   const targetNode = document.querySelector(targetSelector);
-   if (!targetNode) return;
+// function observeDisplayChangeBlock(targetSelector, callback){ //style="display:block;" を検知するやつ。
+//    const targetNode = document.querySelector(targetSelector);
+//    if (!targetNode) return;
 
-   const observer = new MutationObserver((mutationsList) => {
-      for (let mutation of mutationsList) {
-         if (mutation.attributeName == "style") {
-            const displayValue = window.getComputedStyle(targetNode).display;
-            if (displayValue == "block"){
-               callback();
-            }
-         }
-      }
-   });
+//    const observer = new MutationObserver((mutationsList) => {
+//       for (let mutation of mutationsList) {
+//          if (mutation.attributeName == "style") {
+//             const displayValue = window.getComputedStyle(targetNode).display;
+//             if (displayValue == "block"){
+//                callback();
+//             }
+//          }
+//       }
+//    });
 
-   observer.observe(targetNode, { attributes: true, attributeFilter: ["style"] });
-}
+//    observer.observe(targetNode, { attributes: true, attributeFilter: ["style"] });
+// }
 //#endregion
-//#region log&text
 
+//#region log&text
 let textDiv = document.querySelector('#text');
 let autoDelay = 1;
 let skipText = false; // スキップフラグ
@@ -1687,15 +1482,17 @@ document.addEventListener('click', () => {
 let logOOmoto = document.querySelector('#log');
 let log = document.querySelector('#log .log');
 let logOpener = document.querySelector('#log .opener');
-logOpener.addEventListener('click', function(){
-   if(logOOmoto.style.right == '-300px'){
+let log_open = (code) => {
+   if((logOOmoto.style.right == '-300px' || code == 'o') && code != 'c'){
       logOOmoto.style.right = '0px';
       logOpener.textContent = '>';
    }else{
       logOOmoto.style.right = '-300px';
       logOpener.textContent = '<';
    }
-});
+}
+logOpener.addEventListener('click', log_open);
+
 function addlog(text){
    log.innerHTML += text + '<br>';
    log.scrollTop = log.scrollHeight;
@@ -1705,9 +1502,9 @@ function addlog(text){
 //#region Inventory
 let Inventory = document.querySelector('#Inventory');
 let Sutefuris = {
-   'maxhealth':{
+   'maxhp':{
       name:'最大体力',
-      id:'maxhealth',
+      id:'maxhp',
       added:0, //実績用にします？
       value:20,
       description:'最大体力を20増やし、体力を20回復する<br>ピンチな時にぜひ<br>筋肉は全てを解決する',
@@ -1796,7 +1593,7 @@ function inventoryOpen(num){
    document.querySelector('#movabledescription').style.display = 'none';
 
    InventoryPage = num??1;
-   let array = ['name','level','exp','health','maxhealth','attack','defense','maxmp','mattack','mdefense','critlate','critdmg','critresist'];
+   let array = ['name','level','exp','hp','maxhp','attack','defense','maxmp','mattack','mdefense','critlate','critdmg','critresist'];
    let Status = array.map(a => `${a}: ${humans.players[InventoryPage][a]}`).join('<br>');
    
    let Sutefuri = Object.key(Sutefuris).map(a => `<button class="button" data-description="${Sutefuris[a].description}" onclick="suteFuri${a}">${a}</button>`).join('<br>');
@@ -1967,45 +1764,50 @@ function ToolChangeDeside(num,code){
 }
 
 function suteFuri(me,code){
-   if(sp < 1){
+   let who = humans.players[me];
+   if(who.sp <= 0){
       nicoText('spがないのぜ');
       return;
    };
+   //Sutefuris
+   
+   grow(who, code, Sutefuris[code].value);
+
    switch(code){
-      case 'maxhealth':
-         humans.players[me].maxhealth += 20;
-         humans.players[me].health += 20;
+      case 'maxhp':
+         who.maxhp += 20;
+         who.hp += 20;
          break;
       case 'attack':
-         humans.players[me].attack += 5;
+         who.attack += 5;
          break;
       case 'defense':
-         humans.players[me].defense += 5;
+         who.defense += 5;
          break;
       case 'maxmp':
-         humans.players[me].maxmp += 5;
+         who.maxmp += 5;
          break;
       case 'mattack':
-         humans.players[me].mattack += 5; 
+         who.mattack += 5; 
          break;
       case 'mdefense':
-         humans.players[me].mdefense += 5;
+         who.mdefense += 5;
          break;
       case 'critlate':
-         humans.players[me].critlate += 2;
+         who.critlate += 2;
          break;
       case 'critdmg':
-         humans.players[me].critdmg += 0.1;
+         who.critdmg += 0.1;
          break;
       case 'critresist':
-         humans.players[me].critresist += 2;
+         who.critresist += 2;
          break;
       case 'speed':
-         humans.players[me].speed += 5;
+         who.speed += 5;
          break;
    }
 
-   sp -= 1;
+   who.sp -= 1;
    inventoryOpen(me);
 }
 
@@ -2118,7 +1920,7 @@ function MakeNewQuest(code){
 
 function ClearedMainQuest(code){
    if(code == 'M'&&quest.main.num == quest.main.nom){
-      stone += quest.main.rewards;
+      valorimar += quest.main.rewards;
       rpt += 20;
       clearedmainquest += 1;
       MakeNewQuest('x');
@@ -2126,7 +1928,7 @@ function ClearedMainQuest(code){
    switch(code){
       case 0:
          if(quest.daily[0].num == quest.daily[0].nom){
-         stone += quest.daily[0].rewards;
+         valorimar += quest.daily[0].rewards;
          quest.daily[0].id = 0;
          quest.daily[0].description = 'end';
          quest.daily[0].rewards = 0;
@@ -2138,7 +1940,7 @@ function ClearedMainQuest(code){
          break;
       case 1:
          if(quest.daily[1].num == quest.daily[1].nom){
-         stone += quest.daily[1].rewards;
+         valorimar += quest.daily[1].rewards;
          quest.daily[1].id = 0;
          quest.daily[1].description = 'end';
          quest.daily[1].rewards = 0;
@@ -2150,7 +1952,7 @@ function ClearedMainQuest(code){
          break;
       case 2:
          if(quest.daily[2].num == quest.daily[2].nom){
-         stone += quest.daily[2].rewards;
+         valorimar += quest.daily[2].rewards;
          quest.daily[2].id = 0;
          quest.daily[2].description = 'end';
          quest.daily[2].rewards = 0;
@@ -2162,7 +1964,7 @@ function ClearedMainQuest(code){
          break;
       case 3:
          if(quest.daily[3].num == quest.daily[3].nom){            
-         stone += quest.daily[3].rewards;
+         valorimar += quest.daily[3].rewards;
          quest.daily[3].id = 0;
          quest.daily[3].description = 'end';
          quest.daily[3].rewards = 0;
@@ -2174,7 +1976,7 @@ function ClearedMainQuest(code){
          break;
       case 4:
          if(quest.daily[4].num == quest.daily[4].nom){
-         stone += quest.daily[4].rewards;
+         valorimar += quest.daily[4].rewards;
          quest.daily[4].id = 0;
          quest.daily[4].description = 'end';
          quest.daily[4].rewards = 0;
@@ -2251,8 +2053,8 @@ loginDiv.querySelector('.button').addEventListener('click', async function(event
             password: password,
          });
          
-         stone = 0;
-         bankstone = 0;
+         valorimar = 0;
+         bankvalorimar = 0;
          rank = 1;
          rpt = 0;
          clearedmainquest = 0;
@@ -2299,8 +2101,8 @@ async function login(){
    userData = await load();
    await delay(50)
 
-   stone = userData.stone??0;
-   bankstone = userData.bankstone??0;
+   valorimar = userData.valorimar??0;
+   bankvalorimar = userData.bankvalorimar??0;
    rank = userData.rank??1;
    rpt = userData.rpt??0;
    clearedmainquest = userData.clearedmainquest??0;
@@ -2323,7 +2125,6 @@ async function login(){
    cd('home','home','home')
 }
 //#endregion
-
 //#region chatのやつ
 function selectRoom() {
    const roomSelect = document.querySelector('#room-select');
@@ -2514,7 +2315,7 @@ window.addEventListener('beforeunload', () => {
 
 //#endregion
 
-//#region stoneとrankの上のやつ
+//#region valorimarとrankの上のやつ
 function updateUI(){
    if(rpt >= maxrpt){
       rank += 1;
@@ -2527,37 +2328,22 @@ function updateUI(){
    document.querySelector('.user .rank').textContent = `Rank:${rank}`;
    document.querySelector('.rpt .bar .inner').style.width = (rpt / maxrpt) * 100 + '%';
    document.querySelector('.rpt .text').textContent = `${rpt}/${maxrpt}`;
-   document.querySelector('#upperUI .stone').innerHTML = `${stone}𐩰`; 
+   document.querySelector('#upperUI .valorimar').innerHTML = `${valorimar}𐩰`; 
 
 }
 updateUI();
 
-function LetsCharge(){
-   document.querySelector('#homeArea').innerHTML = `
-   <!--<span id="BigText">チャージステーション</span><br>-->
-   <button class="backtoHome">←</button> チャージステーション<br>
-   <div class="row">
-   <button class="buttonC" onclick="Charge(90,120)">90$/120€</button>
-   <button class="buttonC" onclick="Charge(300,360)">300$/360€</button>
-   <button class="buttonC" onclick="Charge(860,860)">860$/860€</button>
-   </div>
-   <div class="row">
-   <button class="buttonC" onclick="Charge(1280,1080)">1280$/1080€</button>
-   <button class="buttonC" onclick="Charge(1840,1460)">1840$/1460€</button>
-   <button class="buttonC" onclick="Charge(2640,2160)">2640$/2160€</button>
-   </div>
-   `;
-}
 function Charge(e,m){
    load();
-   if(userData.stone??0 >= m){
-      stone += e;
+   if(userData.valorimar??0 >= m){
+      valorimar += e;
       usersRef.update({
-         stone: userData.stone??m - m
+         valorimar: userData.valorimar??m - m
       });
       save();
-      nicoText(`${m}€払い、${e}$チャージ完了、です！`);
+      nicoText(`${m}€払い、${e}個チャージ完了、です！`);
    }else{
+      console.log(`必要:${m}€, 所持:${valorimar}€`);
       nicoText('お金が足りません...');
    }
 }
@@ -2590,8 +2376,7 @@ let nowPlace = {
    detail3: null,
 }
 async function cd(tab, area, selection, detail1, detail2, detail3){
-   console.log(`tab:${tab} area:${area} selection:${selection} detail1:${detail1} detail2:${detail2} detail3:${detail3}に移動します！！`);
-   console.log((`#${tab}-tab${area ? ` #${area}Area` : ''}${selection ? ` .${selection}` : ''}${detail1 ? ` .${detail1}` : ''}${detail2 ? ` .${detail2}` : ''}${detail3 ? ` .${detail3}` : ''}`))
+   console.log(`cd:: #${tab}-tab${area ? ` #${area}Area` : ''}${selection ? ` .${selection}` : ''}${detail1 ? ` .${detail1}` : ''}${detail2 ? ` .${detail2}` : ''}${detail3 ? ` .${detail3}` : ''}`)
    
    // document.querySelector(`#${nowPlace.tab}-tab${nowPlace.area ? ` #${nowPlace.area}Area` : ''}${nowPlace.selection ? ` .${nowPlace.selection}` : ''}${nowPlace.detail1 ? ` .${nowPlace.detail1}` : ''}${nowPlace.detail2 ? ` .${nowPlace.detail2}` : ''}${detail3 ? ` .${detail3}` : ''}`).style.display = 'none';
    if(nowPlace.tab) document.querySelector(`#${nowPlace.tab}-tab`).style.display = 'none';
@@ -2608,7 +2393,6 @@ async function cd(tab, area, selection, detail1, detail2, detail3){
    if(detail1) document.querySelector(`#${tab}-tab #${area}Area .${selection} .${detail1}`).style.display = 'block';
    if(detail2) document.querySelector(`#${tab}-tab #${area}Area .${selection} .${detail1} .${detail2}`).style.display = 'block';
    if(detail3) document.querySelector(`#${tab}-tab #${area}Area .${selection} .${detail1} .${detail2} .${detail3}`).style.display = 'block';
-
 
    nowPlace = {
       tab: tab,
@@ -2640,10 +2424,6 @@ async function HomeLetsDungeon(){
    fun = random(1,100);//毎回変更されるのぜ
    stage = 1;
    floor = 0;
-
-   humans.players[1].level = 1;
-   humans.players[1].exp = 0;
-   sp = 1;
    
    for(let id of Object.keys(Charas)){
       let chara = Charas[id];
@@ -2692,15 +2472,18 @@ async function HomeLetsDungeon(){
 
 }
 function HomeGoDungeon(name){
-   let player = humans.players[1]
-   player.id = name;
+   let who = humans.players[0];
+   who.id = name; //Charaのidを
+   who.level = 1;
+   who.exp = 0;
+   who.sp = 1;
 
    Object.keys(Charas['wretch']).forEach(key => { //基本に戻す
-      player[key] = Charas['wretch'][key];
+      who[key] = Charas['wretch'][key];
    })
 
    Object.keys(Charas[name]).forEach(key => { //変更点だけ変更
-      player[key] = Charas[name][key];
+      who[key] = Charas[name][key];
    })
 
    buttonsolid = Charas[name].buttonsolid;
@@ -2718,8 +2501,8 @@ function HomeGoDungeon(name){
       background: ${buttonback};
    }`;
 
-   player.health = player.maxhealth;
-   player.mp = player.maxmp;
+   who.hp = who.maxhp;
+   who.mp = who.maxmp;
 
    enemylv = 1;
    enemyhp = 80;
@@ -2734,8 +2517,7 @@ function HomeGoDungeon(name){
    
    dungeonnow = 1;
    logOOmoto.style.display = 'flex';
-   logOOmoto.style.right = '-300px';
-   logOpener.textContent = '<';
+   log_open('c')
    document.querySelector('#homeArea').style.display = 'none';
    document.querySelector('#overfieldArea').style.display = 'block';
    GoNextFloor();
@@ -2743,7 +2525,7 @@ function HomeGoDungeon(name){
    movable = 0;
 
    IMGselect = new Image();
-   IMGselect.src = images[humans['players'][1].id].src
+   IMGselect.src = images['charas'][humans['players'][0].id].src;
 
    SELECTx = 0;
    SELECTy = 0;
@@ -2752,7 +2534,7 @@ function HomeGoDungeon(name){
 }
 
 function ExitDungeon(code){
-   stone += 50*code;
+   valorimar += 50*code;
    dungeonnow = 0;
    document.querySelector('#overfieldArea').style.display = 'none';
    document.querySelector('#battleArea').style.display = 'none';
@@ -2771,18 +2553,18 @@ function HomeJobStart(name){
    let time = 0;
    let type = 0;
    switch(name){
-      case 'stoneShort':
-         type = 'stone'
+      case 'valorimarShort':
+         type = 'valorimar'
          reword = num*10;
          time = 5
          break;
-      case 'stoneMiddle':
-         type = 'stone';
+      case 'valorimarMiddle':
+         type = 'valorimar';
          reword = num*50;
          time = 15;
          break;
-      case 'stoneLong':
-         type = 'stone'; 
+      case 'valorimarLong':
+         type = 'valorimar'; 
          reword = num*100
          time = 30;  
          break;
@@ -2801,7 +2583,7 @@ function HomeJobStart(name){
          clearInterval(taskTimer);
          afknow = 0;
          switch(type){
-            case 'stone':stone += reword;document.querySelector('#stone').textContent = stone+'€'; break;
+            case 'valorimar':valorimar += reword;document.querySelector('#valorimar').textContent = valorimar+'€'; break;
          }
          HomeJobSelect();
       }
@@ -2861,10 +2643,10 @@ async function friendRecluit(num, code){ //numは回数、codeは"3"で
          newDiv.dataset.num = i;
          newDiv.innerHTML = `
          <div class="img">
-            <img class="inner" src="${images[Friends[i].id].src}">
+            <img class="inner" src="${images['friends'][Friends[i].id].src}">
          </div>
          <div class="rare">
-            <img class="inner" src="${images[`star${Friends[i].rare}`].src}" alt="">
+            <img class="inner" src="${images['system'][`star${Friends[i].rare}`].src}" alt="">
          </div>
          `;
 
@@ -2874,7 +2656,7 @@ async function friendRecluit(num, code){ //numは回数、codeは"3"で
 
             Detail.querySelector('.name .ruby').textContent = friend.ruby;
             Detail.querySelector('.name .txt').textContent = friend.name;
-            Detail.querySelector('.rare .img').src = images[`star${friend.rare}`].src;
+            Detail.querySelector('.rare .img').src = images['system'][`star${friend.rare}`].src;
          })
       })
    });
@@ -2911,19 +2693,19 @@ function HomeBank(){
   <button onclick="BacktoHome()">←</button> 超安心安全銀行<br>
   <span id="bank-deposit" class="bank-title">deposite</span><input type="number" id="bank-deposit-num" /><button id="bank-deposit-num-go" onclick="BankDeposite('Num')" class="bank-button">go</button><button id="bank-deposit-all" class="bank-button" onclick="BankDeposite('All')">All</button><br>
   <span id="bank-withdraw" class="bank-title">withdraw</span><input type="number" id="bank-withdraw-num" /><button id="bank-withdraw-num-go" onclick="BankWithdraw('Num')" class="bank-button">go</button><button id="bank-withdraw-all" class="bank-button" onclick="BankWithdraw('All')">All</button><br>
-  <span id="Bankstone">bank account:0€</span>
+  <span id="Bankvalorimar">bank account:0€</span>
    `;
-   document.querySelector('#Bankstone').textContent = 'bank account:'+bankstone+'€';
+   document.querySelector('#Bankvalorimar').textContent = 'bank account:'+bankvalorimar+'€';
 }
 function BankDeposite(code){
    if(code == 'Num'){
       let num = +document.querySelector('#bank-deposit-num').value;
-      bankstone += num;
-      stone -= num;
+      bankvalorimar += num;
+      valorimar -= num;
       document.querySelector('#bank-deposit-num').value = '';
    }else if(code == 'All'){
-      bankstone += stone;
-      stone = 0;
+      bankvalorimar += valorimar;
+      valorimar = 0;
       document.querySelector('#bank-deposit-num').value = '';
    }
    save();
@@ -2932,12 +2714,12 @@ function BankDeposite(code){
 function BankWithdraw(code){
    if(code == 'Num'){
       let num = +document.querySelector('#bank-withdraw-num').value;
-      stone += num;
-      bankstone -= num;
+      valorimar += num;
+      bankvalorimar -= num;
       document.querySelector('#bank-withdraw-num').value = '';
    }else if(code == 'All'){
-      stone += bankstone;
-      bankstone = 0;
+      valorimar += bankvalorimar;
+      bankvalorimar = 0;
       document.querySelector('#bank-withdraw-num').value = '';
    }
    save();
@@ -2948,87 +2730,89 @@ function BankWithdraw(code){
 //#endregion
 
 //#region 非ダメ時モーション(?)
-async function humandamaged(cam,tcams,me,targets,rate,kind,code){//矛先の陣営、攻撃タイプ(物理||魔法)、自分、矛先、倍率、コード(PS用)
-   if(!Array.isArray(tcams)){tcams = [tcams];}
-   if(!Array.isArray(targets)){targets = [targets];}
-   for(let i = 0; i < tcams.length; i++){
-      let tcam = tcams[i];
-      let target = targets[i];
 
-      let attacker = humans[cam][me];
-      let defender = humans[tcam][target];
+//こちらは旧式。参考にでも
+// async function humandamaged(cam,tcams,me,targets,rate,kind,code){//矛先の陣営、攻撃タイプ(物理||魔法)、自分、矛先、倍率、コード(PS用)
+//    if(!Array.isArray(tcams)){tcams = [tcams];}
+//    if(!Array.isArray(targets)){targets = [targets];}
+//    for(let i = 0; i < tcams.length; i++){
+//       let tcam = tcams[i];
+//       let target = targets[i];
 
-      console.log(`${attacker.name} => ${defender.name}; 倍率は${rate}で、種類は${kind}でコードは${code}だってよ`);
-      console.log(`ついでに言うと攻撃力は${attacker.attack}で、防御力は${defender.defense}だから計算上ダメージは${(attacker.attack * attacker.power * rate) - (defender.defense * defender.shell)}になるはずだよ`)
+//       let attacker = humans[cam][me];
+//       let defender = humans[tcam][target];
 
-      switch(kind){
-         case 'sh':
-            //codeは基本0。sは1、dsは2、solは3、スキルなら's'、アイテムなら'i'(ない)
+//       console.log(`${attacker.name} => ${defender.name}; 倍率は${rate}で、種類は${kind}でコードは${code}だってよ`);
+//       console.log(`ついでに言うと攻撃力は${attacker.attack}で、防御力は${defender.defense}だから計算上ダメージは${(attacker.attack * attacker.power * rate) - (defender.defense * defender.shell)}になるはずだよ`)
+
+//       switch(kind){
+//          case 'sh':
+//             //codeは基本0。sは1、dsは2、solは3、スキルなら's'、アイテムなら'i'(ない)
    
-            if(Weapons[attacker.weapon.id].pp = 0){
-               Weapons[attacker.weapon.id].process(cam,me,tcam,target,rate,kind,code,1);
-            }
+//             if(Weapons[attacker.weapon.id].pp = 0){
+//                Weapons[attacker.weapon.id].process(cam,me,tcam,target,rate,kind,code,1);
+//             }
    
-            x = Weapons[attacker.weapon.id].power;
-            if(typeof x == 'string'){x = eval(x);};
+//             x = Weapons[attacker.weapon.id].power;
+//             if(typeof x == 'string'){x = eval(x);};
             
-            x = (attacker.attack * attacker.power * rate + x);
-            if(code == 3 && attacker.ps == 'highsol'){x *= 3};
-            if(code == 3 && attacker.ps == 'solx5but'){x *= 5};
-            if(buffhas(cam,me,'improve')){x *= 1.4;};
-            if(buffhas(cam,me,'letsthrow')){x *= 2; buffclear(cam,me,'letsthrow');};
-            if(buffhas(cam,me,'gambling')){
-               z = clowngambling[Math.floor(Math.random() * clowngambling.length)];
-               x *= z; buffremove(cam,me,'gambling');
-               await addtext('ダメージは' + z + '倍になった!!')
-            };
+//             x = (attacker.attack * attacker.power * rate + x);
+//             if(code == 3 && attacker.ps == 'highsol'){x *= 3};
+//             if(code == 3 && attacker.ps == 'solx5but'){x *= 5};
+//             if(buffhas(cam,me,'improve')){x *= 1.4;};
+//             if(buffhas(cam,me,'letsthrow')){x *= 2; buffclear(cam,me,'letsthrow');};
+//             if(buffhas(cam,me,'gambling')){
+//                z = clowngambling[Math.floor(Math.random() * clowngambling.length)];
+//                x *= z; buffremove(cam,me,'gambling');
+//                await addtext('ダメージは' + z + '倍になった!!')
+//             };
    
-            x -= (defender.defense * defender.shell);
+//             x -= (defender.defense * defender.shell);
          
-            if(isCrit(attacker.critlate, humans[tcam][me].critresist)){
-               x += (defender.defense * defender.shell);
-               x *= attacker.critdmg;
-               await addtext('会心の一撃！')
-            };
+//             if(isCrit(attacker.critlate, humans[tcam][me].critresist)){
+//                x += (defender.defense * defender.shell);
+//                x *= attacker.critdmg;
+//                await addtext('会心の一撃！')
+//             };
 
             
-            x = Math.ceil(x);
-            if(x < 0){x = 0};
-            if(x > defender.health){x = defender.health};
+//             x = Math.ceil(x);
+//             if(x < 0){x = 0};
+//             if(x > defender.hp){x = defender.hp};
    
-            y = defender.health;
+//             y = defender.hp;
    
-            defender.health -= x;
-            console.log(`damage:${y}->${defender.health}(${x})`);
+//             defender.hp -= x;
+//             console.log(`damage:${y}->${defender.hp}(${x})`);
             
-            if(defender.health < 0){defender.health = 0};
+//             if(defender.hp < 0){defender.hp = 0};
             
-            if(cam == 'players') attacker.ep += Math.floor(10 * attacker.epgain * code == 3 ? 2 : 1);
+//             if(cam == 'players') attacker.ep += Math.floor(10 * attacker.epgain * code == 3 ? 2 : 1);
 
-            tekiou();
+//             tekiou();
 
-            await addtext(`${defender.name}に${x}のダメージ！`)
-            if(code == 3 && attacker.ps == 'solplaceturret'){turretPlace(cam);}
+//             await addtext(`${defender.name}に${x}のダメージ！`)
+//             if(code == 3 && attacker.ps == 'solplaceturret'){turretPlace(cam);}
    
-            if(defender.health <= 0){let result = await killed(cam,me,tcam,target);if(result == 'end'){return 'end';}}
+//             if(defender.hp <= 0){let result = await killed(cam,me,tcam,target);if(result == 'end'){return 'end';}}
    
          
             
-            break;
-         case 'mg':
-            //codeは基本0。sは1、dsは2、solは3、スキルなら's'、アイテムなら'i'(ない)
-            x = (attacker.mattack * attacker.power * rate);
-            x -= (defender.mdefense * defender.shell);
-            x = Math.ceil(x);if(x < 0){x = 0};if(x > defender.health){x = defender.health};
-            defender.health -= x;
-            tekiou();
-            await addtext(`${defender.name}に${x}のダメージ！`)
-            await delay(1000);
-            if(defender.health <= 0){let result = await killed(cam,me,tcam,target);return result;}
-            break;
-      }
-   }   
-};
+//             break;
+//          case 'mg':
+//             //codeは基本0。sは1、dsは2、solは3、スキルなら's'、アイテムなら'i'(ない)
+//             x = (attacker.mattack * attacker.power * rate);
+//             x -= (defender.mdefense * defender.shell);
+//             x = Math.ceil(x);if(x < 0){x = 0};if(x > defender.hp){x = defender.hp};
+//             defender.hp -= x;
+//             tekiou();
+//             await addtext(`${defender.name}に${x}のダメージ！`)
+//             await delay(1000);
+//             if(defender.hp <= 0){let result = await killed(cam,me,tcam,target);return result;}
+//             break;
+//       }
+//    }   
+// };
 
 function isCrit(late, resist){
    let isCritical = false;
@@ -3045,7 +2829,7 @@ function isCrit(late, resist){
    return isCritical
 }
 
-async function humandamaged(cam, me, tcams, targets, rate, kind, attributes){
+async function humandamaged(cam, me, tcams, targets, rate, kind, attributes = []){
    if(!Array.isArray(tcams)){tcams = [tcams];}
    if(!Array.isArray(targets)){targets = [targets];}
    for(let i = 0; i < tcams.length; i++){
@@ -3059,6 +2843,12 @@ async function humandamaged(cam, me, tcams, targets, rate, kind, attributes){
       let attackerOriginal = humans[cam][me];
       let defenderOriginal = humans[tcam][target]
 
+      const stats = [
+         'attack', 'defense',
+         'power', 'shell', 'mattack', 'mdefense',
+         'critlate', 'critdmg', 'critresist'
+      ];
+
       let attacker = {};
       stats.forEach(stat => {
          attacker[stat] = attackerOriginal[stat];
@@ -3069,13 +2859,8 @@ async function humandamaged(cam, me, tcams, targets, rate, kind, attributes){
          defender[stat] = defenderOriginal[stat];
       });
 
-      const stats = [
-         'attack', 'defense',
-         'power', 'shell', 'mattack', 'mdefense',
-         'critlate', 'critdmg', 'critresist'
-      ];
-
       stats.forEach(stat => {
+         console.log(attacker.buffs)
          Object.values(attacker.buffs).forEach(buff => {
             if(buff.data.addable == false){
                if(buff.data.effect.hasOwnProperty(stat)){
@@ -3120,13 +2905,13 @@ async function humandamaged(cam, me, tcams, targets, rate, kind, attributes){
 
       //整え
       damage = Math.floor(damage);
-      if(defender.health < damage) damage = defender.health;
-      console.log(`${defender.health} => ${defender.health - damage} | damage:${damage}`);
+      if(defender.hp < damage) damage = defender.hp;
+      console.log(`${defender.hp} => ${defender.hp - damage} | damage:${damage}`);
 
       //実装
       if(!attributes.includes('heal'))
-         defender.health -= damage;
-      else defender.health += damage;
+         defender.hp -= damage;
+      else defender.hp += damage;
 
       //ep
       if(cam == 'players') humans[cam][me].ep += Math.floor(10 * humans[cam][me].epgain);
@@ -3135,7 +2920,7 @@ async function humandamaged(cam, me, tcams, targets, rate, kind, attributes){
       await addtext(`${defender.name}に${damage}のダメージ！`)
 
       //その後
-      if(defender.health <= 0){let result = await killed(cam,me,tcam,target);return result;}
+      if(defender.hp <= 0){let result = await killed(cam,me,tcam,target);return result;}
 
       //追撃ゾーン　ここどしよ
       if(!attributes.includes('unpursuit')){
@@ -3144,12 +2929,12 @@ async function humandamaged(cam, me, tcams, targets, rate, kind, attributes){
             if(res == 'end'){return 'end'};
          }
 
-         if(attacker.ps == 'enemy50%pursuit' && defender.health <= defender.maxhealth / 2 && enemy50pursuitenelgy == 1 && defender.health > 0){
+         if(attacker.ps == 'enemy50%pursuit' && defender.hp <= defender.maxhp / 2 && enemy50pursuitenelgy == 1 && defender.hp > 0){
             enemy50pursuitenelgy = 0;
             await addtext(arraySelect(['くるくる〜っと','くるりん〜っと']));
             let res = humandamaged(cam,me,tcam,target,0.5,'sh',['unpursuit']);
             if(res == 'end'){return 'end'};
-         }else if(attacker.name == 'herta' && defender.health <= defender.maxhealth / 2 && attacker.level >= 10 && defender.health > 0){//1凸効果「弱みは付け込み」
+         }else if(attacker.name == 'herta' && defender.hp <= defender.maxhp / 2 && attacker.level >= 10 && defender.hp > 0){//1凸効果「弱みは付け込み」
             let res = humandamaged(cam,me,tcam,target,0.2,'sh',['unpursuit']);
             if(res == 'end'){return 'end'};
          }
@@ -3164,12 +2949,12 @@ async function humandamagedFixed(cam,me,tcam,target,num,kind){
    
    let damage = num;
 
-   defender.health -= damage;
+   defender.hp -= damage;
 
    tekiou()
    await addtext(`${defender.name}に${damage}のダメージ！`)
 
-   if(defender.health <= 0){let result = await killed(cam,me,tcam,target);return result;}
+   if(defender.hp <= 0){let result = await killed(cam,me,tcam,target);return result;}
    return 'alive';
 }
 //#endregion
@@ -3316,7 +3101,7 @@ function backtoplayerturn(){
    //errorcheck();
 }
 async function playerturn(cam,me){
-   if(humans[cam][me].ns.process != undefined && (turncount % Skills.ns[humans[cam][me].ns].cool) == 0){
+   if(humans[cam][me].ns.process != undefined && (turncount % Skills.ns[humans[cam][me].ns].ep) == 0){
       await Skills[humans[cam][me].ns].process(cam,me);
       await delay(1000)
    };
@@ -3594,8 +3379,8 @@ async function Tool(cam,me,UseTool){
 }
 //#endregion
 //#region playerのskill
-let Splithealth = 0;
-let Splitmaxhealth = 0;
+let Splithp = 0;
+let Splitmaxhp = 0;
 let clowngambling = ['0','0','2','2','2','4'];
 
 // スキル予約関数
@@ -3626,17 +3411,17 @@ function skillReset(cam,me){
    humans[cam][me].ep = 0;
 }
 function Splittekiou(){
-   document.querySelector('#SplitHealth').textContent = Splithealth;
-   document.querySelector('#SplitMaxHealth').textContent = Splitmaxhealth;
+   document.querySelector('#SplitHealth').textContent = Splithp;
+   document.querySelector('#SplitMaxHealth').textContent = Splitmaxhp;
    }
 async function Splitbreak(){
    buffremove(cam,me,'spliting')
-   x = Math.floor(Splitmaxhealth * 0.7);
-   playerhealth += x;
-   if (playerhealth > playermaxhealth){playerhealth = playermaxhealth;}
+   x = Math.floor(Splitmaxhp * 0.7);
+   playerhp += x;
+   if (playerhp > playermaxhp){playerhp = playermaxhp;}
    document.querySelector('#PlayerFriendFront').innerHTML = '';
-   Splitmaxhealth = 0;
-   Splithealth = 0;
+   Splitmaxhp = 0;
+   Splithp = 0;
    await addtext(playername+'のコピーは倒された...');
    humans[cam][me].ep = 0;
 }
@@ -3644,14 +3429,14 @@ function turretPlace(cam){
    if(!document.querySelector(`#${cam}t`)){
       let newDiv = makeNewPlayer('t')
       humans[cam].t.kazu = 0;
-      humans[cam].t.maxhealth = 0;
-      humans[cam].t.health = 0;
+      humans[cam].t.maxhp = 0;
+      humans[cam].t.hp = 0;
       document.querySelector(`#${cam}`).appendChild(newDiv);
    }
    humans[cam].t.status = 1;
    humans[cam].t.kazu += 1;
-   humans[cam].t.maxhealth += 15;
-   humans[cam].t.health += 15;
+   humans[cam].t.maxhp += 15;
+   humans[cam].t.hp += 15;
    humans[cam].t.name = `Turret x${humans[cam].t.kazu}`;
    tekiou()
    document.querySelector(`#${cam}t`).style.display = 'block'
@@ -3662,8 +3447,8 @@ function turretBreak(cam){
    humans[cam].t.kazu -= 1;
    if(humans[cam].t.kazu <= 0){
       humans[cam].t.kazu = 0;
-      humans[cam].t.maxhealth = 0;
-      humans[cam].t.health = 0;
+      humans[cam].t.maxhp = 0;
+      humans[cam].t.hp = 0;
       document.querySelector(`#${cam}t`).remove();
    }
 }
@@ -3701,20 +3486,20 @@ async function NextTurnis(cam,me,tcam,target){
       //継続ダメージの動き
       if (buffhas(cam,me,'poison')){
          let poison = humans[cam][me].buffs.find(a => a.name == 'poison')
-         x = Math.round(humans[cam][me].maxhealth * Effects.debuffs[poison.name].lv[poison.lv]);
-         humans[cam][me].health -= x;
-         if(humans[cam][me].health < 0){humans[cam][me].health = 0};
+         x = Math.round(humans[cam][me].maxhp * Effects.debuffs[poison.name].lv[poison.lv]);
+         humans[cam][me].hp -= x;
+         if(humans[cam][me].hp < 0){humans[cam][me].hp = 0};
          await addtext(`${humans[cam][me].name}は毒で${x}のダメージ!`);
       };
       if(buffhas(cam,me,'burn')){
          let burn = humans[cam][me].buffs.find(a => a.name == 'burn')
-         x = Math.round(humans[cam][me].maxhealth * Effects.debuffs[burn.name].lv[burn.lv]);
-         humans[cam][me].health -= x;
-         if(humans[cam][me].health < 0){humans[cam][me].health = 0}
+         x = Math.round(humans[cam][me].maxhp * Effects.debuffs[burn.name].lv[burn.lv]);
+         humans[cam][me].hp -= x;
+         if(humans[cam][me].hp < 0){humans[cam][me].hp = 0}
          await addtext(`${humans[cam][me].name}は燃えて${x}のダメージ!`);
       };
       tekiou();
-      if(humans[cam][me].health <= 0){let result = killed(0,0,cam,me);if(result !== 'continue'){return result;}}
+      if(humans[cam][me].hp <= 0){let result = killed(0,0,cam,me);if(result !== 'continue'){return result;}}
    
       for(const key in humans[cam][me].buffs){
          humans[cam][me].buffs[key].time -= 1; // -1する
@@ -3750,10 +3535,10 @@ async function NextTurnis(cam,me,tcam,target){
          let tcams = selected[1];let targets = selected[0];
          console.log(`attack:${humans[cams]['t'].attack} power:${humans[cams]['t'].power} kazu:${humans[cams]['t'].kazu} defense:${humans[tcams][targets].defense} shell:${humans[tcams][targets].shell}`);
          x = Math.ceil(humans[cams]['t'].attack * humans[cams]['t'].power * humans[cams]['t'].kazu) - Math.ceil(humans[tcams][targets].defense*humans[tcams][targets].shell);
-         if(x < 0){x = 0};if(x > humans[tcams][targets].health){x = humans[tcams][targets].health};
-         humans[tcams][targets].health -= x;tekiou();
+         if(x < 0){x = 0};if(x > humans[tcams][targets].hp){x = humans[tcams][targets].hp};
+         humans[tcams][targets].hp -= x;tekiou();
          log.textContent = `${humans[tcams][targets].name}に${x}のダメージ！`;
-         if(humans[tcams][targets].health <= 0){let result = killed(cams,1,tcams,targets);if(result !== 'continue'){return result;}};
+         if(humans[tcams][targets].hp <= 0){let result = killed(cams,1,tcams,targets);if(result !== 'continue'){return result;}};
          await delay(1000);
       }
       if(humans.enemies['t']?.kazu || 0 > 0 && x == false){
@@ -3763,15 +3548,15 @@ async function NextTurnis(cam,me,tcam,target){
          let selected = ShallTargetSelect('enemies','t',`phpl`,0);
          let tcams = selected[1];let targets = selected[0];
          x = Math.ceil(humans[cams]['t'].attack * humans[cams]['t'].kazu) - Math.ceil(humans[tcams][targets].defense*humans[tcams][targets].shell);
-         if(x < 0){x = 0};if(x > humans[tcams][targets].health){x = humans[tcams][targets].health};
-         humans[tcams][targets].health -= x;tekiou();
+         if(x < 0){x = 0};if(x > humans[tcams][targets].hp){x = humans[tcams][targets].hp};
+         humans[tcams][targets].hp -= x;tekiou();
          log.textContent = `${humans[tcams][targets].name}に${x}のダメージ！`;
-         if(humans[tcams][targets].health <= 0){let result = killed(cams,1,tcams,targets);if(result !== 'continue'){return result;}};
+         if(humans[tcams][targets].hp <= 0){let result = killed(cams,1,tcams,targets);if(result !== 'continue'){return result;}};
          await delay(1000);
       }
 
       turncount += 1;
-      const combined = [...Object.values(humans.players).filter(a => a.status === 1 && a.health > 0 && a.num !== 't'), ...Object.values(humans.enemies)].filter(b => b.status === 1 && b.health > 0)// オブジェクトをリストに変換して合体
+      const combined = [...Object.values(humans.players).filter(a => a.status === 1 && a.hp > 0 && a.num !== 't'), ...Object.values(humans.enemies)].filter(b => b.status === 1 && b.hp > 0)// オブジェクトをリストに変換して合体
       .sort((a, b) => {// 降順でソート
          if(b.speed === a.speed){
             if(a.cam === b.cam){
@@ -3841,7 +3626,7 @@ async function NextTurnis(cam,me,tcam,target){
 async function enemyturn(cam,me){
    let enemy = humans.enemies[me];
    let enemydata = Enemies[enemy.name];
-   x = Object.values(humans.enemies).filter(x => x.status == 1&& x.health > 0).map(x => x.num);
+   x = Object.values(humans.enemies).filter(x => x.status == 1&& x.hp > 0).map(x => x.num);
    for(i = 0; i < x.length; i++){
       let n = x[i]
       for(const key in humans.enemies[n].buffs){
@@ -3895,24 +3680,24 @@ function enemySelectAction(me, acts){
 function ShallTargetSelect(cam,me,code,both){
    //これは敵しか使わないターゲットセレクト。だから陣営とかは考えんでいいよ
    //標的陣営、起動者、コード(e = enemies, p = players | m = most highest, l = most lowest,| atk = 攻撃力, def = 防御力, hp = 体力 || r = random)、両隣にも被害を与えるか0,1
-   //,b => b.health//playerのhealth達を、statusが1のやつだけ、小さい順(昇順)に並べてる。
+   //,b => b.hp//playerのhp達を、statusが1のやつだけ、小さい順(昇順)に並べてる。
    const playerstatus = {
-      num:Object.values(humans.players).filter(c => c.status == 1 && c.health > 0).sort((p1, p2) => p1.num - p2.num).map(a => a.num),
-   health:Object.values(humans.players).filter(c => c.status == 1 && c.health > 0).sort((p1, p2) => p1.health - p2.health).map(a => a.num),
-      atk:Object.values(humans.players).filter(c => c.status == 1 && c.health > 0).sort((p1, p2) => p1.attack - p2.attack).map(a => a.num),
-      def:Object.values(humans.players).filter(c => c.status == 1 && c.health > 0).sort((p1, p2) => p1.defense - p2.defense).map(a => a.num),
+      num:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.num - p2.num).map(a => a.num),
+   hp:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.hp - p2.hp).map(a => a.num),
+      atk:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.attack - p2.attack).map(a => a.num),
+      def:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.defense - p2.defense).map(a => a.num),
    }
    const enemystatus = {
-      num:Object.values(humans.enemies).filter(c => c.status == 1 && c.health > 0).sort((e1, e2) => e1.num - e2.num).map(a => a.num),
-   health:Object.values(humans.enemies).filter(c => c.status == 1 && c.health > 0).sort((e1, e2) => e1.health - e2.health).map(a => a.num),
-      atk:Object.values(humans.enemies).filter(c => c.status == 1 && c.health > 0).sort((e1, e2) => e1.attack - e2.attack).map(a => a.num),
-      def:Object.values(humans.enemies).filter(c => c.status == 1 && c.health > 0).sort((e1, e2) => e1.defense - e2.defense).map(a => a.num),
+      num:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.num - e2.num).map(a => a.num),
+   hp:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.hp - e2.hp).map(a => a.num),
+      atk:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.attack - e2.attack).map(a => a.num),
+      def:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.defense - e2.defense).map(a => a.num),
    }
    let ret = [];
    switch(code){
       //players
       case 'pr'://random
-         x = arraySelect(playerstatus.health)
+         x = arraySelect(playerstatus.hp)
          if(!x){return 'end'}
          if(both == 0){
             ret.push(x);
@@ -3925,7 +3710,7 @@ function ShallTargetSelect(cam,me,code,both){
          }
          break;
       case 'phpl':
-         x = playerstatus.health[0];
+         x = playerstatus.hp[0];
          if(!x){return 'end'}
          if(both == 0){
             ret.push(x);
@@ -3938,7 +3723,7 @@ function ShallTargetSelect(cam,me,code,both){
          }
          break;
       case 'phph':
-         x = playerstatus.health[playerstatus.health.length - 1];
+         x = playerstatus.hp[playerstatus.hp.length - 1];
          if(!x){return 'end'}
          if(both == 0){
             ret.push(x);
@@ -4023,7 +3808,7 @@ function ShallTargetSelect(cam,me,code,both){
 
       //enemies
       case 'er':
-         x = arraySelect(enemystatus.health)
+         x = arraySelect(enemystatus.hp)
          if(!x){return 'end'}
          if(both == 0){
             ret.push(x);
@@ -4036,7 +3821,7 @@ function ShallTargetSelect(cam,me,code,both){
          }
          break;
       case 'ehpl':
-         x = enemystatus.health[0]
+         x = enemystatus.hp[0]
          if(!x){return 'end'}
          if(both == 0){
             ret.push(x);
@@ -4049,7 +3834,7 @@ function ShallTargetSelect(cam,me,code,both){
          }
          break;
       case 'ehph':
-         x = enemystatus.health[enemystatus.health.length - 1]
+         x = enemystatus.hp[enemystatus.hp.length - 1]
          if(!x){return 'end'}
          if(both == 0){
             ret.push(x);
@@ -4136,7 +3921,7 @@ function ShallTargetSelect(cam,me,code,both){
 
 //#region 勝利/負けの動き
 async function killed(cam,me,tcam,target){//殺った側cam,meと殺された側tcam,target
-   humans[tcam][target].health = 0;
+   humans[tcam][target].hp = 0;
    humans[tcam][target].status = 2;
    buffclear(tcam,target,'all');tekiou();
    
@@ -4168,7 +3953,7 @@ async function killedCheck(){
       //敵全滅
       let enemyKaz = Object.keys(humans['enemies']).length;
       let recievable = random(5,15) * enemyKaz;
-      stone += recievable;
+      valorimar += recievable;
       
       let gainExp = 0;
       Object.keys(humans.enemies).filter(a => humans.enemies[a].status >= 1).forEach(a => {
@@ -4211,7 +3996,7 @@ async function killedCheck(){
       document.querySelector('#battleArea').style.display = 'none';
       document.querySelector('#overfieldArea').style.display = 'block';
       
-      objMap[MAPy][MAPx] = 0;//戦利品的な何かにしてもいいかも..いやなし
+      objmap[MAPy][MAPx] = 0;//戦利品的な何かにしてもいいかも..いやなし
       draw()
       movable = 1;
       return 'end';
@@ -4221,14 +4006,14 @@ async function killedCheck(){
          return Player.status == 0 || Player.status == 2;
       })
       if(isZemetu){
-         let saydefeats = [`${humans.players[1].name}は力尽きた...残念でしたね！にはははは〜！`, '残念だったね!すごい惜しかったね!!', 'あ、あれ..？もう負けちゃったんですか....？', 'ほら、負けを認めてください？'];
-         if(humans.players[1].level < 3)saydefeats = ['あはは..負けちゃいましたね....防御力を上げると楽ですよ!', 'あはは..負けちゃいましたね....double slashは運要素も少ないので強いですよ!', 'あはは..負けちゃいましたね....魔法にターン数制限はありません!いっぱい使っちゃいましょう!', 'あはは..負けちゃいましたね....mechanicは防御全振りで戦うと良いですよ!', 'あれ〜？負けちゃったんですか〜？？おにいさんよわいね〜？？'];
+         let saydefeats = [`${humans.players[0].name}は力尽きた...残念でしたね！にはははは〜！`, '残念だったね!すごい惜しかったね!!', 'あ、あれ..？もう負けちゃったんですか....？', 'ほら、負けを認めてください？'];
+         if(humans.players[0].level < 3)saydefeats = ['あはは..負けちゃいましたね....防御力を上げると楽ですよ!', 'あはは..負けちゃいましたね....double slashは運要素も少ないので強いですよ!', 'あはは..負けちゃいましたね....魔法にターン数制限はありません!いっぱい使っちゃいましょう!', 'あはは..負けちゃいましたね....mechanicは防御全振りで戦うと良いですよ!', 'あれ〜？負けちゃったんですか〜？？おにいさんよわいね〜？？'];
          
          await addtext(arraySelect(saydefeats));
 
          Object.keys(humans.players).filter(a => humans.players[a].status == 1||humans.players[a].status == 2).forEach(nanka => {
             humans.players[nanka].status = 1;
-            humans.players[nanka].health = Math.floor(humans.players[nanka].maxhealth*0.5);
+            humans.players[nanka].hp = Math.floor(humans.players[nanka].maxhp*0.5);
          })
 
          bossbattlenow = 0;
@@ -4275,8 +4060,7 @@ async function EnemyAppear(){
       tekiou();
    }
    tekiou();
-   logOOmoto.style.right = '0px';
-   logOpener.textContent = '>';
+   log_open('o')
    await addtext(`${humans.enemies[1].name}が現れた!`);
    
    // bar-create
@@ -4309,7 +4093,7 @@ function DesideEnemyName(target){
    enemy.defense = enemydef;
    enemy.mattack = enemymatk;
    enemy.mdefense = enemymdef;
-   enemy.maxhealth = enemyhp;
+   enemy.maxhp = enemyhp;
    enemy.maxmp = enemymp;
    enemy.critlate = enemycrla;
    enemy.critdmg = enemycrdm;
@@ -4332,7 +4116,7 @@ function DesideEnemyName(target){
    enemy.ns = 'null';
    enemy.ps = 'null';
 
-   let statuses = ['attack','defense','mattack','mdefense','maxhealth','maxmp','critlate','critdmg','critresist','speed'];
+   let statuses = ['attack','defense','mattack','mdefense','maxhp','maxmp','critlate','critdmg','critresist','speed'];
    statuses.forEach(statu => {
       if(nameData[statu].startsWith('+') || nameData[statu].startsWith('-')){
          let num = Number(nameData[statu].slice(1));
@@ -4348,11 +4132,12 @@ function DesideEnemyName(target){
    enemy.prefixe = '';
    let prefixe = arraySelect(Object.keys(Prefixes));
    if(Math.floor(Math.random() * 5) == 0){
+      console.log(Prefixes[prefixe].name, 'enemies', target);
       enemy.prefixe = Prefixes[prefixe].name;
-      Prefixes[prefixe].process('enemies',target);
+      Prefixes[prefixe].process('enemies', target);
    };
 
-   enemy.health = enemy.maxhealth;
+   enemy.hp = enemy.maxhp;
    enemy.mp = enemy.maxmp;
    return enemy;
 }
@@ -4387,9 +4172,9 @@ async function testEnemyAppear(){
    enemy.defense = 0;
    enemy.mattack = 10;
    enemy.mdefense = 0;
-   enemy.maxhealth = 50;
+   enemy.maxhp = 50;
    enemy.maxmp = 50;
-   enemy.health = 50;
+   enemy.hp = 50;
    enemy.maxmp = 50;
    enemy.critlate = 3;
    enemy.critdmg = 1.25;
@@ -4417,23 +4202,23 @@ async function testEnemyAppear(){
    row.appendChild(level);
    border.appendChild(row);
 
-   let health = document.createElement('div');
-   health.className = 'health';
+   let hp = document.createElement('div');
+   hp.className = 'hp';
 
-   let healthNum = document.createElement('div');
-   healthNum.className = 'num';
-   healthNum.textContent = `${enemy.health}/${enemy.maxhealth}`;
-   health.appendChild(healthNum);
+   let hpNum = document.createElement('div');
+   hpNum.className = 'num';
+   hpNum.textContent = `${enemy.hp}/${enemy.maxhp}`;
+   hp.appendChild(hpNum);
 
-   let healthBar = document.createElement('div');
-   healthBar.className = 'bar';
+   let hpBar = document.createElement('div');
+   hpBar.className = 'bar';
 
-   let healthBarInner = document.createElement('div');
-   healthBarInner.className = 'inner';
-   healthBarInner.style.width = `${(enemy.health / enemy.maxhealth) * 100}%`;
-   healthBar.appendChild(healthBarInner);
-   health.appendChild(healthBar);
-   border.appendChild(health);
+   let hpBarInner = document.createElement('div');
+   hpBarInner.className = 'inner';
+   hpBarInner.style.width = `${(enemy.hp / enemy.maxhp) * 100}%`;
+   hpBar.appendChild(hpBarInner);
+   hp.appendChild(hpBar);
+   border.appendChild(hp);
 
    let mp = document.createElement('div');
    mp.className = 'mp';
@@ -4474,8 +4259,7 @@ async function testEnemyAppear(){
    document.querySelector('#enemies').appendChild(enemyDiv);
 
    tekiou();
-   logOOmoto.style.right = '0px';
-   logOpener.textContent = '>';
+   log_open('o')
    await addtext(`これは縺代▽縺ｰ繧だ！`);//訳:けつばん
    
    // bar-create
@@ -4501,21 +4285,21 @@ function makeNewPlayer(num){
    let main = document.createElement('div');
    main.className = 'main';
 
-if(num !== 't'){
-   let skill = document.createElement('div');
-   skill.className = 'skill';
+   if(player.id != 'turret'){
+      let skill = document.createElement('div');
+      skill.className = 'skill';
 
-   let skillBack = document.createElement('img');
-   skillBack.className = 'back';
-   skillBack.src = `assets/skills/${player.ex}.png`;
-   skill.appendChild(skillBack);
+      let skillBack = document.createElement('img');
+      skillBack.className = 'back';
+      skillBack.src = `assets/skills/${player.ex}.png`;
+      skill.appendChild(skillBack);
 
-   let skillGauge = document.createElement('div');
-   skillGauge.className = 'gauge';
-   skillGauge.style.height = `${player.ep / player.maxep * 100}%`;
-   skill.appendChild(skillGauge);
-   main.appendChild(skill);
-}
+      let skillGauge = document.createElement('div');
+      skillGauge.className = 'gauge';
+      skillGauge.style.height = `${player.ep / player.maxep * 100}%`;
+      skill.appendChild(skillGauge);
+      main.appendChild(skill);
+   }
 
    let img = document.createElement('img');
    img.className = 'img';
@@ -4541,24 +4325,24 @@ if(num !== 't'){
    row.appendChild(level);
    border.appendChild(row);
 
-   let health = document.createElement('div');
-   health.className = 'health';
+   let hp = document.createElement('div');
+   hp.className = 'hp';
 
-   let healthNum = document.createElement('div');
-   healthNum.className = 'num';
-   healthNum.textContent = `${player.health}/${player.maxhealth}`;
-   health.appendChild(healthNum);
+   let hpNum = document.createElement('div');
+   hpNum.className = 'num';
+   hpNum.textContent = `${player.hp}/${player.maxhp}`;
+   hp.appendChild(hpNum);
 
-   let healthBar = document.createElement('div');
-   healthBar.className = 'bar';
+   let hpBar = document.createElement('div');
+   hpBar.className = 'bar';
 
-   let healthBarInner = document.createElement('div');
-   healthBarInner.className = 'inner';
-   healthBarInner.style.width = `${(player.health / player.maxhealth) * 100}%`; //tekiouで色とか変えるようにしといて
-   healthBarInner.style.backgroundColor = '#ff0000';
-   healthBar.appendChild(healthBarInner);
-   health.appendChild(healthBar);
-   border.appendChild(health);
+   let hpBarInner = document.createElement('div');
+   hpBarInner.className = 'inner';
+   hpBarInner.style.width = `${(player.hp / player.maxhp) * 100}%`; //tekiouで色とか変えるようにしといて
+   hpBarInner.style.backgroundColor = '#ff0000';
+   hpBar.appendChild(hpBarInner);
+   hp.appendChild(hpBar);
+   border.appendChild(hp);
 
    let mp = document.createElement('div');
    mp.className = 'mp';
@@ -4609,23 +4393,23 @@ function makeNewEnemy(num){
    row.appendChild(level);
    border.appendChild(row);
 
-   let health = document.createElement('div');
-   health.className = 'health';
+   let hp = document.createElement('div');
+   hp.className = 'hp';
 
-   let healthNum = document.createElement('div');
-   healthNum.className = 'num';
-   healthNum.textContent = `${enemy.health}/${enemy.maxhealth}`;
-   health.appendChild(healthNum);
+   let hpNum = document.createElement('div');
+   hpNum.className = 'num';
+   hpNum.textContent = `${enemy.hp}/${enemy.maxhp}`;
+   hp.appendChild(hpNum);
 
-   let healthBar = document.createElement('div');
-   healthBar.className = 'bar';
+   let hpBar = document.createElement('div');
+   hpBar.className = 'bar';
 
-   let healthBarInner = document.createElement('div');
-   healthBarInner.className = 'inner';
-   healthBarInner.style.width = `${(enemy.health / enemy.maxhealth) * 100}%`;
-   healthBar.appendChild(healthBarInner);
-   health.appendChild(healthBar);
-   border.appendChild(health);
+   let hpBarInner = document.createElement('div');
+   hpBarInner.className = 'inner';
+   hpBarInner.style.width = `${(enemy.hp / enemy.maxhp) * 100}%`;
+   hpBar.appendChild(hpBarInner);
+   hp.appendChild(hpBar);
+   border.appendChild(hp);
 
    let mp = document.createElement('div');
    mp.className = 'mp';
@@ -4706,13 +4490,13 @@ async function BossEnemyAppear(){
    playermp = playermaxmp;
    playerpower = 1;playershell = 1;
    if(playerps == 'enemy50%pursuit'){enemy50pursuitenelgy = 1;};
-   humans.enemies[me].health = humans.enemies[me].health; document.querySelector('#EnemyMaxHealth').textContent = humans.enemies[me].health; tekiou();
+   humans.enemies[me].hp = humans.enemies[me].hp; document.querySelector('#EnemyMaxHealth').textContent = humans.enemies[me].hp; tekiou();
    if (enemylevel < 1){enemylevel = 1}
    humans.enemies[me].name = bossenemies[me].names[stage-1]; //敵の名前を決めます
    switch(humans.enemies[me].name){//ボスごとのステータスを決めます
       case 'purpleslime':
-         humans.enemies[me].health = 300;
-         humans.enemies[me].health = humans.enemies[me].health;
+         humans.enemies[me].hp = 300;
+         humans.enemies[me].hp = humans.enemies[me].hp;
          humans.enemies[me].attack = 30;
          humans.enemies[me].defense = 10;
          humans.enemies[me].mdefense = 0;
@@ -4721,8 +4505,8 @@ async function BossEnemyAppear(){
          humans.enemies[me].critresist = 0.5;
       break;
       case 'steampumker':
-         humans.enemies[me].health = 250;
-         humans.enemies[me].health = humans.enemies[me].health;
+         humans.enemies[me].hp = 250;
+         humans.enemies[me].hp = humans.enemies[me].hp;
          humans.enemies[me].attack = 25;
          humans.enemies[me].defense = 10;
          humans.enemies[me].mdefense = 20;
@@ -4731,8 +4515,8 @@ async function BossEnemyAppear(){
          humans.enemies[me].critresist = 0;
       break;
       case 'RailwayGun "Shemata"':
-         humans.enemies[me].health = 400;
-         humans.enemies[me].health = humans.enemies[me].health;
+         humans.enemies[me].hp = 400;
+         humans.enemies[me].hp = humans.enemies[me].hp;
          humans.enemies[me].attack = 35;
          humans.enemies[me].defense = 20;
          humans.enemies[me].mdefense = 0;
@@ -4757,7 +4541,7 @@ async function bossenemyturn(){
       //2:攻撃(シンプル)
       //3:相手を毒に(2ターン)
       //if(max0.3>)[確定]防御力down1(討伐まで有効)
-      if(humans.enemies[me].health <= humans.enemies[me].health * 0.3){await buffadd(cam,me,'shelldown','turn',1,1);}
+      if(humans.enemies[me].hp <= humans.enemies[me].hp * 0.3){await buffadd(cam,me,'shelldown','turn',1,1);}
       switch(Math.floor(Math.random()*4)+1){
          case 1:
          case 2:
@@ -4792,14 +4576,14 @@ async function bossenemyturn(){
       //
       //
       //
-      playerhealth = 0;
+      playerhp = 0;
       log.textContent = 'しーんだしんだ、シリウスブラ〜ック!';
       defeat();//いや雑にもほどがあるやろ
    }else if(humans.enemies[me].name == 'joker'){
       //1:爆弾を投げる。普通(x1),雷(x2),炎(x3),閃光弾(x0.5,スタン1)
       //if(max0.25>):勝ち気(攻撃が0倍か4倍になる)を付与(毎ターン)
       x = 1;
-      if(humans.enemies[me].health <= humans.enemies[me].health * 0.25){x = [0,4];x = x[Math.floor(Math.random()*2)]};
+      if(humans.enemies[me].hp <= humans.enemies[me].hp * 0.25){x = [0,4];x = x[Math.floor(Math.random()*2)]};
       y = Math.floor(Math.random() * 4);
       switch(y){
          case 1:log.textContent = '普通の爆弾だった!!';break;//これによる効果とかもあっていいかも
@@ -4811,8 +4595,8 @@ async function bossenemyturn(){
       await humandamaged('players',me,targetselect,x*y,0);
    }
    await enemycontidmg(me);
-   if(humans.enemies[me].health < 0){humans.enemies[me].health = 0};
-   if(humans.enemies[me].health == 0){window.setTimeout(killed, 1000)}
+   if(humans.enemies[me].hp < 0){humans.enemies[me].hp = 0};
+   if(humans.enemies[me].hp == 0){window.setTimeout(killed, 1000)}
    else {
       await delay(1000);
       return 'alive';
@@ -4828,9 +4612,9 @@ function EnemyTurrettekiou(){
 //#region 休憩所の動き
 let Camprestper
   async function Camprest(){
-   playerhealth += playermaxhealth * Camprestper;
-   playerhealth = Math.floor(playerhealth);
-   if(playerhealth > playermaxhealth){playerhealth = playermaxhealth;};
+   playerhp += playermaxhp * Camprestper;
+   playerhp = Math.floor(playerhp);
+   if(playerhp > playermaxhp){playerhp = playermaxhp;};
    log.textContent = '寝ることにした....';//睡眠阻害イベント..とかありでは？
    await delay(2000);
    log.textContent = '起きた！！！！！！！';
@@ -4840,7 +4624,7 @@ let Camprestper
    document.querySelector('#battleArea').style.display = 'none';
    document.querySelector('#overfieldArea').style.display = 'block';
    
-   objMap[MAPy][MAPx] = 4;
+   objmap[MAPy][MAPx] = 4;
    draw()
    movable = 1;
   }
@@ -4883,12 +4667,12 @@ function ShopBuyButton(){
       if(haveweapons.includes(weapons.name[num])){
          log.textContent = 'you already have a it!';
       }else{
-         if(stone >= weapons.price[num]){
-            stone -= weapons.price[num];
+         if(valorimar >= weapons.price[num]){
+            valorimar -= weapons.price[num];
             haveweapons.push(weapons.name[num]);
             log.textContent = weapons.name[num]+'を購入しました!';
          }else{
-            log.textContent = 'not enough stone..';
+            log.textContent = 'not enough valorimar..';
          };
       }
       break;
@@ -4896,12 +4680,12 @@ function ShopBuyButton(){
       if(haveweapons.includes(rareweapons.name[num])){
          log.textContent = 'you already have a it!';
       }else{
-         if(stone >= rareweapons.price[num]){
-            stone -= rareweapons.price[num];
+         if(valorimar >= rareweapons.price[num]){
+            valorimar -= rareweapons.price[num];
             haveweapons.push(rareweapons.name[num]);
             log.textContent = rareweapons.name[num]+'を購入しました!';
          }else{
-            log.textContent = 'not enough stone..';
+            log.textContent = 'not enough valorimar..';
          };
       }
       break;
@@ -4909,22 +4693,22 @@ function ShopBuyButton(){
       if(havearmors.includes(armors.name[num])){
          log.textContent = 'you already have a it!';
       }else{
-         if(stone >= armors.price[num]){
-            stone -= armors.price[num];
+         if(valorimar >= armors.price[num]){
+            valorimar -= armors.price[num];
             havearmors.push(armors.name[num]);
             log.textContent = armors.name[num]+'を購入しました!';
          }else{
-            log.textContent = 'not enough stone..';
+            log.textContent = 'not enough valorimar..';
          };
       }
       break;
       case 3:
-      if(stone >= tools.price[num]){
-         stone -= tools.price[num];
+      if(valorimar >= tools.price[num]){
+         valorimar -= tools.price[num];
          eval(tools.id[num]).num++;
          log.textContent = tools.name[num]+'を購入しました!';
       }else{
-         log.textContent = 'not enough stone..';
+         log.textContent = 'not enough valorimar..';
       };
       break;
    }
@@ -5000,11 +4784,11 @@ function GoToEquipTool(){
    nowshop = 6;
    
    document.querySelector('#eventArea').innerHTML = '<iframe src="resources/appeartools.html" width="100%" height="100%" frameborder="0"></iframe><br><div id="Camptoolequip"><button id="Campequipedtool1" class="button" onclick="Campequiptool(1)"> </button>　<button id="Campequipedtool2" class="button" onclick="Campequiptool(2)"> </button>　<button id="Campequipedtool3" class="button" onclick="Campequiptool(3)"> </button></div><br><br><button class="button" onclick="GoToEquip()">Back</button>'; //持ってないやつも登録できるようにしたら処理楽かな？
-   document.querySelector('#Campequipedtool1').textContent = humans.players[1].tool1.name;
-   document.querySelector('#Campequipedtool2').textContent = equiptool2.name;
-   document.querySelector('#Campequipedtool3').textContent = equiptool3.name;
+   document.querySelector('#Campequipedtool1').textContent = humans.players[0].tool1.name;
+   document.querySelector('#Campequipedtool2').textContent = humans.players[0].tool2.name;
+   document.querySelector('#Campequipedtool3').textContent = humans.players[0].tool3.name;
    log.textContent = 'どうしようかな...?';
-   }
+}
 function Campequiptool(code){
    x = code;
    log.textContent = '何を持とう？';
@@ -5019,11 +4803,11 @@ function Campequiptool(code){
       c.classList.add('button');
       c.addEventListener('click', () => {
          document.querySelector('#toolsdesuwa').remove();
-         humans.players[1].tool1[code] = Tools[nanka].id;
+         humans.players[0].tool1[code] = Tools[nanka].id;
          document.querySelector('#Camptoolequip').innerHTML = '<button id="Campequipedtool1" class="button" onclick="Campequiptool(1)"> </button>　<button id="Campequipedtool2" class="button" onclick="Campequiptool(2)"> </button>　<button id="Campequipedtool3" class="button" onclick="Campequiptool(3)"> </button>';
-         document.querySelector('#Campequipedtool1').textContent = humans.players[1].tool1.name;
-         document.querySelector('#Campequipedtool2').textContent = humans.players[1].tool2.name;
-         document.querySelector('#Campequipedtool3').textContent = humans.players[1].tool3.name;
+         document.querySelector('#Campequipedtool1').textContent = humans.players[0].tool1.name;
+         document.querySelector('#Campequipedtool2').textContent = humans.players[0].tool2.name;
+         document.querySelector('#Campequipedtool3').textContent = humans.players[0].tool3.name;
          log.textContent = Tools[nanka].name+'を持つことにした！';
       })
       x.push(c);
@@ -5081,18 +4865,18 @@ function Campequiptool(code){
    
    document.querySelector('#overfieldArea').style.display = 'block';
    
-   objMap[MAPy][MAPx] = 0;
+   objmap[MAPy][MAPx] = 0;
    draw()
    movable = 1;
   }
 
   function BuyItem(type,id,name,price) {
-   if(stone >= price){
-     stone -= price;
-     humans.players[1][type][id] = id;
+   if(valorimar >= price){
+     valorimar -= price;
+     humans.players[0][type][id] = id;
      log.textContent = name + 'を購入しました！';
    }else{
-     log.textContent = 'not enough stone...';
+     log.textContent = 'not enough valorimar...';
    }
    updateUI();
   }
@@ -5112,18 +4896,18 @@ let Events = {
          log.textContent = 'あめを食べた..';await delay(500);
          
          let changeyousos = [
-            ['attack','defense','maxhealth'],
+            ['attack','defense','maxhp'],
             ['攻撃力','防御力','体力'],
             [Math.floor(Math.random()*4)+2,Math.floor(Math.random()*4)+2,Math.floor(Math.random()*10)+5]
          ];
 
          if(Math.floor(Math.random()*3) == 0){
             let numm = Math.floor(Math.random()*3);
-            humans.players[1][changeyousos[0][numm]] += changeyousos[2][numm];
+            humans.players[0][changeyousos[0][numm]] += changeyousos[2][numm];
             log.textContent = changeyousos[1][numm]+'が上がった！';
          }else{
             let numm = Math.floor(Math.random()*3);
-            humans.players[1][changeyousos[0][numm]] -= changeyousos[2][numm];
+            humans.players[0][changeyousos[0][numm]] -= changeyousos[2][numm];
             log.textContent = changeyousos[1][numm]+'が下がった！';
          }
       }
@@ -5139,31 +4923,31 @@ async function Candytake(){
    candybar.push(candynum);
    switch(Math.floor(Math.random()*3)+1){
       case 1:
-         humans.players[1].attack += Math.floor(Math.random() * 3) + 2;
+         humans.players[0].attack += random(1,4);
          log.textContent = '攻撃力が上がった！';
          break;
       case 2:
-         humans.players[1].defense += Math.floor(Math.random() * 3) + 1;if(humans.players[1].defense < 0){humans.players[1].defense = 0};
+         humans.players[0].defense += random(1,4);if(humans.players[0].defense < 0){humans.players[0].defense = 0};
          log.textContent = '防御力が上がった！';
          break;
       case 3:
-         humans.players[1].maxhealth += Math.floor(Math.random() * 5) + 5;
+         humans.players[0].maxhp += random(5,15);
          log.textContent = '体力が増えた！';
          break;
    };
    }else{
-      switch(Math.floor(Math.random()*3)+1){
+      switch(random(1,3)){
          case 1:
-            humans.players[1].attack -= Math.floor(Math.random() * 13) + 5;if(humans.players[1].attack < 1){humans.players[1].attack = 1};
+            humans.players[0].attack -= random(5,18);if(humans.players[0].attack < 1){humans.players[0].attack = 1};
             log.textContent = '攻撃力が下がった！';
             break;
          case 2:
-            humans.players[1].defense -= Math.floor(Math.random() * 10) + 3;if(humans.players[1].defense < 0){humans.players[1].defense = 0};
+            humans.players[0].defense -= random(3,12);if(humans.players[0].defense < 0){humans.players[0].defense = 0};
             log.textContent = '防御力が下がった！';
             break;
          case 3:
-            humans.players[1].maxhealth -= Math.floor(Math.random() * 21) + 10;if(humans.players[1].maxhealth < 1){humans.players[1].maxhealth = 1};
-            if(humans.players[1].health > humans.players[1].maxhealth){humans.players[1].health = humans.players[1].maxhealth};
+            humans.players[0].maxhp -= random(10,30);if(humans.players[0].maxhp < 1){humans.players[0].maxhp = 1};
+            if(humans.players[0].hp > humans.players[0].maxhp){humans.players[0].hp = humans.players[0].maxhp};
             log.textContent = '体力が減った！';
             break;
       };
@@ -5188,7 +4972,7 @@ async function HopeButtonact(){
    
    document.querySelector('#overfieldArea').style.display = 'block';
    
-   objMap[MAPy][MAPx] = 0;
+   objmap[MAPy][MAPx] = 0;
    draw()
    movable = 1;
 }
@@ -5225,7 +5009,7 @@ async function OpenChest(code){
    document.querySelector('#battleArea').style.display = 'none';
    document.querySelector('#overfieldArea').style.display = 'block';
    
-   objMap[MAPy][MAPx] = 0;
+   objmap[MAPy][MAPx] = 0;
    draw()
    movable = 1;
 }
@@ -5237,24 +5021,24 @@ async function Cookietake(){
    await delay(1000);
    switch(Math.floor(Math.random()*3)+1){
       case 1:
-         humans.players[1].attack += 5 ;
+         humans.players[0].attack += 5 ;
          x = '熱い！焼きたてだぜ！！';
          break;
       case 2:
-         humans.players[1].defense += 5;
+         humans.players[0].defense += 5;
          x = '硬い！凍ってたかもしんねぇ！！';
          break;
       case 3:
-         humans.players[1].maxhealth += 20;
-         humans.players[1].health = humans.players[1].maxhealth;
+         humans.players[0].maxhp += 20;
+         humans.players[0].hp = humans.players[0].maxhp;
          x = 'うまい！！';//体力増える..の味が思いつかなすぎた これはしゃーない 煉獄さん
          break;
       case 4:
-         humans.players[1].maxmp += 10;
+         humans.players[0].maxmp += 10;
          x = '甘い！砂糖マシマシだー！！';
          break;
       case 5:
-         humans.players[1].critdmg += 0.1;//当たり枠(会心ダメージ増加はぶっ壊れてる..たぶん)
+         humans.players[0].critdmg += 0.1;//当たり枠(会心ダメージ増加はぶっ壊れてる..たぶん)
          x = 'はっ..!?これは....ジャム入りだ.....!!!!';//ちなみにコッペくんはジャムが上に乗ったタルト生地のクッキーが好物です マカロンと張るくらい好き
          break;
    }
@@ -5265,7 +5049,7 @@ async function Cookietake(){
    document.querySelector('#battleArea').style.display = 'none';
    document.querySelector('#overfieldArea').style.display = 'block';
    
-   objMap[MAPy][MAPx] = 0;
+   objmap[MAPy][MAPx] = 0;
    draw()
    movable = 1;
 }
@@ -5283,7 +5067,7 @@ let PlacedBombx = 0;
 let PlacedBomby = 0;
 
 async function placebomb(){
-   objMap[MAPy][MAPx] = 15;
+   objmap[MAPy][MAPx] = 15;
    bombtimer = 5;
    PlacedBombx = MAPx;
    PlacedBomby = MAPy;
@@ -5292,10 +5076,12 @@ async function placebomb(){
 //#endregion
 //#region catus
 async function CatusAct(){
-   if(humans.players[1].health > 10){
+   if(humans.players[0].hp > 10){
       log.textContent = 'いてっ';
-      humans.players[1].health -= 10;humans.players[1].attack += 5;if(stage == 3){humans.players[1].health -= 10;humans.players[1].attack += 5;}
-      objMap[MAPy][MAPx] = 0;
+      humans.players[0].hp -= 10;
+      humans.players[0].attack += 5;
+      if(stage == 3) humans.players[0].hp -= 10, humans.players[0].attack += 5;
+      objmap[MAPy][MAPx] = 0;
    }else{
       log.textContent = 'なんか..今触ったら死にそう....'
    }
@@ -5311,7 +5097,7 @@ async function ScorpionAct(code){
       case 2:await buffadd('playerbuff','poison','turn',3,2);break;
    }
    playerattack += 10*code;
-   objMap[MAPy][MAPx] = 0;
+   objmap[MAPy][MAPx] = 0;
    await delay(500);
    
 }
@@ -5326,7 +5112,7 @@ function ZomuEvent(){//創生黎明の原野
    playerps = 'solx5but'//slashoflightを使った際、当たれば5倍だが、外れれば自分にダメージを与える。
    buttonsolid = '#000000';buttonback = '#50C878';
    document.querySelector('#ButtonStyle').textContent = `.button{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};cursor: pointer;}input[type="text"]:focus{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};}`;
-   objMap[MAPy][MAPx] = 0;
+   objmap[MAPy][MAPx] = 0;
    draw()
    movable = 1;
 }
@@ -5338,7 +5124,7 @@ function UtusenEvent(){
    playerps = 'reverseta';//逆TA(相手より体力がめちゃ低いとダメージを喰らわない)
    buttonsolid = '#4c6cb3';buttonback = '#949495';
    document.querySelector('#ButtonStyle').textContent = `.button{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};cursor: pointer;}input[type="text"]:focus{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};}`;
-   objMap[MAPy][MAPx] = 0;
+   objmap[MAPy][MAPx] = 0;
    draw()
    movable = 1;
 }
