@@ -422,16 +422,16 @@ let Slashs = {
     lv:1,
     tcam:'players',
     process:async function(cam,me,tcam,target){
-        let result = await humandamaged(cam,me,tcam,target,1,'sh',1);
-        if(result == 'dead'){return 'dead';}
+        let result = await humandamaged(cam,me,tcam,target,100,'sh',1);
+        if(result) return 1;
 
         //elseesに移行よろ
         if(humans[cam][me].ps == 'sthree' && probability(25)){
           await addtext(`${get(cam, me).name}は頑張った!`);
-          result = await humandamaged(cam,me,tcam,target,1,'sh',1);
-          if(result == 'dead'){return 'dead';}
-          result = await humandamaged(cam,me,tcam,target,1,'sh',1);
-          if(result == 'dead'){return 'dead';}
+          result = await humandamaged(cam,me,tcam,target,100,'sh',1);
+          if(result) return 1;
+          result = await humandamaged(cam,me,tcam,target,100,'sh',1);
+          if(result) return 1;
         }
         return 0;
     }
@@ -446,13 +446,13 @@ let Slashs = {
     process:async function(cam,me,tcam,target){
         if(probability(67)){//端数切り上げは許してくれ
           let result = await humandamaged(cam,me,tcam,target,1,'sh',2);
-          if(result == 'dead') return 'dead';
+          if(result) return 1;
         }else{
           addlog('miss!');
         }
         if(probability(67)){
           let result = await humandamaged(cam,me,tcam,target,1,'sh',2);
-          if(result == 'dead') return 'dead';
+          if(result) return 1;
         }else{
           addlog('miss!');
         }
@@ -467,17 +467,17 @@ let Slashs = {
     lv:1,
     tcam:'players',
     process:async function(cam,me,tcam,target){
-        let attacker = humans[cam][me];
+        let who = humans[cam][me];
         let pro = 33;
-        if(attacker.ps == 'highsol') pro = 20;
-        x = probability(pro) ? 1 : 0;
+        if(who.ps == 'highsol') pro = 20;
 
-        if(x == 1){
-          let result = await humandamaged(cam,me,tcam,target,3,'sh',3);
-          if(result == 'dead'){return 'dead';}
+        let result = 0;
+        if(probability(pro)){
+          result = await humandamaged(cam,me,tcam,target,300,'sh',3);
+          if(result) return dead;
         }else{
           //let result = letsHappen(tcam, target, cam, me, 'missed', 'sl', 'slashoflight');
-          /*if(attacker.ps != 'solx5but'){
+          /*if(who.ps != 'solx5but'){
               log.textContent = 'miss! ダメージを与えられない!';
               await delay(1000);
           }else{
@@ -502,13 +502,9 @@ let Magics = {
     mp:4,
     lv:1,
     process:async function(cam,me,tcam,target){
-        let attacker = humans[cam][me];
-        let defender = humans[tcam][target];
-        await addtext(`${player.name}はhealを唱えた！`)
-        x = Math.round(defender.maxhp * 0.2);
-        if((x + defender.hp) > defender.maxhp) x = defender.maxhp - defender.hp;
-        defender.hp += x;
-        addlog(`${defender.name}はHPを${x}回復！`)
+        await addtext(`${who.name}はhealを唱えた！`)
+        await heal(who, tag, '20%', add)
+        
         return 0;
     }
   },
@@ -519,11 +515,10 @@ let Magics = {
     mp:5,
     lv:1,
     process:async function(cam,me,tcam,target){
-        let attacker = humans[cam][me]
-        await addtext(`${attacker.name}はpowerを唱えた！`)
-        await buffadd(tcam,target,'powerup','turn',3,1);
-        await letsElseed(tcam, target, cam, me, 'magic', 'power'); //読み方はワザップです
-        //soldatoのシステム応用しつつ、受けと攻めの順に変更よろっぷ
+        await addtext(`${who.name}はpowerを唱えた！`)
+        await buffadd(tag,'powerup','turn',3,1);
+        await letsElseed(tag, who, 'magic', 'power'); //読み方はワザップです
+        //soldatoのシステム応用しつつで
         return 0;
     }
   },
@@ -534,8 +529,8 @@ let Magics = {
     mp:5,
     lv:1,
     process:async function(cam,me,tcam,target){
-        await addtext(`${humans[cam][me].name}はshellを唱えた!`);
-        await buffadd(tcam,target,'shellup','turn',3,1);
+        await addtext(`${who.name}はshellを唱えた!`);
+        await buffadd(tag,'shellup','turn',3,1);
         await letsElseed(tcam, target, cam, me, 'magic', 'shell'); 
         return 0;
     }
@@ -547,7 +542,9 @@ let Magics = {
     mp:7,
     lv:3,
     process:async function(cam,me,tcam,target){
-        await addtext(`${humans[cam][me].name}はpoisonを唱えた!`);
+        let who = get(can,me);
+        let tag;
+        await addtext(`${who.name}はpoisonを唱えた!`);
         await buffadd(tcam,target,'poison','turn',4,1);
         await letsElseed(tcam, target, cam, me, 'buff', 'poison'); 
         return 0;
@@ -556,7 +553,7 @@ let Magics = {
   'thundee':{
     id:'thundee',
     name:'サンディ',
-    description:'牽制に使われがち。<br>吹っ飛び率は低め。(雷の小ダメージ)',
+    description:'牽制に使われがち',
     mp:3,
     lv:4,
     process:async function(cam,me,tcam,target){
@@ -568,14 +565,15 @@ let Magics = {
   'garva':{
     id:'garva',
     name:'ガーヴァ',
-    description:'濁点多いと強そうだよね<br>今ならなんと火傷も付いてきます',
+    description:'濁点多いと強そうだよね<br>まれに火傷も',
     mp:4,
     lv:4,
     process:async function(cam,me,tcam,target){
         await addtext(`${humans[cam].name}はガーヴァを唱えた！`);
         let result = await humandamaged(cam,me,tcam,target,1.1,'mg',2);//火
-        await buffadd(tcam,target,'burn','turn',2,1);
-        return result
+        if(result) return 1;
+        if(probability(10)) await buffadd(tcam,target,'burn','turn',2,1);
+        return 0;
     }
   },
   'healerthan':{
@@ -585,13 +583,9 @@ let Magics = {
     mp:8,
     lv:6,
     process:async function(cam,me,tcam,target){
-        let attacker = humans[cam][me];
-        let defender = humans[tcam][target];
-        await addtext(`${player.name}はhealを唱えた！`)
-        x = Math.round(defender.maxhp * 0.4);
-        if((x + defender.hp) > defender.maxhp) x = defender.maxhp - defender.hp;
-        defender.hp += x;
-        addlog(`${defender.name}はHPを${x}回復！`)
+        let who = humans[cam][me];
+        let tag = humans[tcam][target];
+        await heal(who, tag, '40%', 'add')
         return 0;
     }
   },
@@ -603,14 +597,14 @@ let Magics = {
     lv:7,
     process:async function(cam,me,tcam,target){
         await buffadd(tcam,target,'luck','turn',4,1);
-        addtext(`${humans[cam][me].name}はを唱えた!`);
+        addtext(`${who.name}はを唱えた!`);
         return 0;
     }
   },
-  'gigathunder':{
-    id:'gigathunder',
-    name:'thundlos',
-    description:'ギガサンダー出そうとしてたまに出るやつ。そこそこつよい。(雷の中ダメージ)',
+  'サンドス':{
+    id:'thundos',
+    name:'サンドス',
+    description:'二段目。',
     mp:8,
     lv:8,
     process:async function(cam,me,tcam,target){
@@ -1231,14 +1225,14 @@ let Tools = {
     description:'リバースを召喚！このカードは相手と自分の体力を交換する！！割合だ！！！！',
     num:0,
     process:async function(cam,me,tcam,target){
-        let attacker = humans[cam][me];
-        let defender = humans[tcam][target]
-        x = attacker.hp/attacker.maxhp*defender.hp;//割合交換(そのうちゲージにする時用)
-        y = defender.hp/defender.hp*attacker.maxhp;
-        defender.hp = x;
-        if(defender.hp < defender.hp){defender.hp = defender.hp;}
-        attacker.hp = y;
-        if(attacker.maxhp < attacker.hp){attacker.hp = humans.players[me].maxhp;}
+        let who = humans[cam][me];
+        let tag = humans[tcam][target]
+        x = who.hp/who.maxhp*tag.hp;//割合交換(そのうちゲージにする時用)
+        y = tag.hp/tag.hp*who.maxhp;
+        tag.hp = x;
+        if(tag.hp < tag.hp){tag.hp = tag.hp;}
+        who.hp = y;
+        if(who.maxhp < who.hp){who.hp = humans.players[me].maxhp;}
         tekiou();
         await addtext('これはリバースのモニュメントか？');
         return 'alive';
@@ -1979,8 +1973,8 @@ let Prefixes = {
       humans[cam][me].maxhp = Math.floor(humans[cam][me].maxhp*2.0);
     },
   },
-  'defender':{
-    id:'defender',
+  'tag':{
+    id:'tag',
     name:'守りが固い',
     rare:2,
     process:function(cam,me){
@@ -2247,15 +2241,120 @@ let NanigaOkirukana = {
 }
 
 //#region 移行よろ
-function get(cam = '指定なし', me = '指定なし'){
-  if(cam == '指定なし' && me == '指定なし') cam = 'players', me = 0;
-  
-  let who;
-  if(me == '指定なし') who = humans[cam];
-  else humans[cam][me];
-  
-  return who;
+async function humandamaged(cam, me, tcams, targets, rate, kind, attributes = []){
+  if(!Array.isArray(tcams)){tcams = [tcams];}
+  if(!Array.isArray(targets)){targets = [targets];}
+  for(let i = 0; i < tcams.length; i++){
+    let tcam = tcams[i];
+    let target = targets[i];
+    //攻撃x回復o = heal 攻撃+攻撃者与ダメ回復 = absorb
+    //防御無視 = penetrate 確定会心 = crit 会心無効 = nocrit
+    //固定値 = fixed
+    console.log(attributes.includes('fixed') ? `${humans[cam][me].name}=>${humans[tcam][target].name} ${kind}で${rate}ダメージの予定！ ${attributes}` :`${humans[cam][me].name}=>${humans[tcam][target].name} ${kind}で攻撃力の${rate}倍 ${attributes}`);
+
+    let attackerOriginal = humans[cam][me];
+    let defenderOriginal = humans[tcam][target]
+
+    const stats = [
+      'attack', 'defense',
+      'power', 'shell', 'mattack', 'mdefense',
+      'critlate', 'critdmg', 'critresist'
+    ];
+
+    let attacker = {};
+    stats.forEach(stat => {
+      attacker[stat] = attackerOriginal[stat];
+    });
+
+    let defender = {};
+    stats.forEach(stat => {
+      defender[stat] = defenderOriginal[stat];
+    });
+
+    stats.forEach(stat => {
+      console.log(attacker.buffs)
+      Object.values(attacker.buffs).forEach(buff => {
+        if(buff.data.addable == false){
+          if(buff.data.effect.hasOwnProperty(stat)){
+            attacker[stat] += buff.data.effect[stat].value;
+          }
+        }else{
+          if(buff.data.effect.hasOwnProperty(stat)){
+            attacker[stat] += buff.value
+          }
+        }
+      });
+      ['weapon','armor','ear','ring','neck'].forEach(bui => {Object.values(attacker[bui]).forEach(buff => {
+          
+      })})
+
+      Object.values(defender.buffs).forEach(buff => {
+        if(buff.data.addable == false){
+          if(buff.data.effect.hasOwnProperty(stat)){
+            defender[stat] += buff.data.effect[stat].value;
+          }
+        }else{
+          if(buff.data.effect.hasOwnProperty(stat)){
+            defender[stat] += buff.value
+          }
+        }
+      })
+    });
+
+    //攻撃力
+    let damage = kind == 'sh' ? (attacker.attack * attacker.power * rate) : (attacker.mattack * attacker.power * rate);
+    if(attributes.includes('fixed')) damage = rate;
+
+    //防御力
+    if(!attributes.includes('penetrate')) damage -= kind == 'sh' ? (defender.defense * defender.shell) : (defender.mdefense * defender.shell)
+
+    //会心
+    if(isCrit(attacker.critlate, defender.critresist) && !attributes.includes('nocrit') || attributes.includes('crit')){
+      damage += (defender.defense * defender.shell);
+      damage *= attacker.critdmg;
+      await addtext('かいしんのいちげき！')
+    };
+
+    //整え
+    damage = Math.floor(damage);
+    if(defender.hp < damage) damage = defender.hp;
+    console.log(`${defender.hp} => ${defender.hp - damage} | damage:${damage}`);
+
+    //実装
+    if(!attributes.includes('heal'))
+      defender.hp -= damage;
+    else defender.hp += damage;
+
+    //ep
+    if(cam == 'players') humans[cam][me].ep += Math.floor(10 * humans[cam][me].epgain);
+
+    tekiou()
+    await addtext(`${defender.name}に${damage}のダメージ！`)
+
+    //その後
+    if(defender.hp <= 0){let result = await killed(cam,me,tcam,target);return result;}
+
+    //追撃ゾーン　ここどしよ
+    if(!attributes.includes('unpursuit')){
+      if(Weapons[attacker.weapon.id].ap){
+        let res = await Weapons[attacker.weapon.id].afterProcess(cam,me,tcam,target,rate,kind,attributes);
+        if(res == 'end'){return 'end'};
+      }
+
+      if(attacker.ps == 'enemy50%pursuit' && defender.hp <= defender.maxhp / 2 && enemy50pursuitenelgy == 1 && defender.hp > 0){
+        enemy50pursuitenelgy = 0;
+        await addtext(arraySelect(['くるくる〜っと','くるりん〜っと']));
+        let res = humandamaged(cam,me,tcam,target,0.5,'sh',['unpursuit']);
+        if(res == 'end'){return 'end'};
+      }else if(attacker.name == 'herta' && defender.hp <= defender.maxhp / 2 && attacker.level >= 10 && defender.hp > 0){//1凸効果「弱みは付け込み」
+        let res = humandamaged(cam,me,tcam,target,0.2,'sh',['unpursuit']);
+        if(res == 'end'){return 'end'};
+      }
+    }
+  }
+  return 'alive';
 }
+
 async function heal(who, tag, value, code = 'add', ...prop){
   let bh = tag.hp;
   

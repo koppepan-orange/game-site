@@ -1,9 +1,19 @@
 //#region 探索部分
 const overfieldArea = document.querySelector('#overfieldArea')
-const NowMap = document.getElementById('NowMap');
+const nowMap = document.getElementById('nowMap');
 
-const ctx = NowMap.getContext('2d');
+const ctx = nowMap.getContext('2d');
+
 const mapSize = 8;
+let mass = 0;
+function resizeCanvas(){
+   // nowMap.width = overfieldArea.offsetHeight;
+   // nowMap.height = overfieldArea.offsetHeight;
+   nowMap.width = window.innerHeight * 0.8;
+   nowMap.height = window.innerHeight * 0.8;
+   mass = window.innerHeight * 0.8 / mapSize;
+}
+
 const backmaps = [
    [
       ['b','b','b','b','b','b','b','b'],
@@ -484,14 +494,13 @@ const objmaps = [
 ];
 const obsAll = {
    '草原':[
-      {id:2,type:'e',name:'蒼白の粘液',p:35,strong:0},
-      {id:2,type:'e',name:'翠嵐の風刃',p:35,strong:0},
-      {id:2,type:'e',name:'燐光の妖花',p:35,strong:0},
-      {id:2,type:'e',name:'蒼白の粘液',p:15,strong:1},
-      {id:2,type:'e',name:'燐光の妖花',p:12,strong:1},
-      
-      {id:3,type:'o',name:'焚き火',p:25,rare:0,},//このrareは生成時に決めちゃってもいいかも
-      {id:5,type:'0',name:'スキルショップ',p:25},
+      {n:0, id:'enemy', pass:0, p:35, data:{name:'蒼白の粘液', strong:0}},
+      {n:1, id:'enemy', pass:0, p:35, data:{name:'翠嵐の風刃', strong:0}},
+      {n:2, id:'enemy', pass:0, p:35, data:{name:'燐光の妖花', strong:0}},
+      {n:3, id:'enemy', pass:0, p:15, data:{name:'蒼白の粘液', strong:1}},
+      {n:4, id:'enemy', pass:0, p:12, data:{name:'燐光の妖花', strong:1}},
+      {n:5, id:'fire', pass:1, p:25, data:{used:0}},
+      {n:6, id:'shop', pass:1, p:25, data:{type:'skill'}},
    ],
 }
 let objmap = [
@@ -514,7 +523,7 @@ let images = {};
 let imageNames = {
    'maps':['a','b','c','d','e','f','g'],
    'effects':['explosion_1','explosion_2','explosion_3'],
-   'enemies':['翠嵐の風刃','蒼白の粘液'],
+   'enemies':['翠嵐の風刃','蒼白の粘液','燐光の妖花','黄昏の穿影','燦爛する緑夢','紫苑の花姫'],
    'charas':['greenslime','mechanic','clown','magodituono','wretch'],
    'system':['star1','star2','star3'],
 }
@@ -571,28 +580,7 @@ function waitForGameStart(){
 //#endregion
 
 function DrawBackground(){
-   //background、そのまま背景
-   for(let yy = 0; yy < mapSize; yy++){
-     for(let xx = 0; xx < mapSize; xx++){
-      let img = images['maps'][backmap[yy][xx]];
-      if(img){
-        ctx.drawImage(img, xx * 75, yy * 75, 75, 75);
-      }else{
-        console.error(`Image for background value ${backmap[yy][xx]} not found.`);
-      }
-     }
-   }
-   //object、仕掛けとか
-   for(let y = 0; y < objmap.length; y++) {
-     for(let x = 0; x < objmap[y].length; x++) {
-      let img = images[stage][objmap[y][x]];
-      if(img){
-        ctx.drawImage(img, x * 75, y * 75, 75, 75);
-      }else{
-        console.error(`Image for object value ${objmap[y][x]} not found.`);
-      }
-     }
-   }
+   
 }
 
 // 選択画像のロードと初期表示
@@ -610,61 +598,75 @@ let MAPx,MAPy;
 const keys = {};
 document.addEventListener("keydown", (e) => {
    let key = e.key
-   if(key == ' ') key = 'space'
+   if(key == ' ') key = 'space';
    keys[key] = true
 });
 document.addEventListener("keyup", (e) => {
    let key = e.key
-   if(key == ' ') key = 'space'
+   if(key == ' ') key = 'space';
    keys[e.key] = false
 });
 
 // キーが押されたときの...やつ
-document.addEventListener('keydown', function(event) {
+async function pUpdate(){
+   let p = get();
    if(!movable) return;
    let moved = 0;
-
-   draw();
-
-   karix = SELECTx;
-   kariy = SELECTy;
    
-   let speed = 75;
-   switch(event.key) {
-      case 'w':
-      case 'ArrowUp': // 上
-         event.preventDefault();
-         kariy -= speed;
-         moved = 1;
-         break;
-      case 'a':
-      case 'ArrowLeft': // 左
-         event.preventDefault();
-         karix -= speed;
-         moved = 1;
-         break;
-      case 's':
-      case 'ArrowDown': // 下
-         event.preventDefault();
-         kariy += speed;
-         moved = 1;
-         break;
-      case 'd':
-      case 'ArrowRight': // 右
-         event.preventDefault();
-         karix += speed;
-         moved = 1;
-         break;
-   }
+   let mv = 1;
+   if(!p.moving){
+      if((keys.w || keys.arrowup) && !p.moving){
+         if(keys.shift) mv = p.y;
+         if(p.dir == 0) await move(p, 'add', 0, -mv);
+         else p.dir = 0;
+      }
+      if((keys.s || keys.arrowdown) && !p.moving){
+         if(keys.shift) mv = (mapSize - 1) - p.y;
+         if(p.dir == 180) await move(p, 'add', 0, mv);
+         else p.dir = 180;
+      };
+      if((keys.a || keys.arrowleft) && !p.moving){
+         if(keys.shift) mv = p.x;
+         if(p.dir == 270) await move(p, 'add', -mv, 0);
+         else p.dir = 270;
+      };
+      if((keys.d || keys.arrowright) && !p.moving){
+         if(keys.shift) mv = (mapSize - 1) - p.x;
+         if(p.dir == 90) await move(p, 'add', mv, 0);
+         else p.dir = 90;
+      };
+      
+      /*
+      let ac = 0;
+      if((keys.w || keys.arrowdown) && (keys.d || keys.arrowright)){
+         p.dir = 45;
+      }else if((keys.d || keys.arrowdown) && (keys.s || keys.arrowleft)){
+         p.dir = 135;
+      }else if((keys.s || keys.arrowdown) && (keys.a || keys.arrowright)){
+         p.dir = 225;
+      }else if((keys.a || keys.arrowdown) && (keys.w || keys.arrowright)){
+         p.dir = 315;
+      }else if(keys.w || keys.arrowup){
+         p.dir = 0;
+      }else if(keys.d || keys.arrowright){
+         p.dir = 90;
+      }else if(keys.s || keys.arrowleft){
+         p.dir = 180;
+      }else if(keys.a || keys.arrowleft){
+         p.dir = 270;
+      }
 
-   if(objmap[MAPy][MAPx] != undefined || objmap[MAPy][MAPx] != 18){
-      SELECTx = karix;
-      SELECTy = kariy;
+      if((keys.w || keys.arrowdown) || (keys.a || keys.arrowleft) || (keys.s || keys.arrowright) || (keys.d || keys.arrowup)){
+         ac = 1;
+         // if(keys.shift) ac = 2;
+      }
+      move(p, 'drive', ac, 0);
+      */
    }
 
    draw()
 
-   if(MAPx < 0 || mapSize < MAPx || MAPy < 0 || mapSize < MAPy){
+   if(p.x < 0 || mapSize < p.x || p.y < 0 || mapSize < p.y){
       error()
    }
    
@@ -691,9 +693,9 @@ document.addEventListener('keydown', function(event) {
    //          img = explosion3;
    //       }
 
-   //       //MAPx = Math.floor(SELECTx / 75);
-   //       //MAPy = Math.floor(SELECTy / 75);
-   //       //objmap[MAPy][MAPx] = 15;
+   //       //MAPx = Math.floor(SELECTx / mass);
+   //       //MAPy = Math.floor(SELECTy / mass);
+   //       //objmap[MAPy][MAPx].id = 15;
    //       //bombtimer = 5;
    //       //PlacedBombx = MAPx;
    //       //PlacedBomby = MAPy;
@@ -708,10 +710,10 @@ document.addEventListener('keydown', function(event) {
    //          ];
    
    //          explosionCoords.forEach(([x, y]) => {
-   //             ctx.clearRect(x * 75, y * 75, 75, 75); // 前のフレームを消去
-   //             ctx.drawImage(img, x * 75, y * 75, 75, 75); // 新しいフレームを描画
-   //             //DrawBackground();
-   //             //ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+   //             ctx.clearRect(x * mass, y * mass, mass, mass); // 前のフレームを消去
+   //             ctx.drawImage(img, x * mass, y * mass, mass, mass); // 新しいフレームを描画
+   //             //draw();
+   //             //ctx.drawImage(IMGselect, SELECTx, SELECTy, mass, mass);
    //          });
    //       }
    
@@ -747,28 +749,72 @@ document.addEventListener('keydown', function(event) {
    //       }
    //       objmap[PlacedBomby][PlacedBombx] = 0;
    //       ctx.clearRect(0, 0, 600, 600); 
-   //       DrawBackground();
-   //       ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+   //       draw();
+   //       ctx.drawImage(IMGselect, SELECTx, SELECTy, mass, mass);
    //    }
 
    // }
    
 
-});
+};
 
 
 function draw() {
-   if(SELECTx<0) SELECTx=0;
-   if(SELECTy<0) SELECTy=0;
-   if(SELECTx>525) SELECTx=525;
-   if(SELECTy>525) SELECTy=525;
+   // if(SELECTx < 0) SELECTx=0;
+   // if(SELECTy < 0) SELECTy=0;
+   // if(SELECTx > mapSize*mass) SELECTx = mapSize*mass;
+   // if(SELECTy > mapSize*mass) SELECTy = mapSize*mass;
+   // MAPx = Math.floor(SELECTx / mass);
+   // MAPy = Math.floor(SELECTy / mass);
 
-   MAPx = Math.floor(SELECTx / 75);
-   MAPy = Math.floor(SELECTy / 75);
+   ctx.clearRect(0, 0, nowMap.offsetWidth, overfieldArea.offsetHeight); // 画面をクリア
+   
+   // ctx.drawImage(IMGselect, SELECTx, SELECTy, mass, mass);
 
-   ctx.clearRect(0, 0, 600,600);
-   DrawBackground();
-   ctx.drawImage(IMGselect, SELECTx, SELECTy, 75, 75);
+   //background、そのまま背景
+   for(let yy = 0; yy < mapSize; yy++){
+     for(let xx = 0; xx < mapSize; xx++){
+      let img = images['maps'][backmap[yy][xx]];
+      if(img){
+        ctx.drawImage(img, xx * mass, yy * mass, mass, mass);
+      }else{
+        console.error(`assets/maps/${backmap[yy][xx]}.png is not found.`);
+      }
+     }
+   }
+
+   /*
+      for(let y = 0; y < objmap.length; y++) {
+      for(let x = 0; x < objmap[y].length; x++) {
+      let obs = objmap[y][x];
+      if(obs.id == 0) continue;
+
+      let belong = stage;
+      let src = obs.id;
+      if(obs.id == 'enemy') belong = 'enemies', src = obs.data.name;
+      if('used' in obs.data) src += obs.data.used ? '_off' : '_on';
+
+      let img = images[belong][src];
+      if(!img) console.log(`assets/${belong}/${src}.png not found.`), img = images['system']['error'];
+
+      if(img) ctx.drawImage(img, x * mass, y * mass, mass, mass);
+     }
+   }
+   */
+
+   //object、仕掛けとか
+   for(let obs of Objects){
+      if(obs.id == 0) continue;
+      
+      let belong = obs.stage;
+      let src = obs.src;
+      if(obs.id == 'enemy') belong = 'enemies', src = obs.data.name;
+      if('used' in obs.data) src += obs.data.used ? '_off' : '_on';
+
+      let img = images[belong][src];
+      if(!img) console.log(`assets/${belong}/${src}.png is not found.`), img = images['system']['error'];
+      if(img) ctx.drawImage(img, obs.ox, obs.oy, w, h);
+   }
 }
 
 document.addEventListener('keydown', (event) => {
@@ -777,7 +823,7 @@ document.addEventListener('keydown', (event) => {
 
          draw()
 
-         NanigaOkirukana[objmap[MAPy][MAPx]].process();
+         NanigaOkirukana[objmap[MAPy][MAPx].id].process();
          
          draw()
       }
@@ -794,6 +840,115 @@ document.addEventListener('keydown', (event) => {
    }
 });
 
+function get(me = '指定なし'){
+   if(me == '指定なし') me = 0; //特別扱い, player
+   
+   let who = Objects[me];
+
+   return who;
+}
+function able(who, type){
+   return who.ables.some(a => a == type);
+}
+function prop(who, type){
+   return who.prop && who.prop.some(a => a == type);
+}
+async function move(who, code, mx, my, force = 0){
+   // let who = get(cam, me);
+
+   // console.log(`想定: x|${who.x.toString().padStart(2, '0')}, y|${who.y.toString().padStart(2, '0')} => x|${(who.x + mx).toString().padStart(2, '0')}, y|${(who.y + my).toString().padStart(2, '0')}`)
+
+   if(who.x + mx < 0 || 11 < who.x + mx) mx = 0;
+   if(who.y + my < 0 || 11 < who.y + my) my = 0;
+   
+   if(mx == 0 && my == 0) return //console.log(`${who.name}「移動量が0ですわ〜〜！！」`);
+
+   if(!able(who, 'move') && !force) return //console.log(`${who.name}「動けないっっ...!!」`);
+
+   let addx, addy;
+   let ssx = who.sx, ssy = who.sy; //save sxの略
+   if(code == 'add'){
+      who.sx += mx*mass;
+      who.sy += my*mass;
+      addx = mx*mass/who.spd;
+      addy = my*mass/who.spd;
+   }
+   if(code == 'set'){
+      who.sx = mx*mass;
+      who.sy = my*mass;
+      addx = Math.abs(who.x - mx) / who.spd;
+      addy = Math.abs(who.y - my) / who.spd;
+   }
+   if(code == 'drive'){
+      let rad = (who.dir - 90) * Math.PI / 180;
+      
+      my = 0; //これ無視した方がいいかも。使い所isない
+      let noise = random(-my, my);
+
+      let dx = mx * mass * Math.cos(rad) - noise * Math.sin(rad);
+      let dy = mx * mass * Math.sin(rad) + noise * Math.cos(rad);
+
+      who.sx += dx;
+      who.sy += dy;
+
+      addx = dx / who.spd;
+      addy = dy / who.spd;
+   }
+
+   let list = Object.values(Objects).flat();
+   // console.log(`(${looped})${who.name}「${able(who, 'pass')}, ${list.some(t => over(who, t))}, ${list.some(t => able(t, 'bepass'))}」`);
+   if(list.some(t => over(who, t))){
+      list.forEach(t => {
+         if(over(who, t) && !able(t, 'bepass')){
+            // console.log(`(${looped})${who.name}[${who.x},${who.y}]「${t.name}[${t.x},${t.y}]とぶつかる〜〜〜〜！！」`)
+            // console.log(`(${looped})自分: ${who.name} x:${who.x} y:${who.y} sx:${who.sx} sy:${who.sy} w:${who.w} h:${who.h} dir:${who.dir} spd:${who.spd}`);
+            // console.log(`(${looped})相手: ${t.name}) x:${t.x} y:${t.y} sx:${t.sx} sy:${t.sy} w:${t.w} h:${t.h} dir:${t.dir} spd:${t.spd}`);
+         };
+      })
+   }
+   if(!able(who, 'pass') && list.some(t => over(who, t) && !able(t, 'bepass'))) return who.sx = ssx, who.sy = ssy, draw()//, console.log(`(${looped})${who.name}「この先に何かあるっぽい？」`);
+
+   // console.log(`(${looped})想定: x|${who.x.toString().padStart(2, '0')}, y|${who.y.toString().padStart(2, '0')} => x|${(who.x + mx).toString().padStart(2, '0')}, y|${(who.y + my).toString().padStart(2, '0')} || 実行: x|${addx.toString().padStart(5, ' ')}, y|${addy.toString().padStart(5, ' ')} 計${who.spd}回反復`)
+
+   who.moving = 1;
+   for(let i = 0; i < who.spd; i++){
+      who.ox += addx;
+      who.oy += addy;
+      await delay(10);
+      draw();
+   }
+
+   who.x = Math.round(who.ox / mass);
+   who.y = Math.round(who.oy / mass);
+   who.ox = who.sx
+   who.oy = who.sy;
+
+   draw();
+
+   who.moving = 0;
+}
+const EPSILON = 0.01;
+function over(a, b) {
+   if (a.cam == b.cam && a.me == b.me) return false;
+
+   let sx1 = a.sx, sy1 = a.sy, ex1 = a.sx + a.w, ey1 = a.sy + a.h;
+   let sx2 = b.sx, sy2 = b.sy, ex2 = b.sx + b.w, ey2 = b.sy + b.h;
+
+   let overlapX = (sx1 < ex2 - EPSILON) && (ex1 > sx2 + EPSILON);
+   let overlapY = (sy1 < ey2 - EPSILON) && (ey1 > sy2 + EPSILON);
+
+   return overlapX && overlapY;
+}
+
+function cm(cam = '指定なし', me = '指定なし'){
+   if(cam == '指定なし' && me == '指定なし') cam = 'players', me = 0; //超特別扱い
+   
+   let who;
+   if(me == '指定なし') who = humans[cam];
+   else who = humans[cam][me];
+
+   return who;
+}
 
 function GoNextFloor(){
    floor += 1;
@@ -805,13 +960,7 @@ function GoNextFloor(){
 }
 
 function mapmake(code){
-   let mts = stage; //moto stage
-
-   while(mts == stage){
-      // 1~3の間でランダムにステージを決定
-      stage = arraySelect(Object.keys(Stages));
-   }
-
+   //stage
    for(let i = 0; i < mapSize; i++){
       backmap[i] = [];
 
@@ -843,63 +992,141 @@ function mapmake(code){
       }
    }
 
-   //次ここから
-
-   MAPx = objmapnum[stage-1].split('.');
-   MAPy = +MAPx[1]+1
-   MAPx = +MAPx[0]
-   objmap = objmaps[Math.floor(Math.random() *   MAPy)+MAPx];
-   objmap = JSON.parse(JSON.stringify(objmaps[Math.floor(Math.random() * MAPy) + MAPx]));
-
-   if(stage == 1){
-      if(fun == 23 && probability(10)){
-         backmap = backmaps[4];
-         objmap = objmaps[6];
-      }else if(fun <= 50 && probability(10)){
-         backmap = backmaps[5];
-         objmap = objmaps[7];
-      };
-   }else if(stage == 2){
-      if(fun == 68 && probability(10)){
-         backmap = backmaps[11];
-         objmap = objmaps[14];
-         objmap = JSON.parse(JSON.stringify(objmaps[Math.floor(Math.random() * MAPy) + MAPx]));
-      }else if(fun <= 50 && probability(10)){
-         backmap = backmaps[19];
-         objmap = objmaps[23];
-         objmap = JSON.parse(JSON.stringify(objmaps[Math.floor(Math.random() * MAPy) + MAPx]));
-      };
-   }else if(stage == 3){
-      if(fun == 68 && probability(10)){
-         backmap = backmaps[18];
-         objmap = objmaps[22];
-         objmap = JSON.parse(JSON.stringify(objmaps[Math.floor(Math.random() * MAPy) + MAPx]));
-      }else if(fun <= 50 && probability(10)){
-         backmap = backmaps[19];
-         objmap = objmaps[23];
-         objmap = JSON.parse(JSON.stringify(objmaps[Math.floor(Math.random() * MAPy) + MAPx]));
-      };
+   objmap = [];
+   for(let i = 0; i < mapSize; i++){
+      objmap[i] = [];
+      for(let j = 0; j < mapSize; j++){
+         objmap[i][j] = {id:0};
+      }
    }
-   if(stage == 1 && floor >= 10){SELECTx = 150;SELECTy = 525;backmap = backmaps[6];objmap = objmaps[8]}; //創生黎明の原野
-   if(stage == 2 && floor >= 7 ){SELECTx = 150;SELECTy = 525;backmap = backmaps[13];objmap = objmaps[16]}; //ガチェンレイゲスドゥールラート(昼)
-   if(stage == 3 && floor >= 3 ){SELECTx = 150;SELECTy = 525;backmap = backmaps[20];objmap = objmaps[24]}; //ガチェンレイゲスドゥールラート(夜)
+   let maxObs = random(3,7);
+   let obsList = JSON.parse(JSON.stringify(obsAll[stage]));
+   for(let i = 0; i < maxObs; i++){
+      let obs = arrayGacha(obsList, obsList.map(a => a.p));
+      obsList.splice(obs.n, 1);
+
+      let obx = 0, oby = 0;
+      while(objmap[oby][obx].id != 0 || (objmap[oby][obx].pass && !obs.pass)){
+         console.log(`(${obx}, ${oby})はすでに何かがあるっぽい？`);
+         obx = random(0, mapSize - 1);
+         oby = random(0, mapSize - 1);
+      };
+
+      /*
+         もとのobs = {
+            n:0,
+            id:'enemy',
+            pass:0,
+            p:35,
+            data:{
+               name:'蒼白の粘液',
+               strong:0
+            }
+         }
+      */
+      let ob = {
+         ...obs,
+         // cam: stage; //いらんかもこいつ
+         me: Objects.length,
+         src,
+         x: obx,
+         y: oby,
+         sx: obx*mass,
+         sy: oby*mass,
+         ox: obx*mass,
+         oy: oby*mass,
+         w: mass,
+         h: mass,
+         moving: 0,
+         spd: 5,
+         dir: 90,
+      }
+
+      Objects.push(obs);
+   }
+
+   // MAPx = objmapnum[stage-1].split('.');
+   // MAPy = +MAPx[1]+1
+   // MAPx = +MAPx[0]
+   // objmap = objmaps[Math.floor(Math.random() *   MAPy)+MAPx];
+   // objmap = JSON.parse(JSON.stringify(objmaps[Math.floor(Math.random() * MAPy) + MAPx]));
+
+   // if(stage == 1){
+   //    if(fun == 23 && probability(10)){
+   //       backmap = backmaps[4];
+   //       objmap = objmaps[6];
+   //    }else if(fun <= 50 && probability(10)){
+   //       backmap = backmaps[5];
+   //       objmap = objmaps[7];
+   //    };
+   // }else if(stage == 2){
+   //    if(fun == 68 && probability(10)){
+   //       backmap = backmaps[11];
+   //       objmap = objmaps[14];
+   //       objmap = JSON.parse(JSON.stringify(objmaps[Math.floor(Math.random() * MAPy) + MAPx]));
+   //    }else if(fun <= 50 && probability(10)){
+   //       backmap = backmaps[19];
+   //       objmap = objmaps[23];
+   //       objmap = JSON.parse(JSON.stringify(objmaps[Math.floor(Math.random() * MAPy) + MAPx]));
+   //    };
+   // }else if(stage == 3){
+   //    if(fun == 68 && probability(10)){
+   //       backmap = backmaps[18];
+   //       objmap = objmaps[22];
+   //       objmap = JSON.parse(JSON.stringify(objmaps[Math.floor(Math.random() * MAPy) + MAPx]));
+   //    }else if(fun <= 50 && probability(10)){
+   //       backmap = backmaps[19];
+   //       objmap = objmaps[23];
+   //       objmap = JSON.parse(JSON.stringify(objmaps[Math.floor(Math.random() * MAPy) + MAPx]));
+   //    };
+   // }
+   // if(stage == 1 && floor >= 10){SELECTx = 150;SELECTy = 525;backmap = backmaps[6];objmap = objmaps[8]}; //創生黎明の原野
+   // if(stage == 2 && floor >= 7 ){SELECTx = 150;SELECTy = 525;backmap = backmaps[13];objmap = objmaps[16]}; //ガチェンレイゲスドゥールラート(昼)
+   // if(stage == 3 && floor >= 3 ){SELECTx = 150;SELECTy = 525;backmap = backmaps[20];objmap = objmaps[24]}; //ガチェンレイゲスドゥールラート(夜)
+}
+
+function addob(id, mx, my, w, h, spd, dir, data){
+   //idは0なら何もしない
+   if(id == 0) return;
+
+   let src = id;
+   if(id == 'enemy') src = data.name;
+   if('used' in data) src += data.used ? '_off' : '_on';
+
+   //次ここから
+   let ob = {
+      id: id,
+      //cam: cam,
+      me: Objects.length,
+      stage: stage,
+      src: src,
+      x: mx,
+      y: my,
+      sx: mx*mass,
+      sy: my*mass,
+      ox: mx*mass,
+      oy: my*mass,
+      w: w || mass,
+      h: h || mass,
+      moving: 0,
+      spd: spd || 5,
+      dir: dir || 90,
+      data: data || {},
+   }
+
+   Objects.push(ob);
 }
 
 function NextStage(){
-   floor = 0;
-   candybar = [];
-   switch(stage){
-      case 1:
-         ExitDungeon(1);
-      break;
-      case 2:
-         stage = 3;
-         GoNextFloor();
-      break;
-      case 3:
-         ExitDungeon(2);
-      break;
+   let mts = stage; //moto stage
+
+   while(mts == stage){
+      // 1~3の間でランダムにステージを決定
+      stage = arraySelect(Object.keys(Stages));
    }
+   
+   floor = 0;
+   GoNextFloor();
 }
 
 //#endregion
@@ -994,7 +1221,7 @@ async function error(){
 //#endregion
 
 //#region 変数達
-let w,x,y,z;//こいつらは計算
+let x,y,z;//こいつらは計算
 
 let fun = random(1,100);
 
@@ -1028,7 +1255,7 @@ let sp = 1;//能力上昇(ダンジョン内有効)用
 let acted = 0;
 let bar = {
    cam:['players','players','players','players','enemies','enemies','enemies','enemies'],
-   num:[1,2,3,4,1,2,3,4]
+   me:[1,2,3,4,1,2,3,4]
 }
 
 //0 = false,1 = true
@@ -1076,7 +1303,7 @@ let humans = {
       {
          status:1,//0 = none, 1 = alive, 2 = dead
          cam:'players',
-         num:1,
+         me:1,
          name:'player',
          level:1,
          exp:0,
@@ -1144,7 +1371,7 @@ let humans = {
       {
          status:0,//存在の有無
          cam:'enemies',
-         num:1,
+         me:1,
          level:1,
          name:'古書館の魔術師',
          prefixe:'',
@@ -1588,11 +1815,11 @@ let Sutefuris = {
    }
 }
 let InventoryPage = 1;
-function inventoryOpen(num){
+function inventoryOpen(me){
    document.querySelector('#movabledescription').textContent = '';
    document.querySelector('#movabledescription').style.display = 'none';
 
-   InventoryPage = num??1;
+   InventoryPage = me??1;
    let array = ['name','level','exp','hp','maxhp','attack','defense','maxmp','mattack','mdefense','critlate','critdmg','critresist'];
    let Status = array.map(a => `${a}: ${humans.players[InventoryPage][a]}`).join('<br>');
    
@@ -2012,6 +2239,9 @@ let loginDiv = document.querySelector('#login');
 let loginAbleto = document.querySelector('#upperUI .login');
 
 async function GameStart(){
+   resizeCanvas();
+   window.addEventListener('resize', resizeCanvas);
+
    document.querySelector('#homeArea').style.display = 'block';
 
    //autoLogin
@@ -2519,13 +2749,11 @@ function HomeGoDungeon(name){
    logOOmoto.style.display = 'flex';
    log_open('c')
    document.querySelector('#homeArea').style.display = 'none';
-   document.querySelector('#overfieldArea').style.display = 'block';
-   GoNextFloor();
+   overfieldArea.style.display = 'block';
+   NextStage();
 
-   movable = 0;
+   let src = humans['players'][0].id;
 
-   IMGselect = new Image();
-   IMGselect.src = images['charas'][humans['players'][0].id].src;
 
    SELECTx = 0;
    SELECTy = 0;
@@ -2943,20 +3171,6 @@ async function humandamaged(cam, me, tcams, targets, rate, kind, attributes = []
    return 'alive';
 }
 
-async function humandamagedFixed(cam,me,tcam,target,num,kind){
-   let attacker = humans[cam][me];
-   let defender = humans[tcam][target]
-   
-   let damage = num;
-
-   defender.hp -= damage;
-
-   tekiou()
-   await addtext(`${defender.name}に${damage}のダメージ！`)
-
-   if(defender.hp <= 0){let result = await killed(cam,me,tcam,target);return result;}
-   return 'alive';
-}
 //#endregion
 //#region buffの動き
 async function buffadd(tcam,target,buff,time,val){//誰のバフ/デバフか,バフ/デバフの名前,効果時間,効果量
@@ -3294,17 +3508,17 @@ function LetsTargetSelect(one){
             document.getElementById(a).style.backgroundColor = pcolor;
          });
 
-         let num = +element.id.slice(7);
+         let me = +element.id.slice(7);
          let cam = element.id.slice(0, 7);
-         target.push(num);
+         target.push(me);
          target.push(cam);
 
          if(code == 2){
-            let pnum = (humans[cam][num-1]?.status??0 == 1) ? num - 1 : null;
-            let nnum = (humans[cam][num+1]?.status??0 == 1) ? num + 1 : null;
+            let pnum = (humans[cam][me-1]?.status??0 == 1) ? me - 1 : null;
+            let nnum = (humans[cam][me+1]?.status??0 == 1) ? me + 1 : null;
             let cams = [cam];if(pnum){cams.push(cam)};if(nnum){cams.push(cam)};
             target = [
-               [num-1,num,num+1],
+               [me-1,me,me+1],
                cams
             ];
          }else if(code == 3){
@@ -3525,7 +3739,7 @@ async function NextTurnis(cam,me,tcam,target){
    //こっから次のターン行く動き　ここでこの人のターンは終わるって感じだね
 
    acted += 1;
-   if(acted >= bar.num.length){
+   if(acted >= bar.me.length){
       let cams = 0;
       if(humans.players['t'].kazu > 0){
          log.textContent = '我らのturretの攻撃!';
@@ -3556,11 +3770,11 @@ async function NextTurnis(cam,me,tcam,target){
       }
 
       turncount += 1;
-      const combined = [...Object.values(humans.players).filter(a => a.status === 1 && a.hp > 0 && a.num !== 't'), ...Object.values(humans.enemies)].filter(b => b.status === 1 && b.hp > 0)// オブジェクトをリストに変換して合体
+      const combined = [...Object.values(humans.players).filter(a => a.status === 1 && a.hp > 0 && a.id != 't'), ...Object.values(humans.enemies)].filter(b => b.status === 1 && b.hp > 0)// オブジェクトをリストに変換して合体
       .sort((a, b) => {// 降順でソート
          if(b.speed === a.speed){
             if(a.cam === b.cam){
-               return a.num - b.num;  // 同じcamならnumの小さい方が優先
+               return a.me - b.me;  // 同じcamならmeの小さい方が優先
             }
             return a.cam === 'players' ? -1 : 1;  // camが'p'なら優先
          }
@@ -3568,14 +3782,14 @@ async function NextTurnis(cam,me,tcam,target){
       });
       bar = {
          cam: combined.map(c => c.cam),
-         num: combined.map(c => c.num)
+         me: combined.map(c => c.me)
       };
       console.log(bar)
       acted = 0;
       console.log(`〜〜〜〜〜〜${turncount}ターン目〜〜〜〜〜〜`); //あとはskill系とmagicもて加えてって 今skill系着工中 todolistをみんな見れる形にするみたいにしたいね
    } 
 
-   nowturn = bar.num[acted];
+   nowturn = bar.me[acted];
    cam = bar.cam[acted]
 
    console.log('現在、'+cam+'の'+nowturn+'さんのターンですわ〜');
@@ -3626,7 +3840,7 @@ async function NextTurnis(cam,me,tcam,target){
 async function enemyturn(cam,me){
    let enemy = humans.enemies[me];
    let enemydata = Enemies[enemy.name];
-   x = Object.values(humans.enemies).filter(x => x.status == 1&& x.hp > 0).map(x => x.num);
+   x = Object.values(humans.enemies).filter(x => x.status == 1&& x.hp > 0).map(x => x.me);
    for(i = 0; i < x.length; i++){
       let n = x[i]
       for(const key in humans.enemies[n].buffs){
@@ -3682,16 +3896,16 @@ function ShallTargetSelect(cam,me,code,both){
    //標的陣営、起動者、コード(e = enemies, p = players | m = most highest, l = most lowest,| atk = 攻撃力, def = 防御力, hp = 体力 || r = random)、両隣にも被害を与えるか0,1
    //,b => b.hp//playerのhp達を、statusが1のやつだけ、小さい順(昇順)に並べてる。
    const playerstatus = {
-      num:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.num - p2.num).map(a => a.num),
-   hp:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.hp - p2.hp).map(a => a.num),
-      atk:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.attack - p2.attack).map(a => a.num),
-      def:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.defense - p2.defense).map(a => a.num),
+      me:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.me - p2.me).map(a => a.me),
+   hp:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.hp - p2.hp).map(a => a.me),
+      atk:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.attack - p2.attack).map(a => a.me),
+      def:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.defense - p2.defense).map(a => a.me),
    }
    const enemystatus = {
-      num:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.num - e2.num).map(a => a.num),
-   hp:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.hp - e2.hp).map(a => a.num),
-      atk:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.attack - e2.attack).map(a => a.num),
-      def:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.defense - e2.defense).map(a => a.num),
+      me:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.me - e2.me).map(a => a.me),
+   hp:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.hp - e2.hp).map(a => a.me),
+      atk:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.attack - e2.attack).map(a => a.me),
+      def:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.defense - e2.defense).map(a => a.me),
    }
    let ret = [];
    switch(code){
@@ -3703,9 +3917,9 @@ function ShallTargetSelect(cam,me,code,both){
             ret.push(x);
          }else{
             let b = []
-            if(playerstatus.num.includes(x-1)){b.push(x-1)};
+            if(playerstatus.me.includes(x-1)){b.push(x-1)};
             b.push(x);
-            if(playerstatus.num.includes(x+1)){b.push(x+1)};
+            if(playerstatus.me.includes(x+1)){b.push(x+1)};
             ret.push(b)
          }
          break;
@@ -3716,9 +3930,9 @@ function ShallTargetSelect(cam,me,code,both){
             ret.push(x);
          }else{
             let b = []
-            if(playerstatus.num.includes(x-1)){b.push(x-1)};
+            if(playerstatus.me.includes(x-1)){b.push(x-1)};
             b.push(x);
-            if(playerstatus.num.includes(x+1)){b.push(x+1)};
+            if(playerstatus.me.includes(x+1)){b.push(x+1)};
             ret.push(b)
          }
          break;
@@ -3729,9 +3943,9 @@ function ShallTargetSelect(cam,me,code,both){
             ret.push(x);
          }else{
             let b = []
-            if(playerstatus.num.includes(x-1)){b.push(x-1)};
+            if(playerstatus.me.includes(x-1)){b.push(x-1)};
             b.push(x);
-            if(playerstatus.num.includes(x+1)){b.push(x+1)};
+            if(playerstatus.me.includes(x+1)){b.push(x+1)};
             ret.push(b)
          }
          break;
@@ -3742,9 +3956,9 @@ function ShallTargetSelect(cam,me,code,both){
             ret.push(x);
          }else{
             let b = []
-            if(playerstatus.num.includes(x-1)){b.push(x-1)};
+            if(playerstatus.me.includes(x-1)){b.push(x-1)};
             b.push(x);
-            if(playerstatus.num.includes(x+1)){b.push(x+1)};
+            if(playerstatus.me.includes(x+1)){b.push(x+1)};
             ret.push(b)
          }
          break;
@@ -3755,9 +3969,9 @@ function ShallTargetSelect(cam,me,code,both){
             ret.push(x);
          }else{
             let b = []
-            if(playerstatus.num.includes(x-1)){b.push(x-1)};
+            if(playerstatus.me.includes(x-1)){b.push(x-1)};
             b.push(x);
-            if(playerstatus.num.includes(x+1)){b.push(x+1)};
+            if(playerstatus.me.includes(x+1)){b.push(x+1)};
             ret.push(b)
          }
          break;
@@ -3768,9 +3982,9 @@ function ShallTargetSelect(cam,me,code,both){
             ret.push(x);
          }else{
             let b = []
-            if(playerstatus.num.includes(x-1)){b.push(x-1)};
+            if(playerstatus.me.includes(x-1)){b.push(x-1)};
             b.push(x);
-            if(playerstatus.num.includes(x+1)){b.push(x+1)};
+            if(playerstatus.me.includes(x+1)){b.push(x+1)};
             ret.push(b)
          }
          break;
@@ -3781,27 +3995,27 @@ function ShallTargetSelect(cam,me,code,both){
             ret.push(x);
          }else{
             let b = []
-            if(playerstatus.num.includes(x-1)){b.push(x-1)};
+            if(playerstatus.me.includes(x-1)){b.push(x-1)};
             b.push(x);
-            if(playerstatus.num.includes(x+1)){b.push(x+1)};
+            if(playerstatus.me.includes(x+1)){b.push(x+1)};
             ret.push(b)
          }
          break;
       case 'pc'://center
-         x = [me,me-1,me-2,me+1,me+2].find(n => playerstatus.num.includes(n))||1;
+         x = [me,me-1,me-2,me+1,me+2].find(n => playerstatus.me.includes(n))||1;
          if(!x){return 'end'}
          if(both == 0){
             ret.push(x);
          }else{
             let b = [];
-            if(playerstatus.num.includes(x-1)){b.push(x-1)};
+            if(playerstatus.me.includes(x-1)){b.push(x-1)};
             b.push(x);
-            if(playerstatus.num.includes(x+1)){b.push(x+1)};
+            if(playerstatus.me.includes(x+1)){b.push(x+1)};
             ret.push(b);
          }
          break;
       case 'pz'://zentai
-         x = playerstatus.num;
+         x = playerstatus.me;
          if(!x){return 'end'}
          ret.push(x);
          break;
@@ -3814,9 +4028,9 @@ function ShallTargetSelect(cam,me,code,both){
             ret.push(x);
          }else{
             let b = []
-            if(enemystatus.num.includes(x-1)){b.push(x-1)};
+            if(enemystatus.me.includes(x-1)){b.push(x-1)};
             b.push(x);
-            if(enemystatus.num.includes(x+1)){b.push(x+1)};
+            if(enemystatus.me.includes(x+1)){b.push(x+1)};
             ret.push(b)
          }
          break;
@@ -3827,9 +4041,9 @@ function ShallTargetSelect(cam,me,code,both){
             ret.push(x);
          }else{
             let b = []
-            if(enemystatus.num.includes(x-1)){b.push(x-1)};
+            if(enemystatus.me.includes(x-1)){b.push(x-1)};
             b.push(x);
-            if(enemystatus.num.includes(x+1)){b.push(x+1)};
+            if(enemystatus.me.includes(x+1)){b.push(x+1)};
             ret.push(b)
          }
          break;
@@ -3840,9 +4054,9 @@ function ShallTargetSelect(cam,me,code,both){
             ret.push(x);
          }else{
             let b = []
-            if(enemystatus.num.includes(x-1)){b.push(x-1)};
+            if(enemystatus.me.includes(x-1)){b.push(x-1)};
             b.push(x);
-            if(enemystatus.num.includes(x+1)){b.push(x+1)};
+            if(enemystatus.me.includes(x+1)){b.push(x+1)};
             ret.push(b)
          }
          break;
@@ -3853,9 +4067,9 @@ function ShallTargetSelect(cam,me,code,both){
             ret.push(x);
          }else{
             let b = []
-            if(enemystatus.num.includes(x-1)){b.push(x-1)};
+            if(enemystatus.me.includes(x-1)){b.push(x-1)};
             b.push(x);
-            if(enemystatus.num.includes(x+1)){b.push(x+1)};
+            if(enemystatus.me.includes(x+1)){b.push(x+1)};
             ret.push(b)
          }
          break;
@@ -3866,9 +4080,9 @@ function ShallTargetSelect(cam,me,code,both){
             ret.push(x);
          }else{
             let b = []
-            if(enemystatus.num.includes(x-1)){b.push(x-1)};
+            if(enemystatus.me.includes(x-1)){b.push(x-1)};
             b.push(x);
-            if(enemystatus.num.includes(x+1)){b.push(x+1)};
+            if(enemystatus.me.includes(x+1)){b.push(x+1)};
             ret.push(b)
          }
          break;
@@ -3879,9 +4093,9 @@ function ShallTargetSelect(cam,me,code,both){
             ret.push(x);
          }else{
             let b = []
-            if(enemystatus.num.includes(x-1)){b.push(x-1)};
+            if(enemystatus.me.includes(x-1)){b.push(x-1)};
             b.push(x);
-            if(enemystatus.num.includes(x+1)){b.push(x+1)};
+            if(enemystatus.me.includes(x+1)){b.push(x+1)};
             ret.push(b)
          }
          break;
@@ -3892,9 +4106,9 @@ function ShallTargetSelect(cam,me,code,both){
             ret.push(x);
          }else{
             let b = []
-            if(enemystatus.num.includes(x-1)){b.push(x-1)};
+            if(enemystatus.me.includes(x-1)){b.push(x-1)};
             b.push(x);
-            if(enemystatus.num.includes(x+1)){b.push(x+1)};
+            if(enemystatus.me.includes(x+1)){b.push(x+1)};
             ret.push(b)
          }
          break;
@@ -3905,9 +4119,9 @@ function ShallTargetSelect(cam,me,code,both){
             ret.push(x);
          }else{
             let b = []
-            if(enemystatus.num.includes(x-1)){b.push(x-1)};
+            if(enemystatus.me.includes(x-1)){b.push(x-1)};
             b.push(x);
-            if(enemystatus.num.includes(x+1)){b.push(x+1)};
+            if(enemystatus.me.includes(x+1)){b.push(x+1)};
             ret.push(b)
          }
          break;
@@ -3927,8 +4141,8 @@ async function killed(cam,me,tcam,target){//殺った側cam,meと殺された側
    
    if(target == 't'){turretBreak(tcam)};//turretだった場合はkazuも減らすのです
 
-   let karix = bar.cam.map((Cam, Num) => Cam === 'p' && bar.num[Num] === 2 ? Num : -1).filter(Num => Num !== -1);
-   bar.cam.splice(karix,1);bar.num.splice(karix,1);
+   let karix = bar.cam.map((Cam, Num) => Cam === 'p' && bar.me[Num] === 2 ? Num : -1).filter(Num => Num !== -1);
+   bar.cam.splice(karix,1);bar.me.splice(karix,1);
    
    //クエストの動
    Object.keys(quest).filter(a => quest[a].type == 'k' && quest[a].term.includes(0) || quest[a].term.includes(stage) && tcam == 'enemies').forEach(nanka => {
@@ -3996,7 +4210,7 @@ async function killedCheck(){
       document.querySelector('#battleArea').style.display = 'none';
       document.querySelector('#overfieldArea').style.display = 'block';
       
-      objmap[MAPy][MAPx] = 0;//戦利品的な何かにしてもいいかも..いやなし
+      objmap[MAPy][MAPx].id = 0;//戦利品的な何かにしてもいいかも..いやなし
       draw()
       movable = 1;
       return 'end';
@@ -4066,7 +4280,7 @@ async function EnemyAppear(){
    // bar-create
    bar = {
       cam:[],
-      num:[]
+      me:[]
    }
    turncount = 0;
    NextTurnis(0);
@@ -4081,7 +4295,7 @@ function DesideEnemyName(target){
 
    enemy.status = 1;
    enemy.cam = 'enemies';
-   enemy.num = target;
+   enemy.me = target;
 
    enemy.level = enemylv + Math.floor(Math.random() * 7)-3; 
    if(enemy.level < 1){enemy.level = 1;}
@@ -4119,12 +4333,12 @@ function DesideEnemyName(target){
    let statuses = ['attack','defense','mattack','mdefense','maxhp','maxmp','critlate','critdmg','critresist','speed'];
    statuses.forEach(statu => {
       if(nameData[statu].startsWith('+') || nameData[statu].startsWith('-')){
-         let num = Number(nameData[statu].slice(1));
-         if(nameData[statu].startsWith('-')){num *= -1};
-         enemy[statu] += num;
+         let me = Number(nameData[statu].slice(1));
+         if(nameData[statu].startsWith('-')){me *= -1};
+         enemy[statu] += me;
       }else if(nameData[statu].startsWith('=')){
-         let num = Number(nameData[statu].slice(1));
-         enemy[statu] = num;
+         let me = Number(nameData[statu].slice(1));
+         enemy[statu] = me;
       }
       //'0'なら変動無し
    })
@@ -4162,8 +4376,8 @@ async function testEnemyAppear(){
       tekiou();
    }
 
-   let num = 1;
-   const enemy = humans.enemies[num]
+   let me = 1;
+   const enemy = humans.enemies[me]
 
    enemy.status = 1;
    enemy.level = 2;
@@ -4182,7 +4396,7 @@ async function testEnemyAppear(){
    enemy.speed = 50;
 
    let enemyDiv = document.createElement('div');
-   enemyDiv.id = `enemies${num}`;
+   enemyDiv.id = `enemies${me}`;
    enemyDiv.className = 'enemies';
 
    let border = document.createElement('div');
@@ -4265,17 +4479,17 @@ async function testEnemyAppear(){
    // bar-create
    bar = {
       cam:[],
-      num:[]
+      me:[]
    }
    turncount = 0;
    NextTurnis(0);
 }
 
-function makeNewPlayer(num){
-   const player = humans.players[num];
+function makeNewPlayer(me){
+   const player = humans.players[me];
 
    let playerDiv = document.createElement('div');
-   playerDiv.id = `players${num}`;
+   playerDiv.id = `players${me}`;
    playerDiv.className = 'players';
 
    let effects = document.createElement('div');
@@ -4329,7 +4543,7 @@ function makeNewPlayer(num){
    hp.className = 'hp';
 
    let hpNum = document.createElement('div');
-   hpNum.className = 'num';
+   hpNum.className = 'me';
    hpNum.textContent = `${player.hp}/${player.maxhp}`;
    hp.appendChild(hpNum);
 
@@ -4348,7 +4562,7 @@ function makeNewPlayer(num){
    mp.className = 'mp';
 
    let mpNum = document.createElement('div');
-   mpNum.className = 'num';
+   mpNum.className = 'me';
    mpNum.textContent = `${player.mp}/${player.maxmp}`;
    mp.appendChild(mpNum);
 
@@ -4365,11 +4579,11 @@ function makeNewPlayer(num){
 
    return playerDiv;
 }
-function makeNewEnemy(num){
-   const enemy = humans.enemies[num];
+function makeNewEnemy(me){
+   const enemy = humans.enemies[me];
 
    let enemyDiv = document.createElement('div');
-   enemyDiv.id = `enemies${num}`;
+   enemyDiv.id = `enemies${me}`;
    enemyDiv.className = 'enemies';
 
    let border = document.createElement('div');
@@ -4455,7 +4669,7 @@ function makeNewEnemy(num){
    let spanScrollWidth = nameSpan.scrollWidth
    console.log(`${nameSpan.textContent}のnameSpanは${spanScrollWidth}です`)
    if(spanScrollWidth > 80){
-      const animationName = `scroll-enemies${num}-${enemy.id}ver`;
+      const animationName = `scroll-enemies${me}-${enemy.id}ver`;
       const styleSheet = document.styleSheets[0];
       let fixedTime = 1.5;//前後の固定タイム
       let moveTime = (spanScrollWidth - 80) * 0.05;
@@ -4467,7 +4681,7 @@ function makeNewEnemy(num){
             ${(1 - fixedTime / (fixedTime * 2 + moveTime)) * 100}% { transform: translateX(-${Math.max(0, spanScrollWidth - 80)}px); }
             100% { transform: translateX(-${Math.max(0, spanScrollWidth - 80)}px); }
          }`, styleSheet.cssRules.length);
-      nameSpan.style.animation = `scroll-enemies${num}-${enemy.id}ver ${fixedTime * 2 + moveTime}s linear infinite`;
+      nameSpan.style.animation = `scroll-enemies${me}-${enemy.id}ver ${fixedTime * 2 + moveTime}s linear infinite`;
    }
 
 
@@ -4624,7 +4838,7 @@ let Camprestper
    document.querySelector('#battleArea').style.display = 'none';
    document.querySelector('#overfieldArea').style.display = 'block';
    
-   objmap[MAPy][MAPx] = 4;
+   objmap[MAPy][MAPx].data.used = 1;
    draw()
    movable = 1;
   }
@@ -4865,7 +5079,7 @@ function Campequiptool(code){
    
    document.querySelector('#overfieldArea').style.display = 'block';
    
-   objmap[MAPy][MAPx] = 0;
+   objmap[MAPy][MAPx].id = 0;
    draw()
    movable = 1;
   }
@@ -4972,7 +5186,7 @@ async function HopeButtonact(){
    
    document.querySelector('#overfieldArea').style.display = 'block';
    
-   objmap[MAPy][MAPx] = 0;
+   objmap[MAPy][MAPx].id = 0;
    draw()
    movable = 1;
 }
@@ -5009,7 +5223,7 @@ async function OpenChest(code){
    document.querySelector('#battleArea').style.display = 'none';
    document.querySelector('#overfieldArea').style.display = 'block';
    
-   objmap[MAPy][MAPx] = 0;
+   objmap[MAPy][MAPx].id = 0;
    draw()
    movable = 1;
 }
@@ -5049,7 +5263,7 @@ async function Cookietake(){
    document.querySelector('#battleArea').style.display = 'none';
    document.querySelector('#overfieldArea').style.display = 'block';
    
-   objmap[MAPy][MAPx] = 0;
+   objmap[MAPy][MAPx].id = 0;
    draw()
    movable = 1;
 }
@@ -5067,11 +5281,12 @@ let PlacedBombx = 0;
 let PlacedBomby = 0;
 
 async function placebomb(){
-   objmap[MAPy][MAPx] = 15;
+   objmap[MAPy][MAPx].id = 'bomv';
    bombtimer = 5;
    PlacedBombx = MAPx;
    PlacedBomby = MAPy;
    log.textContent = '爆弾を設置しました！';
+   //so coolのやつやってもいいかも
 }//出口を消した時どうする論争
 //#endregion
 //#region catus
@@ -5081,7 +5296,7 @@ async function CatusAct(){
       humans.players[0].hp -= 10;
       humans.players[0].attack += 5;
       if(stage == 3) humans.players[0].hp -= 10, humans.players[0].attack += 5;
-      objmap[MAPy][MAPx] = 0;
+      objmap[MAPy][MAPx].id = 0;
    }else{
       log.textContent = 'なんか..今触ったら死にそう....'
    }
@@ -5097,7 +5312,7 @@ async function ScorpionAct(code){
       case 2:await buffadd('playerbuff','poison','turn',3,2);break;
    }
    playerattack += 10*code;
-   objmap[MAPy][MAPx] = 0;
+   objmap[MAPy][MAPx].id = 0;
    await delay(500);
    
 }
@@ -5112,7 +5327,7 @@ function ZomuEvent(){//創生黎明の原野
    playerps = 'solx5but'//slashoflightを使った際、当たれば5倍だが、外れれば自分にダメージを与える。
    buttonsolid = '#000000';buttonback = '#50C878';
    document.querySelector('#ButtonStyle').textContent = `.button{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};cursor: pointer;}input[type="text"]:focus{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};}`;
-   objmap[MAPy][MAPx] = 0;
+   objmap[MAPy][MAPx].id = 0;
    draw()
    movable = 1;
 }
@@ -5124,7 +5339,7 @@ function UtusenEvent(){
    playerps = 'reverseta';//逆TA(相手より体力がめちゃ低いとダメージを喰らわない)
    buttonsolid = '#4c6cb3';buttonback = '#949495';
    document.querySelector('#ButtonStyle').textContent = `.button{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};cursor: pointer;}input[type="text"]:focus{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};}`;
-   objmap[MAPy][MAPx] = 0;
+   objmap[MAPy][MAPx].id = 0;
    draw()
    movable = 1;
 }
