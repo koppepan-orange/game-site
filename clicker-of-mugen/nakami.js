@@ -494,13 +494,13 @@ const objmaps = [
 ];
 const obsAll = {
    '草原':[
-      {n:0, id:'enemy', pass:0, p:35, data:{name:'蒼白の粘液', strong:0}},
-      {n:1, id:'enemy', pass:0, p:35, data:{name:'翠嵐の風刃', strong:0}},
-      {n:2, id:'enemy', pass:0, p:35, data:{name:'燐光の妖花', strong:0}},
-      {n:3, id:'enemy', pass:0, p:15, data:{name:'蒼白の粘液', strong:1}},
-      {n:4, id:'enemy', pass:0, p:12, data:{name:'燐光の妖花', strong:1}},
-      {n:5, id:'fire', pass:1, p:25, data:{used:0}},
-      {n:6, id:'shop', pass:1, p:25, data:{type:'skill'}},
+      {n:0, id:'enemy', on:0, p:35, data:{name:'蒼白の粘液', strong:0}},
+      {n:1, id:'enemy', on:0, p:35, data:{name:'翠嵐の風刃', strong:0}},
+      {n:2, id:'enemy', on:0, p:35, data:{name:'燐光の妖花', strong:0}},
+      {n:3, id:'enemy', on:0, p:15, data:{name:'蒼白の粘液', strong:1}},
+      {n:4, id:'enemy', on:0, p:12, data:{name:'燐光の妖花', strong:1}},
+      {n:5, id:'fire', on:1, p:25, data:{used:0}},
+      {n:6, id:'shop', on:1, p:25, data:{type:'skill'}},
    ],
 }
 let objmap = [
@@ -616,22 +616,22 @@ async function pUpdate(){
    let mv = 1;
    if(!p.moving){
       if((keys.w || keys.arrowup) && !p.moving){
-         if(keys.shift) mv = p.y;
+         // if(keys.shift) mv = p.y;
          if(p.dir == 0) await move(p, 'add', 0, -mv);
          else p.dir = 0;
       }
       if((keys.s || keys.arrowdown) && !p.moving){
-         if(keys.shift) mv = (mapSize - 1) - p.y;
+         // if(keys.shift) mv = (mapSize - 1) - p.y;
          if(p.dir == 180) await move(p, 'add', 0, mv);
          else p.dir = 180;
       };
       if((keys.a || keys.arrowleft) && !p.moving){
-         if(keys.shift) mv = p.x;
+         // if(keys.shift) mv = p.x;
          if(p.dir == 270) await move(p, 'add', -mv, 0);
          else p.dir = 270;
       };
       if((keys.d || keys.arrowright) && !p.moving){
-         if(keys.shift) mv = (mapSize - 1) - p.x;
+         // if(keys.shift) mv = (mapSize - 1) - p.x;
          if(p.dir == 90) await move(p, 'add', mv, 0);
          else p.dir = 90;
       };
@@ -664,7 +664,32 @@ async function pUpdate(){
       */
    }
 
-   draw()
+   if((keys.z || keys.enter) && textShowing == 0 && !p.moving){
+      // 今乗ってるやつ（on = true かつ座標が同じ）
+      let obon = Objects.filter(a => a.x == p.x && a.y == p.y && a.on);
+      if(obon.length > 1 || obon.length == 0) return console.log(obon);
+      draw();
+      let res = NanigaOkirukana[obon[0].id].process();
+      draw();
+      if(res) return 1;
+
+      // 目の前にあるやつ（on = false かつ向いてる方向）
+      let karix = 0, kariy = 0;
+      switch (p.dir) {
+         case 0: kariy -= 1; break;
+         case 90: karix += 1; break;
+         case 180: kariy += 1; break;
+         case 270: karix -= 1; break;
+      }
+      
+      let arr = Objects.filter(a => a.x == p.x + karix && a.y == p.y + kariy && !a.on)
+      for(let nobon of arr){
+         draw();
+         let res = NanigaOkirukana[nobon.id].process();
+         draw();
+         if(res) return 1;
+      }
+   }
 
    if(p.x < 0 || mapSize < p.x || p.y < 0 || mapSize < p.y){
       error()
@@ -754,9 +779,21 @@ async function pUpdate(){
    //    }
 
    // }
-   
-
 };
+
+document.addEventListener('keydown', (event) => {
+   
+   if(event.key == 'e' && document.querySelector('#overfieldArea').style.display == 'block'){
+      if(movable){
+         movable = 0;
+         window.setTimeout(inventoryOpen,200)
+      }else{
+         movable = 1;
+         window.setTimeout(inventoryClose,200)
+   }}else if(event.key == 'g' && document.querySelector('#overfieldArea').style.display == 'block'){
+      testEnemyAppear();
+   }
+});
 
 
 function draw() {
@@ -808,37 +845,16 @@ function draw() {
       
       let belong = obs.stage;
       let src = obs.src;
+      if(obs.id == 'player') belong = 'charas', src = obs.data.name;
       if(obs.id == 'enemy') belong = 'enemies', src = obs.data.name;
       if('used' in obs.data) src += obs.data.used ? '_off' : '_on';
 
       let img = images[belong][src];
       if(!img) console.log(`assets/${belong}/${src}.png is not found.`), img = images['system']['error'];
-      if(img) ctx.drawImage(img, obs.ox, obs.oy, w, h);
+      if(img) ctx.drawImage(img, obs.ox, obs.oy, obs.w, obs.h);
    }
 }
 
-document.addEventListener('keydown', (event) => {
-   if(movable && dungeonnow && textShowing == 0){
-      if(event.key == 'Enter'|| event.key == 'z'){
-
-         draw()
-
-         NanigaOkirukana[objmap[MAPy][MAPx].id].process();
-         
-         draw()
-      }
-   }
-   if(event.key == 'e' && document.querySelector('#overfieldArea').style.display == 'block'){
-      if(movable){
-         movable = 0;
-         window.setTimeout(inventoryOpen,200)
-      }else{
-         movable = 1;
-         window.setTimeout(inventoryClose,200)
-   }}else if(event.key == 'g' && document.querySelector('#overfieldArea').style.display == 'block'){
-      testEnemyAppear();
-   }
-});
 
 function get(me = '指定なし'){
    if(me == '指定なし') me = 0; //特別扱い, player
@@ -1005,18 +1021,28 @@ function mapmake(code){
       let obs = arrayGacha(obsList, obsList.map(a => a.p));
       obsList.splice(obs.n, 1);
 
+      let obdata = Objectdatas[obs.id]?.[obs.data.name]
+      if(!obdata) obdata = Objectdatas['enemy']['none'];
+
       let obx = 0, oby = 0;
-      while(objmap[oby][obx].id != 0 || (objmap[oby][obx].pass && !obs.pass)){
+      let douBasyo = Objects.filter(a => a.x == obx && a.y == oby && a.id != 0);
+      while(douBasyo.length || !(douBasyo.filter(a => a.on) && !obdata.on)){
+         console.log(`あるか:${douBasyo.length}, 乗れるか:${!obs.on}`)
          console.log(`(${obx}, ${oby})はすでに何かがあるっぽい？`);
          obx = random(0, mapSize - 1);
          oby = random(0, mapSize - 1);
+         douBasyo = Objects.filter(a => a.x == obx && a.y == oby && a.id != 0)
       };
+
+      console.log(obs)
+      console.log(obs.id, obs.data.name)
+      addob(obs.id, obx, oby, obdata.w, obdata.h, obdata.spd, 90, obdata.ables, obs.data);
 
       /*
          もとのobs = {
             n:0,
             id:'enemy',
-            pass:0,
+            on:0,
             p:35,
             data:{
                name:'蒼白の粘液',
@@ -1024,25 +1050,6 @@ function mapmake(code){
             }
          }
       */
-      let ob = {
-         ...obs,
-         // cam: stage; //いらんかもこいつ
-         me: Objects.length,
-         src,
-         x: obx,
-         y: oby,
-         sx: obx*mass,
-         sy: oby*mass,
-         ox: obx*mass,
-         oy: oby*mass,
-         w: mass,
-         h: mass,
-         moving: 0,
-         spd: 5,
-         dir: 90,
-      }
-
-      Objects.push(obs);
    }
 
    // MAPx = objmapnum[stage-1].split('.');
@@ -1085,15 +1092,13 @@ function mapmake(code){
    // if(stage == 3 && floor >= 3 ){SELECTx = 150;SELECTy = 525;backmap = backmaps[20];objmap = objmaps[24]}; //ガチェンレイゲスドゥールラート(夜)
 }
 
-function addob(id, mx, my, w, h, spd, dir, data){
+let Objects = [];
+function addob(id, mx, my, w, h, spd, dir, ables, data){
    //idは0なら何もしない
    if(id == 0) return;
 
    let src = id;
-   if(id == 'enemy') src = data.name;
-   if('used' in data) src += data.used ? '_off' : '_on';
 
-   //次ここから
    let ob = {
       id: id,
       //cam: cam,
@@ -1106,11 +1111,12 @@ function addob(id, mx, my, w, h, spd, dir, data){
       sy: my*mass,
       ox: mx*mass,
       oy: my*mass,
-      w: w || mass,
-      h: h || mass,
+      w: w*mass,
+      h: h*mass,
       moving: 0,
       spd: spd || 5,
       dir: dir || 90,
+      ables: ables || [],
       data: data || {},
    }
 
@@ -1312,14 +1318,14 @@ let humans = {
          speed:10,
          hp:0,
          maxhp:0,
-         attack:0,
-         defense:0,
+         atk:0,
+         def:0,
          power:1,
          shell:1,
          mp:10,
          maxmp:10,
-         mattack:0,
-         mdefense:0,
+         matk:0,
+         mdef:0,
          critlate:0.03, //これが確率。会心率ってやつだね
          critdmg:3, //これが倍率。会心ダメージってやつだね
          critresist:0,//これは会心抵抗。ハルカ(正月)さんが下げるやつだね
@@ -1379,10 +1385,10 @@ let humans = {
          speed:1,
          hp:100,
          maxhp:100,
-         attack:10,
-         defense:10,
-         mattack:5,
-         mdefense:5,
+         atk:10,
+         def:10,
+         matk:5,
+         mdef:5,
          critdmg:0.1,
          critlate:0.1,
          critresist:0.1,
@@ -1736,16 +1742,16 @@ let Sutefuris = {
       value:20,
       description:'最大体力を20増やし、体力を20回復する<br>ピンチな時にぜひ<br>筋肉は全てを解決する',
    },
-   'attack':{
+   'atk':{
       name:'攻撃力',
-      id:'attack',
+      id:'atk',
       added:0,
       value:5,
       description:'攻撃力を5増加させる。腕立て伏せかな'
    },
-   'defense':{
+   'def':{
       name:'防御力',
-      id:'defense',
+      id:'def',
       added:0,
       value:5,
       description:'防御力を5増加させる。腹筋とかかな'
@@ -1757,16 +1763,16 @@ let Sutefuris = {
       value:10,
       description:'最大魔素保有量を10増加。けど圧縮してる感じ<br>筋肉でも解決できないことはある'
    },
-   'mattack':{
+   'matk':{
       name:'魔法攻撃力',
-      id:'mattack',
+      id:'matk',
       added:0,
       value:5,
       description:'魔法攻撃力を5増加。おそらく変換機の改良'
    },
-   'mdefense':{
+   'mdef':{
       name:'魔法抵抗力',
-      id:'mdefense',
+      id:'mdef',
       added:0,
       value:5,
       description:'魔法防御力を5増加。おそらく気合い'
@@ -1820,7 +1826,7 @@ function inventoryOpen(me){
    document.querySelector('#movabledescription').style.display = 'none';
 
    InventoryPage = me??1;
-   let array = ['name','level','exp','hp','maxhp','attack','defense','maxmp','mattack','mdefense','critlate','critdmg','critresist'];
+   let array = ['name','level','exp','hp','maxhp','atk','def','maxmp','matk','mdef','critlate','critdmg','critresist'];
    let Status = array.map(a => `${a}: ${humans.players[InventoryPage][a]}`).join('<br>');
    
    let Sutefuri = Object.key(Sutefuris).map(a => `<button class="button" data-description="${Sutefuris[a].description}" onclick="suteFuri${a}">${a}</button>`).join('<br>');
@@ -2005,20 +2011,20 @@ function suteFuri(me,code){
          who.maxhp += 20;
          who.hp += 20;
          break;
-      case 'attack':
-         who.attack += 5;
+      case 'atk':
+         who.atk += 5;
          break;
-      case 'defense':
-         who.defense += 5;
+      case 'def':
+         who.def += 5;
          break;
       case 'maxmp':
          who.maxmp += 5;
          break;
-      case 'mattack':
-         who.mattack += 5; 
+      case 'matk':
+         who.matk += 5; 
          break;
-      case 'mdefense':
-         who.mdefense += 5;
+      case 'mdef':
+         who.mdef += 5;
          break;
       case 'critlate':
          who.critlate += 2;
@@ -2749,6 +2755,9 @@ function HomeGoDungeon(name){
    logOOmoto.style.display = 'flex';
    log_open('c')
    document.querySelector('#homeArea').style.display = 'none';
+   
+   addob('player', 0, 0, 1, 1, 20, 90, ['move'], {name})
+
    overfieldArea.style.display = 'block';
    NextStage();
 
@@ -2759,6 +2768,15 @@ function HomeGoDungeon(name){
    SELECTy = 0;
    draw()
    movable = 1;
+   
+   loop = 1;
+   gameloop();
+}
+let loop = 0;
+function gameloop(){
+   pUpdate();
+
+   if(loop) requestAnimationFrame(gameloop);
 }
 
 function ExitDungeon(code){
@@ -2967,26 +2985,26 @@ function BankWithdraw(code){
 //       let tcam = tcams[i];
 //       let target = targets[i];
 
-//       let attacker = humans[cam][me];
-//       let defender = humans[tcam][target];
+//       let atker = humans[cam][me];
+//       let defer = humans[tcam][target];
 
-//       console.log(`${attacker.name} => ${defender.name}; 倍率は${rate}で、種類は${kind}でコードは${code}だってよ`);
-//       console.log(`ついでに言うと攻撃力は${attacker.attack}で、防御力は${defender.defense}だから計算上ダメージは${(attacker.attack * attacker.power * rate) - (defender.defense * defender.shell)}になるはずだよ`)
+//       console.log(`${atker.name} => ${defer.name}; 倍率は${rate}で、種類は${kind}でコードは${code}だってよ`);
+//       console.log(`ついでに言うと攻撃力は${atker.atk}で、防御力は${defer.def}だから計算上ダメージは${(atker.atk * atker.power * rate) - (defer.def * defer.shell)}になるはずだよ`)
 
 //       switch(kind){
 //          case 'sh':
 //             //codeは基本0。sは1、dsは2、solは3、スキルなら's'、アイテムなら'i'(ない)
    
-//             if(Weapons[attacker.weapon.id].pp = 0){
-//                Weapons[attacker.weapon.id].process(cam,me,tcam,target,rate,kind,code,1);
+//             if(Weapons[atker.weapon.id].pp = 0){
+//                Weapons[atker.weapon.id].process(cam,me,tcam,target,rate,kind,code,1);
 //             }
    
-//             x = Weapons[attacker.weapon.id].power;
+//             x = Weapons[atker.weapon.id].power;
 //             if(typeof x == 'string'){x = eval(x);};
             
-//             x = (attacker.attack * attacker.power * rate + x);
-//             if(code == 3 && attacker.ps == 'highsol'){x *= 3};
-//             if(code == 3 && attacker.ps == 'solx5but'){x *= 5};
+//             x = (atker.atk * atker.power * rate + x);
+//             if(code == 3 && atker.ps == 'highsol'){x *= 3};
+//             if(code == 3 && atker.ps == 'solx5but'){x *= 5};
 //             if(buffhas(cam,me,'improve')){x *= 1.4;};
 //             if(buffhas(cam,me,'letsthrow')){x *= 2; buffclear(cam,me,'letsthrow');};
 //             if(buffhas(cam,me,'gambling')){
@@ -2995,48 +3013,48 @@ function BankWithdraw(code){
 //                await addtext('ダメージは' + z + '倍になった!!')
 //             };
    
-//             x -= (defender.defense * defender.shell);
+//             x -= (defer.def * defer.shell);
          
-//             if(isCrit(attacker.critlate, humans[tcam][me].critresist)){
-//                x += (defender.defense * defender.shell);
-//                x *= attacker.critdmg;
+//             if(isCrit(atker.critlate, humans[tcam][me].critresist)){
+//                x += (defer.def * defer.shell);
+//                x *= atker.critdmg;
 //                await addtext('会心の一撃！')
 //             };
 
             
 //             x = Math.ceil(x);
 //             if(x < 0){x = 0};
-//             if(x > defender.hp){x = defender.hp};
+//             if(x > defer.hp){x = defer.hp};
    
-//             y = defender.hp;
+//             y = defer.hp;
    
-//             defender.hp -= x;
-//             console.log(`damage:${y}->${defender.hp}(${x})`);
+//             defer.hp -= x;
+//             console.log(`damage:${y}->${defer.hp}(${x})`);
             
-//             if(defender.hp < 0){defender.hp = 0};
+//             if(defer.hp < 0){defer.hp = 0};
             
-//             if(cam == 'players') attacker.ep += Math.floor(10 * attacker.epgain * code == 3 ? 2 : 1);
+//             if(cam == 'players') atker.ep += Math.floor(10 * atker.epgain * code == 3 ? 2 : 1);
 
 //             tekiou();
 
-//             await addtext(`${defender.name}に${x}のダメージ！`)
-//             if(code == 3 && attacker.ps == 'solplaceturret'){turretPlace(cam);}
+//             await addtext(`${defer.name}に${x}のダメージ！`)
+//             if(code == 3 && atker.ps == 'solplaceturret'){turretPlace(cam);}
    
-//             if(defender.hp <= 0){let result = await killed(cam,me,tcam,target);if(result == 'end'){return 'end';}}
+//             if(defer.hp <= 0){let result = await killed(cam,me,tcam,target);if(result == 'end'){return 'end';}}
    
          
             
 //             break;
 //          case 'mg':
 //             //codeは基本0。sは1、dsは2、solは3、スキルなら's'、アイテムなら'i'(ない)
-//             x = (attacker.mattack * attacker.power * rate);
-//             x -= (defender.mdefense * defender.shell);
-//             x = Math.ceil(x);if(x < 0){x = 0};if(x > defender.hp){x = defender.hp};
-//             defender.hp -= x;
+//             x = (atker.matk * atker.power * rate);
+//             x -= (defer.mdef * defer.shell);
+//             x = Math.ceil(x);if(x < 0){x = 0};if(x > defer.hp){x = defer.hp};
+//             defer.hp -= x;
 //             tekiou();
-//             await addtext(`${defender.name}に${x}のダメージ！`)
+//             await addtext(`${defer.name}に${x}のダメージ！`)
 //             await delay(1000);
-//             if(defender.hp <= 0){let result = await killed(cam,me,tcam,target);return result;}
+//             if(defer.hp <= 0){let result = await killed(cam,me,tcam,target);return result;}
 //             break;
 //       }
 //    }   
@@ -3068,101 +3086,101 @@ async function humandamaged(cam, me, tcams, targets, rate, kind, attributes = []
       //固定値 = fixed
       console.log(attributes.includes('fixed') ? `${humans[cam][me].name}=>${humans[tcam][target].name} ${kind}で${rate}ダメージの予定！ ${attributes}` :`${humans[cam][me].name}=>${humans[tcam][target].name} ${kind}で攻撃力の${rate}倍 ${attributes}`);
 
-      let attackerOriginal = humans[cam][me];
-      let defenderOriginal = humans[tcam][target]
+      let atkerOriginal = humans[cam][me];
+      let deferOriginal = humans[tcam][target]
 
       const stats = [
-         'attack', 'defense',
-         'power', 'shell', 'mattack', 'mdefense',
+         'atk', 'def',
+         'power', 'shell', 'matk', 'mdef',
          'critlate', 'critdmg', 'critresist'
       ];
 
-      let attacker = {};
+      let atker = {};
       stats.forEach(stat => {
-         attacker[stat] = attackerOriginal[stat];
+         atker[stat] = atkerOriginal[stat];
       });
 
-      let defender = {};
+      let defer = {};
       stats.forEach(stat => {
-         defender[stat] = defenderOriginal[stat];
+         defer[stat] = deferOriginal[stat];
       });
 
       stats.forEach(stat => {
-         console.log(attacker.buffs)
-         Object.values(attacker.buffs).forEach(buff => {
+         console.log(atker.buffs)
+         Object.values(atker.buffs).forEach(buff => {
             if(buff.data.addable == false){
                if(buff.data.effect.hasOwnProperty(stat)){
-                  attacker[stat] += buff.data.effect[stat].value;
+                  atker[stat] += buff.data.effect[stat].value;
                }
             }else{
                if(buff.data.effect.hasOwnProperty(stat)){
-                  attacker[stat] += buff.value
+                  atker[stat] += buff.value
                }
             }
          });
-         ['weapon','armor','ear','ring','neck'].forEach(bui => {Object.values(attacker[bui]).forEach(buff => {
+         ['weapon','armor','ear','ring','neck'].forEach(bui => {Object.values(atker[bui]).forEach(buff => {
             
          })})
 
-         Object.values(defender.buffs).forEach(buff => {
+         Object.values(defer.buffs).forEach(buff => {
             if(buff.data.addable == false){
                if(buff.data.effect.hasOwnProperty(stat)){
-                  defender[stat] += buff.data.effect[stat].value;
+                  defer[stat] += buff.data.effect[stat].value;
                }
             }else{
                if(buff.data.effect.hasOwnProperty(stat)){
-                  defender[stat] += buff.value
+                  defer[stat] += buff.value
                }
             }
          })
       });
 
       //攻撃力
-      let damage = kind == 'sh' ? (attacker.attack * attacker.power * rate) : (attacker.mattack * attacker.power * rate);
+      let damage = kind == 'sh' ? (atker.atk * atker.power * rate) : (atker.matk * atker.power * rate);
       if(attributes.includes('fixed')) damage = rate;
 
       //防御力
-      if(!attributes.includes('penetrate')) damage -= kind == 'sh' ? (defender.defense * defender.shell) : (defender.mdefense * defender.shell)
+      if(!attributes.includes('penetrate')) damage -= kind == 'sh' ? (defer.def * defer.shell) : (defer.mdef * defer.shell)
 
       //会心
-      if(isCrit(attacker.critlate, defender.critresist) && !attributes.includes('nocrit') || attributes.includes('crit')){
-         damage += (defender.defense * defender.shell);
-         damage *= attacker.critdmg;
+      if(isCrit(atker.critlate, defer.critresist) && !attributes.includes('nocrit') || attributes.includes('crit')){
+         damage += (defer.def * defer.shell);
+         damage *= atker.critdmg;
          await addtext('かいしんのいちげき！')
       };
 
       //整え
       damage = Math.floor(damage);
-      if(defender.hp < damage) damage = defender.hp;
-      console.log(`${defender.hp} => ${defender.hp - damage} | damage:${damage}`);
+      if(defer.hp < damage) damage = defer.hp;
+      console.log(`${defer.hp} => ${defer.hp - damage} | damage:${damage}`);
 
       //実装
       if(!attributes.includes('heal'))
-         defender.hp -= damage;
-      else defender.hp += damage;
+         defer.hp -= damage;
+      else defer.hp += damage;
 
       //ep
       if(cam == 'players') humans[cam][me].ep += Math.floor(10 * humans[cam][me].epgain);
 
       tekiou()
-      await addtext(`${defender.name}に${damage}のダメージ！`)
+      await addtext(`${defer.name}に${damage}のダメージ！`)
 
       //その後
-      if(defender.hp <= 0){let result = await killed(cam,me,tcam,target);return result;}
+      if(defer.hp <= 0){let result = await killed(cam,me,tcam,target);return result;}
 
       //追撃ゾーン　ここどしよ
       if(!attributes.includes('unpursuit')){
-         if(Weapons[attacker.weapon.id].ap){
-            let res = await Weapons[attacker.weapon.id].afterProcess(cam,me,tcam,target,rate,kind,attributes);
+         if(Weapons[atker.weapon.id].ap){
+            let res = await Weapons[atker.weapon.id].afterProcess(cam,me,tcam,target,rate,kind,attributes);
             if(res == 'end'){return 'end'};
          }
 
-         if(attacker.ps == 'enemy50%pursuit' && defender.hp <= defender.maxhp / 2 && enemy50pursuitenelgy == 1 && defender.hp > 0){
+         if(atker.ps == 'enemy50%pursuit' && defer.hp <= defer.maxhp / 2 && enemy50pursuitenelgy == 1 && defer.hp > 0){
             enemy50pursuitenelgy = 0;
             await addtext(arraySelect(['くるくる〜っと','くるりん〜っと']));
             let res = humandamaged(cam,me,tcam,target,0.5,'sh',['unpursuit']);
             if(res == 'end'){return 'end'};
-         }else if(attacker.name == 'herta' && defender.hp <= defender.maxhp / 2 && attacker.level >= 10 && defender.hp > 0){//1凸効果「弱みは付け込み」
+         }else if(atker.name == 'herta' && defer.hp <= defer.maxhp / 2 && atker.level >= 10 && defer.hp > 0){//1凸効果「弱みは付け込み」
             let res = humandamaged(cam,me,tcam,target,0.2,'sh',['unpursuit']);
             if(res == 'end'){return 'end'};
          }
@@ -3176,19 +3194,19 @@ async function humandamaged(cam, me, tcams, targets, rate, kind, attributes = []
 async function buffadd(tcam,target,buff,time,val){//誰のバフ/デバフか,バフ/デバフの名前,効果時間,効果量
    if(!buff || !time || !val){console.error('要素が足りないぜ！！！');}
    let buffData = [...Object.values(Effects.buffs), ...Object.values(Effects.debuffs), ...Object.values(Effects.handles), ...Object.values(Effects.uniques)].find(e => e.name === buff);
-   let defender = humans[tcam][target];
+   let defer = humans[tcam][target];
 
-   console.log(`${defender.name}に${val}の${buff}を${time}付与します！！`);
+   console.log(`${defer.name}に${val}の${buff}を${time}付与します！！`);
 
    let newbuff = {};
 
    switch(buffData.kind){
       case 'turn':{
          //すでにある場合の処理
-         let hasbuffIndex = defender.buffs.findIndex(e => e.name == buff && e.value == val);
+         let hasbuffIndex = defer.buffs.findIndex(e => e.name == buff && e.value == val);
          if(hasbuffIndex >= 0){
-            newbuff = defender.buffs[hasbuffIndex];
-            defender.buffs.splice(hasbuffIndex,1);
+            newbuff = defer.buffs[hasbuffIndex];
+            defer.buffs.splice(hasbuffIndex,1);
             newbuff.time += time;
          }else{
             newbuff = {
@@ -3202,14 +3220,14 @@ async function buffadd(tcam,target,buff,time,val){//誰のバフ/デバフか,�
          }
       };
       tekiou();
-      await addtext(`${defender.name}は${buff}を${time}turn受けた!`);
+      await addtext(`${defer.name}は${buff}を${time}turn受けた!`);
       break;
 
       case 'stack':{
-         let hasbuffIndex = defender.buffs.findIndex(e => e.name == buff);
+         let hasbuffIndex = defer.buffs.findIndex(e => e.name == buff);
          if(hasbuffIndex >= 0){
-            defender.buffs[hasbuffIndex].time += time;
-            defender.buffs[hasbuffIndex].value = buffData.lv[time];
+            defer.buffs[hasbuffIndex].time += time;
+            defer.buffs[hasbuffIndex].value = buffData.lv[time];
          }else{
             newbuff = {
                type: buffData.type,
@@ -3222,7 +3240,7 @@ async function buffadd(tcam,target,buff,time,val){//誰のバフ/デバフか,�
          }
       };
       tekiou();
-      await addtext(`${defender.name}は${buff}を${time}stack受けた!`);
+      await addtext(`${defer.name}は${buff}を${time}stack受けた!`);
       break;
    }
 
@@ -3231,38 +3249,38 @@ async function buffadd(tcam,target,buff,time,val){//誰のバフ/デバフか,�
 }
 function buffremove(tcam,target,buff){
    //誰のバフ/デバフか,バフ/デバフの名前
-   let defender = humans[tcam][target];
-   let i = defender.buffs.findIndex(e => e.name == buff)
-   defender.buffs.splice(i,1);
+   let defer = humans[tcam][target];
+   let i = defer.buffs.findIndex(e => e.name == buff)
+   defer.buffs.splice(i,1);
    tekiou();
 }
 function buffclear(tcam,target,code){
-   let defender = humans[tcam][target];
+   let defer = humans[tcam][target];
    switch(code){
       case 'all':
-         defender.buffs = [];
+         defer.buffs = [];
          break;
       case 'turn':
-         defender.buffs = defender.buffs.filter(e => e.kind != 'turn');
+         defer.buffs = defer.buffs.filter(e => e.kind != 'turn');
          break;
       case 'stack':
-         defender.buffs = defender.buffs.filter(e => e.kind != 'stack');
+         defer.buffs = defer.buffs.filter(e => e.kind != 'stack');
          break;
       case 'buffs':
-         defender.buffs = defender.buffs.filter(e => e.type == 'buffs');
+         defer.buffs = defer.buffs.filter(e => e.type == 'buffs');
          break;
       case 'debuffs':
-         defender.buffs = defender.buffs.filter(e => e.type == 'debuffs');
+         defer.buffs = defer.buffs.filter(e => e.type == 'debuffs');
          break;
       case 'handles':
-         defender.buffs = defender.buffs.filter(e => e.type == 'handles');
+         defer.buffs = defer.buffs.filter(e => e.type == 'handles');
          break;
       case 'uniques':
-         defender.buffs = defender.buffs.filter(e => e.type == 'uniques');
+         defer.buffs = defer.buffs.filter(e => e.type == 'uniques');
          break;
       default:
          console.console('codeが違ったからとりあえず同名消したけど、よかった？');
-         defender.buffs = defender.buffs.filter(e => e.name == code);
+         defer.buffs = defer.buffs.filter(e => e.name == code);
    }
    tekiou();
 }
@@ -3747,8 +3765,8 @@ async function NextTurnis(cam,me,tcam,target){
          cams = 'players';
          let selected = ShallTargetSelect('players','t',`ehpl`,0);
          let tcams = selected[1];let targets = selected[0];
-         console.log(`attack:${humans[cams]['t'].attack} power:${humans[cams]['t'].power} kazu:${humans[cams]['t'].kazu} defense:${humans[tcams][targets].defense} shell:${humans[tcams][targets].shell}`);
-         x = Math.ceil(humans[cams]['t'].attack * humans[cams]['t'].power * humans[cams]['t'].kazu) - Math.ceil(humans[tcams][targets].defense*humans[tcams][targets].shell);
+         console.log(`atk:${humans[cams]['t'].atk} power:${humans[cams]['t'].power} kazu:${humans[cams]['t'].kazu} def:${humans[tcams][targets].def} shell:${humans[tcams][targets].shell}`);
+         x = Math.ceil(humans[cams]['t'].atk * humans[cams]['t'].power * humans[cams]['t'].kazu) - Math.ceil(humans[tcams][targets].def*humans[tcams][targets].shell);
          if(x < 0){x = 0};if(x > humans[tcams][targets].hp){x = humans[tcams][targets].hp};
          humans[tcams][targets].hp -= x;tekiou();
          log.textContent = `${humans[tcams][targets].name}に${x}のダメージ！`;
@@ -3761,7 +3779,7 @@ async function NextTurnis(cam,me,tcam,target){
          cams = 'enemies';
          let selected = ShallTargetSelect('enemies','t',`phpl`,0);
          let tcams = selected[1];let targets = selected[0];
-         x = Math.ceil(humans[cams]['t'].attack * humans[cams]['t'].kazu) - Math.ceil(humans[tcams][targets].defense*humans[tcams][targets].shell);
+         x = Math.ceil(humans[cams]['t'].atk * humans[cams]['t'].kazu) - Math.ceil(humans[tcams][targets].def*humans[tcams][targets].shell);
          if(x < 0){x = 0};if(x > humans[tcams][targets].hp){x = humans[tcams][targets].hp};
          humans[tcams][targets].hp -= x;tekiou();
          log.textContent = `${humans[tcams][targets].name}に${x}のダメージ！`;
@@ -3898,14 +3916,14 @@ function ShallTargetSelect(cam,me,code,both){
    const playerstatus = {
       me:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.me - p2.me).map(a => a.me),
    hp:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.hp - p2.hp).map(a => a.me),
-      atk:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.attack - p2.attack).map(a => a.me),
-      def:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.defense - p2.defense).map(a => a.me),
+      atk:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.atk - p2.atk).map(a => a.me),
+      def:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.def - p2.def).map(a => a.me),
    }
    const enemystatus = {
       me:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.me - e2.me).map(a => a.me),
    hp:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.hp - e2.hp).map(a => a.me),
-      atk:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.attack - e2.attack).map(a => a.me),
-      def:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.defense - e2.defense).map(a => a.me),
+      atk:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.atk - e2.atk).map(a => a.me),
+      def:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.def - e2.def).map(a => a.me),
    }
    let ret = [];
    switch(code){
@@ -4303,10 +4321,10 @@ function DesideEnemyName(target){
    enemy.id = enemyname; //nameは表示用、idは内部処理用
    enemy.name = enemyname;
 
-   enemy.attack = enemyatk;
-   enemy.defense = enemydef;
-   enemy.mattack = enemymatk;
-   enemy.mdefense = enemymdef;
+   enemy.atk = enemyatk;
+   enemy.def = enemydef;
+   enemy.matk = enemymatk;
+   enemy.mdef = enemymdef;
    enemy.maxhp = enemyhp;
    enemy.maxmp = enemymp;
    enemy.critlate = enemycrla;
@@ -4330,7 +4348,7 @@ function DesideEnemyName(target){
    enemy.ns = 'null';
    enemy.ps = 'null';
 
-   let statuses = ['attack','defense','mattack','mdefense','maxhp','maxmp','critlate','critdmg','critresist','speed'];
+   let statuses = ['atk','def','matk','mdef','maxhp','maxmp','critlate','critdmg','critresist','speed'];
    statuses.forEach(statu => {
       if(nameData[statu].startsWith('+') || nameData[statu].startsWith('-')){
          let me = Number(nameData[statu].slice(1));
@@ -4382,10 +4400,10 @@ async function testEnemyAppear(){
    enemy.status = 1;
    enemy.level = 2;
    enemy.name = '縺代▽縺ｰ繧'
-   enemy.attack = 10;
-   enemy.defense = 0;
-   enemy.mattack = 10;
-   enemy.mdefense = 0;
+   enemy.atk = 10;
+   enemy.def = 0;
+   enemy.matk = 10;
+   enemy.mdef = 0;
    enemy.maxhp = 50;
    enemy.maxmp = 50;
    enemy.hp = 50;
@@ -4711,9 +4729,9 @@ async function BossEnemyAppear(){
       case 'purpleslime':
          humans.enemies[me].hp = 300;
          humans.enemies[me].hp = humans.enemies[me].hp;
-         humans.enemies[me].attack = 30;
-         humans.enemies[me].defense = 10;
-         humans.enemies[me].mdefense = 0;
+         humans.enemies[me].atk = 30;
+         humans.enemies[me].def = 10;
+         humans.enemies[me].mdef = 0;
          humans.enemies[me].critlate = 0.01;
          humans.enemies[me].critdmg = 2;
          humans.enemies[me].critresist = 0.5;
@@ -4721,9 +4739,9 @@ async function BossEnemyAppear(){
       case 'steampumker':
          humans.enemies[me].hp = 250;
          humans.enemies[me].hp = humans.enemies[me].hp;
-         humans.enemies[me].attack = 25;
-         humans.enemies[me].defense = 10;
-         humans.enemies[me].mdefense = 20;
+         humans.enemies[me].atk = 25;
+         humans.enemies[me].def = 10;
+         humans.enemies[me].mdef = 20;
          humans.enemies[me].critlate = 0.05;
          humans.enemies[me].critdmg = 2;
          humans.enemies[me].critresist = 0;
@@ -4731,9 +4749,9 @@ async function BossEnemyAppear(){
       case 'RailwayGun "Shemata"':
          humans.enemies[me].hp = 400;
          humans.enemies[me].hp = humans.enemies[me].hp;
-         humans.enemies[me].attack = 35;
-         humans.enemies[me].defense = 20;
-         humans.enemies[me].mdefense = 0;
+         humans.enemies[me].atk = 35;
+         humans.enemies[me].def = 20;
+         humans.enemies[me].mdef = 0;
          humans.enemies[me].critlate = 0;
          humans.enemies[me].critdmg = 0;
          humans.enemies[me].critresist = 0;
@@ -5110,7 +5128,7 @@ let Events = {
          log.textContent = 'あめを食べた..';await delay(500);
          
          let changeyousos = [
-            ['attack','defense','maxhp'],
+            ['atk','def','maxhp'],
             ['攻撃力','防御力','体力'],
             [Math.floor(Math.random()*4)+2,Math.floor(Math.random()*4)+2,Math.floor(Math.random()*10)+5]
          ];
@@ -5137,11 +5155,11 @@ async function Candytake(){
    candybar.push(candynum);
    switch(Math.floor(Math.random()*3)+1){
       case 1:
-         humans.players[0].attack += random(1,4);
+         humans.players[0].atk += random(1,4);
          log.textContent = '攻撃力が上がった！';
          break;
       case 2:
-         humans.players[0].defense += random(1,4);if(humans.players[0].defense < 0){humans.players[0].defense = 0};
+         humans.players[0].def += random(1,4);if(humans.players[0].def < 0){humans.players[0].def = 0};
          log.textContent = '防御力が上がった！';
          break;
       case 3:
@@ -5152,11 +5170,11 @@ async function Candytake(){
    }else{
       switch(random(1,3)){
          case 1:
-            humans.players[0].attack -= random(5,18);if(humans.players[0].attack < 1){humans.players[0].attack = 1};
+            humans.players[0].atk -= random(5,18);if(humans.players[0].atk < 1){humans.players[0].atk = 1};
             log.textContent = '攻撃力が下がった！';
             break;
          case 2:
-            humans.players[0].defense -= random(3,12);if(humans.players[0].defense < 0){humans.players[0].defense = 0};
+            humans.players[0].def -= random(3,12);if(humans.players[0].def < 0){humans.players[0].def = 0};
             log.textContent = '防御力が下がった！';
             break;
          case 3:
@@ -5235,11 +5253,11 @@ async function Cookietake(){
    await delay(1000);
    switch(Math.floor(Math.random()*3)+1){
       case 1:
-         humans.players[0].attack += 5 ;
+         humans.players[0].atk += 5 ;
          x = '熱い！焼きたてだぜ！！';
          break;
       case 2:
-         humans.players[0].defense += 5;
+         humans.players[0].def += 5;
          x = '硬い！凍ってたかもしんねぇ！！';
          break;
       case 3:
@@ -5294,8 +5312,8 @@ async function CatusAct(){
    if(humans.players[0].hp > 10){
       log.textContent = 'いてっ';
       humans.players[0].hp -= 10;
-      humans.players[0].attack += 5;
-      if(stage == 3) humans.players[0].hp -= 10, humans.players[0].attack += 5;
+      humans.players[0].atk += 5;
+      if(stage == 3) humans.players[0].hp -= 10, humans.players[0].atk += 5;
       objmap[MAPy][MAPx].id = 0;
    }else{
       log.textContent = 'なんか..今触ったら死にそう....'
@@ -5311,7 +5329,7 @@ async function ScorpionAct(code){
       case 1:await buffadd('playerbuff','poison','turn',3,1);break;
       case 2:await buffadd('playerbuff','poison','turn',3,2);break;
    }
-   playerattack += 10*code;
+   playeratk += 10*code;
    objmap[MAPy][MAPx].id = 0;
    await delay(500);
    

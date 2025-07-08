@@ -16,10 +16,10 @@ let Charas = {
     ex:'null',
     ns:'null',
     ps:'null',
-    attack:20,
-    defense:0,
-    mattack:10,
-    mdefense:0,
+    atk:20,
+    def:0,
+    matk:10,
+    mdef:0,
     maxhp:100,
     maxmp:50,
     critlate:5,
@@ -37,10 +37,10 @@ let Charas = {
     ex:'null',
     ns:'null',
     ps:'null',
-    attack:20,
-    defense:0,
-    mattack:10,
-    mdefense:0,
+    atk:20,
+    def:0,
+    matk:10,
+    mdef:0,
     maxhp:100,
     maxmp:50,
     critlate:0,
@@ -58,10 +58,10 @@ let Charas = {
     ex:'placeturret',
     ns:'throwwrench',
     ps:'solplaceturret',
-    attack:25,
-    defense:0,
-    mattack:20,
-    mdefense:20,
+    atk:25,
+    def:0,
+    matk:20,
+    mdef:20,
     maxhp:25,
     maxmp:30,
     critlate:7,
@@ -79,10 +79,10 @@ let Charas = {
     ex:'trickyvaiavles',
     ns:'gambler',
     ps:'highsol',
-    attack:20,
-    defense:0,
-    mattack:10,
-    mdefense:0,
+    atk:20,
+    def:0,
+    matk:10,
+    mdef:0,
     maxhp:100,
     maxmp:50,
     critlate:9,
@@ -100,10 +100,10 @@ let Charas = {
     ex:'lightningstorm',
     ns:'elecbarrier',
     ps:'elecshock',
-    attack:10,
-    defense:0,
-    mattack:30,
-    mdefense:20,
+    atk:10,
+    def:0,
+    matk:30,
+    mdef:20,
     maxhp:40,
     maxmp:100,
     critlate:5,
@@ -304,7 +304,7 @@ let Effects = {
         //ターン終了時xダメージ
         effect:{
           'burn':10,
-          'attack':-3
+          'atk':-3
         }
     },
     'injury':{
@@ -445,13 +445,13 @@ let Slashs = {
     tcam:'players',
     process:async function(cam,me,tcam,target){
         if(probability(67)){//端数切り上げは許してくれ
-          let result = await humandamaged(cam,me,tcam,target,1,'sh',2);
+          let result = await humandamaged(cam,me,tcam,target,100,'sh',2);
           if(result) return 1;
         }else{
           addlog('miss!');
         }
         if(probability(67)){
-          let result = await humandamaged(cam,me,tcam,target,1,'sh',2);
+          let result = await humandamaged(cam,me,tcam,target,100,'sh',2);
           if(result) return 1;
         }else{
           addlog('miss!');
@@ -481,7 +481,7 @@ let Slashs = {
               log.textContent = 'miss! ダメージを与えられない!';
               await delay(1000);
           }else{
-              humans[cam][me].hp -= (humans[cam][me].attack + humans[cam][me].weapon.power);
+              humans[cam][me].hp -= (humans[cam][me].atk + humans[cam][me].weapon.power);
               if(humans[cam][me].hp <= 0){humans[cam][me].hp = 1;};
               tekiou();
               log.textContent = humans[cam][me].name+'は混乱して自分を殴った！';
@@ -558,8 +558,10 @@ let Magics = {
     lv:4,
     process:async function(cam,me,tcam,target){
         await addtext(`${humans[cam][me].name}はサンディを唱えた!!`);
-        let result = await humandamaged(cam,me,tcam,target,0.7,'mg',4);//雷 なんかいい感じにしといて fi,aq,th,wi,da,liみたいな
-        return result;
+        let result = await humandamaged(cam,me,tcam,target,30,'mg',4);//雷 なんかいい感じにしといて fi,aq,th,wi,da,liみたいな
+        if(result) return 1;
+        if(probability(2)) buffadd(cam, me, tcam, target, 'hirumi', 1)
+        return 0;
     }
   },
   'garva':{
@@ -570,7 +572,7 @@ let Magics = {
     lv:4,
     process:async function(cam,me,tcam,target){
         await addtext(`${humans[cam].name}はガーヴァを唱えた！`);
-        let result = await humandamaged(cam,me,tcam,target,1.1,'mg',2);//火
+        let result = await humandamaged(cam,me,tcam,target,110,'mg',2);//火
         if(result) return 1;
         if(probability(10)) await buffadd(tcam,target,'burn','turn',2,1);
         return 0;
@@ -601,15 +603,17 @@ let Magics = {
         return 0;
     }
   },
-  'サンドス':{
+  'thundos':{
     id:'thundos',
     name:'サンドス',
-    description:'二段目。',
+    description:'二段目。<br>サンドじゃないんです許してください',
     mp:8,
     lv:8,
     process:async function(cam,me,tcam,target){
-        await addtext(`${humans[cam][me].name}はellthunderを唱えた!`);
-        humandamaged(cam,me,tcam,target,1.2,'mg',4);//雷
+        await addtext(`${humans[cam][me].name}はサンドスを唱えた!`);
+
+        humandamaged(cam,me,tcam,target,120,'mg',4);//雷
+        if(probability(5)) buffadd(cam,me,tcam,target,'hirumi',1)
         return 0
     }
   },
@@ -620,8 +624,8 @@ let Magics = {
     mp:8,
     lv:9,
     process:async function(cam,me,tcam,target){
-        await buffadd(tcam,target,'powerup','turn',3,2)
-        log.textContent = humans[cam][me].name + 'はmore powerを唱えた!';await delay(1000);
+        await buffadd(tcam,target,'powerup',3,2)
+        await addtext(`${humans[cam][me].name}はmore powerを唱えた!`);
         return 0
     }
   },
@@ -632,9 +636,9 @@ let Magics = {
     mp:8,
     lv:9,
     process:async function(cam,me,tcam,target){
-        await buffadd(tcam,target,'shellup','turn',3,2)
-        log.textContent = humans[cam][me].name + 'はmore shellを唱えた!';await delay(1000);
-        return 'alive'
+        await buffadd(tcam,target,'shellup',3,2)
+        await addtext(`${humans[cam][me].name}はmore shellを唱えた!`);
+        return 0
     }
   },
   'deadlypoison':{
@@ -645,19 +649,19 @@ let Magics = {
     lv:10,
     process:async function(cam,me,tcam,target){
         await buffadd(tcam,target,'poison','turn',5,2);
-        log.textContent = humans[cam][me].name + 'はdeadly poisonを唱えた!';await delay(1000);
-        return 'alive'
+        await addtext(`${humans[cam][me].name }はdeadly poisonを唱えた!`);
+        return 0;
     }
   },
-  'gigafire':{
-    id:'gigafire',
-    name:'giga fire',
-    description:'激ウザ攻撃No2ですね。1はPKファイア。<br>これの後にスマッシュするのが最高(炎の中ダメージ)',//ずっっっとルフレの話してます私 まじであの人楽しい
+  'garvan':{
+    id:'garvan',
+    name:'ガーヴァン',
+    description:'<br>notラージャン',
     mp:10,
     lv:11,
     process:async function(cam,me,tcam,target){
         log.textContent = humans[cam][me].name + 'はgiga fireを唱えた!';await delay(1000);
-        let result = await humandamaged(cam,me,tcam,target,2.3,'mg',2);//火
+        let result = await humandamaged(cam,me,tcam,target,230,'mg',2);//火
         await buffadd(tcam,target,'burn','turn',2,2);
         return result
     }
@@ -875,8 +879,8 @@ let Weapons = {
     description:'名前意味わからんランキング第1位。<br>攻撃時相手の体力を吸い回復する。<br>変換効率は80%..水力発電と同じくらい',
     buyable:1,
     ap:1,
-    afterProcess:async function(cam,me,tcam,target,rate,kind,attributes,damage){
-        x = (damage * 0.80).toFixed(0);
+    afterProcess:async function(cam,me,tcam,target,rate,kind,attributes,dmg){
+        x = (dmg * 0.80).toFixed(0);
         humans[cam][me].hp += x;
         if(humans[cam][me].hp > humans[cam][me].maxhp){humans[cam][me].hp = humans[cam][me].maxhp;}
         addtext('血を吸った！');
@@ -895,7 +899,7 @@ let Weapons = {
     description:'ナギサ様の手好き',
     buyable:1,
     ap:1,
-    afterProcess:async function(cam,me,tcam,target,rate,kind,attributes,damage){
+    afterProcess:async function(cam,me,tcam,target,rate,kind,attributes,dmg){
         addtext(arraySelect(['トリニティの砲撃術は優秀ですから。','お口に合うと良いのですが..']));
         let result = await humandamaged(cam,me,tcam,target,0.4,kind,['unpursuit']);
         if(result == 'end'){return 'end';}
@@ -915,7 +919,7 @@ let Weapons = {
     ap:0,
     ce:1,
     combatEffect:{
-        attack: Math.floor(Math.random()*100)+1,
+        atk: Math.floor(Math.random()*100)+1,
     }
   },
   'contrarian':{
@@ -1608,11 +1612,11 @@ let Enemies = {
     name:'蒼白の粘液',
     stage:1,
     maxhp:'+10',
-    attack:'+0',
-    defense:'-10',
+    atk:'+0',
+    def:'-10',
     maxmp:'0',
-    mattack:'0',
-    mdefense:'-20',
+    matk:'0',
+    mdef:'-20',
     critlate:'-0.01',
     critdmg:'-1',
     critresist:'+1',
@@ -1647,11 +1651,11 @@ let Enemies = {
     name:'翠嵐の風刃',
     stage:1,
     maxhp:'+10',
-    attack:'+10',
-    defense:'-10',
+    atk:'+10',
+    def:'-10',
     maxmp:'0',
-    mattack:'+0',
-    mdefense:'+0',
+    matk:'+0',
+    mdef:'+0',
     critlate:'+0.3',
     critdmg:'+0.5',
     critresist:'+0',
@@ -1687,11 +1691,11 @@ let Enemies = {
     name:'黄昏の穿影',
     stage:1,
     maxhp:'-10',
-    attack:'+15',
-    defense:'+0',
+    atk:'+15',
+    def:'+0',
     maxmp:'0',
-    mattack:'+0',
-    mdefense:'+0',
+    matk:'+0',
+    mdef:'+0',
     critlate:'+0',
     critdmg:'+0',
     critresist:'+0',
@@ -1741,11 +1745,11 @@ let Enemies = {
     name:'燐光の妖花',
     stage:1,
     maxhp:'-15',
-    attack:'-10',
-    defense:'+0',
+    atk:'-10',
+    def:'+0',
     maxmp:'0',
-    mattack:'+0',
-    mdefense:'+15',
+    matk:'+0',
+    mdef:'+15',
     critlate:'+0',
     critdmg:'+0.5',
     critresist:'+0.1',
@@ -1798,11 +1802,11 @@ let Enemies = {
   '古書館の魔術師':{//ウイさん　コッペパンの"めっちゃ好きなキャラ"。ヒナタさんと仲がいい。
     name:'古書館の魔術師',
     maxhp:'-10',
-    attack:'-15',
-    defense:'+5',
+    atk:'-15',
+    def:'+5',
     maxmp:'0',
-    mattack:'+0',
-    mdefense:'+20',
+    matk:'+0',
+    mdef:'+20',
     critlate:'+0.05',
     critdmg:'+0',
     critresist:'+0.1',
@@ -1843,11 +1847,11 @@ let Enemies = {
   '読書マニアな司書':{ //シミコさん
     name:'読書マニアな司書',
     maxhp:'+10',
-    attack:'+10',
-    defense:'-10',
+    atk:'+10',
+    def:'-10',
     maxmp:'0',
-    mattack:'+0',
-    mdefense:'+0',
+    matk:'+0',
+    mdef:'+0',
     critlate:'+0.3',
     critdmg:'+0.5',
     critresist:'+0',
@@ -1876,11 +1880,11 @@ let Enemies = {
   '忍び寄るナース':{ //セリナさん
     name:'忍び寄るナース',
     maxhp:'+10',
-    attack:'+0',
-    defense:'+10',
+    atk:'+0',
+    def:'+10',
     maxmp:'0',
-    mattack:'+0',
-    mdefense:'+0',
+    matk:'+0',
+    mdef:'+0',
     critlate:'+0',
     critdmg:'+0',
     critresist:'+0',
@@ -1911,11 +1915,11 @@ let Enemies = {
   '「救護」のプロ':{ //ミネさん
     name:'「救護」のプロ',
     maxhp:'+10',
-    attack:'+0',
-    defense:'+10',
+    atk:'+0',
+    def:'+10',
     maxmp:'0',
-    mattack:'+0',
-    mdefense:'+0',
+    matk:'+0',
+    mdef:'+0',
     critlate:'+0',
     critdmg:'+0',
     critresist:'+0',
@@ -1949,8 +1953,8 @@ let Prefixes = {
     name:'激昂',
     rare:1,
     process:function(cam,me){
-      humans[cam][me].attack  = Math.floor(humans[cam][me].attack*1.5);
-      humans[cam][me].defense = Math.floor(humans[cam][me].defense*0.75);
+      humans[cam][me].atk  = Math.floor(humans[cam][me].atk*1.5);
+      humans[cam][me].def = Math.floor(humans[cam][me].def*0.75);
       humans[cam][me].critlate = 0.05
     },
   },
@@ -1959,8 +1963,8 @@ let Prefixes = {
     name:'冷静沈着な',
     rare:1,
     process:function(cam,me){
-      humans[cam][me].attack  = Math.floor(humans[cam][me].attack*0.75);
-      humans[cam][me].defense = Math.floor(humans[cam][me].defense*2.0);
+      humans[cam][me].atk  = Math.floor(humans[cam][me].atk*0.75);
+      humans[cam][me].def = Math.floor(humans[cam][me].def*2.0);
       humans[cam][me].critrate = 5
     },
   },
@@ -1980,8 +1984,8 @@ let Prefixes = {
     process:function(cam,me){
       humans[cam][me].critresist += 5;
       humans[cam][me].maxhp = Math.floor(humans[cam][me].maxhp*1.25);
-      humans[cam][me].defense = Math.floor(humans[cam][me].defense*1.5);
-      humans[cam][me].attack = Math.floor(humans[cam][me].attack*0.3)
+      humans[cam][me].def = Math.floor(humans[cam][me].def*1.5);
+      humans[cam][me].atk = Math.floor(humans[cam][me].atk*0.3)
     },
   },
   'wise':{
@@ -1991,7 +1995,7 @@ let Prefixes = {
     process:function(cam,me){
       humans[cam][me].critlate = 100; //確定会心人間
       humans[cam][me].critdmg = 1.2; //さすがに弱め
-      humans[cam][me].attack = Math.floor(humans[cam][me].attack*0.3); //つまり防御力無視害悪敵ってこと
+      humans[cam][me].atk = Math.floor(humans[cam][me].atk*0.3); //つまり防御力無視害悪敵ってこと
     },
   },
 }
@@ -2240,119 +2244,144 @@ let NanigaOkirukana = {
   }
 }
 
+let Objectdatas = {
+  'enemy':{
+    'none':{
+      id: 'enemy',
+      name: 'none',
+      w: 1, //1 == 1massの意
+      h: 1,
+      spd: 20,
+      pass: 0,
+    }
+  }
+}
+
 //#region 移行よろ
-async function humandamaged(cam, me, tcams, targets, rate, kind, attributes = []){
-  if(!Array.isArray(tcams)){tcams = [tcams];}
-  if(!Array.isArray(targets)){targets = [targets];}
-  for(let i = 0; i < tcams.length; i++){
-    let tcam = tcams[i];
-    let target = targets[i];
+async function humandamaged(who, tages, value, kind, attributes = []){
+  let hasa = (name) => attributes.includes(name);
+  if(!Array.isArray(tages)){tages = [tages];}
+  for(let tag of tages){
     //攻撃x回復o = heal 攻撃+攻撃者与ダメ回復 = absorb
     //防御無視 = penetrate 確定会心 = crit 会心無効 = nocrit
     //固定値 = fixed
-    console.log(attributes.includes('fixed') ? `${humans[cam][me].name}=>${humans[tcam][target].name} ${kind}で${rate}ダメージの予定！ ${attributes}` :`${humans[cam][me].name}=>${humans[tcam][target].name} ${kind}で攻撃力の${rate}倍 ${attributes}`);
+    console.log(hasa('fixed') ? `${who.name} => ${tag.name} ${kind}で${value}ダメージの予定！ [${attributes}]` :
+      `${who.name} => ${tag.name} ${kind}で攻撃力の${value}倍 [${attributes}]`);
 
-    let attackerOriginal = humans[cam][me];
-    let defenderOriginal = humans[tcam][target]
+
+    /*
+    let orgAtker = {...who};
+    let orgDefer = {...tag};
 
     const stats = [
-      'attack', 'defense',
-      'power', 'shell', 'mattack', 'mdefense',
+      'hp', 'maxhp', 'mp', 'maxmp'
+      'atk', 'def',
+      'power', 'shell', 'matk', 'mdef',
       'critlate', 'critdmg', 'critresist'
     ];
 
-    let attacker = {};
+    let atker = {};
     stats.forEach(stat => {
-      attacker[stat] = attackerOriginal[stat];
+      atker[stat] = orgAtker[stat];
     });
 
-    let defender = {};
+    let defer = {};
     stats.forEach(stat => {
-      defender[stat] = defenderOriginal[stat];
+      defer[stat] = orgDefer[stat];
     });
+    */
+
+    let atker = {...who};
+    let defer = {...tag}
 
     stats.forEach(stat => {
-      console.log(attacker.buffs)
-      Object.values(attacker.buffs).forEach(buff => {
-        if(buff.data.addable == false){
+      console.log(atker.buffs)
+      Object.values(atker.buffs).forEach(buff => {
+        if(!buff.data.addable){
           if(buff.data.effect.hasOwnProperty(stat)){
-            attacker[stat] += buff.data.effect[stat].value;
+            atker[stat] += buff.data.effect[stat].value;
           }
         }else{
           if(buff.data.effect.hasOwnProperty(stat)){
-            attacker[stat] += buff.value
+            atker[stat] += buff.value
           }
         }
       });
-      ['weapon','armor','ear','ring','neck'].forEach(bui => {Object.values(attacker[bui]).forEach(buff => {
+      ['weapon','armor','ear','ring','neck'].forEach(bui => {Object.values(atker[bui]).forEach(buff => {
           
       })})
 
-      Object.values(defender.buffs).forEach(buff => {
-        if(buff.data.addable == false){
+      Object.values(defer.buffs).forEach(buff => {
+        if(!buff.data.addable){
           if(buff.data.effect.hasOwnProperty(stat)){
-            defender[stat] += buff.data.effect[stat].value;
+            defer[stat] += buff.data.effect[stat].value;
           }
         }else{
           if(buff.data.effect.hasOwnProperty(stat)){
-            defender[stat] += buff.value
+            defer[stat] += buff.value
           }
         }
       })
     });
 
     //攻撃力
-    let damage = kind == 'sh' ? (attacker.attack * attacker.power * rate) : (attacker.mattack * attacker.power * rate);
-    if(attributes.includes('fixed')) damage = rate;
-
-    //防御力
-    if(!attributes.includes('penetrate')) damage -= kind == 'sh' ? (defender.defense * defender.shell) : (defender.mdefense * defender.shell)
+    let atkval = kind == 'sh' ? atker.atk : atker.matk;
+    let dmg = (atkval * atker.power * value/100);
+    if(hasa('fixed')) dmg = value;
 
     //会心
-    if(isCrit(attacker.critlate, defender.critresist) && !attributes.includes('nocrit') || attributes.includes('crit')){
-      damage += (defender.defense * defender.shell);
-      damage *= attacker.critdmg;
-      await addtext('かいしんのいちげき！')
+    let crited = 0;
+    if(isCrit(atker, defer)) crited = 1;
+    if((crited && !hasa('nocrit')) || hasa('crit')){
+      dmg *= atker.critdmg / 100;
+      if(who.cam == 'players') await addtext('かいしんのいちげき！');
+      if(who.cam == 'enemies') await addtext('つーこんのいちげき！');
     };
 
+    //防御力
+    let defval = kind == 'sh' ? defer.def : defer.mdef;
+    if(!hasa('penetrate')) dmg -= (defval * defer.shell);
+
     //整え
-    damage = Math.floor(damage);
-    if(defender.hp < damage) damage = defender.hp;
-    console.log(`${defender.hp} => ${defender.hp - damage} | damage:${damage}`);
+    dmg = Math.floor(dmg);
+    if(defer.hp < dmg) dmg = defer.hp;
+    console.log(`予測:: ${defer.hp} => ${defer.hp - dmg} | dmg:${dmg}`);
 
     //実装
-    if(!attributes.includes('heal'))
-      defender.hp -= damage;
-    else defender.hp += damage;
+    if(!hasa('heal')) defer.hp -= dmg;
+    else defer.hp += dmg;
 
     //ep
     if(cam == 'players') humans[cam][me].ep += Math.floor(10 * humans[cam][me].epgain);
 
     tekiou()
-    await addtext(`${defender.name}に${damage}のダメージ！`)
+    await addtext(`${defer.name}に${dmg}のダメージ`)
 
     //その後
-    if(defender.hp <= 0){let result = await killed(cam,me,tcam,target);return result;}
+    let result = 0;
+    if(defer.hp <= 0) result = await killed(cam,me,tcam,target);
+    if(result) return 1;
 
     //追撃ゾーン　ここどしよ
-    if(!attributes.includes('unpursuit')){
-      if(Weapons[attacker.weapon.id].ap){
-        let res = await Weapons[attacker.weapon.id].afterProcess(cam,me,tcam,target,rate,kind,attributes);
+    if(!hasa('unpursuit')){
+      if(Weapons[atker.weapon.id].ap){
+        let res = await Weapons[atker.weapon.id].afterProcess(cam,me,tcam,target,value,kind,attributes);
         if(res == 'end'){return 'end'};
       }
 
-      if(attacker.ps == 'enemy50%pursuit' && defender.hp <= defender.maxhp / 2 && enemy50pursuitenelgy == 1 && defender.hp > 0){
+      if(atker.name == 'herta' && defer.hp <= defer.maxhp / 2 && atker.level >= 10){ // 1凸効果「弱みは付け込み」
+        result = humandamaged(who, tag, 20, 'sh', ['unpursuit']);
+        if(result) return 1;
+      }
+      if(atker.ps == 'enemy50%pursuit' && defer.hp <= defer.maxhp / 2 && enemy50pursuitenelgy == 1){
         enemy50pursuitenelgy = 0;
         await addtext(arraySelect(['くるくる〜っと','くるりん〜っと']));
-        let res = humandamaged(cam,me,tcam,target,0.5,'sh',['unpursuit']);
-        if(res == 'end'){return 'end'};
-      }else if(attacker.name == 'herta' && defender.hp <= defender.maxhp / 2 && attacker.level >= 10 && defender.hp > 0){//1凸効果「弱みは付け込み」
-        let res = humandamaged(cam,me,tcam,target,0.2,'sh',['unpursuit']);
-        if(res == 'end'){return 'end'};
+        result = humandamaged(who, tag, 50, 'sh', ['unpursuit']);
+        if(result) return 1;
       }
     }
   }
-  return 'alive';
+  return 0;
 }
 
 async function heal(who, tag, value, code = 'add', ...prop){
@@ -2382,3 +2411,36 @@ async function heal(who, tag, value, code = 'add', ...prop){
   return
 }
 //#endregion
+
+
+function cm(cam = '指定なし', me = '指定なし'){
+  if(cam == '指定なし' && me == '指定なし') cam = 'players', me = 0; //超特別扱い
+  
+  let who;
+  if(me == '指定なし') who = humans[cam];
+  else who = humans[cam][me];
+
+  return who;
+}
+
+
+function isCrit(who, tag){
+  let lat = who.critlate;
+  let res = tag.critresist;
+  let is = 0;
+
+  if(!attributes.includes('nocrit')) return 
+  
+  if(res == 'absolute'){
+    is = 0;
+    console.log('会心無効！')
+  }else if(lat == 'absolute'){
+    is = 1;
+    console.log('確定会心！')
+  }else{
+    is = Math.random() < (lat - res) / 100;
+    console.log(`${lat - res}%...結果は${is ? 'true' : 'false'}!!`)
+  }
+
+  return is;
+}
