@@ -667,11 +667,15 @@ async function pUpdate(){
    if((keys.z || keys.enter) && textShowing == 0 && !p.moving){
       // 今乗ってるやつ（on = true かつ座標が同じ）
       let obon = Objects.filter(a => a.x == p.x && a.y == p.y && a.on);
-      if(obon.length > 1 || obon.length == 0) return console.log(obon);
-      draw();
-      let res = NanigaOkirukana[obon[0].id].process();
-      draw();
-      if(res) return 1;
+      if(obon.length > 1) return console.log('onのやつらが重なってるみたいっす！',obon);
+      else if(obon.length == 1){
+         draw();
+         let obonid = obon[0].id;
+         if(!NanigaOkirukana[obonid]) return console.log(obon,'←これのidの処理、書いてないっすよ〜？(ニヤっ)')
+         let res = NanigaOkirukana[obonid].process();
+         draw();
+         if(res) return 1;
+      }
 
       // 目の前にあるやつ（on = false かつ向いてる方向）
       let karix = 0, kariy = 0;
@@ -685,7 +689,9 @@ async function pUpdate(){
       let arr = Objects.filter(a => a.x == p.x + karix && a.y == p.y + kariy && !a.on)
       for(let nobon of arr){
          draw();
-         let res = NanigaOkirukana[nobon.id].process();
+         let nobonid = nobon.id;
+         if(!NanigaOkirukana[nobonid]) return console.log(nobon,'←これのidの処理、書いてないっすよ〜？(ニヤっ)');
+         let res = NanigaOkirukana[nobonid].process();
          draw();
          if(res) return 1;
       }
@@ -695,7 +701,7 @@ async function pUpdate(){
       error()
    }
    
-
+};
    // ここに爆弾　一旦廃止してます
    // if(moved == 1){
    // if(objmap.some(row => row.includes(15))){
@@ -779,7 +785,7 @@ async function pUpdate(){
    //    }
 
    // }
-};
+
 
 document.addEventListener('keydown', (event) => {
    

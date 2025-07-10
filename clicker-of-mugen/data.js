@@ -422,15 +422,15 @@ let Slashs = {
     lv:1,
     tcam:'players',
     process:async function(cam,me,tcam,target){
-        let result = await humandamaged(cam,me,tcam,target,100,'sh',1);
+        let result = await damage(cam,me,tcam,target,100,'sh',1);
         if(result) return 1;
 
         //elseesに移行よろ
         if(humans[cam][me].ps == 'sthree' && probability(25)){
           await addtext(`${get(cam, me).name}は頑張った!`);
-          result = await humandamaged(cam,me,tcam,target,100,'sh',1);
+          result = await damage(cam,me,tcam,target,100,'sh',1);
           if(result) return 1;
-          result = await humandamaged(cam,me,tcam,target,100,'sh',1);
+          result = await damage(cam,me,tcam,target,100,'sh',1);
           if(result) return 1;
         }
         return 0;
@@ -445,13 +445,13 @@ let Slashs = {
     tcam:'players',
     process:async function(cam,me,tcam,target){
         if(probability(67)){//端数切り上げは許してくれ
-          let result = await humandamaged(cam,me,tcam,target,100,'sh',2);
+          let result = await damage(cam,me,tcam,target,100,'sh',2);
           if(result) return 1;
         }else{
           addlog('miss!');
         }
         if(probability(67)){
-          let result = await humandamaged(cam,me,tcam,target,100,'sh',2);
+          let result = await damage(cam,me,tcam,target,100,'sh',2);
           if(result) return 1;
         }else{
           addlog('miss!');
@@ -473,7 +473,7 @@ let Slashs = {
 
         let result = 0;
         if(probability(pro)){
-          result = await humandamaged(cam,me,tcam,target,300,'sh',3);
+          result = await damage(cam,me,tcam,target,300,'sh',3);
           if(result) return dead;
         }else{
           //let result = letsHappen(tcam, target, cam, me, 'missed', 'sl', 'slashoflight');
@@ -558,7 +558,7 @@ let Magics = {
     lv:4,
     process:async function(cam,me,tcam,target){
         await addtext(`${humans[cam][me].name}はサンディを唱えた!!`);
-        let result = await humandamaged(cam,me,tcam,target,30,'mg',4);//雷 なんかいい感じにしといて fi,aq,th,wi,da,liみたいな
+        let result = await damage(cam,me,tcam,target,30,'mg',4);//雷 なんかいい感じにしといて fi,aq,th,wi,da,liみたいな
         if(result) return 1;
         if(probability(2)) buffadd(cam, me, tcam, target, 'hirumi', 1)
         return 0;
@@ -572,7 +572,7 @@ let Magics = {
     lv:4,
     process:async function(cam,me,tcam,target){
         await addtext(`${humans[cam].name}はガーヴァを唱えた！`);
-        let result = await humandamaged(cam,me,tcam,target,110,'mg',2);//火
+        let result = await damage(cam,me,tcam,target,110,'mg',2);//火
         if(result) return 1;
         if(probability(10)) await buffadd(tcam,target,'burn','turn',2,1);
         return 0;
@@ -612,7 +612,7 @@ let Magics = {
     process:async function(cam,me,tcam,target){
         await addtext(`${humans[cam][me].name}はサンドスを唱えた!`);
 
-        humandamaged(cam,me,tcam,target,120,'mg',4);//雷
+        damage(cam,me,tcam,target,120,'mg',4);//雷
         if(probability(5)) buffadd(cam,me,tcam,target,'hirumi',1)
         return 0
     }
@@ -661,7 +661,7 @@ let Magics = {
     lv:11,
     process:async function(cam,me,tcam,target){
         log.textContent = humans[cam][me].name + 'はgiga fireを唱えた!';await delay(1000);
-        let result = await humandamaged(cam,me,tcam,target,230,'mg',2);//火
+        let result = await damage(cam,me,tcam,target,230,'mg',2);//火
         await buffadd(tcam,target,'burn','turn',2,2);
         return result
     }
@@ -702,7 +702,7 @@ let Magics = {
     process:async function(cam,me,tcam,target){
         log.textContent = humans[cam][me].name + 'はメラゾーマを唱えた!';
         await delay(1000);
-        let result = await humandamaged(cam,me,tcam,target,3.5,'mg',4);//雷
+        let result = await damage(cam,me,tcam,target,3.5,'mg',4);//雷
         await buffadd(tcam,target,'burn','turn',3,2);
         return result
     }
@@ -715,7 +715,7 @@ let Magics = {
     lv:15,
     process:async function(cam,me,tcam,target){
         log.textContent = 'トロン！！！';await delay(1000);//byルフレ
-        let result = await humandamaged(cam,me,tcam,target,6,'mg',4);//雷
+        let result = await damage(cam,me,tcam,target,6,'mg',4);//雷
         return result
     }
   },
@@ -901,7 +901,7 @@ let Weapons = {
     ap:1,
     afterProcess:async function(cam,me,tcam,target,rate,kind,attributes,dmg){
         addtext(arraySelect(['トリニティの砲撃術は優秀ですから。','お口に合うと良いのですが..']));
-        let result = await humandamaged(cam,me,tcam,target,0.4,kind,['unpursuit']);
+        let result = await damage(cam,me,tcam,target,0.4,kind,['unpursuit']);
         if(result == 'end'){return 'end';}
         await buffadd(tcam,target,'shelldown','turn',3,1);
         return 'alive';
@@ -1132,7 +1132,7 @@ let Tools = {
     process:async function(cam,me,tcam,target){
         await addtext('では、ナイフの錆にしてあげましょう');
         x = Math.ceil(humans[tcam][target].hp*0.2);
-        let result = await humandamaged(cam,me,tcam,target,x,'sh',['unpursuit','fixed'])
+        let result = await damage(cam,me,tcam,target,x,'sh',['unpursuit','fixed'])
         tekiou();
         await addtext(`${humans[tcam][target].name}に${x}のダメージ！`);
         if(result == 'end'){return 'end'};
@@ -1158,7 +1158,7 @@ let Tools = {
               await addtext('これぞ醍醐味、ってやつ？');
               x = Math.floor(humans[tcam][target].hp*0.40);break;
         };
-        let result = await humandamaged(cam,me,tcam,target,x,'sh',['unpursuit','fixed'])
+        let result = await damage(cam,me,tcam,target,x,'sh',['unpursuit','fixed'])
         if(result == 'end'){return 'end'};
         return 'alive';
     }
@@ -1171,7 +1171,7 @@ let Tools = {
     num:0,
     process:async function(cam,me,tcam,target){
         await addtext('これはちょっと、スパイシーなやつだよ');
-        let result = await humandamaged(cam,me,tcam,target,0.8,'mg',['unpursuit'])
+        let result = await damage(cam,me,tcam,target,0.8,'mg',['unpursuit'])
         if(result == 'end'){
           await addtext('レッドウィンターの問題児にしては上出来じゃない？');
           return 'dead';
@@ -1189,7 +1189,7 @@ let Tools = {
     process:async function(cam,me,tcam,target){
         await addtext('え、援護します...');
         let x = Math.ceil(humans[tcam][target].hp*0.6);
-        let result = await humandamaged(cam,me,tcam,target,x,'mg',['unpursuit','fixed']);
+        let result = await damage(cam,me,tcam,target,x,'mg',['unpursuit','fixed']);
         if(result == 'end'){
           await addtext('わ、私のことはお気になさらずに...');
           return 'dead';
@@ -1205,7 +1205,7 @@ let Tools = {
     num:1,
     process:async function(cam,me,tcam,target){
         let x = humans[tcam][target].hp;
-        let result = await humandamaged(cam,me,tcam,target,x,'mg',['unpursuit',"fixed","penetrate"]);
+        let result = await damage(cam,me,tcam,target,x,'mg',['unpursuit',"fixed","penetrate"]);
         await addtext('爆発オチなんてサイテー！！');
         return 'dead';
     }
@@ -1350,7 +1350,7 @@ let Skills = {
                 break;
               };
           }
-          let result = await humandamaged(cam,me,tcam,target,x,'sh',4);
+          let result = await damage(cam,me,tcam,target,x,'sh',4);
           if(result == 'end'){return 1;}
           return 0;
         }
@@ -1373,7 +1373,7 @@ let Skills = {
               ]
             )
           );
-          let result = await humandamaged(cam,me,tcam,target,1.5,'sh',4);
+          let result = await damage(cam,me,tcam,target,1.5,'sh',4);
           if(result == 'end'){return 'end';}
           if(Math.floor(Math.random()*2)) await buffadd(tcam,target,'freeze',4,1)
           return 0;
@@ -1388,7 +1388,7 @@ let Skills = {
         buyable:1,
         process:async function(cam,me){
           let [target, tcam] = await LetsTargetSelect(3);
-          let result = await humandamaged(cam,me,tcam,target,1.5,'sh',4);
+          let result = await damage(cam,me,tcam,target,1.5,'sh',4);
           if(result == 'end'){return 1;}
           await buffadd(tcam,target,'elec',2,1);
           return 'alive';
@@ -1406,7 +1406,7 @@ let Skills = {
           let target = await LetsTargetSelect();
           x = 2;
           if(humans[target[1]][target].hp > humans[target[1]][target].maxhp * 0.7) x = 4;
-          let result = await humandamaged(cam,me,target[1],target,x,'sh',4);
+          let result = await damage(cam,me,target[1],target,x,'sh',4);
           if(result == 'end'){return 'end';}
           return 'alive';
         }
@@ -1421,7 +1421,7 @@ let Skills = {
         process:async function(cam,me){
           phase = 0; disappear();
           let target = await LetsTargetSelect();
-          let result = await humandamaged(cam,me,target[1],target,0.75,'sh',4);
+          let result = await damage(cam,me,target[1],target,0.75,'sh',4);
           if(result == 'end'){return 'end';}
           await buffadd(target[1],target,'stun',1,1);
           return 'alive';
@@ -1437,7 +1437,7 @@ let Skills = {
         process:async function(cam,me){
           phase = 0; disappear();
           let [tcam,target] = await LetsTargetSelect();
-          let result = await humandamaged(cam,me,tcam,target,0.2,'sh',4);
+          let result = await damage(cam,me,tcam,target,0.2,'sh',4);
           if(result == 'end'){return 'end';}
           await buffadd(tcam,target,'shelldown',3,1);
           await buffadd(cam,me,'powerup',3,2);
@@ -1629,7 +1629,7 @@ let Enemies = {
           process:async function(cam, me){
               await addtext(`${humans[cam][me].name}は粘液を飛ばしてきた！`);
               let [tcam,target] = ShallTargetSelect(cam,me,'phph',0);
-              let result = await humandamaged(cam,me,tcam,target,1,'sh',1);
+              let result = await damage(cam,me,tcam,target,1,'sh',1);
               if(result == 'end')return 'end';
               return 'alive';
           }
@@ -1668,7 +1668,7 @@ let Enemies = {
           process:async function(cam, me){
               await addtext(`${humans[cam][me].name}は体当たりを仕掛けてきた！`);
               let [tcam,target] = ShallTargetSelect(cam,me,'phpl',0);
-              let result = await humandamaged(cam,me,tcam,target,1,'sh',1);
+              let result = await damage(cam,me,tcam,target,1,'sh',1);
               if(result == 'end')return 'end';
               return 'alive';
           }
@@ -1680,7 +1680,7 @@ let Enemies = {
           process:async function(cam, me){
               await addtext(`${humans[cam][me].name}は回転しながら突進してきた！`);
               let [tcam,target] = ShallTargetSelect(cam,me,'phpl',0);
-              let result = await humandamaged(cam,me,tcam,target,1.5,'sh',1);
+              let result = await damage(cam,me,tcam,target,1.5,'sh',1);
               if(result == 'end')return 'end';
               return 'alive';
           }
@@ -1722,7 +1722,7 @@ let Enemies = {
               let x = buffhas(cam, me, 'disappear') ? (buffclear(cam, me, 'disappear'), 2) : 1;
               await addtext(`${humans[cam][me].name}は突進してきた！`);
               let [tcam,target] = ShallTargetSelect(cam,me,'pr',0);
-              let result = await humandamaged(cam,me,tcam,target,x,'sh',1);
+              let result = await damage(cam,me,tcam,target,x,'sh',1);
               return result;
           }
         },
@@ -1734,7 +1734,7 @@ let Enemies = {
           process:async function(cam, me){
               await addtext(`${humans[cam][me].name}はローキックしてきた！`)
               let selected = ShallTargetSelect(cam,me,'phpl',0);
-              let result = await humandamaged(cam,selected[1],me,selected[0],x,'sh',1);
+              let result = await damage(cam,selected[1],me,selected[0],x,'sh',1);
               await buffadd(selected[1],selected[0],'speeddown','turn',2,1);
               return result;
           }
@@ -1818,7 +1818,7 @@ let Enemies = {
           process:async function(cam, me){  
               log.textContent = `${humans[cam][me].name}はピストルカービンで撃った！`;await delay(1000);//ウイさんの武器やね デ・リーズル カービン
               let selected = ShallTargetSelect(cam,me,'phpl',0);
-              let result = await humandamaged(cam,selected[0],me,selected[1],1,'sh',1);
+              let result = await damage(cam,selected[0],me,selected[1],1,'sh',1);
               return result;
           }
         },
@@ -2087,25 +2087,33 @@ let noticeData = [
   },
 ]
 
-
+let objProcesses = {
+  'enemy': async function() {
+    
+  }
+}
 let NanigaOkirukana = {
-  0:{
+  'none':{
+    id:'none',
     name: 'none',
     process:async function(){},
   },
-  1:{
+  'stair':{
+    id:'stair',
     name:'階段',
     process:async function(){
       GoNextFloor();
     },
   },
-  2:{
+  'enemy':{
+    id:'enemy',
     name:'敵',
     process:async function(){
       EnemyAppear();
     },
   },
-  3:{
+  'fire_on':{
+    id:'fire_on',
     name:'焚き火',
     process:async function(){
       movable = 1;
@@ -2125,7 +2133,8 @@ let NanigaOkirukana = {
       }
     }
   },
-  4:{
+  'fire_off':{
+    id:'fire_off',
     name:'焚き火跡',
     process:async function(){
       await addtext(arrayGacha( //この重複感好き
@@ -2134,62 +2143,58 @@ let NanigaOkirukana = {
       ));
     }
   },
-  5:{
+  'shop_skill':{
+    id:'shop_skill',
     name:'スキルショップ',
     process:async function(){
       SkillShopOpen();
     }
   },
-  6:{
+  'chest_n':{
+    id:'chest_n',
     name:'宝箱',
     process:async function(){
       if(!objMap.some(row => row.includes(2))){OpenChest(1);}
     }
   },
-  7:{
+  'chest_r':{
+    id:'chest_r',
     name:'レア宝箱',
     process:async function(){
       if(!objMap.some(row => row.includes(2))){OpenChest(2);}
     }
   },
-  8:{
+  'hopebutton':{
+    id:'hopebutton',
     name:'救いのボタン',
     process:async function(){
       HopeButtonact();
     },
   },
-  9:{
-    name:'none',
-    process:async function(){
-      addtext('まだ用意できていないのです...')
-    }
-  },
-  10:{
+  'candytray':{
+    id:'candytray',
     name:'あめ置き場',
     process:async function(){
       Candytake();
     }
   },
-  11:{
+  'cookietray':{
+    id:'cookietray',
     name:'クッキー置き場',
     process:async function(){
       Cookietake();
     }
   },
-  12:{
-    name:'zom_mzyb',
-    process:async function(){
-      ZomuEvent();
-    }
-  },
-  13:{
+  'boss':{
+    id:'boss',
     name:'boss',
     process:async function(){
       BossEnemyAppear();
     }
   },
-  14:{
-    name:'door',
+  'door':{
+    id:'door',
+    name:'ドア',
     process:async function(){
       if(!objMap.some(row => row.includes(13))){NextStage();}
     }
@@ -2236,12 +2241,6 @@ let NanigaOkirukana = {
       ScorpionAct(2);
     }
   },
-  24:{
-    name:'utu_mzyb',
-    process:async function(){
-      UtusenEvent();
-    }
-  }
 }
 
 let Objectdatas = {
@@ -2258,7 +2257,7 @@ let Objectdatas = {
 }
 
 //#region 移行よろ
-async function humandamaged(who, tages, value, kind, attributes = []){
+async function damage(who, tages, value, kind, attributes = []){
   let hasa = (name) => attributes.includes(name);
   if(!Array.isArray(tages)){tages = [tages];}
   for(let tag of tages){
@@ -2348,36 +2347,37 @@ async function humandamaged(who, tages, value, kind, attributes = []){
     console.log(`予測:: ${defer.hp} => ${defer.hp - dmg} | dmg:${dmg}`);
 
     //実装
-    if(!hasa('heal')) defer.hp -= dmg;
+    if(!hasa('heal')) await heal(atker, defer, dmg)
     else defer.hp += dmg;
 
     //ep
-    if(cam == 'players') humans[cam][me].ep += Math.floor(10 * humans[cam][me].epgain);
+    if(atker.cam == 'players') atker.ep += Math.floor(10 * atker.epgain);
 
     tekiou()
     await addtext(`${defer.name}に${dmg}のダメージ`)
 
     //その後
     let result = 0;
-    if(defer.hp <= 0) result = await killed(cam,me,tcam,target);
+    if(defer.hp <= 0) result = await killed(atker, defer);
     if(result) return 1;
 
     //追撃ゾーン　ここどしよ
     if(!hasa('unpursuit')){
+      let res = 0;
       if(Weapons[atker.weapon.id].ap){
-        let res = await Weapons[atker.weapon.id].afterProcess(cam,me,tcam,target,value,kind,attributes);
-        if(res == 'end'){return 'end'};
+        res = await Weapons[atker.weapon.id].afterProcess(cam,me,tcam,target,value,kind,attributes);
+        if(res) return 1;
       }
 
       if(atker.name == 'herta' && defer.hp <= defer.maxhp / 2 && atker.level >= 10){ // 1凸効果「弱みは付け込み」
-        result = humandamaged(who, tag, 20, 'sh', ['unpursuit']);
-        if(result) return 1;
+        res = damage(who, tag, 20, 'sh', ['unpursuit']);
+        if(res) return 1;
       }
       if(atker.ps == 'enemy50%pursuit' && defer.hp <= defer.maxhp / 2 && enemy50pursuitenelgy == 1){
         enemy50pursuitenelgy = 0;
         await addtext(arraySelect(['くるくる〜っと','くるりん〜っと']));
-        result = humandamaged(who, tag, 50, 'sh', ['unpursuit']);
-        if(result) return 1;
+        res = damage(who, tag, 50, 'sh', ['unpursuit']);
+        if(res) return 1;
       }
     }
   }
@@ -2408,7 +2408,7 @@ async function heal(who, tag, value, code = 'add', ...prop){
   
   tag.hp = ah;
   
-  return
+  return 0;
 }
 //#endregion
 

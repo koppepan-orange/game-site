@@ -11,8 +11,15 @@
         color: #5ba751;
       }
     </style>
+    <link rel="stylesheet" href="origin.css">
   </head>
 <body>
+  <div id="movableDescription"></div>
+  <div id="log">
+    <div class="opener"><</div>
+    <div class="log"></div>
+  </div>
+  <div id="text"></div>
   My Game-Park!!<br>
   <ul>
     <li><a href="readme.txt">read.me</a></li>
@@ -26,5 +33,29 @@
   </ul>
   <br>
   <a href="https://koppepan-orange.github.io/test-site/home.html">test-site</a>
+
+  <div class="float">
+    <div class="count">
+      <div class="label">mozisu-count</div>
+      <input type="text" class="in"/>
+      <div class="out">0</div>
+    </div>
+    <div class="anagram">
+      <div class="label">anagram-saysay</div>
+      <input type="text" class="in"/><button class="send">check</button>
+      <div class="out"></div>
+    </div>
+  </div>
+  <script src="origin.js" defer></script>
+  <script defer>
+    const Ccount = document.querySelector('.count');
+    const Cin = Ccount.querySelector('.in');
+    const Cout = Ccount.querySelector('.out');
+    let count = 0;
+    Cin.addEventListener('input', () => {
+      count = Cin.value.length;
+      Cout.textContent = count;
+    });
+  </script>
 </body>
 </html>
