@@ -35,12 +35,12 @@
   <a href="https://koppepan-orange.github.io/test-site/home.html">test-site</a>
 
   <div class="float">
-    <div class="count">
+    <div id="count">
       <div class="label">mozisu-count</div>
       <input type="text" class="in"/>
       <div class="out">0</div>
     </div>
-    <div class="anagram">
+    <div id="anagram">
       <div class="label">anagram-saysay</div>
       <input type="text" class="in"/><button class="send">check</button>
       <div class="out"></div>
@@ -48,13 +48,32 @@
   </div>
   <script src="origin.js" defer></script>
   <script defer>
-    const Ccount = document.querySelector('.count');
+    const Ccount = document.getElementById('count');
     const Cin = Ccount.querySelector('.in');
     const Cout = Ccount.querySelector('.out');
     let count = 0;
     Cin.addEventListener('input', () => {
       count = Cin.value.length;
       Cout.textContent = count;
+    });
+
+    let Aanag = document.getElementById('anagram');
+    let Ain = Aanag.querySelector('.in');
+    let Asend = Aanag.querySelector('.send');
+    let Aout = Aanag.querySelector('.out');
+    Asend.addEventListener('click', () => {
+      let text = Ain.value;
+      let optout = text.split('');
+      let reses = [];
+      let loopen = 10;
+      while(loopen > 0){
+        loopen -= 1;
+        let res = arrayShuffle(optout).join(''); 
+        if(reses.includes(res) || res == text) loopen += 1;
+        else reses.push(res);
+      }
+      
+      Aout.textContent = reses.join('/n');
     });
   </script>
 </body>
