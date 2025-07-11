@@ -51,10 +51,11 @@
     const Ccount = document.getElementById('count');
     const Cin = Ccount.querySelector('.in');
     const Cout = Ccount.querySelector('.out');
-    let count = 0;
     Cin.addEventListener('input', () => {
-      count = Cin.value.length;
-      Cout.textContent = count;
+      let text = Cin.value;
+      let count = text.length;
+      let size = arraySize(text.split(''))
+      Cout.textContent = `文字数${count} 種類${size}`;
     });
 
     let Aanag = document.getElementById('anagram');
@@ -63,17 +64,8 @@
     let Aout = Aanag.querySelector('.out');
     Asend.addEventListener('click', () => {
       let text = Ain.value;
-      let optout = text.split('');
-      let reses = [];
-      let loopen = 10;
-      while(loopen > 0){
-        loopen -= 1;
-        let res = arrayShuffle(optout).join(''); 
-        if(reses.includes(res) || res == text) loopen += 1;
-        else reses.push(res);
-      }
-      
-      Aout.textContent = reses.join('/n');
+      let res = anagramSaySay(text);
+      Aout.innerHTML = res;
     });
   </script>
 </body>

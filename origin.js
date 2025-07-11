@@ -17,6 +17,11 @@ async function nicoText(mes){
     await delay(2000); 
     newDiv.remove();
 };
+function kaijou(num){
+    if(num == 0) return 0;
+    if(num == 1) return 1;
+    return num * kaijou(num - 1);
+}
 function arraySelect(array){
     let select = Math.floor(Math.random()*array.length);
     return array[select];
@@ -28,6 +33,20 @@ function arrayShuffle(array) {
     }
     return array;
 };
+function arraySize(array){
+    let res = new Set(array).size;
+    return res;
+};
+function arrayCount(array){
+    const counts = {};
+    for (let value of array) {
+        counts[value] = (counts[value] || 0) + 1;
+    }
+    return counts;
+}
+function arrayMult(array){
+    return array.reduce((a, v) => a * v, 1);
+}
 function arrayGacha(array,probability){
     if(array.length !== probability.length){throw new Error("長さがあってないっす！先輩、ちゃんとチェックした方がいいっすよ〜？");}
     const total = probability.reduce((sum, p) => sum + p, 0);
@@ -61,17 +80,42 @@ function probability(num){
 function random(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 };
-function countText(text){
-    if(typeof text !== 'string'){text = text.toString();}
-    let count = 0;
-    text.split('').forEach(a => {
-        if(/^[a-z_0-9]+$/.test(a)){
-            count += 1;
-        }else{
-            count += 2;
-        }
-    })
-    return count;
+
+function anagramSaySay(text, loop = 10, bet = '<br>'){
+    let menjo = 0;
+    let len = text.length;
+    if(len < 4) menjo = 1, console.log('長さが3以下なんで最大6っす');
+    
+    let optout = text.split('');
+    let optcou = arrayCount(optout);
+    let optvals = [];
+    for(a of Object.keys(optcou)){
+        let b = optcou[a];
+        b = kaijou(b);
+        optvals.push(b);
+    }
+    let optmat = arrayMult(optvals);
+    let cal = (kaijou(len) / optmat) - 1;
+
+    let loopen = loop;
+    console.log(`総数:${cal} 回数:${loopen}`);
+    if(cal < loopen) menjo = 1;
+    
+    let reses = [];
+    while(loopen > 0){
+        loopen -= 1;
+        let res = arrayShuffle(optout).join(''); 
+        if(reses.includes(res)){loopen += 1; continue}
+        
+        if(res == text && !menjo){loopen += 1; continue;}
+
+        if(res == text && menjo && reses.length < cal){loopen += 1; continue}
+        else if(res == text && menjo) res = '[重複エラー]';
+
+        reses.push(res);
+    }
+    
+    return reses.join(bet);
 }
 function setLocalStorage(name, value) {
     localStorage.setItem(name, value || "");
