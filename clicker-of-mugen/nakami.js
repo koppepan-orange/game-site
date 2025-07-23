@@ -1267,7 +1267,7 @@ let sp = 1;//能力上昇(ダンジョン内有効)用
 let acted = 0;
 let bar = {
    cam:['players','players','players','players','enemies','enemies','enemies','enemies'],
-   me:[1,2,3,4,1,2,3,4]
+   me:[0,1,2,3,0,1,2,3]
 }
 
 //0 = false,1 = true
@@ -1315,7 +1315,7 @@ let humans = {
       {
          status:1,//0 = none, 1 = alive, 2 = dead
          cam:'players',
-         me:1,
+         me:0,
          name:'player',
          level:1,
          exp:0,
@@ -1379,58 +1379,7 @@ let humans = {
          ps:'null',
       },
    ],
-   enemies:[
-      {
-         status:0,//存在の有無
-         cam:'enemies',
-         me:1,
-         level:1,
-         name:'古書館の魔術師',
-         prefixe:'',
-
-         speed:1,
-         hp:100,
-         maxhp:100,
-         atk:10,
-         def:10,
-         matk:5,
-         mdef:5,
-         critdmg:0.1,
-         critlate:0.1,
-         critresist:0.1,
-         mp:0,
-         maxmp:0,
-
-         power:0,shell:0,
-         buffs:[],
-
-         weapon:{
-            id:'none',
-            lv:1,
-         },
-         armor:{
-            id:'none',
-            lv:1,
-         },
-         ear:{
-            id:'none',
-            lv:1,
-         },
-         ring:{
-            id:'none',
-            lv:1,
-         },
-         neck:{
-            id:'none',
-            lv:1,
-         },
-
-         ep:100,
-         ex:'null',
-         ns:'null',
-         ps:'null',
-      },
-   ]
+   enemies:[]
 };
 
 function tekiou(){
@@ -1439,24 +1388,24 @@ function tekiou(){
    Object.keys(humans).forEach(cam => {
       Object.keys(humans[cam]).map(a => a.toString()).filter(s => humans[cam][s].status == 1 || humans[cam][s].status == 2).forEach(me => {
          let human = humans[cam][me];
-         let humanDiv = document.querySelector(`#${cam}${me}`);
+         let humanD = document.querySelector(`#${cam}${me}`);
 
          let name = human.prefixe ? `${human.prefixe} ${human.name}` : human.name;
 
-         humanDiv.querySelector(`.name`).textContent = name;
-         humanDiv.querySelector(`.level`).textContent = `Lv.${human.level}`;
-         humanDiv.querySelector(`.hp .num`).textContent = `${human.hp}/${human.maxhp}`;
-         humanDiv.querySelector(`.hp .bar .inner`).style.width = `${(human.hp / human.maxhp)*100}%`;
-         humanDiv.querySelector(`.mp .num`).textContent = `${human.mp}/${human.maxmp}`;
-         humanDiv.querySelector(`.mp .bar .inner`).style.width = `${(human.mp / human.maxmp)*100}%`;
+         humanD.querySelector(`.name`).textContent = name;
+         humanD.querySelector(`.level`).textContent = `Lv.${human.level}`;
+         humanD.querySelector(`.hp .num`).textContent = `${human.hp}/${human.maxhp}`;
+         humanD.querySelector(`.hp .bar .inner`).style.width = `${(human.hp / human.maxhp)*100}%`;
+         humanD.querySelector(`.mp .num`).textContent = `${human.mp}/${human.maxmp}`;
+         humanD.querySelector(`.mp .bar .inner`).style.width = `${(human.mp / human.maxmp)*100}%`;
 
          if(cam == 'players' && me !== 't'){
-            humanDiv.querySelector('.skill .gauge').style.height = `${(human.ep / human.maxep)*100}%`;
-            if(human.ep >= human.maxep){human.ep = human.maxep; humanDiv.querySelector('.skill gauge').style.height = '100%'}
+            humanD.querySelector('.skill .gauge').style.height = `${(human.ep / human.maxep)*100}%`;
+            if(human.ep >= human.maxep){human.ep = human.maxep; humanD.querySelector('.skill gauge').style.height = '100%'}
          }
 
          let apply = buffcheck(cam,me);
-         humanDiv.querySelector(`.effects`).innerHTML = apply.join('');
+         humanD.querySelector(`.effects`).innerHTML = apply.join('');
 
          humans[cam][me].power = 1;humans[cam][me].shell = 1;
          let karix = 0;
@@ -4284,13 +4233,14 @@ async function EnemyAppear(){
    enemy50pursuitenelgy = 1;
 
    x = Object.keys(humans.players).filter(a => humans.players[a].status == 1 || humans.players[a].status == 2).length;
-   for(i = 1; i < x+1; i++){
+   console.log(`playersの数:${x}`);
+   for(i = 0; i < x; i++){
       let newDiv = makeNewPlayer(i);
       document.querySelector('#players').appendChild(newDiv);
       tekiou();
    }
-   x = [1,1,1,1,2,2,3]
-   x = x[Math.floor(Math.random() * x.length)];
+   x = arraySelect([1,1,1,1,2,2,3])
+   console.log(`敵の数:${x}`);
    for(i = 1; i < x+1; i++){
       humans.enemies[i] = DesideEnemyName(i);
       /**let newDiv = */makeNewEnemy(i);
@@ -4567,7 +4517,7 @@ function makeNewPlayer(me){
    hp.className = 'hp';
 
    let hpNum = document.createElement('div');
-   hpNum.className = 'me';
+   hpNum.className = 'num';
    hpNum.textContent = `${player.hp}/${player.maxhp}`;
    hp.appendChild(hpNum);
 
@@ -4586,7 +4536,7 @@ function makeNewPlayer(me){
    mp.className = 'mp';
 
    let mpNum = document.createElement('div');
-   mpNum.className = 'me';
+   mpNum.className = 'num';
    mpNum.textContent = `${player.mp}/${player.maxmp}`;
    mp.appendChild(mpNum);
 

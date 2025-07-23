@@ -33,40 +33,9 @@
   </ul>
   <br>
   <a href="https://koppepan-orange.github.io/test-site/home.html">test-site</a>
-
-  <div class="float">
-    <div id="count">
-      <div class="label">mozisu-count</div>
-      <input type="text" class="in"/>
-      <div class="out">0</div>
-    </div>
-    <div id="anagram">
-      <div class="label">anagram-saysay</div>
-      <input type="text" class="in"/><button class="send">check</button>
-      <div class="out"></div>
-    </div>
-  </div>
+  
   <script src="origin.js" defer></script>
   <script defer>
-    const Ccount = document.getElementById('count');
-    const Cin = Ccount.querySelector('.in');
-    const Cout = Ccount.querySelector('.out');
-    Cin.addEventListener('input', () => {
-      let text = Cin.value;
-      let count = text.length;
-      let size = arraySize(text.split(''))
-      Cout.textContent = `文字数${count} 種類${size}`;
-    });
-
-    let Aanag = document.getElementById('anagram');
-    let Ain = Aanag.querySelector('.in');
-    let Asend = Aanag.querySelector('.send');
-    let Aout = Aanag.querySelector('.out');
-    Asend.addEventListener('click', () => {
-      let text = Ain.value;
-      let res = anagramSaySay(text);
-      Aout.innerHTML = res;
-    });
   </script>
 </body>
 </html>
