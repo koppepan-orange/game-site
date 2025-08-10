@@ -579,9 +579,6 @@ function waitForGameStart(){
 
 //#endregion
 
-function DrawBackground(){
-   
-}
 
 // 選択画像のロードと初期表示
 let IMGselect = 0;
@@ -1194,7 +1191,7 @@ function copy(obj){
     }
     const result = {};
     for (const key in obj) {
-        if (obj.hasOwnProperty(key)) {
+        if (has(obj, key)) {
             result[key] = copy(obj[key]); // オブジェクトのプロパティを再帰コピー
         }
     }
@@ -1229,6 +1226,11 @@ async function error(){
    addtext('errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
    await delay(2000);
    window.open('about:blank', '_self').close();
+}
+function has(obj, key){
+   let res = obj.hasOwnProperty(key);
+   res = res ? 1 : 0;
+   return res;
 }
 //#endregion
 
@@ -1311,74 +1313,7 @@ document.addEventListener('touchend', function (e) {
 
 
 let humans = {
-   players:[
-      {
-         status:1,//0 = none, 1 = alive, 2 = dead
-         cam:'players',
-         me:0,
-         name:'player',
-         level:1,
-         exp:0,
-         sp:0,
-   
-         speed:10,
-         hp:0,
-         maxhp:0,
-         atk:0,
-         def:0,
-         power:1,
-         shell:1,
-         mp:10,
-         maxmp:10,
-         matk:0,
-         mdef:0,
-         critlate:0.03, //これが確率。会心率ってやつだね
-         critdmg:3, //これが倍率。会心ダメージってやつだね
-         critresist:0,//これは会心抵抗。ハルカ(正月)さんが下げるやつだね
-   
-         buffs:[],
-   
-         slash1:'slash',
-         slash2:'double slash',
-         slash3:'slash of light',
-         
-         magic1:'heal',
-         magic2:'power',
-         magic3:'shell',
-
-         tool1:'aspirin',
-         tool2:'throwknife',
-         tool3:'redcard',
-
-         weapon:{
-            id:'none',
-            lv:1,
-         },
-         armor:{
-            id:'none',
-            lv:1,
-         },
-         ear:{ // 耳
-            id:'none',
-            lv:1,
-         },
-         ring:{ // 腕
-            id:'none',
-            lv:1,
-         },
-         neck:{ // 首
-            id:'none',
-            lv:1,
-         },
-         //ああそうさ、俺の趣味さ！！！！！"おもちゃ箱の夢"みたいなステージであることをしたくってねぇ...もしかしたら首はなくなるかも..いやまあ好きだけど解像度低いから自分でできなさそう
-         //...あれ？これ読まれたらやばくね？..まあ....いいか！！！！直接的な表現無いしだいじょぶっしょ、多分 え？なんのことかわからないって？ならdiscordのなんか..なんか。のkoppekun-uraを見るといい！！！！え？見れないって？ふっふっふ..ざまぁ(可愛くてごめん風)
-   
-         ep:100,
-         ex:'50%heal',
-         ns:'5%heal',
-         ps:'null',
-      },
-   ],
+   players:[],
    enemies:[]
 };
 
@@ -1794,8 +1729,8 @@ function inventoryOpen(me){
    // document.querySelector('#IMagicAppearence').innerHTML = magics.join('<br>');
    // let weapons = Object.keys(Weapons).map(a => Weapons[a].num >= 1 && Weapons[a].num > Object.keys(humans.players).filter(b => humans.players[b].weapon.id == Weapons[a].id).length ? `<span class="hasd" data-description="${Weapons[a].description}">${Weapons[a].name} x${Weapons[a].num}</span>` : null).filter(Boolean)
    // document.querySelector('#IWeapons').innerHTML = weapons.join('<br>');
-   // let armors = Object.keys(Armors).map(a => Armors[a].num >= 1 && Armors[a].num > Object.keys(humans.players).filter(b => humans.players[b].armor.id == Armors[a].id).length ? `<span class=" hasd" data-description="${Armors[a].description}">${Armors[a].name} x${Armors[a].num}</span>` : null).filter(Boolean)
-   // document.querySelector('#IArmors').innerHTML = armors.join('<br>');
+   // let shields = Object.keys(Armors).map(a => Armors[a].num >= 1 && Armors[a].num > Object.keys(humans.players).filter(b => humans.players[b].shield.id == Armors[a].id).length ? `<span class=" hasd" data-description="${Armors[a].description}">${Armors[a].name} x${Armors[a].num}</span>` : null).filter(Boolean)
+   // document.querySelector('#IArmors').innerHTML = shields.join('<br>');
    // let tools = Object.keys(Tools).filter(a => Tools[a].num > 0).map(a => `<span class="hasd" data-description="${Tools[a].description}">${Tools[a].name} x${Tools[a].num}:</span>`).filter(Boolean)
    // document.querySelector('#IItems').innerHTML = tools.join('<br>');
 
@@ -1846,13 +1781,13 @@ function SlashChangeDecide(name,num){
    // 選択したスロットに魔法を割り当て
    switch(num) {
        case 1:
-           humans.players[InventoryPage].slash1 = name;
+           humans.players[InventoryPage].slash[1] = name;
            break;
        case 2:
-           humans.players[InventoryPage].slash2 = name;
+           humans.players[InventoryPage].slash[2] = name;
            break;
        case 3:
-           humans.players[InventoryPage].slash3 = name;
+           humans.players[InventoryPage].slash[3] = name;
            break;
    }
    inventoryOpen(InventoryPage)
@@ -1872,13 +1807,13 @@ function MagicChangeDecide(name,num){
    // 選択したスロットに魔法を割り当て
    switch(num) {
        case 1:
-           humans.players[InventoryPage].magic1 = name;
+           humans.players[InventoryPage].magic[1] = name;
            break;
        case 2:
-           humans.players[InventoryPage].magic2 = name;
+           humans.players[InventoryPage].magic[2] = name;
            break;
        case 3:
-           humans.players[InventoryPage].magic3 = name;
+           humans.players[InventoryPage].magic[3] = name;
            break;
    }
    inventoryOpen(InventoryPage)
@@ -1915,18 +1850,18 @@ function ArmorChange(){
    myArmors.forEach((a,i) => {
       joins.push(`<button class="button hasd" data-description="${Armors[a.id].description}" onclick="ArmorChangeDeside('${i}')">${Armors[a.id].name}</button>`)
    })
-   if(humans.players[InventoryPage].armor.id !== 'none'){joins.unshift(`<button class="button hasd" data-description="${Armors.none.description}" onclick="ArmorChangeDeside('none')">none</button>`)};
+   if(humans.players[InventoryPage].shield.id !== 'none'){joins.unshift(`<button class="button hasd" data-description="${Armors.none.description}" onclick="ArmorChangeDeside('none')">none</button>`)};
    document.querySelector('#IEquipsChangeZone').innerHTML += joins.join(' ');
 }
 function ArmorChangeDeside(code){
-   console.log(`${Armors[humans.players[InventoryPage].armor.id]?.name??'error'} => ${Armors[myArmors[code]?.id??'none']?.name??'error'}`);
+   console.log(`${Armors[humans.players[InventoryPage].shield.id]?.name??'error'} => ${Armors[myArmors[code]?.id??'none']?.name??'error'}`);
    if(code !== 'none'){
-      humans.players[InventoryPage].armor.id !== 'none' && myArmors.push(humans.players[InventoryPage].armor);
-      humans.players[InventoryPage].armor = myArmors[code];
+      humans.players[InventoryPage].shield.id !== 'none' && myArmors.push(humans.players[InventoryPage].shield);
+      humans.players[InventoryPage].shield = myArmors[code];
       myArmors.splice(code,1);
    }else{
-      humans.players[InventoryPage].armor.id !== 'none' && myArmors.push(humans.players[InventoryPage].armor);
-      humans.players[InventoryPage].armor = Armors.none;
+      humans.players[InventoryPage].shield.id !== 'none' && myArmors.push(humans.players[InventoryPage].shield);
+      humans.players[InventoryPage].shield = Armors.none;
    }
    inventoryOpen(InventoryPage);
 }
@@ -1939,13 +1874,13 @@ function ToolChange(num){
 function ToolChangeDeside(num,code){
    switch(num){
       case 1:
-         humans.players[InventoryPage].tool1 = Tools[code].id;
+         humans.players[InventoryPage].tool[1] = Tools[code].id;
          break;
       case 2:
-         humans.players[InventoryPage].tool2 = Tools[code].id;
+         humans.players[InventoryPage].tool[2] = Tools[code].id;
          break;
       case 3:
-         humans.players[InventoryPage].tool3 = Tools[code].id;
+         humans.players[InventoryPage].tool[3] = Tools[code].id;
          break;
    }
    inventoryOpen(InventoryPage);   
@@ -2642,32 +2577,99 @@ async function HomeLetsDungeon(){
       
       document.querySelector('#homeArea .station .select .chara').appendChild(newDiv);
 
-      //後付けハードディスク
-      let spanScrollWidth = span.scrollWidth
-      if(spanScrollWidth > 60){
-         const animationName = `scroll-${chara.id}ver`;
-         const styleSheet = document.styleSheets[0];
-         let fixedTime = 2;//前後の固定タイム
-         let moveTime = (spanScrollWidth - 60) * 0.05;
-
-         styleSheet.insertRule(`
-            @keyframes ${animationName} {
-               0% { transform: translateX(0); }
-               ${(fixedTime / (fixedTime * 2 + moveTime)) * 100}% { transform: translateX(0); }
-               ${(1 - fixedTime / (fixedTime * 2 + moveTime)) * 100}% { transform: translateX(-${Math.max(0, spanScrollWidth - 60)}px); }
-               100% { transform: translateX(-${Math.max(0, spanScrollWidth - 60)}px); }
-            }`, styleSheet.cssRules.length);
-         span.style.animation = `scroll-${chara.id}ver ${fixedTime * 2 + moveTime}s linear infinite`;
+      // 先に専用styleタグを準備（1回だけ作る）
+      if(!window.dynamicStyle){
+      window.dynamicStyle = document.createElement('style');
+      window.dynamicStyle.id = 'dynamicStyles';
+      document.head.appendChild(window.dynamicStyle);
       }
+      let sheet = window.dynamicStyle.sheet;
+
+      // 後付けハードディスク部分
+      let spanScrollWidth = span.scrollWidth;
+      if (spanScrollWidth > 60) {
+      const animationName = `scroll-${chara.id}ver`;
+      let fixedTime = 2; // 前後の固定タイム
+      let moveTime = (spanScrollWidth - 60) * 0.05;
+
+      // 既に同名アニメーションが登録されてないか確認
+      let exists = Array.from(sheet.cssRules).some(rule => rule.name === animationName);
+      if (!exists) {
+         sheet.insertRule(`
+            @keyframes ${animationName} {
+            0% { transform: translateX(0); }
+            ${(fixedTime / (fixedTime * 2 + moveTime)) * 100}% { transform: translateX(0); }
+            ${(1 - fixedTime / (fixedTime * 2 + moveTime)) * 100}% { transform: translateX(-${Math.max(0, spanScrollWidth - 60)}px); }
+            100% { transform: translateX(-${Math.max(0, spanScrollWidth - 60)}px); }
+            }`, sheet.cssRules.length);
+      }
+
+      span.style.animation = `${animationName} ${fixedTime * 2 + moveTime}s linear infinite`;
+      }
+
    }
 
 }
 function HomeGoDungeon(name){
-   let who = humans.players[0];
-   who.id = name; //Charaのidを
-   who.level = 1;
-   who.exp = 0;
-   who.sp = 1;
+   humans.players = [];
+   humans.enemies = [];
+   
+   let who = {
+      status:1,//0 = none, 1 = alive, 2 = dead
+      cam:'players',
+      me:0,
+      id:name,
+      name:'supermario wiiiiiiiiiiii',
+      level:1,
+      exp:0,
+      sp:1,
+
+      buffs:[],
+
+      slash:{
+         1:{name:'slash'},
+         2:{name:'double slash'},
+         3:{name:'slash of light'}
+      },
+      
+      magic:{
+         1:{name:'heal'},
+         2:{name:'power'},
+         3:{name:'shell'},
+      },
+
+      tool:{
+         1:{name:'aspirin'},
+         2:{name:'throwknife'},
+         3:{name:'redcard'}
+      },
+
+      weapon:{
+         id:'none',
+         lv:1,
+      },
+      shield:{
+         id:'none',
+         lv:1,
+      },
+      ear:{ // 耳
+         id:'none',
+         lv:1,
+      },
+      ring:{ // 腕
+         id:'none',
+         lv:1,
+      },
+      neck:{ // 首
+         id:'none',
+         lv:1,
+      },
+      
+      ep:100,
+      ex:'50%heal',
+      ns:'5%heal',
+      ps:'null',
+   };
 
    Object.keys(Charas['wretch']).forEach(key => { //基本に戻す
       who[key] = Charas['wretch'][key];
@@ -2677,23 +2679,14 @@ function HomeGoDungeon(name){
       who[key] = Charas[name][key];
    })
 
-   buttonsolid = Charas[name].buttonsolid;
-   buttonback = Charas[name].buttonback;
-   document.querySelector('#ButtonStyle').textContent = `
-   .button{
-      border: 2px solid ${buttonsolid};
-      padding: 2px 3px;
-      background: ${buttonback};
-      cursor: pointer;
-   }
-   input[type="text"]:focus{
-      border: 2px solid ${buttonsolid};
-      padding: 2px 3px;
-      background: ${buttonback};
-   }`;
+   Style.button.solid = Charas[name].buttonsolid;
+   Style.button.back = Charas[name].buttonback;
+   Style.tekiou();
 
    who.hp = who.maxhp;
    who.mp = who.maxmp;
+
+   humans.players.unshift(who);
 
    enemylv = 1;
    enemyhp = 80;
@@ -2715,9 +2708,6 @@ function HomeGoDungeon(name){
 
    overfieldArea.style.display = 'block';
    NextStage();
-
-   let src = humans['players'][0].id;
-
 
    SELECTx = 0;
    SELECTy = 0;
@@ -3015,153 +3005,210 @@ function BankWithdraw(code){
 //    }   
 // };
 
-function isCrit(late, resist){
-   let isCritical = false;
-   if(resist == 'absolute'){
-      isCritical = false;
-      console.log('会心無効！')
-   }else if(late == 'absolute'){
-      isCritical = true;
-      console.log('確定会心！')
-   }else{
-      isCritical = Math.random() < (late - resist) / 100;
-      console.log(`${late - resist}%...結果は${isCritical}!!`)
-   }
-   return isCritical
-}
-
-async function humandamaged(cam, me, tcams, targets, rate, kind, attributes = []){
-   if(!Array.isArray(tcams)){tcams = [tcams];}
-   if(!Array.isArray(targets)){targets = [targets];}
-   for(let i = 0; i < tcams.length; i++){
-      let tcam = tcams[i];
-      let target = targets[i];
+async function damage(...arr){
+   let [who, tages, value, kind, prop = []] = arr;
+   if(!who || !tag) return console.log(who, tag, '対象が定まってないっぽい！！！')
+   let hasa = (whi, name) => whi.ables.includes(name);
+   // let hasp = (name) => prop.includes(name);
+   // let hasa = (name) => prop.includes(name);
+   if(!Array.isArray(tages)){tages = [tages];}
+   for(let tag of tages){
       //攻撃x回復o = heal 攻撃+攻撃者与ダメ回復 = absorb
       //防御無視 = penetrate 確定会心 = crit 会心無効 = nocrit
       //固定値 = fixed
-      console.log(attributes.includes('fixed') ? `${humans[cam][me].name}=>${humans[tcam][target].name} ${kind}で${rate}ダメージの予定！ ${attributes}` :`${humans[cam][me].name}=>${humans[tcam][target].name} ${kind}で攻撃力の${rate}倍 ${attributes}`);
+      console.log(hasa('fixed') ? `${who.name} => ${tag.name} ${kind}で${value}ダメージの予定！ [${prop}]`
+      : `${who.name} => ${tag.name} ${kind}で攻撃力の${value}倍 [${prop}]`);
 
-      let atkerOriginal = humans[cam][me];
-      let deferOriginal = humans[tcam][target]
-
-      const stats = [
-         'atk', 'def',
-         'power', 'shell', 'matk', 'mdef',
-         'critlate', 'critdmg', 'critresist'
+      let atker = {...who};
+      let defer = {...tag};
+      
+      let stats = [
+         'atk','matk','def','mdef',
+         'hp','maxhp','mp','maxmp', 'shl',
+         'spd','critlate','critdmg','critresist',
       ];
 
-      let atker = {};
-      stats.forEach(stat => {
-         atker[stat] = atkerOriginal[stat];
-      });
-
-      let defer = {};
-      stats.forEach(stat => {
-         defer[stat] = deferOriginal[stat];
-      });
-
-      stats.forEach(stat => {
+      for(let stat of stats){
          console.log(atker.buffs)
          Object.values(atker.buffs).forEach(buff => {
-            if(buff.data.addable == false){
-               if(buff.data.effect.hasOwnProperty(stat)){
+            if(!buff.data.addable){
+               if(has(buff.data.effect, stat)){
                   atker[stat] += buff.data.effect[stat].value;
                }
             }else{
-               if(buff.data.effect.hasOwnProperty(stat)){
+               if(has(buff.data.effect, stat)){
                   atker[stat] += buff.value
                }
             }
          });
-         ['weapon','armor','ear','ring','neck'].forEach(bui => {Object.values(atker[bui]).forEach(buff => {
-            
-         })})
+         
+         console.log(`weapon:${atker.weapon.id}, shield:${atker.shield.id}, ear:${atker.ear.id}, ring:${atker.ring.id}, neck:${atker.neck.id}`);
+         for(let bui in ['weapon','shield','ear','ring','neck']){
+            let eq = Equips[bui][atker[bui].id];
+            let res = 0;
+            if(eq.ap){
+               res = await eq.afterProcess(arr);
+               if(res) return 1;
+            }
+         }
 
          Object.values(defer.buffs).forEach(buff => {
-            if(buff.data.addable == false){
-               if(buff.data.effect.hasOwnProperty(stat)){
+            if(!buff.data.addable){
+               if(has(buff.data.effect, stat)){
                   defer[stat] += buff.data.effect[stat].value;
                }
-            }else{
-               if(buff.data.effect.hasOwnProperty(stat)){
+            }
+            if(buff.data.addable){
+               if(has(buff.data.effect, stat)){
                   defer[stat] += buff.value
                }
             }
          })
-      });
-
-      //攻撃力
-      let damage = kind == 'sh' ? (atker.atk * atker.power * rate) : (atker.matk * atker.power * rate);
-      if(attributes.includes('fixed')) damage = rate;
-
-      //防御力
-      if(!attributes.includes('penetrate')) damage -= kind == 'sh' ? (defer.def * defer.shell) : (defer.mdef * defer.shell)
-
-      //会心
-      if(isCrit(atker.critlate, defer.critresist) && !attributes.includes('nocrit') || attributes.includes('crit')){
-         damage += (defer.def * defer.shell);
-         damage *= atker.critdmg;
-         await addtext('かいしんのいちげき！')
       };
 
+      //攻撃力
+      let atkval = kind == 'sh' ? atker.atk : atker.matk;
+      let dmg = (atkval * atker.power * value/100);
+      if(hasa('fixed')) dmg = value;
+
+      //会心
+      let crited = 0;
+      if(isCrit(atker, defer)) crited = 1;
+      if((crited && !hasa('nocrit')) || hasa('crit')){
+         dmg *= atker.critdmg / 100;
+         if(who.cam == 'players') await addtext('かいしんのいちげき！');
+         if(who.cam == 'enemies') await addtext('つーこんのいちげき！');
+      };
+
+      //防御力
+      let defval = kind == 'sh' ? defer.def : defer.mdef;
+      if(!hasa('penetrate')) dmg -= (defval * defer.shell);
+
       //整え
-      damage = Math.floor(damage);
-      if(defer.hp < damage) damage = defer.hp;
-      console.log(`${defer.hp} => ${defer.hp - damage} | damage:${damage}`);
+      dmg = Math.floor(dmg);
+      if(defer.hp < dmg) dmg = defer.hp;
+      console.log(`予測:: ${defer.hp} => ${defer.hp - dmg} | dmg:${dmg}`);
 
       //実装
-      if(!attributes.includes('heal'))
-         defer.hp -= damage;
-      else defer.hp += damage;
+      if(!hasa('heal')) await heal(atker, defer, dmg)
+      else defer.hp += dmg;
 
       //ep
-      if(cam == 'players') humans[cam][me].ep += Math.floor(10 * humans[cam][me].epgain);
+      if(atker.cam == 'players') atker.ep += Math.floor(10 * atker.epgain);
 
       tekiou()
-      await addtext(`${defer.name}に${damage}のダメージ！`)
+      await addtext(`${defer.name}に${dmg}のダメージ`)
 
       //その後
-      if(defer.hp <= 0){let result = await killed(cam,me,tcam,target);return result;}
+      let result = 0, killen = 0;
+      if(defer.hp <= 0) result = await killed(atker, defer);
+      if(result) return killen = 1;
 
-      //追撃ゾーン　ここどしよ
-      if(!attributes.includes('unpursuit')){
-         if(Weapons[atker.weapon.id].ap){
-            let res = await Weapons[atker.weapon.id].afterProcess(cam,me,tcam,target,rate,kind,attributes);
-            if(res == 'end'){return 'end'};
-         }
+      //追撃ゾーン..ここどしよ
+      let res = 0;
+      if(Weapons[atker.weapon.id].ap){
+         res = await Weapons[atker.weapon.id].afterProcess(arr);
+         if(res) return 1;
+      }
 
-         if(atker.ps == 'enemy50%pursuit' && defer.hp <= defer.maxhp / 2 && enemy50pursuitenelgy == 1 && defer.hp > 0){
-            enemy50pursuitenelgy = 0;
-            await addtext(arraySelect(['くるくる〜っと','くるりん〜っと']));
-            let res = humandamaged(cam,me,tcam,target,0.5,'sh',['unpursuit']);
-            if(res == 'end'){return 'end'};
-         }else if(atker.name == 'herta' && defer.hp <= defer.maxhp / 2 && atker.level >= 10 && defer.hp > 0){//1凸効果「弱みは付け込み」
-            let res = humandamaged(cam,me,tcam,target,0.2,'sh',['unpursuit']);
-            if(res == 'end'){return 'end'};
-         }
+      if(atker.name == 'herta' && defer.hp <= (defer.maxhp / 2) && 10 <= atker.level){ // 1凸効果「弱みは付け込み」
+         res = damage(who, tag, 20, 'sh', ['unpursuit']);
+         if(res) return 1;
+      }
+      if(atker.ps == 'enemy50%pursuit' && defer.hp <= defer.maxhp / 2 && enemy50pursuitenelgy == 1){
+         enemy50pursuitenelgy = 0;
+         await addtext(arraySelect(['くるくる〜っと','くるりん〜っと']));
+         res = damage(who, tag, 50, 'sh', ['unpursuit']);
+         if(res) return 1;
       }
    }
-   return 'alive';
+   return 0;
+}
+
+async function heal(who, tag, value, code = 'add', ...prop){
+   if(!who || !tag) return console.log(who, tag, '対象が定まってないっぽい！！！')
+   let hasa = (whi, name) => whi.ables.includes(name);
+   let hasp = (name) => prop.includes(name);
+
+   let bh = tag.hp;
+   
+   let val = value;
+   if(val.endsWith('%')){
+      val = +val.slice(0, -1)/100;
+      comsole.log(`${value}っていう%だったから${val}って値に変えといたぜ`);
+      val *= tag.maxhp;
+   }
+   
+   let ah = 0;
+   if(code == 'add'){
+      ah = tag.hp + val;
+   }
+   if(code == 'set'){
+      ah = val;
+   }
+   
+   if(tag.maxhp < ah) ah = tag.maxhp;
+   
+   console.log(`${who.nane} => ${tag.name}, val:${val} | ${bh} => ${ah}`);
+   
+   tag.hp = ah;
+   
+   return 0;
+}
+
+function cm(cam = '指定なし', me = '指定なし'){
+   if(cam == '指定なし' && me == '指定なし') cam = 'players', me = 0; //超特別扱い
+   
+   let who;
+   if(me == '指定なし') who = humans[cam];
+   else who = humans[cam][me];
+
+   return who;
+}
+
+function isCrit(who, tag){
+   let lat = who.critlate;
+   let res = tag.critresist;
+   let is = 0;
+
+   if(!prop.includes('nocrit')) return false;
+   
+   if(res == 'absolute'){
+      is = false;
+      console.log('会心無効！')
+   }else if(lat == 'absolute'){
+      is = true;
+      console.log('確定会心！')
+   }else{
+      is = Math.random() < (lat - res) / 100;
+      console.log(`${lat - res}%...結果は${is}!!`)
+   }
+
+   return is;
 }
 
 //#endregion
 //#region buffの動き
-async function buffadd(tcam,target,buff,time,val){//誰のバフ/デバフか,バフ/デバフの名前,効果時間,効果量
+async function buffadd(...arr){//誰のバフ/デバフか,バフ/デバフの名前,効果時間,効果量
+   let [who, buff, time, val] = arr;
+   let newbuff = buffMold(buff, time, val);
+   who.buffs.push(newbuff);
+}
+function buffMold(buff, time, val){
    if(!buff || !time || !val){console.error('要素が足りないぜ！！！');}
    let buffData = [...Object.values(Effects.buffs), ...Object.values(Effects.debuffs), ...Object.values(Effects.handles), ...Object.values(Effects.uniques)].find(e => e.name === buff);
-   let defer = humans[tcam][target];
 
-   console.log(`${defer.name}に${val}の${buff}を${time}付与します！！`);
+   console.log(`${who.name}に${val}の${buff}を${time}付与します！！`);
 
    let newbuff = {};
 
    switch(buffData.kind){
       case 'turn':{
          //すでにある場合の処理
-         let hasbuffIndex = defer.buffs.findIndex(e => e.name == buff && e.value == val);
+         let hasbuffIndex = who.buffs.findIndex(e => e.name == buff && e.value == val);
          if(hasbuffIndex >= 0){
-            newbuff = defer.buffs[hasbuffIndex];
-            defer.buffs.splice(hasbuffIndex,1);
+            newbuff = who.buffs[hasbuffIndex];
+            who.buffs.splice(hasbuffIndex,1);
             newbuff.time += time;
          }else{
             newbuff = {
@@ -3175,14 +3222,14 @@ async function buffadd(tcam,target,buff,time,val){//誰のバフ/デバフか,�
          }
       };
       tekiou();
-      await addtext(`${defer.name}は${buff}を${time}turn受けた!`);
+      addtext(`${who.name}は${buff}を${time}turn受けた!`);
       break;
 
       case 'stack':{
-         let hasbuffIndex = defer.buffs.findIndex(e => e.name == buff);
+         let hasbuffIndex = who.buffs.findIndex(e => e.name == buff);
          if(hasbuffIndex >= 0){
-            defer.buffs[hasbuffIndex].time += time;
-            defer.buffs[hasbuffIndex].value = buffData.lv[time];
+            who.buffs[hasbuffIndex].time += time;
+            who.buffs[hasbuffIndex].value = buffData.lv[time];
          }else{
             newbuff = {
                type: buffData.type,
@@ -3195,12 +3242,11 @@ async function buffadd(tcam,target,buff,time,val){//誰のバフ/デバフか,�
          }
       };
       tekiou();
-      await addtext(`${defer.name}は${buff}を${time}stack受けた!`);
+      addtext(`${who.name}は${buff}を${time}stack受けた!`);
       break;
    }
 
-   
-   
+   return newbuff;
 }
 function buffremove(tcam,target,buff){
    //誰のバフ/デバフか,バフ/デバフの名前
@@ -3246,34 +3292,34 @@ function buffhas(tcam,target,buff){
 //#region QTEのやつ
 async function qte(keyLeft, keyRight, limit) {
    return new Promise((resolve) => {
-       let isLeft = Math.random() < 0.5; // 左右をランダムに決定
-       let keyToPress = isLeft ? keyLeft : keyRight;
-       let qteElement = isLeft ? document.getElementById("qteLeft") : document.getElementById("qteRight");
+      let isLeft = Math.random() < 0.5; // 左右をランダムに決定
+      let keyToPress = isLeft ? keyLeft : keyRight;
+      let qteElement = isLeft ? document.getElementById("qteLeft") : document.getElementById("qteRight");
 
-       qteElement.style.display = "block";
-       let success = false;
+      qteElement.style.display = "block";
+      let success = false;
 
-       function keyHandler(event) {
-           if (event.key === keyToPress) {
-               success = true;
-               qteElement.style.display = "none";
-               window.removeEventListener("keydown", keyHandler);
-               resolve(true); // 成功！
-           } else if (event.key === keyLeft || event.key === keyRight) {
-               success = false;
-               qteElement.style.display = "none";
-               window.removeEventListener("keydown", keyHandler);
-               resolve(false); // 間違えた
-           }
-       }
+      function keyHandler(event) {
+         if (event.key === keyToPress) {
+            success = true;
+            qteElement.style.display = "none";
+            window.removeEventListener("keydown", keyHandler);
+            resolve(true); // 成功！
+         } else if (event.key === keyLeft || event.key === keyRight) {
+            success = false;
+            qteElement.style.display = "none";
+            window.removeEventListener("keydown", keyHandler);
+            resolve(false); // 間違えた
+         }
+      }
 
-       window.addEventListener("keydown", keyHandler);
+      window.addEventListener("keydown", keyHandler);
 
-       setTimeout(() => {
-           qteElement.style.display = "none";
-           window.removeEventListener("keydown", keyHandler);
-           if(!success)resolve(false); // タイムアウトで失敗
-       }, limit * 1000);
+      setTimeout(() => {
+         qteElement.style.display = "none";
+         window.removeEventListener("keydown", keyHandler);
+         if(!success)resolve(false); // タイムアウトで失敗
+      }, limit * 1000);
    });
 }
 //#endregion
@@ -3281,10 +3327,10 @@ async function qte(keyLeft, keyRight, limit) {
 //#region playerturn
 function backtoplayerturn(){
    phase = 1;
-   select1.textContent = 'act';
-   select2.textContent = 'magic';
-   select3.textContent = 'tools';
-   select4.textContent = 'run';
+   commandC.s1B.textContent = 'act';
+   commandC.s2B.textContent = 'magic';
+   commandC.s3B.textContent = 'tools';
+   commandC.s4B.textContent = 'run';
    //errorcheck();
 }
 async function playerturn(cam,me){
@@ -3305,44 +3351,41 @@ let nowturn = 0;
 let targetselect = 0;
 
 const battleArea = document.querySelector('#battleArea');
-const battleCommands = battleArea.querySelector('.UIs .commands');
-const select1 = battleCommands.querySelector('.select1');
-const select2 = battleCommands.querySelector('.select2');
-const select3 = battleCommands.querySelector('.select3');
-const select4 = battleCommands.querySelector('.select4');
+const commandD = battleArea.querySelector('.UIs .commands');
+let commandC = {
+   s1B: commandD.querySelector('.s1'),
+   s2B: commandD.querySelector('.s2'),
+   s3B: commandD.querySelector('.s3'),
+   s4B: commandD.querySelector('.s4'),
+}
 
-select1.addEventListener('click', async function(){
-   let me = turn[0]
+commandC.s1B.addEventListener('click', async function(){
+   let me = turn[0];
    switch(phase){
       case 1:
          phase = 2;
-         select1.textContent = humans[1].slash1.name;
-         select2.textContent = humans[1].slash2.name;
-         select3.textContent = humans[1].slash3.name;
-         select4.textContent = 'back';
+         commandC.s1B.textContent = humans.players[0].slash[1].name;
+         commandC.s2B.textContent = humans.players[0].slash[2].name;
+         commandC.s3B.textContent = humans.players[0].slash[3].name;
+         commandC.s4B.textContent = 'back';
          break;
       case 2:
+         Slash('players', me, 1)
+         break;
+      case 3:
          disappear()
-         if(humans.players[me].slash1 !== 0){
-            Slash('players',me,humans.players[me].slash1)
+         let mg = who.magic[1]
+         if(sl.name){
+            Slash('players', me, sl)
          }else{
             await addtext('you dont have slash...');
             backtoplayerturn()
          }
          break;
-      case 3:
-         disappear()
-         if(humans.players[me].magic1 !== 0){
-            Magic('players', me, humans.players[me].magic1)
-         }else{
-            await addtext('you dont have magic...');
-            backtoplayerturn()
-         }
-         break;
       case 4:
          disappear()
-         if(humans.players[me].tool1){
-            Tool('players',me,humans.players[me].tool1)
+         if(humans.players[me].tool[1]){
+            Tool('players',me,humans.players[me].tool[1])
          }else{
             await addtext('you dont have tool...');
             backtoplayerturn()
@@ -3351,20 +3394,21 @@ select1.addEventListener('click', async function(){
    }
 })
 
-select2.addEventListener('click', async function(){
+commandC.s2B.addEventListener('click', async function(){
+   let who = humans.players[0];
    switch(phase){
       case 1:
          phase = 2;
-         battleCommands.querySelector('.select1').textContent = humans[1].magic1.name;
-         select2.textContent = humans[1].magic2.name;
-         select3.textContent = humans[1].magic3.name;
-         select4.textContent = 'back';
+         commandC.s1B.textContent = who.magic[1].name;
+         commandC.s2B.textContent = who.magic[2].name;
+         commandC.s3B.textContent = who.magic[3].name;
+         commandC.s4B.textContent = 'back';
          break;
       case 2:
-         disappear()
-         if(humans.players[me].slash2 !== 0){
-            await addtext(`${humans.players[me].name}は${humans.players[me].slash2}をした！`);
-            Slash('players',me,humans.players[me].slash2)
+         disappear();
+         let sl = who.slash[2]
+         if(sl.name){
+            Slash('players', me, sl)
          }else{
             await addtext('you dont have slash...');
             backtoplayerturn()
@@ -3372,8 +3416,8 @@ select2.addEventListener('click', async function(){
          break;
       case 3:
          disappear()
-         if(humans.players[me].magic2 !== 0){
-            Magic('players',me,humans.players[me].magic2)
+         if(humans.players[me].magic[2] !== 0){
+            Magic('players',me,humans.players[me].magic[2])
          }else{
             await addtext('you dont have magic...');
             backtoplayerturn()
@@ -3381,8 +3425,8 @@ select2.addEventListener('click', async function(){
          break;
       case 4:
          disappear()
-         if(humans.players[me].tool2){
-            Tool('players',me,humans.players[me].tool2)
+         if(humans.players[me].tool[2]){
+            Tool('players',me,humans.players[me].tool[2])
          }else{
             await addtext('you dont have tool...');
             backtoplayerturn()
@@ -3391,29 +3435,29 @@ select2.addEventListener('click', async function(){
    }
 })
 
-select3.addEventListener('click', async function(){
+commandC.s3B.addEventListener('click', async function(){
    switch(phase){
       case 1:
          phase = 2;
-         select1.textContent = humans[1].tool1.name;
-         select2.textContent = humans[1].tool2.name;
-         select3.textContent = humans[1].tool3.name;
-         select4.textContent = 'back';
+         commandC.s1B.textContent = who.tool[1].name;
+         commandC.s2B.textContent = who.tool[2].name;
+         commandC.s3B.textContent = who.tool[3].name;
+         commandC.s4B.textContent = 'back';
          break;
       case 2:
          disappear()
-         if(humans.players[me].slash3 !== 0){
-            await addtext(`${humans.players[me].name}は${humans.players[me].slash3}をした！`);
-            Slash('players',me,humans.players[me].slash3)
+         let sl = who.slash[2]
+         if(sl.name){
+            Slash('players', me, sl)
          }else{
             await addtext('you dont have slash...');
             backtoplayerturn()
-         }
+         };
          break;
       case 3:
          disappear()
-         if(humans.players[me].magic3 !== 0){
-            Magic('players',me,humans.players[me].magic3)
+         if(humans.players[me].magic[3] !== 0){
+            Magic('players',me,humans.players[me].magic[3])
          }else{
             await addtext('you dont have magic...');
             backtoplayerturn()
@@ -3421,8 +3465,8 @@ select3.addEventListener('click', async function(){
          break;
       case 4:
          disappear()
-         if(humans.players[me].tool3){
-            Tool('players',me,humans.players[me].tool3)
+         if(humans.players[me].tool[3]){
+            Tool('players',me,humans.players[me].tool[3])
          }else{
             await addtext('you dont have tool...');
             backtoplayerturn()
@@ -3431,7 +3475,7 @@ select3.addEventListener('click', async function(){
    }
 })
 
-select4.addEventListener('click', async function(){
+commandC.s4B.addEventListener('click', async function(){
    switch(phase){
       case 1:
          disappear();
@@ -3452,10 +3496,10 @@ select4.addEventListener('click', async function(){
 
 function disappear(){
    phase = 0;
-   select1.textContent = ' ';
-   select2.textContent = ' ';
-   select3.textContent = ' ';
-   select4.textContent = ' ';
+   commandC.s1B.textContent = ' ';
+   commandC.s2B.textContent = ' ';
+   commandC.s3B.textContent = ' ';
+   commandC.s4B.textContent = ' ';
 }
 
 function LetsTargetSelect(one){
@@ -3521,47 +3565,90 @@ function LetsTargetSelect(one){
 
 //#endregion
 //#region playerの斬撃
-async function Slash(cam,me,name){
-   if(humans.players[me].mp >= Slashs[name].mp){
-      target = await LetsTargetSelect();
-      humans.players[me].mp -= Slashs[name].mp;tekiou();
-      await addtext(`${humans.players[me].name}の${Slashs[name].name}！`);
-      let result = await Slashs[name].process('players',me,target[1],target[0]);
-      if(result == 'dead'){let results = await killed('players',me,target[1],target[0]);return results}
-      NextTurnis('players',me,target[1],target[0]);
+async function Slash(who, num){
+   let sl = who.slash[num]
+   if(!sl.name){
+      await addtext('you dont have slash...');
+      return backtoplayerturn()
+   }
+
+   let name = sl.name;
+   let data = Slashs[name]
+   if(who.mp >= data.mp){
+      let [tme, tcam] = await LetsTargetSelect();
+      let are = humans[tcam][tme];
+
+      who.mp -= data.mp;
+      tekiou();
+
+      await addtext(`${who.name}の${name}！`);
+      let result = await data.process(who, are);
+      if(result == 'dead') return await killed(who, are);
+
+      NextTurnis(who, are);
    }else{
       await addtext('not enough mp...');
-      window.setTimeout(backtoplayerturn, 1000)
+      await delay(1000);
+      backtoplayerturn();
    }
 }
 //#endregion
 //#region playerの魔法
-async function Magic(cam,me,name){
-   if(humans.players[me].mp >= Magics[name].mp){
-      target = await LetsTargetSelect();
-      humans.players[me].mp -= Magics[name].mp;tekiou();
-      let result = await Magics[name].process('players',me,target[1],target[0]);
-      if(result == 'dead'){let results = await killed('players',me,target[1],target[0]);return results}
-      NextTurnis('players',me,target[1],target[0]);
+async function Magic(who, num){
+   let mg = who.magic[num]
+   if(!mg.name){
+      await addtext('you dont have magic...');
+      return backtoplayerturn()
+   }
+
+   let name = mg.name;
+   let data = Magics[name]
+   if(who.mp >= data.mp){
+      let [tme, tcam] = await LetsTargetSelect();
+      let are = humans[tcam][tme];
+
+      who.mp -= data.mp;
+      tekiou();
+
+      await addtext(`${who.name}の${name}！`);
+      let result = await data.process(who, are);
+      if(result == 'dead') return await killed(who, are);
+
+      NextTurnis(who, are);
    }else{
       await addtext('not enough mp...');
-      window.setTimeout(backtoplayerturn, 1000)
+      await delay(1000);
+      backtoplayerturn();
    }
 }
 
 //#endregion
 //#region playerの道具
-async function Tool(cam,me,UseTool){
-   if(Tools[UseTool].num > 0){
-      target = await LetsTargetSelect();
-      await addtext(humans.players[me].name + 'は'+Tools[UseTool].name+'を使用した!');
-      Tools[UseTool].num -= 1
-      let result = await Tools[UseTool].process(cam,me,target[1],target[0]);
-      if(result == 'dead'){let results = await killed(cam,me,target[1],target[0]);return results};
-      NextTurnis(cam,me,target[1],target[0]);
+async function Tool(who, num){
+   let tl = who.tool[num]
+   if(!tl.name){
+      await addtext('you dont have slash...');
+      return backtoplayerturn()
+   }
+
+   let name = tl;
+   //今はいいけど、inven(tory)に全部詰め込むことになるならdata.jsのnumじゃなくて簡単関数でinven内の数を求めて、で〜って形にした方がいいかも
+   let data = Tools[name]
+   if(data.num > 0){
+      data.num -= 1;
+
+      let [tme, tcam] = await LetsTargetSelect();
+      let are = humans[tcam][tme];
+      await addtext(`${who.name}は${name}を使用した!`);
+      
+      let result = await data.process(who, are);
+
+      if(result == 'dead') return await killed(who, are);
+      NextTurnis(who, are);
    }else{
       await addtext('not enough tool...');
-      window.setTimeout(backtoplayerturn, 1000)
+      await delay(1000);
+      backtoplayerturn();
    }
 }
 //#endregion
@@ -3595,21 +3682,6 @@ async function skillAct(cam,me,skill){
    return result;
 }
 function skillReset(cam,me){
-   humans[cam][me].ep = 0;
-}
-function Splittekiou(){
-   document.querySelector('#SplitHealth').textContent = Splithp;
-   document.querySelector('#SplitMaxHealth').textContent = Splitmaxhp;
-   }
-async function Splitbreak(){
-   buffremove(cam,me,'spliting')
-   x = Math.floor(Splitmaxhp * 0.7);
-   playerhp += x;
-   if (playerhp > playermaxhp){playerhp = playermaxhp;}
-   document.querySelector('#PlayerFriendFront').innerHTML = '';
-   Splitmaxhp = 0;
-   Splithp = 0;
-   await addtext(playername+'のコピーは倒された...');
    humans[cam][me].ep = 0;
 }
 function turretPlace(cam){
@@ -3713,34 +3785,6 @@ async function NextTurnis(cam,me,tcam,target){
 
    acted += 1;
    if(acted >= bar.me.length){
-      let cams = 0;
-      if(humans.players['t'].kazu > 0){
-         log.textContent = '我らのturretの攻撃!';
-         await delay(1000);
-         cams = 'players';
-         let selected = ShallTargetSelect('players','t',`ehpl`,0);
-         let tcams = selected[1];let targets = selected[0];
-         console.log(`atk:${humans[cams]['t'].atk} power:${humans[cams]['t'].power} kazu:${humans[cams]['t'].kazu} def:${humans[tcams][targets].def} shell:${humans[tcams][targets].shell}`);
-         x = Math.ceil(humans[cams]['t'].atk * humans[cams]['t'].power * humans[cams]['t'].kazu) - Math.ceil(humans[tcams][targets].def*humans[tcams][targets].shell);
-         if(x < 0){x = 0};if(x > humans[tcams][targets].hp){x = humans[tcams][targets].hp};
-         humans[tcams][targets].hp -= x;tekiou();
-         log.textContent = `${humans[tcams][targets].name}に${x}のダメージ！`;
-         if(humans[tcams][targets].hp <= 0){let result = killed(cams,1,tcams,targets);if(result !== 'continue'){return result;}};
-         await delay(1000);
-      }
-      if(humans.enemies['t']?.kazu || 0 > 0 && x == false){
-         log.textContent = '敵のturretの攻撃!';
-         await delay(1000);
-         cams = 'enemies';
-         let selected = ShallTargetSelect('enemies','t',`phpl`,0);
-         let tcams = selected[1];let targets = selected[0];
-         x = Math.ceil(humans[cams]['t'].atk * humans[cams]['t'].kazu) - Math.ceil(humans[tcams][targets].def*humans[tcams][targets].shell);
-         if(x < 0){x = 0};if(x > humans[tcams][targets].hp){x = humans[tcams][targets].hp};
-         humans[tcams][targets].hp -= x;tekiou();
-         log.textContent = `${humans[tcams][targets].name}に${x}のダメージ！`;
-         if(humans[tcams][targets].hp <= 0){let result = killed(cams,1,tcams,targets);if(result !== 'continue'){return result;}};
-         await delay(1000);
-      }
 
       turncount += 1;
       const combined = [...Object.values(humans.players).filter(a => a.status === 1 && a.hp > 0 && a.id != 't'), ...Object.values(humans.enemies)].filter(b => b.status === 1 && b.hp > 0)// オブジェクトをリストに変換して合体
@@ -4193,8 +4237,8 @@ async function killedCheck(){
          return Player.status == 0 || Player.status == 2;
       })
       if(isZemetu){
-         let saydefeats = [`${humans.players[0].name}は力尽きた...残念でしたね！にはははは〜！`, '残念だったね!すごい惜しかったね!!', 'あ、あれ..？もう負けちゃったんですか....？', 'ほら、負けを認めてください？'];
-         if(humans.players[0].level < 3)saydefeats = ['あはは..負けちゃいましたね....防御力を上げると楽ですよ!', 'あはは..負けちゃいましたね....double slashは運要素も少ないので強いですよ!', 'あはは..負けちゃいましたね....魔法にターン数制限はありません!いっぱい使っちゃいましょう!', 'あはは..負けちゃいましたね....mechanicは防御全振りで戦うと良いですよ!', 'あれ〜？負けちゃったんですか〜？？おにいさんよわいね〜？？'];
+         let saydefeats = [`${who.name}は力尽きた...残念でしたね！にはははは〜！`, '残念だったね!すごい惜しかったね!!', 'あ、あれ..？もう負けちゃったんですか....？', 'ほら、負けを認めてください？'];
+         if(who.level < 3)saydefeats = ['あはは..負けちゃいましたね....防御力を上げると楽ですよ!', 'あはは..負けちゃいましたね....double slashは運要素も少ないので強いですよ!', 'あはは..負けちゃいましたね....魔法にターン数制限はありません!いっぱい使っちゃいましょう!', 'あはは..負けちゃいましたね....mechanicは防御全振りで戦うと良いですよ!', 'あれ〜？負けちゃったんですか〜？？おにいさんよわいね〜？？'];
          
          await addtext(arraySelect(saydefeats));
 
@@ -4223,10 +4267,10 @@ async function EnemyAppear(){
    movable = 0;
    document.querySelector('#overfieldArea').style.display = 'none';
    document.querySelector('#battleArea').style.display = 'block';
-   select1.textContent = '';
-   select2.textContent = '';
-   select3.textContent = '';
-   select4.textContent = '';
+   commandC.s1B.textContent = '';
+   commandC.s2B.textContent = '';
+   commandC.s3B.textContent = '';
+   commandC.s4B.textContent = '';
 
    //前までのやつの処理
    turretAllClear();
@@ -4294,7 +4338,7 @@ function DesideEnemyName(target){
    enemy.buffs = [];
    
    enemy.weapon = {id:'none', lv:1};
-   enemy.armor  = {id:'none', lv:1};
+   enemy.shield  = {id:'none', lv:1};
    enemy.ear    = {id:'none', lv:1};
    enemy.ring   = {id:'none', lv:1};
    enemy.neck   = {id:'none', lv:1};
@@ -4319,10 +4363,54 @@ function DesideEnemyName(target){
 
    enemy.prefixe = '';
    let prefixe = arraySelect(Object.keys(Prefixes));
-   if(Math.floor(Math.random() * 5) == 0){
-      console.log(Prefixes[prefixe].name, 'enemies', target);
+   if(probability(20)){
+      console.log(`enemies(${target})、"${Prefixes[prefixe].name}"`);
       enemy.prefixe = Prefixes[prefixe].name;
-      Prefixes[prefixe].process('enemies', target);
+      let arr = Object.entries(Prefixes[prefixe].effects);
+      arr.forEach(a => {
+         let key = a[0];
+         let val = a[1];
+         if(key != 'buff'){
+            let res = null;
+            // val = "=10%"
+            if(val.startsWith('=')) res = 0;
+            if(val.startsWith('+') || val.startsWith('-')) res = 1;
+            if(val.endsWith('%')){
+               if(res == 0) res = 2;
+               if(res == 1) res = 3;
+            }
+            switch(res){
+               case 0:
+                  res = +val.slice(1);
+                  enemy[key] = res;
+                  break;
+               case 1:
+                  res = +val.slice(1);
+                  if(val.startsWith('-')) res *= -1;
+                  enemy[key] += res;
+                  break;
+               case 2:
+                  res = +(val.slice(0,-1))/100; //10% => 0.1
+                  enemy[key] *= res; //0.1 => key*0.1
+                  res = enemy[key];
+                  break;
+               case 3:
+                  res = +(val.slice(0, -1) / 100); //10% => 0.1
+                  res = enemy[key] * res; //0.1 => key*0.1
+                  if(val.startsWith('-')) res *= -1; //if"-" => -(key*0.1)
+                  enemy[key] += res;
+                  break;
+               default:
+                  break;
+            }
+         }
+         if(key == 'buff'){
+            val.forEach(b => {
+               let newbuff = buffMold(b.name, b.time, b.val);
+               enemy.buffs.push(newbuff);
+            })
+         }
+      })
    };
 
    enemy.hp = enemy.maxhp;
@@ -4334,10 +4422,10 @@ async function testEnemyAppear(){
    movable = 0;
    document.querySelector('#overfieldArea').style.display = 'none';
    document.querySelector('#battleArea').style.display = 'block';
-   select1.textContent = '';
-   select2.textContent = '';
-   select3.textContent = '';
-   select4.textContent = '';
+   commandC.s1B.textContent = '';
+   commandC.s2B.textContent = '';
+   commandC.s3B.textContent = '';
+   commandC.s4B.textContent = '';
 
    //前までのやつの処理
    turretAllClear();
@@ -4641,7 +4729,7 @@ function makeNewEnemy(me){
 
    //後付けハードディスク
    let spanScrollWidth = nameSpan.scrollWidth
-   console.log(`${nameSpan.textContent}のnameSpanは${spanScrollWidth}です`)
+   // console.log(`${nameSpan.textContent}のnameSpanは${spanScrollWidth}です`)
    if(spanScrollWidth > 80){
       const animationName = `scroll-enemies${me}-${enemy.id}ver`;
       const styleSheet = document.styleSheets[0];
@@ -4669,10 +4757,10 @@ async function BossEnemyAppear(){
    document.querySelector('#overfieldArea').style.display = 'none';
    document.querySelector('#battleArea').style.display = 'block';
    bossbattlenow = 1;
-   select1.textContent = ' ';
-   select2.textContent = ' ';
-   select3.textContent = ' ';
-   select4.textContent = ' ';
+   commandC.s1B.textContent = ' ';
+   commandC.s2B.textContent = ' ';
+   commandC.s3B.textContent = ' ';
+   commandC.s4B.textContent = ' ';
    turncount = 0;
    document.querySelector('#TurnCount').textContent = turncount;
    playermp = playermaxmp;
@@ -4829,7 +4917,7 @@ let Camprestper
          await delay(1000);
          nowshop = 2;
          log.textContent = 'うちの店ではこんなものが売ってるよ';
-         document.querySelector('#eventArea').innerHTML = '<iframe height="400" width="300" src="assets/shops/armors.txt"></iframe><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopBuyButton()">Buy</button><br><br><button class="button" onclick="CampBye()">Bye</button>';
+         document.querySelector('#eventArea').innerHTML = '<iframe height="400" width="300" src="assets/shops/shields.txt"></iframe><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopBuyButton()">Buy</button><br><br><button class="button" onclick="CampBye()">Bye</button>';
       }else if(y == 3){
          log.textContent = '道具屋に話しかけた！';
          await delay(1000);
@@ -4878,13 +4966,13 @@ function ShopBuyButton(){
       }
       break;
       case 2:
-      if(havearmors.includes(armors.name[num])){
+      if(haveshields.includes(shields.name[num])){
          log.textContent = 'you already have a it!';
       }else{
-         if(valorimar >= armors.price[num]){
-            valorimar -= armors.price[num];
-            havearmors.push(armors.name[num]);
-            log.textContent = armors.name[num]+'を購入しました!';
+         if(valorimar >= shields.price[num]){
+            valorimar -= shields.price[num];
+            haveshields.push(shields.name[num]);
+            log.textContent = shields.name[num]+'を購入しました!';
          }else{
             log.textContent = 'not enough valorimar..';
          };
@@ -4921,7 +5009,7 @@ function Campback(){
    }
 }
 let appearweapons = '';
-let appeararmors = '';
+let appearshields = '';
 let appeartools = '';
 function GoToEquip(){
    document.querySelector('#eventArea').innerHTML = '<button class="button"onclick="GoToEquipWeapon()">Equip Weapon</button>  <button class="button"onclick="GoToEquipArmor()">Equip Armor</button>  <button class="button"onclick="GoToEquipTool()">Equip Tool</button><br><br><button class="button"onclick="Campback()">Leave</button>'
@@ -4940,11 +5028,11 @@ function GoToEquipWeapon(){
 function GoToEquipArmor(){
    nowshop = 5;
    document.querySelector('#eventArea').innerHTML = '<span id="AppearShops"></span><br><br><input type="text" id="ShopInputText" minlength="2" maxlength="2" size="16" placeholder="write number here"><button class="button" onclick="ShopEquipButton()">Equip</button><br><br><button class="button" onclick="GoToEquip()">Back</button>';
-   appeararmors = '';
+   appearshields = '';
    x = 0;
-   for(let i = 0; i < havearmors.length; i++){
+   for(let i = 0; i < haveshields.length; i++){
       let ChildNText = document.createElement('span');
-      ChildNText.innerHTML = havearmors[i]+ ` <button class="button" onclick="ShopEquipButton('armor',${i})">Equip</button>` + '<br>';
+      ChildNText.innerHTML = haveshields[i]+ ` <button class="button" onclick="ShopEquipButton('shield',${i})">Equip</button>` + '<br>';
       document.querySelector('#AppearShops').appendChild(ChildNText);
    }
 }
@@ -4959,10 +5047,10 @@ function ShopEquipButton(){
          }else{log.textContent = 'you dont have it!'};
       break;
       case 5:
-         if(havearmors.includes(armors.name[Num])){
-            log.textContent = 'あなたは'+armors.name[Num]+'を装備しました！';
-            equiparmor = Num;
-            armorshell = armors.shell[Num];
+         if(haveshields.includes(shields.name[Num])){
+            log.textContent = 'あなたは'+shields.name[Num]+'を装備しました！';
+            equipshield = Num;
+            shieldshell = shields.shell[Num];
          }else{log.textContent = 'you dont have it!'};
       break;
    }
@@ -4972,9 +5060,9 @@ function GoToEquipTool(){
    nowshop = 6;
    
    document.querySelector('#eventArea').innerHTML = '<iframe src="resources/appeartools.html" width="100%" height="100%" frameborder="0"></iframe><br><div id="Camptoolequip"><button id="Campequipedtool1" class="button" onclick="Campequiptool(1)"> </button>　<button id="Campequipedtool2" class="button" onclick="Campequiptool(2)"> </button>　<button id="Campequipedtool3" class="button" onclick="Campequiptool(3)"> </button></div><br><br><button class="button" onclick="GoToEquip()">Back</button>'; //持ってないやつも登録できるようにしたら処理楽かな？
-   document.querySelector('#Campequipedtool1').textContent = humans.players[0].tool1.name;
-   document.querySelector('#Campequipedtool2').textContent = humans.players[0].tool2.name;
-   document.querySelector('#Campequipedtool3').textContent = humans.players[0].tool3.name;
+   document.querySelector('#Campequipedtool1').textContent = humans.players[0].tool[1].name;
+   document.querySelector('#Campequipedtool2').textContent = humans.players[0].tool[2].name;
+   document.querySelector('#Campequipedtool3').textContent = humans.players[0].tool[3].name;
    log.textContent = 'どうしようかな...?';
 }
 function Campequiptool(code){
@@ -4991,11 +5079,11 @@ function Campequiptool(code){
       c.classList.add('button');
       c.addEventListener('click', () => {
          document.querySelector('#toolsdesuwa').remove();
-         humans.players[0].tool1[code] = Tools[nanka].id;
+         humans.players[0].tool[1][code] = Tools[nanka].id;
          document.querySelector('#Camptoolequip').innerHTML = '<button id="Campequipedtool1" class="button" onclick="Campequiptool(1)"> </button>　<button id="Campequipedtool2" class="button" onclick="Campequiptool(2)"> </button>　<button id="Campequipedtool3" class="button" onclick="Campequiptool(3)"> </button>';
-         document.querySelector('#Campequipedtool1').textContent = humans.players[0].tool1.name;
-         document.querySelector('#Campequipedtool2').textContent = humans.players[0].tool2.name;
-         document.querySelector('#Campequipedtool3').textContent = humans.players[0].tool3.name;
+         document.querySelector('#Campequipedtool1').textContent = humans.players[0].tool[1].name;
+         document.querySelector('#Campequipedtool2').textContent = humans.players[0].tool[2].name;
+         document.querySelector('#Campequipedtool3').textContent = humans.players[0].tool[3].name;
          log.textContent = Tools[nanka].name+'を持つことにした！';
       })
       x.push(c);
@@ -5299,8 +5387,11 @@ function ZomuEvent(){//創生黎明の原野
    humans.players[me].ex = 'bombe';//clownみたいな感じで爆弾投げ。普通、水、マグマ、閃光弾。ex使用後は攻撃力が1.5倍になる(1ターン)
    playerns = 'hitelec';//4の倍数のターンの時、強制的にエレキギターで殴る。攻撃力の3倍のダメージを与える。
    playerps = 'solx5but'//slashoflightを使った際、当たれば5倍だが、外れれば自分にダメージを与える。
-   buttonsolid = '#000000';buttonback = '#50C878';
-   document.querySelector('#ButtonStyle').textContent = `.button{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};cursor: pointer;}input[type="text"]:focus{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};}`;
+
+   Styles.button.solid = '#000000';
+   Styles.button.back = '#50C878';
+   Styles.tekiou();
+
    objmap[MAPy][MAPx].id = 0;
    draw()
    movable = 1;
@@ -5311,8 +5402,10 @@ function UtusenEvent(){
    humans.players[me].ex = '50%appease';//相手の体力が半分以下なら仲間にする｡でなければ､攻撃力の1.5倍のダメージ
    playerns = 'ehp50%but';//3の倍数のターンの時、相手か自分の体力を半分にする。運ゲー
    playerps = 'reverseta';//逆TA(相手より体力がめちゃ低いとダメージを喰らわない)
-   buttonsolid = '#4c6cb3';buttonback = '#949495';
-   document.querySelector('#ButtonStyle').textContent = `.button{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};cursor: pointer;}input[type="text"]:focus{border: 2px solid ${buttonsolid};padding: 2px 3px;background: ${buttonback};}`;
+
+   Style.button.solid = '#4c6cb3';
+   Style.button.back = '#949495';
+   Style.tekiou();
    objmap[MAPy][MAPx].id = 0;
    draw()
    movable = 1;

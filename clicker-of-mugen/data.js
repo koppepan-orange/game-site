@@ -1,3 +1,24 @@
+let Style = {
+  button: {
+    solid: '#000000',
+    back: '#ffffff',
+  },
+  text: {
+    main: '#222222',
+    sub: '#666666',
+  },
+  tekiou: function() {
+    for (let section in this) {
+      if (section === 'apply') continue;
+      for (let key in this[section]) {
+        document.documentElement.style
+          .setProperty(`--${section}-${key}`, this[section][key]);
+      }
+    }
+  }
+}
+
+
 let IranMikans = {
     'koppepan':{
         name:'koppepan',
@@ -8,11 +29,12 @@ let IranMikans = {
         serifs:['まかせロンドン', 'まかせロンドン2階建て', 'まず無いバスラオ', 'ありがとう角砂糖(大パクリ)', 'こいつ好き ビフィズス菌', 'ヨスギルオス', '危なすワロスステゴサウルス', '髪長ザウルス', 'どっちにせよ理論', 'ニョロトノ', '流石にせざるオーエンは彼女なのか？', 'アクセン・クトゥ', 'ヤメトコの杖', '的なテキーラシャンパンタワー'],
     }
 }
+
 let Charas = {
   'wretch':{
     id:'wretch',
     name:'持たざる者',
-    description:'持たざる者。何もないが、何でもあるとも言える。<br>平均的で普遍的。普通の凡才でただの人間。',
+    description:'持たざる者。何もないが、何でもあるとも言える。\n平均的で普遍的。普通の凡才でただの人間。',
     ex:'null',
     ns:'null',
     ps:'null',
@@ -53,8 +75,8 @@ let Charas = {
 
   'mechanic':{
     id:'mechanic',
-    name:'メカニッカ',
-    description:'メカニック。言うなれば「諸刃の刃」<br>ARMSのあの人ではない。打たれ弱いので繊細にね',
+    name:'アミー',
+    description:'メカニック。工具を用いて割となんでも作れる。\nそのせいか助手には大きく慕われている。\n打たれ弱いので繊細にね',
     ex:'placeturret',
     ns:'throwwrench',
     ps:'solplaceturret',
@@ -75,7 +97,7 @@ let Charas = {
   'clown':{
     id:'clown',
     name:'週末の道化師',
-    description:'ピエロさん。ランダム要素多め。<br>',
+    description:'ピエロさん。ランダム要素多め。\n',
     ex:'trickyvaiavles',
     ns:'gambler',
     ps:'highsol',
@@ -96,7 +118,7 @@ let Charas = {
   'magodituono':{
     id:'magodituono',
     name:'スオーノ・フルマイン',
-    description:'雷電魔術師。"帯電"を用いて戦う<br>将軍ではない。誰だ将軍って言ったやつは',
+    description:'雷電魔術師。"帯電"を用いて戦う\n将軍ではない。誰だ将軍って言ったやつは',
     ex:'lightningstorm',
     ns:'elecbarrier',
     ps:'elecshock',
@@ -219,7 +241,7 @@ let Effects = {
         kind:'turn',
         addable:0,
         img:'luck',
-        description:'ターン終了時、1/6の確率でもう一回行動できる。<br>願うと起きやすいです',
+        description:'ターン終了時、1/6の確率でもう一回行動できる。\n願うと起きやすいです',
         effect:0
     },
     'luck_great':{
@@ -228,7 +250,7 @@ let Effects = {
         kind:'turn',
         addable:0,
         img:'luck',
-        description:'ターン終了時、1/3の確率でもう一回行動できる。<br>気分はさながらラスボスですね',
+        description:'ターン終了時、1/3の確率でもう一回行動できる。\n気分はさながらラスボスですね',
         effect:0
     },
     'disappear':{
@@ -237,7 +259,7 @@ let Effects = {
         kind:'turn',
         addable:0,
         img:'disappear',
-        description:'姿を消し、攻撃を受けなくなる。<br>しかし範囲攻撃はちゃんと当たる。<br>lv1ならば範囲攻撃で解除される。',
+        description:'姿を消し、攻撃を受けなくなる。\nしかし範囲攻撃はちゃんと当たる。\nlv1ならば範囲攻撃で解除される。',
     },
     'cheerup':{
         name:'cheerup',
@@ -245,7 +267,7 @@ let Effects = {
         kind:'turn',
         addable:0,
         img:'cheerup',
-        description:'応援されている状態。攻撃力と速度が上がり会心率が下がる。<br>ちょっと緊張しちゃうよね、わかる',
+        description:'応援されている状態。攻撃力と速度が上がり会心率が下がる。\nちょっと緊張しちゃうよね、わかる',
         effect:{
           'power':1.0,
           'speed':20.0,
@@ -276,7 +298,7 @@ let Effects = {
         kind:'turn',
         addable:0,
         img:'poison',
-        description:'ターン終了時割合で防御貫通ダメージ。<br>毒の苦しみもお好きなんですね',
+        description:'ターン終了時割合で防御貫通ダメージ。\n毒の苦しみもお好きなんですね',
         //ターン終了時体力のx%のダメージ
         effect:{
           'poison':0.05 //"毒ダメージ"として5%削れる
@@ -288,7 +310,7 @@ let Effects = {
         kind:'turn',
         addable:0,
         img:'blood',
-        description:'ターン終了時固定ダメージ、徐々に増加。<br>増加率は"2倍"<br>そのままにしとくと普通に死にます',
+        description:'ターン終了時固定ダメージ、徐々に増加。\n増加率は"2倍"\nそのままにしとくと普通に死にます',
         //ターン終了時xダメージ
         effect:{
           'blood':2
@@ -300,7 +322,7 @@ let Effects = {
         kind:'turn',
         addable:0,
         img:'burn',
-        description:'ターン終了時固定ダメージ。ついでに攻撃力低下。<br>まじでこれ嫌い...ww',
+        description:'ターン終了時固定ダメージ。ついでに攻撃力低下。\nまじでこれ嫌い...ww',
         //ターン終了時xダメージ
         effect:{
           'burn':10,
@@ -313,7 +335,7 @@ let Effects = {
         kind:'turn',
         addable:0,
         img:'injury',
-        description:'行動時固定ダメージ。<br>連続行動ビルドに大打撃',
+        description:'行動時固定ダメージ。\n連続行動ビルドに大打撃',
         //ターン終了時xダメージ
         effect:{
           'injury':12
@@ -353,7 +375,7 @@ let Effects = {
         kind:'turn',
         addable:0,
         img:'skip',
-        description:'はいお前スキップ〜〜ww状態です。<br>ぴえん超えてだっさぁ',
+        description:'はいお前スキップ〜〜ww状態です。\nぴえん超えてだっさぁ',
     },
     'sleep':{
         name:'sleep',
@@ -369,7 +391,7 @@ let Effects = {
         kind:'stack',
         addable:0,
         img:'anger',
-        description:'すごいイラつかせてくる敵..だからメガさんとかと相性良さそう<br>で避けられてさらに煽られるみたいな',
+        description:'すごいイラつかせてくる敵..だからメガさんとかと相性良さそう\nで避けられてさらに煽られるみたいな',
         // stack/100の確率で殴りかかる
     }
   },
@@ -450,19 +472,21 @@ let Slashs = {
         }else{
           addlog('miss!');
         }
+
         if(probability(67)){
           let result = await damage(cam,me,tcam,target,100,'sh',2);
           if(result) return 1;
         }else{
           addlog('miss!');
         }
+
         return 0;
     }
   },
   'slash of light':{
     id:'slash of light',
     name:'一閃',//まじん斬り も作りたいね 霹靂一閃も
-    description:'初期のロマン技。<br>当たれば幸い的な感じで打ったほうが楽',
+    description:'初期のロマン技。\n当たれば幸い的な感じで打ったほうが楽',
     mp:0,
     lv:1,
     tcam:'players',
@@ -525,7 +549,7 @@ let Magics = {
   'shell':{
     id:'shell',
     name:'shell',
-    description:'防御力が1.25倍になります！<br>実感あんまりないけど..',
+    description:'防御力が1.25倍になります！\n実感あんまりないけど..',
     mp:5,
     lv:1,
     process:async function(cam,me,tcam,target){
@@ -538,7 +562,7 @@ let Magics = {
   'poison':{
     id:'poison',
     name:'poison',
-    description:'相手を毒にします<br>毒ビルド強すぎてやばい',
+    description:'相手を毒にします\n毒ビルド強すぎてやばい',
     mp:7,
     lv:3,
     process:async function(cam,me,tcam,target){
@@ -567,7 +591,7 @@ let Magics = {
   'garva':{
     id:'garva',
     name:'ガーヴァ',
-    description:'濁点多いと強そうだよね<br>まれに火傷も',
+    description:'濁点多いと強そうだよね\nまれに火傷も',
     mp:4,
     lv:4,
     process:async function(cam,me,tcam,target){
@@ -594,7 +618,7 @@ let Magics = {
   'luck':{
     id:'luck',
     name:'luck',
-    description:'二回行動人間になれるかも？なやつ。lv1<br>欠けた運を施錠しましょう',
+    description:'二回行動人間になれるかも？なやつ。lv1\n欠けた運を施錠しましょう',
     mp:4,
     lv:7,
     process:async function(cam,me,tcam,target){
@@ -606,7 +630,7 @@ let Magics = {
   'thundos':{
     id:'thundos',
     name:'サンドス',
-    description:'二段目。<br>サンドじゃないんです許してください',
+    description:'二段目。\nサンドじゃないんです許してください',
     mp:8,
     lv:8,
     process:async function(cam,me,tcam,target){
@@ -656,7 +680,7 @@ let Magics = {
   'garvan':{
     id:'garvan',
     name:'ガーヴァン',
-    description:'<br>notラージャン',
+    description:'\nnotラージャン',
     mp:10,
     lv:11,
     process:async function(cam,me,tcam,target){
@@ -669,7 +693,7 @@ let Magics = {
   'thehealest':{
     id:'thehealest',
     name:'the healest',
-    description:'60%回復。これ以上はない、っていう意味ですね。<br>xyzじゃないよ',
+    description:'60%回復。これ以上はない、っていう意味ですね。\nxyzじゃないよ',
     mp:12,
     lv:12,
     process:async function(cam,me,tcam,target){
@@ -710,7 +734,7 @@ let Magics = {
   'thoron':{
     id:'thoron',
     name:'Thoron',
-    description:'当たったらラッキー、シールドでされたら空前で追撃なつよつよ技。<br>けどギガサンダーの方が好き(雷の大ダメージ)',
+    description:'当たったらラッキー、シールドでされたら空前で追撃なつよつよ技。\nけどギガサンダーの方が好き(雷の大ダメージ)',
     mp:20,
     lv:15,
     process:async function(cam,me,tcam,target){
@@ -726,320 +750,328 @@ let Magics = {
     mp:5,
     lv:1,
     process:async function(cam,me,tcam,target){
-        log.textContent = 'randomを唱えた.......';await delay(1000);
-        x = Object.keys(Magics).map(a => Magics[a].lv <= humans[cam][me].level ? Magics[a].name : null).filter(Boolean)
-        y = Math.floor(Math.random() * x.length);
-        log.textContent = x[y]+'が出た！';await delay(1000);
-        x[y](cam,me,tcam,target);
+      log.textContent = 'randomを唱えた.......';await delay(1000);
+      x = Object.keys(Magics).map(a => Magics[a].lv <= humans[cam][me].level ? Magics[a].name : null).filter(Boolean)
+      y = Math.floor(Math.random() * x.length);
+      log.textContent = x[y]+'が出た！';await delay(1000);
+      x[y](cam,me,tcam,target);
     }
   },
 
   
 }
 
-let Weapons = {
-  'none':{
-    name:'なし',
-    id:'none',
-    num:0,
-    power:0,
-    price:0,
-    description:'ないです。素手とか念とか自由に解釈しておk',
-    buyable:0,
-    ap:0,
-    ce:0,
-  },
-  'woodenstick':{
-    name:'木の棒',
-    id:'woodstick',
-    num:0,
-    power:2,
-    price:10,
-    description:'初期装備あるあるの武器。値段に見合わず割と強い',
-    buyable:1,//購入可能かどうか
-    ap:0,
-    ce:0,
-    
-  },
-  'woodensword':{
-    name:'木刀',
-    id:'woodsword',
-    num:0,
-    power:4,
-    price:20,
-    description:'木の棒よりも強い。言うなれば気の剣。',
-    buyable:1,
-    ap:0,
-    ce:0,
-  },
-  'bamboo_sword':{
-    name:'竹刀',
-    id:'bamboo_sword',
-    num:0,
-    power:6,
-    price:30,
-    description:'さあ、剣道しようぜ！！',
-    buyable:1,
-    ap:0,
-    ce:0,
-  },
-  'stone':{
-    name:'石ころ',
-    id:'stone',
-    num:0,
-    power:8,
-    price:50,
-    description:'石です。よわよわ',
-    buyable:1,
-    ap:0,
-    ce:0,
-  },
-  'bigrock':{
-    name:'大きな石',
-    id:'bigrock',
-    num:0,
-    power:10,
-    price:80,
-    description:'岩です。つよつよ',
-    buyable:1,
-    ap:0,
-    ce:0,
-  },
-  'brick':{
-    name:'レンガ',
-    id:'brick',
-    num:0,
-    power:12,
-    price:100,
-    description:'岩にセメントつけたら強くなるのって意味わからなくね？',
-    buyable:1,
-    ap:0,
-    ce:0,
-  },
-  'thinpaper':{
-    name:'薄めの紙',
-    id:'thinpaper',
-    num:0,
-    power:20,
-    price:5,
-    description:'薄い紙です。すって相手に切り付けて｢いたっ..｣ってさせる用です',
-    buyable:1,
-    ap:0,
-    ce:1,
-    combatEffect:{ //攻撃前の効果
-        critlate: 70,
-    }
-  },
-  'card':{
-    name:'カード',
-    id:'card',
-    num:0,
-    power:'Math.floor(Math.random()*13)+1',
-    price:7,
-    description:'ちょっとした運要素。攻撃方法は切り付けなので弱い',
-    buyable:1,
-    ap:0,
-    ce:0,
-  },
-  'scissors':{
-    name:'はさみ',
-    id:'scissors',
-    num:0,
-    power:25,
-    price:200,
-    description:'持って｢近づいたら*すよ..?｣っていう用。実際*せない',
-    buyable:1,
-    ap:0,
-    ce:1,
-    combatEffect:{
-        critdmg: 4.0,
-    }
-  },
-  'knife':{
-    name:'ほんもののナイフ',
-    id:'knife',
-    num:0,
-    power:40,
-    price:300,
-    description:'つよつよ武器。<br>花や骨に向かって振り回しましょう',
-    buyable:1,
-    ap:0,
-    ce:1,
-    combatEffect:{
-        critlate: 10,
-    }
-  },
+let Equips = {
+  'weapon':{
+    'none':{
+      name:'なし',
+      id:'none',
+      num:0, //このnumはいらんとおもう、hasEquip( [] )で管理するし
+      power:0,
+      price:0,
+      description:'ないです。素手とか念とか自由に解釈しておk',
+      buyable:0,
+      ap:0,
+      ce:0,
+    },
+    'woodenstick':{
+      name:'木の棒',
+      id:'woodstick',
+      num:0,
+      power:2,
+      price:10,
+      description:'初期装備あるあるの武器。値段に見合わず割と強い',
+      buyable:1,//購入可能かどうか
+      ap:0,
+      ce:0,
+      
+    },
+    'woodensword':{
+      name:'木刀',
+      id:'woodsword',
+      num:0,
+      power:4,
+      price:20,
+      description:'木の棒よりも強い。言うなれば気の剣。',
+      buyable:1,
+      ap:0,
+      ce:0,
+    },
+    'bamboo_sword':{
+      name:'竹刀',
+      id:'bamboo_sword',
+      num:0,
+      power:6,
+      price:30,
+      description:'さあ、剣道しようぜ！！',
+      buyable:1,
+      ap:0,
+      ce:0,
+    },
+    'stone':{
+      name:'石ころ',
+      id:'stone',
+      num:0,
+      power:8,
+      price:50,
+      description:'石です。よわよわ',
+      buyable:1,
+      ap:0,
+      ce:0,
+    },
+    'bigrock':{
+      name:'大きな石',
+      id:'bigrock',
+      num:0,
+      power:10,
+      price:80,
+      description:'岩です。つよつよ',
+      buyable:1,
+      ap:0,
+      ce:0,
+    },
+    'brick':{
+      name:'レンガ',
+      id:'brick',
+      num:0,
+      power:12,
+      price:100,
+      description:'岩にセメントつけたら強くなるのって意味わからなくね？',
+      buyable:1,
+      ap:0,
+      ce:0,
+    },
+    'thinpaper':{
+      name:'薄めの紙',
+      id:'thinpaper',
+      num:0,
+      power:20,
+      price:5,
+      description:'薄い紙です。すって相手に切り付けて｢いたっ..｣ってさせる用です',
+      buyable:1,
+      ap:0,
+      ce:1,
+      combatEffect:{ //攻撃前の効果
+          critlate: 70,
+      }
+    },
+    'card':{
+      name:'カード',
+      id:'card',
+      num:0,
+      power:'Math.floor(Math.random()*13)+1',
+      price:7,
+      description:'ちょっとした運要素。攻撃方法は切り付けなので弱い',
+      buyable:1,
+      ap:0,
+      ce:0,
+    },
+    'scissors':{
+      name:'はさみ',
+      id:'scissors',
+      num:0,
+      power:25,
+      price:200,
+      description:'持って｢近づいたら*すよ..?｣っていう用。実際*せない',
+      buyable:1,
+      ap:0,
+      ce:1,
+      combatEffect:{
+          critdmg: 4.0,
+      }
+    },
+    'knife':{
+      name:'ほんもののナイフ',
+      id:'knife',
+      num:0,
+      power:40,
+      price:300,
+      description:'つよつよ武器。\n花や骨に向かって振り回しましょう',
+      buyable:1,
+      ap:0,
+      ce:1,
+      combatEffect:{
+          critlate: 10,
+      }
+    },
 
-  'blooddagger':{
-    name:'ジェン・ソルテ',
-    id:'blooddagger',
-    num:0,
-    power:0,
-    price:150,
-    description:'名前意味わからんランキング第1位。<br>攻撃時相手の体力を吸い回復する。<br>変換効率は80%..水力発電と同じくらい',
-    buyable:1,
-    ap:1,
-    afterProcess:async function(cam,me,tcam,target,rate,kind,attributes,dmg){
-        x = (dmg * 0.80).toFixed(0);
-        humans[cam][me].hp += x;
-        if(humans[cam][me].hp > humans[cam][me].maxhp){humans[cam][me].hp = humans[cam][me].maxhp;}
-        addtext('血を吸った！');
-        tekiou();
-        addtext(`体力が${x}回復した!`);
-        return 'alive';
+    'blooddagger':{
+      name:'ジェン・ソルテ',
+      id:'blooddagger',
+      num:0,
+      power:0,
+      price:150,
+      description:'名前意味わからんランキング第1位。\n攻撃時相手の体力を吸い回復する。\n変換効率は80%..水力発電と同じくらい',
+      buyable:1,
+      ap:1,
+      afterProcess:async function(cam,me,tcam,target,rate,kind,prop,dmg){
+          x = (dmg * 0.80).toFixed(0);
+          humans[cam][me].hp += x;
+          if(humans[cam][me].hp > humans[cam][me].maxhp){humans[cam][me].hp = humans[cam][me].maxhp;}
+          addtext('血を吸った！');
+          tekiou();
+          addtext(`体力が${x}回復した!`);
+          return 'alive';
+      },
+      ce:0,
     },
-    ce:0,
-  },
-  'timeontarget':{
-    name:'time on target',
-    id:'timeontarget',
-    num:0,
-    power:10,
-    price:150,
-    description:'ナギサ様の手好き',
-    buyable:1,
-    ap:1,
-    afterProcess:async function(cam,me,tcam,target,rate,kind,attributes,dmg){
-        addtext(arraySelect(['トリニティの砲撃術は優秀ですから。','お口に合うと良いのですが..']));
-        let result = await damage(cam,me,tcam,target,0.4,kind,['unpursuit']);
-        if(result == 'end'){return 'end';}
-        await buffadd(tcam,target,'shelldown','turn',3,1);
-        return 'alive';
+    'timeontarget':{
+      name:'time on target',
+      id:'timeontarget',
+      num:0,
+      power:10,
+      price:150,
+      description:'ナギサ様の手好き',
+      buyable:1,
+      ap:1,
+      afterProcess:async function(cam,me,tcam,target,rate,kind,prop,dmg){
+          addtext(arraySelect(['トリニティの砲撃術は優秀ですから。','お口に合うと良いのですが..']));
+          let result = await damage(cam,me,tcam,target,0.4,kind,['unpursuit']);
+          if(result == 'end'){return 'end';}
+          await buffadd(tcam,target,'shelldown','turn',3,1);
+          return 'alive';
+      },
+      ce:0,
     },
-    ce:0,
+    'biggamble':{
+      name:'大博打',
+      id:'biggamble',
+      num:0,
+      power:0,
+      price:150,
+      description:'大勝負..ってやつ？まじで賭け。がんばえ',
+      buyable:1,
+      ap:0,
+      ce:1,
+      combatEffect:{
+          atk: Math.floor(Math.random()*100)+1,
+      }
+    },
+    'contrarian':{
+      name:'天邪鬼',
+      id:'contrarian',
+      num:0,
+      power:80,
+      price:150,
+      description:'名前変更予定。',
+      buyable:0,
+      ap:0,
+      ce:1,
+      combatEffect:{
+          critlate: 60
+      }
+    },
   },
-  'biggamble':{
-    name:'大博打',
-    id:'biggamble',
-    num:0,
-    power:0,
-    price:150,
-    description:'大勝負..ってやつ？まじで賭け。がんばえ',
-    buyable:1,
-    ap:0,
-    ce:1,
-    combatEffect:{
-        atk: Math.floor(Math.random()*100)+1,
-    }
-  },
-  'contrarian':{
-    name:'天邪鬼',
-    id:'contrarian',
-    num:0,
-    power:80,
-    price:150,
-    description:'名前変更予定。',
-    buyable:0,
-    ap:0,
-    ce:1,
-    combatEffect:{
-        critlate: 60
+  'shield':{
+    'none':{
+      name:'なし',
+      id:'none',
+      num:0,
+      shell:0,
+      price:0,
+      description:'ないです。\n筋肉とでもフォースとでもなんとでも解釈しておk',
+      buyable:0,
+      sp:0
+    },
+    'mask':{
+      name:'マスク',
+      id:'mask',
+      num:0,
+      shell:0,
+      price:1,
+      // description:'大事ですね。\n防御力は関係ありませんが病気にはならない',
+      description:'防御力はないです..が、\n精神的な防御力は激高です',
+      buyable:1,
+      sp:0
+    },
+    'thinbook':{
+      name:'薄い本',
+      id:'thinbook',
+      num:0,
+      shell:1,
+      price:5,
+      description:'***なのは駄目！！死刑！！！！',//コハルさんなのでセーフ
+      buyable:1,
+      sp:0
+    },
+    'woodenplank':{
+      name:'木の板',
+      id:'woodenplank',
+      num:0,
+      shell:5,
+      price:20,
+      description:'これを使って最初はつるはしを作りましょう',
+      buyable:1,
+      sp:0
+    },
+    'ironplate':{
+      name:'テッパン',
+      id:'ironplate',
+      num:0,
+      shell:10,
+      price:30,
+      description:'突進してくるあいつ。こいつに手間取ると他のが来てすぐ*ぬので注意',
+      buyable:1,
+      sp:0
+    },
+    'potlid':{
+      name:'鍋の蓋',
+      id:'potlid',
+      num:0,
+      shell:15,
+      price:50,
+      description:'初期装備あるあるⅡですね。多分コスパ最強',
+      buyable:1,
+      sp:0
+    },
+    'thickbook':{
+      name:'厚めの本',
+      id:'thickbook',
+      num:0,
+      shell:20,
+      price:80,
+      description:'辞書とかなのかな。いや六法全書かも',
+      buyable:1,
+      sp:0
+    },
+    'door':{
+      name:'ドア',
+      id:'door',
+      num:0,
+      shell:25,
+      price:100,
+      description:'え？木の板と一緒だって？-\n君は知らないのかい...?\n木の板を6つ並べるとドアが3つできるってことを',
+      buyable:1,
+      sp:0
+    },
+    'electricfan':{
+      name:'扇風機',
+      id:'electricfan',
+      num:0,
+      shell:30,
+      price:200,
+      description:'涼めるのに便利。\nまた武器にもなり、ついでに敵から身を守れる万能装備',
+      buyable:1,
+      sp:0
+    },
+    'perorodoll':{
+      name:'ペロロ様人形',
+      id:'perorodoll',
+      num:0,
+      shell:50,
+      price:400,
+      description:'ペロロ様の出番です！！\nhifumi daisuki',
+      buyable:1,
+      sp:0
     }
   }
 }
+let Weapons = {
+  //errored!!
+}
 
 let Armors = {
-  'none':{
-    name:'なし',
-    id:'none',
-    num:0,
-    shell:0,
-    price:0,
-    description:'ないです。<br>筋肉とでもフォースとでもなんとでも解釈しておk',
-    buyable:0,
-    sp:0
-  },
-  'mask':{
-    name:'マスク',
-    id:'mask',
-    num:0,
-    shell:0,
-    price:1,
-    description:'大事ですね。防御力は関係ありませんが病気にはならない',
-    buyable:1,
-    sp:0
-  },
-  'thinbook':{
-    name:'薄い本',
-    id:'thinbook',
-    num:0,
-    shell:1,
-    price:5,
-    description:'***なのは駄目！！死刑！！！！',//コハルさんなのでセーフ
-    buyable:1,
-    sp:0
-  },
-  'woodenplank':{
-    name:'木の板',
-    id:'woodenplank',
-    num:0,
-    shell:5,
-    price:20,
-    description:'これを使って最初はつるはしを作りましょう',
-    buyable:1,
-    sp:0
-  },
-  'ironplate':{
-    name:'テッパン',
-    id:'ironplate',
-    num:0,
-    shell:10,
-    price:30,
-    description:'突進してくるあいつ。こいつに手間取ると他のがきてす*ぬので注意',
-    buyable:1,
-    sp:0
-  },
-  'potlid':{
-    name:'鍋の蓋',
-    id:'potlid',
-    num:0,
-    shell:15,
-    price:50,
-    description:'初期装備あるあるⅡですね。多分コスパ最強',
-    buyable:1,
-    sp:0
-  },
-  'thickbook':{
-    name:'厚めの本',
-    id:'thickbook',
-    num:0,
-    shell:20,
-    price:80,
-    description:'辞書とかなのかな。いや六法全書かも',
-    buyable:1,
-    sp:0
-  },
-  'door':{
-    name:'ドア',
-    id:'door',
-    num:0,
-    shell:25,
-    price:100,
-    description:'え？木の板と一緒だって？-<br>君は知らないのかい...?<br>木の板を6つ並べるとドアが3つできるってことを',
-    buyable:1,
-    sp:0
-  },
-  'electricfan':{
-    name:'扇風機',
-    id:'electricfan',
-    num:0,
-    shell:30,
-    price:200,
-    description:'涼めるのに便利。また武器にもなり、ついでに敵から身を守れる万能装備',
-    buyable:1,
-    sp:0
-  },
-  'perorodoll':{
-    name:'ペロロ様人形',
-    id:'perorodoll',
-    num:0,
-    shell:50,
-    price:400,
-    description:'ペロロ様の出番です！！まじでヒフミさんいいよね',
-    buyable:1,
-    sp:0
-  }
-
+  //errored!!
 }
 
 let Tools = {
@@ -1114,7 +1146,7 @@ let Tools = {
     description:'投げつけたい。敵に',
     num:0,
     process:async function(cam,me,tcam,target){
-        await addtext(`なんか一番しょうもないよね、これ<br>あ、全回復です`)
+        await addtext(`なんか一番しょうもないよね、これ\nあ、全回復です`)
         x = Math.round(humans[tcam][target].maxhp);
         if((x + humans[tcam][target].hp) > humans[tcam][target].maxhp){x = humans[tcam][target].maxhp - humans[tcam][target].hp;};
         humans[tcam][target].hp += x;
@@ -1143,7 +1175,7 @@ let Tools = {
     name:'トリッキーな変数',
     id:'trickyvariables',
     price:40,
-    description:'黒崎コユキ、きちゃいました！！なんか面白いことないですか？<br>(10%,25%,40%からランダム)',
+    description:'黒崎コユキ、きちゃいました！！なんか面白いことないですか？\n(10%,25%,40%からランダム)',
     num:1,
     process:async function(cam,me,tcam,target){
         x = Math.floor(Math.random() * 3) + 1;
@@ -1167,7 +1199,7 @@ let Tools = {
     name:'ボトルグレネード',
     id:'bottlegrenade',
     price:60,
-    description:'殴るついでに燃やす。まじでつよい<br>レッドウィンターの問題児にしては上出来すぎる',
+    description:'殴るついでに燃やす。まじでつよい\nレッドウィンターの問題児にしては上出来すぎる',
     num:0,
     process:async function(cam,me,tcam,target){
         await addtext('これはちょっと、スパイシーなやつだよ');
@@ -1201,7 +1233,7 @@ let Tools = {
     name:'爆弾',
     id:'bomb',
     price:100,
-    description:'エクスプローージョン！！！<br>敵を確殺します。嬉しいね',
+    description:'エクスプローージョン！！！\n敵を確殺します。嬉しいね',
     num:1,
     process:async function(cam,me,tcam,target){
         let x = humans[tcam][target].hp;
@@ -1383,7 +1415,7 @@ let Skills = {
         type:'ex',
         id:'lightningstorm',
         name:'ライニングストーム',
-        description:'敵全体に攻撃力の120%のダメージを与え、帯電にする<br>帯電:自身の行動時自傷ダメージが入る',
+        description:'敵全体に攻撃力の120%のダメージを与え、帯電にする\n帯電:自身の行動時自傷ダメージが入る',
         price:60,
         buyable:1,
         process:async function(cam,me){
@@ -1532,7 +1564,7 @@ let Skills = {
         type:'ns',
         id:'elecbarrier',
         name:'エレクトリックバリア',
-        description:'体力が最も低い味方に帯電バリアを付与する。<br>帯電バリア:被攻撃時相手に帯電を付与する<br>帯電:自身の行動時自傷ダメージが入る',
+        description:'体力が最も低い味方に帯電バリアを付与する。\n帯電バリア:被攻撃時相手に帯電を付与する\n帯電:自身の行動時自傷ダメージが入る',
         price:70,
         buyable:1,
         cool:3,
@@ -1589,7 +1621,7 @@ let Skills = {
         type:'ps',
         id:'elecshock',
         name:'エレクトリック衝撃',
-        description:'会心時、相手に帯電を付与する。<br>帯電:自身の行動時自傷ダメージが入る',
+        description:'会心時、相手に帯電を付与する。\n帯電:自身の行動時自傷ダメージが入る',
         price:90,
         buyable:1,
     }
@@ -1610,7 +1642,7 @@ let Stages = {
 let Enemies = {
   '蒼白の粘液':{
     name:'蒼白の粘液',
-    stage:1,
+    stage:'草原',
     maxhp:'+10',
     atk:'+0',
     def:'-10',
@@ -1649,7 +1681,7 @@ let Enemies = {
   },
   '翠嵐の風刃':{
     name:'翠嵐の風刃',
-    stage:1,
+    stage:'草原',
     maxhp:'+10',
     atk:'+10',
     def:'-10',
@@ -1689,7 +1721,7 @@ let Enemies = {
   },
   '黄昏の穿影':{
     name:'黄昏の穿影',
-    stage:1,
+    stage:'草原',
     maxhp:'-10',
     atk:'+15',
     def:'+0',
@@ -1743,7 +1775,7 @@ let Enemies = {
   },
   '燐光の妖花':{
     name:'燐光の妖花',
-    stage:1,
+    stage:'草原',
     maxhp:'-15',
     atk:'-10',
     def:'+0',
@@ -1952,51 +1984,51 @@ let Prefixes = {
     id:'furious',
     name:'激昂',
     rare:1,
-    process:function(cam,me){
-      humans[cam][me].atk  = Math.floor(humans[cam][me].atk*1.5);
-      humans[cam][me].def = Math.floor(humans[cam][me].def*0.75);
-      humans[cam][me].critlate = 0.05
-    },
+    effects:{
+      atk: '=150%',
+      def: '=75%',
+      critrate: '=5'
+    }
   },
   'calm':{
     id:'calm',
     name:'冷静沈着な',
     rare:1,
-    process:function(cam,me){
-      humans[cam][me].atk  = Math.floor(humans[cam][me].atk*0.75);
-      humans[cam][me].def = Math.floor(humans[cam][me].def*2.0);
-      humans[cam][me].critrate = 5
+    effects:{
+      atk: '=75%',
+      def: '=200%',
+      critrate: '=5'
     },
   },
   'gambler':{
     id:'gambler',
     name:'ギャンブラーな',
     rare:1,
-    process:function(cam,me){
-      humans[cam][me].critrate += 4
-      humans[cam][me].maxhp = Math.floor(humans[cam][me].maxhp*2.0);
-    },
+    effects:{
+      critlate: '+4',
+      maxhp: '=200%'
+    }
   },
   'tag':{
     id:'tag',
     name:'守りが固い',
     rare:2,
-    process:function(cam,me){
-      humans[cam][me].critresist += 5;
-      humans[cam][me].maxhp = Math.floor(humans[cam][me].maxhp*1.25);
-      humans[cam][me].def = Math.floor(humans[cam][me].def*1.5);
-      humans[cam][me].atk = Math.floor(humans[cam][me].atk*0.3)
-    },
+    effects:{
+      critresist: '+5',
+      maxhp: '=125%',
+      atk: '=30%',
+      def: '=150%',
+    }
   },
   'wise':{
     id:'wise',
     name:'心眼持ちの',
     rare:3,
-    process:function(cam,me){
-      humans[cam][me].critlate = 100; //確定会心人間
-      humans[cam][me].critdmg = 1.2; //さすがに弱め
-      humans[cam][me].atk = Math.floor(humans[cam][me].atk*0.3); //つまり防御力無視害悪敵ってこと
-    },
+    effects:{
+      critlate: '=100',
+      critdmg: '=120',
+      atk: '=30%',
+    }
   },
 }
 
@@ -2078,6 +2110,7 @@ const Quests = {
     }
   ]
 };
+
 let noticeData = [
   {
     date: '2025/3/29',
@@ -2119,7 +2152,7 @@ let NanigaOkirukana = {
       movable = 1;
       document.querySelector('#overfieldArea').style.display = 'none';
       document.querySelector('#eventArea').style.display = 'block';
-      document.querySelector('#eventArea').innerHTML = '<button id="CampRest" onclick="Camprest()"></button><br><button id="CampTrade" onclick="Camptrade()"></button>'
+      document.querySelector('#eventArea').innerHTML = '<button id="CampRest" onclick="Camprest()"></button>\n<button id="CampTrade" onclick="Camptrade()"></button>'
       log.textContent = '休憩できそうな場所を見つけた！';
       Camprestper = (Math.floor(Math.random() * 4)+3)/10;
       document.querySelector('#CampRest').textContent = '朝まで休む(' + Camprestper*100 + '%回復)';//30のときはスキルカード強化みたいなやつあってもいいかも
@@ -2254,193 +2287,4 @@ let Objectdatas = {
       pass: 0,
     }
   }
-}
-
-//#region 移行よろ
-async function damage(who, tages, value, kind, attributes = []){
-  let hasa = (name) => attributes.includes(name);
-  if(!Array.isArray(tages)){tages = [tages];}
-  for(let tag of tages){
-    //攻撃x回復o = heal 攻撃+攻撃者与ダメ回復 = absorb
-    //防御無視 = penetrate 確定会心 = crit 会心無効 = nocrit
-    //固定値 = fixed
-    console.log(hasa('fixed') ? `${who.name} => ${tag.name} ${kind}で${value}ダメージの予定！ [${attributes}]` :
-      `${who.name} => ${tag.name} ${kind}で攻撃力の${value}倍 [${attributes}]`);
-
-
-    /*
-    let orgAtker = {...who};
-    let orgDefer = {...tag};
-
-    const stats = [
-      'hp', 'maxhp', 'mp', 'maxmp'
-      'atk', 'def',
-      'power', 'shell', 'matk', 'mdef',
-      'critlate', 'critdmg', 'critresist'
-    ];
-
-    let atker = {};
-    stats.forEach(stat => {
-      atker[stat] = orgAtker[stat];
-    });
-
-    let defer = {};
-    stats.forEach(stat => {
-      defer[stat] = orgDefer[stat];
-    });
-    */
-
-    let atker = {...who};
-    let defer = {...tag}
-
-    stats.forEach(stat => {
-      console.log(atker.buffs)
-      Object.values(atker.buffs).forEach(buff => {
-        if(!buff.data.addable){
-          if(buff.data.effect.hasOwnProperty(stat)){
-            atker[stat] += buff.data.effect[stat].value;
-          }
-        }else{
-          if(buff.data.effect.hasOwnProperty(stat)){
-            atker[stat] += buff.value
-          }
-        }
-      });
-      ['weapon','armor','ear','ring','neck'].forEach(bui => {Object.values(atker[bui]).forEach(buff => {
-          
-      })})
-
-      Object.values(defer.buffs).forEach(buff => {
-        if(!buff.data.addable){
-          if(buff.data.effect.hasOwnProperty(stat)){
-            defer[stat] += buff.data.effect[stat].value;
-          }
-        }else{
-          if(buff.data.effect.hasOwnProperty(stat)){
-            defer[stat] += buff.value
-          }
-        }
-      })
-    });
-
-    //攻撃力
-    let atkval = kind == 'sh' ? atker.atk : atker.matk;
-    let dmg = (atkval * atker.power * value/100);
-    if(hasa('fixed')) dmg = value;
-
-    //会心
-    let crited = 0;
-    if(isCrit(atker, defer)) crited = 1;
-    if((crited && !hasa('nocrit')) || hasa('crit')){
-      dmg *= atker.critdmg / 100;
-      if(who.cam == 'players') await addtext('かいしんのいちげき！');
-      if(who.cam == 'enemies') await addtext('つーこんのいちげき！');
-    };
-
-    //防御力
-    let defval = kind == 'sh' ? defer.def : defer.mdef;
-    if(!hasa('penetrate')) dmg -= (defval * defer.shell);
-
-    //整え
-    dmg = Math.floor(dmg);
-    if(defer.hp < dmg) dmg = defer.hp;
-    console.log(`予測:: ${defer.hp} => ${defer.hp - dmg} | dmg:${dmg}`);
-
-    //実装
-    if(!hasa('heal')) await heal(atker, defer, dmg)
-    else defer.hp += dmg;
-
-    //ep
-    if(atker.cam == 'players') atker.ep += Math.floor(10 * atker.epgain);
-
-    tekiou()
-    await addtext(`${defer.name}に${dmg}のダメージ`)
-
-    //その後
-    let result = 0;
-    if(defer.hp <= 0) result = await killed(atker, defer);
-    if(result) return 1;
-
-    //追撃ゾーン　ここどしよ
-    if(!hasa('unpursuit')){
-      let res = 0;
-      if(Weapons[atker.weapon.id].ap){
-        res = await Weapons[atker.weapon.id].afterProcess(cam,me,tcam,target,value,kind,attributes);
-        if(res) return 1;
-      }
-
-      if(atker.name == 'herta' && defer.hp <= defer.maxhp / 2 && atker.level >= 10){ // 1凸効果「弱みは付け込み」
-        res = damage(who, tag, 20, 'sh', ['unpursuit']);
-        if(res) return 1;
-      }
-      if(atker.ps == 'enemy50%pursuit' && defer.hp <= defer.maxhp / 2 && enemy50pursuitenelgy == 1){
-        enemy50pursuitenelgy = 0;
-        await addtext(arraySelect(['くるくる〜っと','くるりん〜っと']));
-        res = damage(who, tag, 50, 'sh', ['unpursuit']);
-        if(res) return 1;
-      }
-    }
-  }
-  return 0;
-}
-
-async function heal(who, tag, value, code = 'add', ...prop){
-  let bh = tag.hp;
-  
-  let val = value;
-  if(val.endsWith('%')){
-    val = +val.slice(0, -1)/100;
-    comsole.log(`%だったから${val}って値に変えといたぜ`);
-    val *= tag.maxhp;
-  }
-  
-  let ah = 0;
-  if(code == 'add'){
-    ah = tag.hp + val;
-  }
-  if(code == 'set'){
-    ah = val;
-  }
-  
-  if(tag.maxhp < ah) ah = tag.maxhp;
-  
-  console.log(`${who.nane} => ${tag.name}, val:${val} | ${bh} => ${ah}`);
-  
-  tag.hp = ah;
-  
-  return 0;
-}
-//#endregion
-
-
-function cm(cam = '指定なし', me = '指定なし'){
-  if(cam == '指定なし' && me == '指定なし') cam = 'players', me = 0; //超特別扱い
-  
-  let who;
-  if(me == '指定なし') who = humans[cam];
-  else who = humans[cam][me];
-
-  return who;
-}
-
-
-function isCrit(who, tag){
-  let lat = who.critlate;
-  let res = tag.critresist;
-  let is = 0;
-
-  if(!attributes.includes('nocrit')) return 
-  
-  if(res == 'absolute'){
-    is = 0;
-    console.log('会心無効！')
-  }else if(lat == 'absolute'){
-    is = 1;
-    console.log('確定会心！')
-  }else{
-    is = Math.random() < (lat - res) / 100;
-    console.log(`${lat - res}%...結果は${is ? 'true' : 'false'}!!`)
-  }
-
-  return is;
 }

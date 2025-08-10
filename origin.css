@@ -97,3 +97,14 @@
     border-radius: 5px;
     z-index: 256;
 }
+
+水色 #f0f8ff, #eaf5ff, #def0ff, #cfe9ff, #b5dcff
+紫色 #f8f6ff, #f5f2ff, #f1edff, #ece8ff, #e9e4ff
+橙色 #fffaf3, #fff7eb, #fff3e2, #fff0d9, #ffeccf
+緑色 #f6fff2, #eeffe7, #e6ffdc, #ddffd0, #d4ffc3
+
+#dummy{
+    color: #cfe9ff;
+    /* 上の謎の4つの文章によって、なんか最初のやつ無効化されるっぽい */
+    /* 謎に */
+}

@@ -11,7 +11,7 @@ async function nicoText(mes){
     document.querySelector('body').appendChild(newDiv);
 
     requestAnimationFrame(() => {
-        newDiv.style.right = `${window.innerWidth + newDiv.offsetWidth}px`; //なんか電車の問題解いてるみたいだね
+    newDiv.style.right = `${window.innerWidth + newDiv.offsetWidth}px`; //なんか電車の問題解いてるみたいだね
     });
     
     await delay(2000); 
@@ -28,8 +28,8 @@ function arraySelect(array){
 };
 function arrayShuffle(array) {
     for(let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
     }
     return array;
 };
@@ -40,7 +40,7 @@ function arraySize(array){
 function arrayCount(array){
     const counts = {};
     for (let value of array) {
-        counts[value] = (counts[value] || 0) + 1;
+    counts[value] = (counts[value] || 0) + 1;
     }
     return counts;
 }
@@ -52,24 +52,29 @@ function arrayGacha(array,probability){
     const total = probability.reduce((sum, p) => sum + p, 0);
     let random = Math.random() * total;
     for (let i = 0; i < array.length; i++) {
-        if(random < probability[i]){
-        return array[i];
-        }
-        random -= probability[i];
+    if(random < probability[i]){
+    return array[i];
+    }
+    random -= probability[i];
     }
 };
+function hask(obj, key){
+   let res = obj.hasOwnProperty(key);
+   res = res ? 1 : 0;
+   return res;
+}
 function copy(obj){
     if (obj === null || typeof obj !== 'object') {
-        return obj; // 基本型はそのまま返す
+    return obj; // 基本型はそのまま返す
     }
     if (Array.isArray(obj)) {
-        return obj.map(copy); // 配列の各要素を再帰コピー
+    return obj.map(copy); // 配列の各要素を再帰コピー
     }
     const result = {};
     for (const key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            result[key] = copy(obj[key]); // オブジェクトのプロパティを再帰コピー
-        }
+    if (obj.hasOwnProperty(key)) {
+        result[key] = copy(obj[key]); // オブジェクトのプロパティを再帰コピー
+    }
     }
     return result;
 };
@@ -90,9 +95,9 @@ function anagramSaySay(text, loop = 10, bet = '<br>'){
     let optcou = arrayCount(optout);
     let optvals = [];
     for(a of Object.keys(optcou)){
-        let b = optcou[a];
-        b = kaijou(b);
-        optvals.push(b);
+    let b = optcou[a];
+    b = kaijou(b);
+    optvals.push(b);
     }
     let optmat = arrayMult(optvals);
     let cal = (kaijou(len) / optmat) - 1;
@@ -103,16 +108,16 @@ function anagramSaySay(text, loop = 10, bet = '<br>'){
     
     let reses = [];
     while(loopen > 0){
-        loopen -= 1;
-        let res = arrayShuffle(optout).join(''); 
-        if(reses.includes(res)){loopen += 1; continue}
-        
-        if(res == text && !menjo){loopen += 1; continue;}
+    loopen -= 1;
+    let res = arrayShuffle(optout).join(''); 
+    if(reses.includes(res)){loopen += 1; continue}
+    
+    if(res == text && !menjo){loopen += 1; continue;}
 
-        if(res == text && menjo && reses.length < cal){loopen += 1; continue}
-        else if(res == text && menjo) res = '[重複エラー]';
+    if(res == text && menjo && reses.length < cal){loopen += 1; continue}
+    else if(res == text && menjo) res = '[重複エラー]';
 
-        reses.push(res);
+    reses.push(res);
     }
     
     return reses.join(bet);
@@ -127,6 +132,23 @@ async function error(){
     addtext('errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
     await delay(2000);
     window.open('about:blank', '_self').close();
+}
+function hoshoku(color) {
+  color = color.replace(/^#/, ''); // #付きなら取る
+
+  if(color.length != 6) return console.log('カラーコードは6、ですよ〜？楽しないでくださいね〜♪')
+
+  // RGB分解
+  const r = parseInt(color.slice(0, 2), 16);
+  const g = parseInt(color.slice(2, 4), 16);
+  const b = parseInt(color.slice(4, 6), 16);
+
+  // 補色：255から引く
+  const compR = (255 - r).toString(16).padStart(2, '0');
+  const compG = (255 - g).toString(16).padStart(2, '0');
+  const compB = (255 - b).toString(16).padStart(2, '0');
+
+  return `#${compR}${compG}${compB}`;
 }
 //#endregion
 //#region log&text
@@ -143,25 +165,67 @@ function colorcheck(rawtext) {
     let isBlue = false; // ^^ で囲まれた部分かどうか
 
     for(let i = 0; i < rawtext.length; i++){
-        if(rawtext[i] === "*" && rawtext[i + 1] === "*"){
+        if(rawtext[i] == "*" && rawtext[i + 1] == "*"){
             isRed = !isRed; // 状態を切り替える
             i++; // 次の * をスキップ
-        }else if(rawtext[i] === "&" && rawtext[i + 1] === "&"){
+        }else if(rawtext[i] == "&" && rawtext[i + 1] == "&"){
             isPink = !isPink;
             i++; // 次の & をスキップ
-        }else if(rawtext[i] === "^" && rawtext[i + 1] === "^"){
+        }else if(rawtext[i] == "^" && rawtext[i + 1] == "^"){
             isBlue = !isBlue;
             i++;
         }else{
-            text.push({ char: rawtext[i], color: isRed ? "red" : isPink ? "pink" : isBlue ? "blue" : null });
+            let color = null;
+            if(isRed) color = 'red';
+            if(isPink) color = 'pink';
+            if(isBlue) color = 'blue';
+            text.push({
+                char: rawtext[i],
+                color: color
+            });
         }
     }
     return text;
 }
 
-async function addtext(text){
+// ↓一瞬これにしようとしてた
+// if(textShowing){
+//     queueAddtext.push(text);
+//     while(textShowing){
+//         await delay(10);
+//     }
+// };
+
+let queueAddtext = [];
+let loopAddtext = 0;
+async function waitforAddtext(){
+    let len = queueAddtext.length;
+
+    if(len == 0) loopAddtext = 0;
+    else loopAddtext = 1;
+
+    if(!loopAddtext) return console.log('loopがないんでしゅーりょー');
+    requestAnimationFrame(waitforAddtext);
+    
+    if(textShowing) return console.log('文字表示されたんでスキップ');
+    
+    let raw = queueAddtext.shift();
+    console.log(`${raw}を送信します`);
+    console.log(`残り: (${len - 1})[${queueAddtext}]`);
+    await addtext(raw);
+}
+async function addtext(raw){
+    if(!raw) return console.log('「内容が？内容が〜〜？ないよ〜〜〜つってwwww直せ」');
+
+    if(textShowing){
+        queueAddtext.push(raw);
+
+        if(!loopAddtext) waitforAddtext();
+        return;
+    }
+    
     textShowing = 1;
-    text = colorcheck(text);
+    text = colorcheck(raw);
     textDiv.innerHTML = ""; // 中身をリセット
     textDiv.style.display = "block"; // 表示
     let index = 0;
