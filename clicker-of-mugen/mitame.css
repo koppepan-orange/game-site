@@ -12,13 +12,23 @@ html{
   padding: 0;
   overflow-x: hidden;
 }
-::-webkit-scrollbar {
+
+::-webkit-scrollbar{
   display: none;
+}
+:focus{
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-focus-ring-color: transparent;
 }
 
 body{
   background-color: #eeeeee;
   user-select: none;
+}
+
+img{
+  -webkit-user-drag: none;
 }
 
 .row{

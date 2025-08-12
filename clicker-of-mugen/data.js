@@ -217,221 +217,213 @@ let Friends = {
   }
 }
 
-let Effects = {
-  buffs:{
-    'powerup':{
-        name:'powerup',
-        type:'buffs',
-        kind:'turn',
-        addable:1,
-        img:'power',
-        description:'攻撃倍率が上がる。やったね！',
-    },
-    'shellup':{
-        name:'shellup',
-        type:'buffs',
-        kind:'turn',
-        addable:1,
-        img:'shell',
-        description:'防御倍率が上がる。あんまり実感しづらい。',
-    },
-    'luck':{
-        name:'luck',
-        type:'buffs',
-        kind:'turn',
-        addable:0,
-        img:'luck',
-        description:'ターン終了時、1/6の確率でもう一回行動できる。\n願うと起きやすいです',
-        effect:0
-    },
-    'luck_great':{
-        name:'luck_great',
-        type:'buffs',
-        kind:'turn',
-        addable:0,
-        img:'luck',
-        description:'ターン終了時、1/3の確率でもう一回行動できる。\n気分はさながらラスボスですね',
-        effect:0
-    },
-    'disappear':{
-        name:'disappear',
-        type:'buffs',
-        kind:'turn',
-        addable:0,
-        img:'disappear',
-        description:'姿を消し、攻撃を受けなくなる。\nしかし範囲攻撃はちゃんと当たる。\nlv1ならば範囲攻撃で解除される。',
-    },
-    'cheerup':{
-        name:'cheerup',
-        type:'buffs',
-        kind:'turn',
-        addable:0,
-        img:'cheerup',
-        description:'応援されている状態。攻撃力と速度が上がり会心率が下がる。\nちょっと緊張しちゃうよね、わかる',
-        effect:{
-          'power':1.0,
-          'speed':20.0,
-          'crit':-5.0
-        }
+let Buffs = {
+  'powerup':{
+    name:'powerup',
+    type:'buff',
+    kind:'turn',
+    addable:1,
+    img:'power',
+    description:'攻撃倍率が上がる。やったね！',
+  },
+  'shellup':{
+    name:'shellup',
+    type:'buff',
+    kind:'turn',
+    addable:1,
+    img:'shell',
+    description:'防御倍率が上がる。あんまり実感しづらい。',
+  },
+  'luck':{
+    name:'luck',
+    type:'buff',
+    kind:'turn',
+    addable:0,
+    img:'luck',
+    description:'ターン終了時、1/6の確率でもう一回行動できる。\n願うと起きやすいです',
+    effect:0
+  },
+  'luck_great':{
+    name:'luck_great',
+    type:'buff',
+    kind:'turn',
+    addable:0,
+    img:'luck',
+    description:'ターン終了時、1/3の確率でもう一回行動できる。\n気分はさながらラスボスですね',
+    effect:0
+  },
+  'disappear':{
+    name:'disappear',
+    type:'buff',
+    kind:'turn',
+    addable:0,
+    img:'disappear',
+    description:'姿を消し、攻撃を受けなくなる。\nしかし範囲攻撃はちゃんと当たる。\nlv1ならば範囲攻撃で解除される。',
+  },
+  'cheerup':{
+    name:'cheerup',
+    type:'buff',
+    kind:'turn',
+    addable:0,
+    img:'cheerup',
+    description:'応援されている状態。攻撃力と速度が上がり会心率が下がる。\nちょっと緊張しちゃうよね、わかる',
+    effect:{
+      'power':1.0,
+      'speed':20.0,
+      'crit':-5.0
     }
   },
-  debuffs:{
-    'powerdown':{
-        name:'powerdown',
-        type:'debuffs',
-        kind:'turn',
-        addable:1,
-        img:'power',
-        description:'攻撃力が下がる。stackするようにしたいけどまあいっか',
-    },
-    'shelldown':{
-        name:'shelldown',
-        type:'debuffs',
-        kind:'turn',
-        addable:1,
-        img:'shell',
-        description:'防御力が下がる。こっちは実感しやすいのよね',
-    },
-    'poison':{
-        name:'poison',
-        type:'debuffs',
-        kind:'turn',
-        addable:0,
-        img:'poison',
-        description:'ターン終了時割合で防御貫通ダメージ。\n毒の苦しみもお好きなんですね',
-        //ターン終了時体力のx%のダメージ
-        effect:{
-          'poison':0.05 //"毒ダメージ"として5%削れる
-        }
-    },
-    'blood':{
-        name:'blood',
-        type:'debuffs',
-        kind:'turn',
-        addable:0,
-        img:'blood',
-        description:'ターン終了時固定ダメージ、徐々に増加。\n増加率は"2倍"\nそのままにしとくと普通に死にます',
-        //ターン終了時xダメージ
-        effect:{
-          'blood':2
-        }
-    },
-    'burn':{
-        name:'burn',
-        type:'debuffs',
-        kind:'turn',
-        addable:0,
-        img:'burn',
-        description:'ターン終了時固定ダメージ。ついでに攻撃力低下。\nまじでこれ嫌い...ww',
-        //ターン終了時xダメージ
-        effect:{
-          'burn':10,
-          'atk':-3
-        }
-    },
-    'injury':{
-        name:'injury',
-        type:'debuffs',
-        kind:'turn',
-        addable:0,
-        img:'injury',
-        description:'行動時固定ダメージ。\n連続行動ビルドに大打撃',
-        //ターン終了時xダメージ
-        effect:{
-          'injury':12
-        }
+  'powerdown':{
+    name:'powerdown',
+    type:'debuff',
+    kind:'turn',
+    addable:1,
+    img:'power',
+    description:'攻撃力が下がる。stackするようにしたいけどまあいっか',
+  },
+  'shelldown':{
+    name:'shelldown',
+    type:'debuff',
+    kind:'turn',
+    addable:1,
+    img:'shell',
+    description:'防御力が下がる。こっちは実感しやすいのよね',
+  },
+  'poison':{
+    name:'poison',
+    type:'debuff',
+    kind:'turn',
+    addable:0,
+    img:'poison',
+    description:'ターン終了時割合で防御貫通ダメージ。\n毒の苦しみもお好きなんですね',
+    //ターン終了時体力のx%のダメージ
+    effect:{
+      'poison':0.05 //"毒ダメージ"として5%削れる
     }
   },
-  handles:{
-    'freeze':{
-        name:'freeze',
-        type:'handles',
-        kind:'turn',
-        addable:0,
-        img:'freeze',
-        description:'凍っている状態。これ燃やされたら解除みたいにしたい',
-        //1/xの確率で解除
-    },
-    'palsy':{
-        name:'palsy',
-        type:'handles',
-        kind:'turn',
-        addable:0,
-        img:'palsy',
-        description:'麻痺ですね。これ好き',
-        //1/xの確率で行動不可
-    },
-    'stan':{
-        name:'stan',
-        type:'handles',
-        kind:'turn',
-        addable:0,
-        img:'stan',
-        description:'スタンなうです。おつおつお〜',
-    },
-    'skip':{
-        name:'skip',
-        type:'handles',
-        kind:'turn',
-        addable:0,
-        img:'skip',
-        description:'はいお前スキップ〜〜ww状態です。\nぴえん超えてだっさぁ',
-    },
-    'sleep':{
-        name:'sleep',
-        type:'handles',
-        kind:'turn',
-        addable:0,
-        img:'sleep',
-        description:'睡眠ですね...いやね....ちょ..っと......w',
-    },
-    'anger':{
-        name:'anger',
-        type:'handles',
-        kind:'stack',
-        addable:0,
-        img:'anger',
-        description:'すごいイラつかせてくる敵..だからメガさんとかと相性良さそう\nで避けられてさらに煽られるみたいな',
-        // stack/100の確率で殴りかかる
+  'blood':{
+    name:'blood',
+    type:'debuff',
+    kind:'turn',
+    addable:0,
+    img:'blood',
+    description:'ターン終了時固定ダメージ、徐々に増加。\n増加率は"2倍"\nそのままにしとくと普通に死にます',
+    //ターン終了時xダメージ
+    effect:{
+      'blood':2
     }
   },
-  uniques:{
-    'onslime':{
-        name:'onslime',
-        type:'uniques',
-        kind:'turn',
-        addable:0,
-        img:'onslime',
-        description:'スライムが体に粘りついている状態です。やばいね(行動不可)',
-        lv:{
-          1:1,
-        }
-    },
-    'stickyslime':{
-        name:'stickyslime',
-        type:'uniques',
-        kind:'turn',
-        addable:0,
-        img:'stickyslime',
-        description:'スライムがくっついているおかげで行動するとダメージを受けます',
-        //行動時ダメージ(固定)
-    },
-    'letsthrow':{
-        name:'letsthrow',
-        type:'uniques',
-        kind:'turn',
-        addable:0,
-        img:'wrench',
-        description:'レンチを投げる準備をしている状態。次の攻撃与ダメ2倍',
-    },
-    'gambling':{
-        name:'gambling',
-        type:'uniques',
-        kind:'turn',
-        addable:0,
-        img:'gamble',
-        description:'次の攻撃が0,2,4倍になる。これぞ醍醐味..ってやつ？',
-    },
+  'burn':{
+    name:'burn',
+    type:'debuff',
+    kind:'turn',
+    addable:0,
+    img:'burn',
+    description:'ターン終了時固定ダメージ。ついでに攻撃力低下。\nまじでこれ嫌い...ww',
+    //ターン終了時xダメージ
+    effect:{
+      'burn':10,
+      'atk':-3
+    }
+  },
+  'injury':{
+    name:'injury',
+    type:'debuff',
+    kind:'turn',
+    addable:0,
+    img:'injury',
+    description:'行動時固定ダメージ。\n連続行動ビルドに大打撃',
+    //ターン終了時xダメージ
+    effect:{
+      'injury':12
+    }
+  },
+  'freeze':{
+    name:'freeze',
+    type:'handle',
+    kind:'turn',
+    addable:0,
+    img:'freeze',
+    description:'凍っている状態。これ燃やされたら解除みたいにしたい',
+    //1/xの確率で解除
+  },
+  'palsy':{
+    name:'palsy',
+    type:'handle',
+    kind:'turn',
+    addable:0,
+    img:'palsy',
+    description:'麻痺ですね。これ好き',
+    //1/xの確率で行動不可
+  },
+  'stan':{
+    name:'stan',
+    type:'handle',
+    kind:'turn',
+    addable:0,
+    img:'stan',
+    description:'スタンなうです。おつおつお〜',
+  },
+  'skip':{
+    name:'skip',
+    type:'handle',
+    kind:'turn',
+    addable:0,
+    img:'skip',
+    description:'はいお前スキップ〜〜ww状態です。\nぴえん超えてだっさぁ',
+  },
+  'sleep':{
+    name:'sleep',
+    type:'handle',
+    kind:'turn',
+    addable:0,
+    img:'sleep',
+    description:'睡眠ですね...いやね....ちょ..っと......w',
+  },
+  'anger':{
+    name:'anger',
+    type:'handle',
+    kind:'stack',
+    addable:0,
+    img:'anger',
+    description:'すごいイラつかせてくる敵..だからメガさんとかと相性良さそう\nで避けられてさらに煽られるみたいな',
+    // stack/100の確率で殴りかかる
+  },
+  'onslime':{
+    name:'onslime',
+    type:'unique',
+    kind:'turn',
+    addable:0,
+    img:'onslime',
+    description:'スライムが体に粘りついている状態です。やばいね(行動不可)',
+    lv:{
+      1:1,
+    }
+  },
+  'stickyslime':{
+    name:'stickyslime',
+    type:'unique',
+    kind:'turn',
+    addable:0,
+    img:'stickyslime',
+    description:'スライムがくっついているおかげで行動するとダメージを受けます',
+    //行動時ダメージ(固定)
+  },
+  'letsthrow':{
+    name:'letsthrow',
+    type:'unique',
+    kind:'turn',
+    addable:0,
+    img:'wrench',
+    description:'レンチを投げる準備をしている状態。次の攻撃与ダメ2倍',
+  },
+  'gambling':{
+    name:'gambling',
+    type:'unique',
+    kind:'turn',
+    addable:0,
+    img:'gamble',
+    description:'次の攻撃が0,2,4倍になる。これぞ醍醐味..ってやつ？',
   }
 }
 
@@ -444,15 +436,15 @@ let Slashs = {
     lv:1,
     tcam:'players',
     process:async function(who, are){
-        let result = await damage(who, are,100,'sh',1);
+        let result = await damage(who, are, 100, 'sh');
         if(result) return 1;
 
         //elseesに移行よろ
         if(humans[cam][me].ps == 'sthree' && probability(25)){
           await addtext(`${get(cam, me).name}は頑張った!`);
-          result = await damage(who, are,100,'sh',1);
+          result = await damage(who, are, 100, 'sh');
           if(result) return 1;
-          result = await damage(who, are,100,'sh',1);
+          result = await damage(who, are, 100, 'sh');
           if(result) return 1;
         }
         return 0;
@@ -466,15 +458,15 @@ let Slashs = {
     lv:1,
     tcam:'players',
     process:async function(who, are){
-        if(probability(67)){//端数切り上げは許してくれ
-          let result = await damage(who, are,100,'sh',2);
+        if(probability(67)){ //端数切り上げは許してくれ
+          let result = await damage(who, are, 100, 'sh');
           if(result) return 1;
         }else{
           addlog('miss!');
         }
 
         if(probability(67)){
-          let result = await damage(who, are,100,'sh',2);
+          let result = await damage(who, are, 100, 'sh');
           if(result) return 1;
         }else{
           addlog('miss!');
@@ -491,13 +483,12 @@ let Slashs = {
     lv:1,
     tcam:'players',
     process:async function(who, are){
-        let who = humans[cam][me];
         let pro = 33;
         if(who.ps == 'highsol') pro = 20;
 
         let result = 0;
         if(probability(pro)){
-          result = await damage(who, are,300,'sh',3);
+          result = await damage(who, are,300,'sh');
           if(result) return dead;
         }else{
           //let result = letsHappen(tcam, target, cam, me, 'missed', 'sl', 'slashoflight');
@@ -527,7 +518,7 @@ let Magics = {
     lv:1,
     process:async function(who, are){
         await addtext(`${who.name}はhealを唱えた！`)
-        await heal(who, tag, '20%', add)
+        await heal(who, are, '20%', add)
         
         return 0;
     }
@@ -540,8 +531,8 @@ let Magics = {
     lv:1,
     process:async function(who, are){
         await addtext(`${who.name}はpowerを唱えた！`)
-        await buffadd(tag,'powerup','turn',3,1);
-        await letsElseed(tag, who, 'magic', 'power'); //読み方はワザップです
+        await buffadd(are,'powerup','turn',3,1);
+        await letsElseed(are, who, 'magic', 'power'); //読み方はワザップです
         //soldatoのシステム応用しつつで
         return 0;
     }
@@ -554,8 +545,8 @@ let Magics = {
     lv:1,
     process:async function(who, are){
         await addtext(`${who.name}はshellを唱えた!`);
-        await buffadd(tag,'shellup','turn',3,1);
-        await letsElseed(tcam, target, cam, me, 'magic', 'shell'); 
+        await buffadd(are,'shellup','turn',3,1);
+        // await letsElseed(tcam, target, cam, me, 'magic', 'shell'); 
         return 0;
     }
   },
@@ -566,8 +557,6 @@ let Magics = {
     mp:7,
     lv:3,
     process:async function(who, are){
-        let who = get(can,me);
-        let tag;
         await addtext(`${who.name}はpoisonを唱えた!`);
         await buffadd(who, are,'poison','turn',4,1);
         await letsElseed(tcam, target, cam, me, 'buff', 'poison'); 
@@ -1058,6 +1047,45 @@ let Equips = {
       buyable:1,
       sp:0
     }
+  },
+  'ear':{
+    'none':{
+      name:'なし',
+      id:'none',
+      num:0, //そのうちhasEqでやって管理するようにしよーね
+      power:0,
+      shell:0,
+      price:0,
+      description:'なし',
+      buyable:0,
+      sp:0
+    }
+  },
+  'ring':{
+    'none':{
+      name:'なし',
+      id:'none',
+      num:0,
+      power:0,
+      shell:0,
+      price:0,
+      description:'なし',
+      buyable:0,
+      sp:0
+    }
+  },
+  'neck':{
+    'none':{
+      name:'なし',
+      id:'none',
+      num:0,
+      power:0,
+      shell:0,
+      price:0,
+      description:'なし',
+      buyable:0,
+      sp:0
+    }
   }
 }
 let Weapons = {
@@ -1254,13 +1282,11 @@ let Tools = {
     price:35,
     description:'リバースを召喚！このカードは相手と自分の体力を交換する！！割合だ！！！！',
     num:0,
-    process:async function(cam,me,are){
-        let who = humans[cam][me];
-        let tag = humans[tcam][target]
-        x = who.hp/who.maxhp*tag.hp;//割合交換(そのうちゲージにする時用)
-        y = tag.hp/tag.hp*who.maxhp;
-        tag.hp = x;
-        if(tag.hp < tag.hp){tag.hp = tag.hp;}
+    process:async function(who, are){
+        x = who.hp/who.maxhp*are.hp;//割合交換(そのうちゲージにする時用)
+        y = are.hp/are.hp*who.maxhp;
+        are.hp = x;
+        if(are.hp < are.hp){are.hp = are.hp;}
         who.hp = y;
         if(who.maxhp < who.hp){who.hp = humans.players[me].maxhp;}
         tekiou();
@@ -1647,31 +1673,32 @@ let Enemies = {
     critdmg:'-1',
     critresist:'+1',
     speed:'40',
-    acts:{
-        1:{
-          name:'粘液飛ばし',
-          probability:75,
-          num:1,
-          process:async function(cam, me){
-              await addtext(`${humans[cam][me].name}は粘液を飛ばしてきた！`);
-              let [tcam, tme] = ShallTargetSelect(cam,me,'phph',0);
-              let result = await damage(cam,me,are,1,'sh',1);
-              if(result == 'end')return 1;
-              return 0;
-          }
-        },
-        2:{
-          name:'粘液付与',//やばい方のスライムも作りたいね 一緒に溶けよ....? みたいな..ってちょっと癖すぎるか....?よし、技名は自己責任で表示可にしよう その場合セリフは...?
-          probability:25,
-          num:3,
-          process:async function(cam, me){
-              await addtext(`${humans[cam][me].name}は粘液を絡ませてきた！`);//いやこれはこれでやばいか...?いや全然捉えようによってはやばいわ
-              let [tcam, tme] = ShallTargetSelect(cam,me,'phph',0);
-              await buffadd(who, are,'stickyslime',2,1);
-              return 0;
-          }
+    acts:[
+      {
+        name:'粘液飛ばし',
+        probable:75,
+        num:1,
+        process:async function(who){
+          await addtext(`${who.name}は粘液を飛ばしてきた！`);
+          let are = ShallTargetSelect(cam,me,'phph',0);
+          let res = await damage(who, are, 1, 'sh');
+          if(res) return 1;
+          
+          return 0;
         }
-    }
+      },
+      {
+        name:'粘液付与',//やばい方のスライムも作りたいね 一緒に溶けよ....? みたいな..ってちょっと癖すぎるか....?よし、技名は自己責任で表示可にしよう その場合セリフは...?
+        probable:25,
+        num:3,
+        process:async function(cam, me){
+          await addtext(`${who.name}は粘液を絡ませてきた！`);//いやこれはこれでやばいか...?いや全然捉えようによってはやばいわ
+          let are = ShallTargetSelect(who, 'phph', 0);
+          await buffadd(who, are,'stickyslime',2,1);
+          return 0;
+        }
+      }
+    ]
   },
   '翠嵐の風刃':{
     name:'翠嵐の風刃',
@@ -1686,32 +1713,32 @@ let Enemies = {
     critdmg:'+0.5',
     critresist:'+0',
     speed:'75',
-    acts:{
-        1:{
-          name:'体当たり',
-          probability:70,
-          num:1,
-          process:async function(cam, me){
-              await addtext(`${humans[cam][me].name}は体当たりを仕掛けてきた！`);
-              let [tcam, tme] = ShallTargetSelect(cam,me,'phpl',0);
-              let result = await damage(cam,me,are,1,'sh',1);
-              if(result == 'end')return 1;
-              return 0;
-          }
-        },
-        3:{
-          name:'体当たり・改',
-          probability:30,
-          num:3,
-          process:async function(cam, me){
-              await addtext(`${humans[cam][me].name}は回転しながら突進してきた！`);
-              let [tcam, tme] = ShallTargetSelect(cam,me,'phpl',0);
-              let result = await damage(cam,me,are,1.5,'sh',1);
-              if(result == 'end')return 1;
-              return 0;
-          }
+    acts:[
+      {
+        name:'体当たり',
+        probable:70,
+        num:1,
+        process:async function(cam, me){
+          await addtext(`${humans[cam][me].name}は体当たりを仕掛けてきた！`);
+          let [tcam, tme] = ShallTargetSelect(cam,me,'phpl',0);
+          let result = await damage(cam,me,are,1,'sh',1);
+          if(result == 'end')return 1;
+          return 0;
         }
-    }
+      },
+      {
+        name:'体当たり・改',
+        probable:30,
+        num:3,
+        process:async function(cam, me){
+          await addtext(`${humans[cam][me].name}は回転しながら突進してきた！`);
+          let [tcam, tme] = ShallTargetSelect(cam,me,'phpl',0);
+          let result = await damage(cam,me,are,1.5,'sh',1);
+          if(result == 'end')return 1;
+          return 0;
+        }
+      }
+    ]
   },
   '黄昏の穿影':{
     name:'黄昏の穿影',
@@ -1726,46 +1753,48 @@ let Enemies = {
     critdmg:'+0',
     critresist:'+0',
     speed:'60',
-    acts:{
-        1:{
-          name:'消滅',
-          probability:60,
-          type:'reinvisi',
-          num:1,
-          process:async function(cam, me){
-              await addtext(`${humans[cam][me].name}は姿を消..あれどこ行った？`);
-              let [tcam, tme] = ShallTargetSelect(cam,me,'ec',0);
-              await buffadd(who, are,'disappear',2,1);
-              return 0;
-          }
-        },
-        2:{
-          name:'衝突',
-          probability:20,
-          type:'abinvisi',
-          num:2,
-          process:async function(cam, me){
-              let x = buffhas(cam, me, 'disappear') ? (buffclear(cam, me, 'disappear'), 2) : 1;
-              await addtext(`${humans[cam][me].name}は突進してきた！`);
-              let [tcam, tme] = ShallTargetSelect(cam,me,'pr',0);
-              let result = await damage(cam,me,are,x,'sh',1);
-              return result;
-          }
-        },
-        3:{
-          name:'ローキック',//ロストワンの号哭の号哭使いたいけど意味が泣くことらしい
-          probability:20,
-          type:'none',
-          num:3,
-          process:async function(cam, me){
-              await addtext(`${humans[cam][me].name}はローキックしてきた！`)
-              let selected = ShallTargetSelect(cam,me,'phpl',0);
-              let result = await damage(cam,selected[1],me,selected[0],x,'sh',1);
-              await buffadd(selected[1],selected[0],'speeddown','turn',2,1);
-              return result;
-          }
+    acts:[
+      {
+        name:'消滅',
+        probable:60,
+        type:'',
+        prop:['reInvisi'],
+        num:1,
+        process:async function(cam, me){
+          await addtext(`${humans[cam][me].name}は姿を消..あれどこ行った？`);
+          let [tcam, tme] = ShallTargetSelect(cam,me,'ec',0);
+          await buffadd(who, are,'disappear',2,1);
+          return 0;
         }
-    }
+      },
+      {
+        name:'衝突',
+        probable:20,
+        type:'',
+        prop:['abInvisi'],
+        num:2,
+        process:async function(cam, me){
+          let x = buffhas(cam, me, 'disappear') ? (buffclear(cam, me, 'disappear'), 2) : 1;
+          await addtext(`${humans[cam][me].name}は突進してきた！`);
+          let [tcam, tme] = ShallTargetSelect(cam,me,'pr',0);
+          let result = await damage(cam,me,are,x,'sh',1);
+          return result;
+        }
+      },
+      {
+        name:'ローキック',//ロストワンの号哭の号哭使いたいけど意味が泣くことらしい
+        probable:20,
+        type:'none',
+        num:3,
+        process:async function(cam, me){
+          await addtext(`${humans[cam][me].name}はローキックしてきた！`)
+          let selected = ShallTargetSelect(cam,me,'phpl',0);
+          let result = await damage(cam,selected[1],me,selected[0],x,'sh',1);
+          await buffadd(selected[1],selected[0],'speeddown','turn',2,1);
+          return result;
+        }
+      }
+    ]
   },
   '燐光の妖花':{
     name:'燐光の妖花',
@@ -1780,197 +1809,45 @@ let Enemies = {
     critdmg:'+0.5',
     critresist:'+0.1',
     speed:'50',
-    acts:{
-        1:{
-          name:'しびれごな',
-          probability:30,
-          type:'none',
-          num:1,
-          process:async function(cam, me){
-              await addtext(`${humans[cam][me].name}は痺れ粉を振りかけてきた！`)
-              let selected = ShallTargetSelect(cam,me,'patkh',0);
-              await buffadd(selected[1],selected[0],'palsy','turn',2,1);
-              return 0;
-          }
-        },
-        2:{
-          name:'どくのこな',
-          probability:30,
-          type:'none',
-          num:2,
-          process:async function(cam, me){
-              await addtext(`${humans[cam][me].name}は毒の粉を振りかけてきた！`)
-              let selected = ShallTargetSelect(cam,me,'phph',0);
-              await buffadd(selected[1],selected[0],'poison','turn',2,1);
-              return 0;
-          }
-        },
-        3:{
-          name:'ねむりごな',
-          probability:30,
-          type:'none',
-          num:3,
-          process:async function(cam, me){
-              await addtext(`${humans[cam][me].name}は眠り粉を振りかけてきた！`)
-              let selected = ShallTargetSelect(cam,me,'patkh',0);
-              await buffadd(selected[1],selected[0],'sleep','turn',1,1);
-              return 0;
-          }
+    acts:[
+      {
+        name:'しびれごな',
+        probable:30,
+        type:'none',
+        num:1,
+        process:async function(cam, me){
+          await addtext(`${humans[cam][me].name}は痺れ粉を振りかけてきた！`)
+          let selected = ShallTargetSelect(cam,me,'patkh',0);
+          await buffadd(selected[1],selected[0],'palsy','turn',2,1);
+          return 0;
         }
-    }
+      },
+      {
+        name:'どくのこな',
+        probable:30,
+        type:'none',
+        num:2,
+        process:async function(cam, me){
+          await addtext(`${humans[cam][me].name}は毒の粉を振りかけてきた！`)
+          let selected = ShallTargetSelect(cam,me,'phph',0);
+          await buffadd(selected[1],selected[0],'poison','turn',2,1);
+          return 0;
+        }
+      },
+      {
+        name:'ねむりごな',
+        probable:30,
+        type:'none',
+        num:3,
+        process:async function(cam, me){
+          await addtext(`${humans[cam][me].name}は眠り粉を振りかけてきた！`)
+          let selected = ShallTargetSelect(cam,me,'patkh',0);
+          await buffadd(selected[1],selected[0],'sleep','turn',1,1);
+          return 0;
+        }
+      }
+    ]
   },
-
-
-
-
-
-
-  '古書館の魔術師':{//ウイさん　コッペパンの"めっちゃ好きなキャラ"。ヒナタさんと仲がいい。
-    name:'古書館の魔術師',
-    maxhp:'-10',
-    atk:'-15',
-    def:'+5',
-    maxmp:'0',
-    matk:'+0',
-    mdef:'+20',
-    critlate:'+0.05',
-    critdmg:'+0',
-    critresist:'+0.1',
-    speed:'40',
-    acts:{
-        1:{
-          name:'攻撃！',//これはpazzlineね
-          num:1,
-          process:async function(cam, me){  
-              log.textContent = `${humans[cam][me].name}はピストルカービンで撃った！`;await delay(1000);//ウイさんの武器やね デ・リーズル カービン
-              let selected = ShallTargetSelect(cam,me,'phpl',0);
-              let result = await damage(cam,selected[0],me,selected[1],1,'sh',1);
-              return result;
-          }
-        },
-        2:{
-          name:'古書の専門家',
-          num:2,
-          process:async function(cam, me){
-              log.textContent = `${humans[cam][me].name}は古書の専門家だ！！`;await delay(1000);//いやごめん、は？ (ウイさんのEX「古書の専門家」より)
-              let selected = ShallTargetSelect(cam,me,'eatkh',0);//enemies atk high
-              let result = await Magics.power.process(cam,selected[0],me,selected[1]);
-              return result;
-          }
-        },
-        3:{
-          name:'伝達されていく知識',
-          num:3,
-          process:async function(cam, me){
-              log.textContent = `${humans[cam][me].name}は知識を伝達した！`;await delay(1000);//ウイさんのNS「伝達されていく知識」..いやそのまますぎるか...?
-              let selected = ShallTargetSelect(cam,me,'ec',1);//自分付近
-              await Magics.boost.process(cam,selected[0],me,selected[1]);
-              return 0;
-          }
-        }
-    }
-  },
-  '読書マニアな司書':{ //シミコさん
-    name:'読書マニアな司書',
-    maxhp:'+10',
-    atk:'+10',
-    def:'-10',
-    maxmp:'0',
-    matk:'+0',
-    mdef:'+0',
-    critlate:'+0.3',
-    critdmg:'+0.5',
-    critresist:'+0',
-    speed:'75',
-    acts:{
-        1:{
-          name:'体当たり',
-          num:1,
-          process:async function(cam, me){
-          }
-        },
-        2:{
-          name:'体当たり',
-          num:2,
-          process:async function(cam, me){
-          }
-        },
-        3:{
-          name:'体当たり',
-          num:3,
-          process:async function(cam, me){
-          }
-        }
-    }
-  },
-  '忍び寄るナース':{ //セリナさん
-    name:'忍び寄るナース',
-    maxhp:'+10',
-    atk:'+0',
-    def:'+10',
-    maxmp:'0',
-    matk:'+0',
-    mdef:'+0',
-    critlate:'+0',
-    critdmg:'+0',
-    critresist:'+0',
-    speed:'50',
-    acts:{
-        1:{
-          name:'体当たり',
-          num:1,
-          process:async function(cam, me){
-          }
-        },
-        2:{
-          name:'体当たり',
-          num:2,
-          provess:async function(cam, me){
-              
-          }
-        },
-        3:{
-          name:'体当たり',
-          num:3,
-          process:async function(cam, me){
-              
-          }
-        }
-    }
-  },
-  '「救護」のプロ':{ //ミネさん
-    name:'「救護」のプロ',
-    maxhp:'+10',
-    atk:'+0',
-    def:'+10',
-    maxmp:'0',
-    matk:'+0',
-    mdef:'+0',
-    critlate:'+0',
-    critdmg:'+0',
-    critresist:'+0',
-    speed:'50',
-    acts:{
-        1:{
-          name:'体当たり',
-          num:1,
-          process:async function(cam, me){
-          }
-        },
-        2:{
-          name:'体当たり',
-          num:2,
-          process:async function(cam, me){
-          }
-        },
-        3:{
-          name:'体当たり',
-          num:3,
-          process:async function(cam, me){
-          }
-        }
-    }
-  }
 };
 
 let Prefixes = {
@@ -2003,8 +1880,8 @@ let Prefixes = {
       maxhp: '=200%'
     }
   },
-  'tag':{
-    id:'tag',
+  'toudh':{
+    id:'tough',
     name:'守りが固い',
     rare:2,
     effects:{

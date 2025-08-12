@@ -309,15 +309,17 @@ document.addEventListener('click', () => {
 let logOOmoto = document.querySelector('#log');
 let log = document.querySelector('#log .log');
 let logOpener = document.querySelector('#log .opener');
-logOpener.addEventListener('click', function(){
-    if(logOOmoto.style.right == '-300px'){
-        logOOmoto.style.right = '0px';
-        logOpener.textContent = '>';
-    }else{
-        logOOmoto.style.right = '-300px';
-        logOpener.textContent = '<';
-    }
-});
+let log_open = (code) => {
+   if((logOOmoto.style.right == '-300px' || code == 'o') && code != 'c'){
+      logOOmoto.style.right = '0px';
+      logOpener.textContent = '>';
+   }else{
+      logOOmoto.style.right = '-300px';
+      logOpener.textContent = '<';
+   }
+}
+logOpener.addEventListener('click', log_open);
+
 function addlog(text){
     log.innerHTML += text + '<br>';
     log.scrollTop = log.scrollHeight;

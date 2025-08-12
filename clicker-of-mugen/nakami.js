@@ -1030,15 +1030,15 @@ function mapmake(code){
       let obx = 0, oby = 0;
       let douBasyo = Objects.filter(a => a.x == obx && a.y == oby && a.id != 0);
       while(douBasyo.length || !(douBasyo.filter(a => a.on) && !obdata.on)){
-         console.log(`あるか:${douBasyo.length}, 乗れるか:${!obs.on}`)
-         console.log(`(${obx}, ${oby})はすでに何かがあるっぽい？`);
+         // console.log(`あるか:${douBasyo.length}, 乗れるか:${!obs.on}`)
+         // console.log(`(${obx}, ${oby})はすでに何かがあるっぽい？`);
          obx = random(0, mapSize - 1);
          oby = random(0, mapSize - 1);
          douBasyo = Objects.filter(a => a.x == obx && a.y == oby && a.id != 0)
       };
 
-      console.log(obs)
-      console.log(obs.id, obs.data.name)
+      // console.log(obs)
+      // console.log(obs.id, obs.data.name)
       addob(obs.id, obx, oby, obdata.w, obdata.h, obdata.spd, 90, obdata.ables, obs.data);
 
       /*
@@ -1431,7 +1431,7 @@ function tekiou(){
 
       result.forEach(effect => {
          //console.log(`${effect.lv}Lvの${effect.time}の${effect.name}。typeは${effect.type}で、kindは${effect.kind}`);
-         let buffData = Object.values(Effects[effect.type]).find(e => e.name == effect.name);
+         let buffData = Object.values(Buffs).find(e => e.name == effect.name);
 
          let Time = effect.kind == 'turn' ? effect.time : (effect.kind == 'stack' ? effect.lv : '？？？');
          let Lv = effect.kind == 'turn' ? `<br>Lv: ${effect.lv}` : '';
@@ -1704,15 +1704,17 @@ document.addEventListener('click', () => {
 let logOOmoto = document.querySelector('#log');
 let log = document.querySelector('#log .log');
 let logOpener = document.querySelector('#log .opener');
-logOpener.addEventListener('click', function(){
-    if(logOOmoto.style.right == '-300px'){
-        logOOmoto.style.right = '0px';
-        logOpener.textContent = '>';
-    }else{
-        logOOmoto.style.right = '-300px';
-        logOpener.textContent = '<';
-    }
-});
+let log_open = (code) => {
+   if((logOOmoto.style.right == '-300px' || code == 'o') && code != 'c'){
+      logOOmoto.style.right = '0px';
+      logOpener.textContent = '>';
+   }else{
+      logOOmoto.style.right = '-300px';
+      logOpener.textContent = '<';
+   }
+}
+
+logOpener.addEventListener('click', log_open);
 function addlog(text){
     log.innerHTML += text + '<br>';
     log.scrollTop = log.scrollHeight;
@@ -3020,7 +3022,7 @@ function BankWithdraw(code){
 //#region 非ダメ時モーション(?)
 
 //こちらは旧式。参考にでも
-// async function humandamaged(cam,tcams,me,targets,rate,kind,code){//矛先の陣営、攻撃タイプ(物理||魔法)、自分、矛先、倍率、コード(PS用)
+// async function damage(cam,tcams,me,targets,rate,kind,code){//矛先の陣営、攻撃タイプ(物理||魔法)、自分、矛先、倍率、コード(PS用)
 //    if(!Array.isArray(tcams)){tcams = [tcams];}
 //    if(!Array.isArray(targets)){targets = [targets];}
 //    for(let i = 0; i < tcams.length; i++){
@@ -3103,22 +3105,25 @@ function BankWithdraw(code){
 // };
 
 async function damage(...arr){
-   let [who, tages, value, kind, prop = []] = arr;
+   let [who, ares, value, kind, prop = []] = arr;
 
    let hasa = (whi, name) => whi.ables.includes(name);
    let hasp = (name) => prop.includes(name);
 
-   if(!Array.isArray(tages)) tages = [tages];
+   if(!Array.isArray(ares)) ares = [ares];
 
-   for(let tag of tages){
+   for(let are of ares){
       //攻撃x回復o = heal 攻撃+攻撃者与ダメ回復 = absorb
       //防御無視 = penetrate 確定会心 = crit 会心無効 = nocrit
       //固定値 = fixed
-      console.log(hasa('fixed') ? `${who.name} => ${tag.name} ${kind}で${value}ダメージの予定！ [${prop}]`
-      : `${who.name} => ${tag.name} ${kind}で攻撃力の${value}倍 [${prop}]`);
+      console.log(hasp('fixed')
+      ? `${who.name} => ${are.name} ${kind}で${value}ダメージの予定！ [${prop}]`
+      : `${who.name} => ${are.name} "${kind}"で攻撃力の${value}倍 [${prop}]`);
 
       let atker = {...who};
-      let defer = {...tag};
+      let defer = {...are};
+      // console.log(atker);
+      // console.log(defer);
       
       let stats = [
          'atk','matk','def','mdef',
@@ -3126,38 +3131,38 @@ async function damage(...arr){
          'spd','critlate','critdmg','critresist',
       ];
 
+      console.log(`weapon:${atker.weapon.id}, shield:${atker.shield.id}, ear:${atker.ear.id}, ring:${atker.ring.id}, neck:${atker.neck.id}`);
       for(let stat of stats){
-         console.log(atker.buffs)
          Object.values(atker.buffs).forEach(buff => {
             if(!buff.data.addable){
-               if(has(buff.data.effect, stat)){
+               if(hask(buff.data.effect, stat)){
                   atker[stat] += buff.data.effect[stat].value;
                }
             }else{
-               if(has(buff.data.effect, stat)){
+               if(hask(buff.data.effect, stat)){
                   atker[stat] += buff.value
                }
             }
          });
          
-         console.log(`weapon:${atker.weapon.id}, shield:${atker.shield.id}, ear:${atker.ear.id}, ring:${atker.ring.id}, neck:${atker.neck.id}`);
-         for(let bui in ['weapon','shield','ear','ring','neck']){
-            let eq = Equips[bui][atker[bui].id];
+         for(let bui of ['weapon','shield','ear','ring','neck']){
+            let eq = atker[bui];
+            let data = Equips[bui][eq.id];
             let res = 0;
-            if(eq.ap){
-               res = await eq.afterProcess(arr);
+            if(data.ap){
+               res = await data.afterProcess(arr);
                if(res) return 1;
             }
          }
 
          Object.values(defer.buffs).forEach(buff => {
             if(!buff.data.addable){
-               if(has(buff.data.effect, stat)){
+               if(hask(buff.data.effect, stat)){
                   defer[stat] += buff.data.effect[stat].value;
                }
             }
             if(buff.data.addable){
-               if(has(buff.data.effect, stat)){
+               if(hask(buff.data.effect, stat)){
                   defer[stat] += buff.value
                }
             }
@@ -3167,90 +3172,101 @@ async function damage(...arr){
       //攻撃力
       let atkval = kind == 'sh' ? atker.atk : atker.matk;
       let dmg = (atkval * atker.power * value/100);
-      if(hasa('fixed')) dmg = value;
+      if(hasp('fixed')) dmg = value;
 
       //会心
       let crited = 0;
       if(isCrit(atker, defer)) crited = 1;
-      if((crited && !hasa('nocrit')) || hasa('crit')){
+      if((crited && !hasp('nocrit')) || hasp('crit')){
          dmg *= atker.critdmg / 100;
          if(who.cam == 'players') await addtext('かいしんのいちげき！');
          if(who.cam == 'enemies') await addtext('つーこんのいちげき！');
-      };
+      }
+      if(crited && hasp('nocrit')){
+         console.log('この攻撃は会心が無効です！')
+      }
 
       //防御力
       let defval = kind == 'sh' ? defer.def : defer.mdef;
-      if(!hasa('penetrate')) dmg -= (defval * defer.shell);
+      if(!hasp('penetrate')) dmg -= (defval * defer.shell);
 
       //整え
       dmg = Math.floor(dmg);
       if(defer.hp < dmg) dmg = defer.hp;
       console.log(`予測:: ${defer.hp} => ${defer.hp - dmg} | dmg:${dmg}`);
 
+      // ~~終了~~ atker - defer ~~終了~~ //
+      
       //実装
-      if(!hasa('heal')) await heal(atker, defer, dmg)
-      else defer.hp += dmg;
+      if(!hasp('heal')) are.hp -= dmg;
+      else await heal(atker, defer, dmg)
 
       //ep
-      if(atker.cam == 'players') atker.ep += Math.floor(10 * atker.epgain);
+      if(who.cam == 'players') who.ep += Math.floor(10 * who.epgain);
 
       tekiou()
-      await addtext(`${defer.name}に${dmg}のダメージ`)
+      await addtext(`${are.name}に${dmg}のダメージ`)
 
       //その後
-      let result = 0, killen = 0;
-      if(defer.hp <= 0) result = await killed(atker, defer);
-      if(result) return killen = 1;
-
-      //追撃ゾーン..ここどしよ
       let res = 0;
-      if(Weapons[atker.weapon.id].ap){
-         res = await Weapons[atker.weapon.id].afterProcess(arr);
-         if(res) return 1;
-      }
+      if(are.hp <= 0) res = await killed(who, are);
+      if(res) return 1;
 
-      if(atker.name == 'herta' && defer.hp <= (defer.maxhp / 2) && 10 <= atker.level){ // 1凸効果「弱みは付け込み」
-         res = damage(who, tag, 20, 'sh', ['unpursuit']);
-         if(res) return 1;
-      }
-      if(atker.ps == 'enemy50%pursuit' && defer.hp <= defer.maxhp / 2 && enemy50pursuitenelgy == 1){
-         enemy50pursuitenelgy = 0;
-         await addtext(arraySelect(['くるくる〜っと','くるりん〜っと']));
-         res = damage(who, tag, 50, 'sh', ['unpursuit']);
-         if(res) return 1;
+      //追撃ゾーン
+      if(!hasp('unpursuit')){
+         let weapon = who.weapon;
+         if(Equips.weapon[who.id]?.ap){
+            res = await Weapons[weapon.id].afterProcess(arr);
+            if(res) return 1;
+         }
+
+         if(who.name == 'herta' && are.hp <= (are.maxhp / 2) && 10 <= who.level){ // 1凸効果「弱みは付け込み」
+            res = damage(who, are, 20, 'sh', ['unpursuit']);
+            if(res) return 1;
+         }
+         if(who.ps == 'enemy50%pursuit' && are.hp <= are.maxhp / 2 && enemy50pursuitenelgy == 1){
+            enemy50pursuitenelgy = 0;
+            await addtext(arraySelect(['くるくる〜っと','くるりん〜っと']));
+            res = damage(who, are, 50, 'sh', ['unpursuit']);
+            if(res) return 1;
+         }
       }
    }
    return 0;
 }
 
-async function heal(who, tag, value, code = 'add', ...prop){
-   if(!who || !tag) return console.log(who, tag, '対象が定まってないっぽい！！！')
+async function heal(who, ares, value, code = 'add', ...prop){
    let hasa = (whi, name) => whi.ables.includes(name);
    let hasp = (name) => prop.includes(name);
 
-   let bh = tag.hp;
-   
-   let val = value;
-   if(val.endsWith('%')){
-      val = +val.slice(0, -1)/100;
-      comsole.log(`${value}っていう%だったから${val}って値に変えといたぜ`);
-      val *= tag.maxhp;
+   if(!Array.isArray(ares)) ares = [ares];
+
+   for(let are of ares){
+
+      let bh = are.hp;
+      
+      let val = value;
+      if(val.endsWith('%')){
+         val = +val.slice(0, -1)/100;
+         comsole.log(`${value}っていう%だったから${val}って値に変えといたぜ`);
+         val *= are.maxhp;
+      }
+      
+      let ah = 0;
+      if(code == 'add'){
+         ah = are.hp + val;
+      }
+      if(code == 'set'){
+         ah = val;
+      }
+      
+      if(are.maxhp < ah) ah = are.maxhp;
+      
+      console.log(`${who.nane} => ${are.name}, val:${val} | ${bh} => ${ah}`);
+      
+      are.hp = ah;
    }
-   
-   let ah = 0;
-   if(code == 'add'){
-      ah = tag.hp + val;
-   }
-   if(code == 'set'){
-      ah = val;
-   }
-   
-   if(tag.maxhp < ah) ah = tag.maxhp;
-   
-   console.log(`${who.nane} => ${tag.name}, val:${val} | ${bh} => ${ah}`);
-   
-   tag.hp = ah;
-   
+
    return 0;
 }
 
@@ -3264,12 +3280,10 @@ function cm(cam = '指定なし', me = '指定なし'){
    return who;
 }
 
-function isCrit(who, tag){
+function isCrit(who, are){
    let lat = who.critlate;
-   let res = tag.critresist;
+   let res = are.critresist;
    let is = 0;
-
-   if(!prop.includes('nocrit')) return false;
    
    if(res == 'absolute'){
       is = false;
@@ -3294,7 +3308,7 @@ async function buffadd(...arr){//誰のバフ/デバフか,バフ/デバフの�
 }
 function buffMold(buff, time, val){
    if(!buff || !time || !val){console.error('要素が足りないぜ！！！');}
-   let buffData = [...Object.values(Effects.buffs), ...Object.values(Effects.debuffs), ...Object.values(Effects.handles), ...Object.values(Effects.uniques)].find(e => e.name === buff);
+   let buffData = Object.values(Buffs).find(e => e.name == buff);
 
    console.log(`${who.name}に${val}の${buff}を${time}付与します！！`);
 
@@ -3458,8 +3472,7 @@ let commandC = {
 }
 
 commandC.s1B.addEventListener('click', async function(){
-   let me = turn[0];
-   let who = humans.players[me];
+   let who = humans.players[0];
    switch(phase){
       case 1:
          phase = 2;
@@ -3503,6 +3516,7 @@ commandC.s2B.addEventListener('click', async function(){
 })
 
 commandC.s3B.addEventListener('click', async function(){
+   let who = humans.players[0];
    switch(phase){
       case 1:
          phase = 2;
@@ -3524,6 +3538,7 @@ commandC.s3B.addEventListener('click', async function(){
 })
 
 commandC.s4B.addEventListener('click', async function(){
+   let who = humans.players[0];
    switch(phase){
       case 1:
          dassyutsu();
@@ -3580,18 +3595,12 @@ function LetsTargetSelect(one){
 
          let me = +element.id.slice(7);
          let cam = element.id.slice(0, 7);
-         target.push(me);
-         target.push(cam);
+         target = [
+            me,
+            cam
+         ]
 
          if(code == 2){
-            let pnum = (humans[cam][me-1]?.status??0 == 1) ? me - 1 : null;
-            let nnum = (humans[cam][me+1]?.status??0 == 1) ? me + 1 : null;
-            let cams = [cam];if(pnum){cams.push(cam)};if(nnum){cams.push(cam)};
-            target = [
-               [me-1,me,me+1],
-               cams
-            ];
-         }else if(code == 3){
             let nums = Object.keys(humans[cam]).filter(a => humans[cam][a].status == 1);
             let cams = Array(nums.length).fill(cam); //fillは全ての値を同じ値にするやつ。同数にするために使用されがち
             target = [
@@ -3599,10 +3608,57 @@ function LetsTargetSelect(one){
                cams
             ];
          }
+         if(code == 3){ //拡散-3
+            let pnum = (humans[cam][me-1]?.status??0 == 1) ? me - 1 : null;
+            let nnum = (humans[cam][me+1]?.status??0 == 1) ? me + 1 : null;
+            
+            let cn = 1;
+            if(pnum) cn += 1;
+            if(nnum) cn += 1;
+            
+            let cams = Array(cn).fill(cam);
+            
+            target = [
+               [me-1,me,me+1],
+               cams
+            ];
+         }
+         if(code == 4){// 拡散-5
+            let pnum = (humans[cam][me-1]?.status??0 == 1) ? me - 1 : null;
+            let p2num = (humans[cam][me-2]?.status??0 == 1) ? me - 2 : null;
+            let nnum = (humans[cam][me+1]?.status??0 == 1) ? me + 1 : null;
+            let n2num = (humans[cam][me+2]?.status??0 == 1) ? me + 2 : null;
+            
+            let cn = 1;
+            if(pnum) cn += 1;
+            if(p2num) cn += 1;
+            if(nnum) cn += 1;
+            if(n2num) cn += 1;
+            
+            let cams = Array(cn).fill(cam);
+            
+            target = [
+               [me-2,me-1,me,me+1,me+2],
+               cams
+            ];
+         }
 
-         // 基本、[me,cam]の並びになるはず
-         console.log(`？？？「${target[1]}${target[0]}を狙います！」`);
-         resolve(target);
+         let cs = target[1];
+          if(typeof cs == 'string') cs = [cs]
+         let ns = target[0];
+          if(typeof ns == 'string' || typeof ns == 'number') ns = [ns]
+         // console.log(cs, ns)
+         let whoes = [];
+         for(let i = 0; i < cs.length; i++){
+            let c = cs[i];
+            let n = ns[i];
+            console.log(`humans[${c}][${n}]を狙います！`);
+            let cn = humans[c][n];
+            console.log(cn);
+            whoes.push(cn);
+         }
+
+         resolve(whoes);
       }
 
       array.forEach(a => {
@@ -3629,8 +3685,7 @@ async function Slash(who, num){
    let name = sl.name;
    let data = Slashs[name]
    if(who.mp >= data.mp){
-      let [tme, tcam] = await LetsTargetSelect();
-      let are = humans[tcam][tme];
+      let are = await LetsTargetSelect();
 
       who.mp -= data.mp;
       tekiou();
@@ -3785,30 +3840,32 @@ function turretAllClear(){
 //#endregion
 
 //#region next-turn
-async function NextTurnis(cam,me,tcam,target){
+async function NextTurnis(who, are){
    phase = 0;
 
    //アンコールの動き
-   if(!cam == 0){
+   if(!who == 0){
       y = 1;//luck
-      if(buffhas(cam,me,'luck')){y = Math.floor(Math.random() * humans[cam][me].buffs.luck.lv);}//luck
+      if(buffhas(who, 'luck')) humans[cam][me].buffs.luck.lv//luck
       if(y == 0){
-         await addtext('当たりが出たらもう一本♪');
+         await addtext('当たりが出たら！！もう一本！！！！');
          backtoplayerturn(); return;
       }
 
-
       //継続ダメージの動き
+      for(let buff of who.buffs){
+         if(buff.name == 'poison'){}
+      }
       if (buffhas(cam,me,'poison')){
-         let poison = humans[cam][me].buffs.find(a => a.name == 'poison')
-         x = Math.round(humans[cam][me].maxhp * Effects.debuffs[poison.name].lv[poison.lv]);
+         let poison = who.buffs.find(a => a.name == 'poison')
+         x = Math.round(humans[cam][me].maxhp * Buffs[poison.name].lv[poison.lv]);
          humans[cam][me].hp -= x;
          if(humans[cam][me].hp < 0){humans[cam][me].hp = 0};
          await addtext(`${humans[cam][me].name}は毒で${x}のダメージ!`);
       };
       if(buffhas(cam,me,'burn')){
          let burn = humans[cam][me].buffs.find(a => a.name == 'burn')
-         x = Math.round(humans[cam][me].maxhp * Effects.debuffs[burn.name].lv[burn.lv]);
+         x = Math.round(humans[cam][me].maxhp * Buffs.debuffs[burn.name].lv[burn.lv]);
          humans[cam][me].hp -= x;
          if(humans[cam][me].hp < 0){humans[cam][me].hp = 0}
          await addtext(`${humans[cam][me].name}は燃えて${x}のダメージ!`);
@@ -3873,7 +3930,7 @@ async function NextTurnis(cam,me,tcam,target){
    }
 
    if(buffhas(cam,nowturn,'onslime')){
-      if(Math.floor(Math.random() * Effects.debuffs.onslime.lv[humans[cam][nowturn].buffs.onslime.lv]) !== 0){
+      if(Math.floor(Math.random() * Buffs.debuffs.onslime.lv[humans[cam][nowturn].buffs.onslime.lv]) !== 0){
          buffremove(cam,nowturn,'onslime');
          log.textContent = 'なんとかスライムを取り払った!!';
       }else{
@@ -3889,7 +3946,7 @@ async function NextTurnis(cam,me,tcam,target){
       NextTurnis(cam,me,0,0); return;
    }
    if(buffhas(cam,nowturn,'freeze')){
-      if(!Math.floor(Math.random() * Effects.debuffs.freeze.lv[humans[cam][nowturn].buffs.freeze.lv]) !== 0){
+      if(!Math.floor(Math.random() * Buffs.debuffs.freeze.lv[humans[cam][nowturn].buffs.freeze.lv]) !== 0){
          await addtext(`氷が溶けた!`); buffremove(cam,nowturn,'freeze');
       }else{
          await addtext(`${humans[cam][nowturn].name}は凍っている...`);
@@ -3910,61 +3967,66 @@ async function NextTurnis(cam,me,tcam,target){
 //#endregion
 
 //#region enemyturn
-async function enemyturn(cam,me){
-   let enemy = humans.enemies[me];
-   let enemydata = Enemies[enemy.name];
-   x = Object.values(humans.enemies).filter(x => x.status == 1&& x.hp > 0).map(x => x.me);
-   for(i = 0; i < x.length; i++){
-      let n = x[i]
-      for(const key in humans.enemies[n].buffs){
-         humans.enemies[n].buffs[key].time -= 1; //-1する
-         if (humans.enemies[n].buffs[key].time <= 0) {
-            delete humans.enemies[n].buffs[key]; //0以下なら消し去る
-         }
+async function enemyturn(who){
+   let data = Enemies[who.name];
+
+   for(let buff in who.buffs){
+      buff.time -= 1;
+      if (buff.time <= 0) {
+         delete buff; //0以下なら消し去る
       }
    }
    tekiou();
-   
-   await addtext(enemy.name+'のターン！')
-   let selected = ['players',1] //一旦のやつ。実際はShallTargetSelect(cam,me,'phpl',0);みたいなのがあるからこれの中の数値は関係ない
 
-   if(enemydata){
-      let selectedAction = enemySelectAction(me,enemydata.acts)
-      await selectedAction.process(cam, me);
+   if(data){
+      let act = enemySelectAction(who)
+      await act.process(who);
    }else{
-      await addtext(`${enemy.name}は何かで攻撃した！`)
-      selected = ShallTargetSelect(cam,me,'phpl',0);
-      let result = await humandamaged(cam,me,selected[1],selected[0],1,'sh',1);
-      if(result == 'end'){let results = killed(cam,me,selected[1],selected[0]);if(results !== 'continue'){return results;}}
+      await addtext(`${who.name}は何かで攻撃した！`)
+      let are = ShallTargetSelect(who, 'phpl');
+      let res = await damage(who, are, 'sh', 1); //areの後、1の前に"何の倍率か"を入れるべき。基本atkかもだけどfixで固定、とかできそう
+      if(res) return 1;
    }
-   NextTurnis(cam,me,selected[1],selected[0]);
+
+   NextTurnis(who, are);
 }
-function enemySelectAction(me, acts){
-   let enemy = humans.enemies[me];
+function enemySelectAction(who){
+   let acts = [];
+   let pros = [];
 
-   let keys = Object.keys(acts);
-   let probabilities = keys.map(key => acts[key].probability || 1);
-
-   let lastType = enemy.lastype;
-   if(lastType){
-      //直前にreを実行していたならば、対応するab確定実行するやつ
-      let absKey = keys.find(key => key.startsWith("ab") && key.endsWith(lastType));
-      if (absKey) {
-         enemy.lastype = null;
-         return acts[absKey];
-      }
+   if(who.lasts){
+      //直前にreを実行していたならば、対応するabを確定実行するやつ
+      who.lasts.forEach(last => {
+         who.acts.forEach(a => {
+            let props = a.props;
+            props.filter(p => p.startsWith('ab') && p.endsWith(last)).forEach(p => {
+               console.log(a, p)
+               acts.push(a);
+               pros.push(a.probable);
+            });
+         })
+      })
+      who.lasts = [];
+   }else{
+      who.acts.forEach(a => {
+         acts.push(a);
+         pros.push(a.probable);
+      })
    }
+   console.log(acts);
+   console.log(pros);
 
-   //reをするとlastypeを記録
-   let selectedKey = arrayGacha(keys, probabilities);
-   if (selectedKey.startsWith("re")) {
-      enemy.lastype = selectedKey.substring(2);//reを除いたものを保存
-   }
+   //reをするとlastを記録
+   let act = arrayGacha(acts, pros);
+   act.prop.forEach(p => {
+      if(p.startsWith('re')) who.lasts.push(p.splice(2)), console.log(p);
+   })
 
-   return acts[selectedKey];
+   return act;
 }
 
-function ShallTargetSelect(cam,me,code,both){
+function ShallTargetSelect(who,code,both){
+   let me = who.me
    //これは敵しか使わないターゲットセレクト。だから陣営とかは考えんでいいよ
    //標的陣営、起動者、コード(e = enemies, p = players | m = most highest, l = most lowest,| atk = 攻撃力, def = 防御力, hp = 体力 || r = random)、両隣にも被害を与えるか0,1
    //,b => b.hp//playerのhp達を、statusが1のやつだけ、小さい順(昇順)に並べてる。
@@ -4202,9 +4264,22 @@ function ShallTargetSelect(cam,me,code,both){
    if(code.startsWith('p')){ret.push('players')}
    if(code.startsWith('e')){ret.push('enemies')}
    
-   let who = humans[ret[1]][ret[0]];
+   let ed1 //num
+   if(ret.length > 1) ed1 = [let[0]]
+   else ed1 = ret[0];
+   let ed2 //cam
+   if(ret.length > 1) ed2 = [let[1]];
+   else ed2 = ret[1];
+   let whoes;
+   for(let i = 0; i < ed1.length; i++){
+      let a = ed1[i];
+      let b = ed2[i];
+      let ab = humans[b][a];
+      console.log(ab);
+      whoes.push(ab);
+   }
    
-   return who;
+   return whoes;
 }
 //#endregion
 
@@ -4880,7 +4955,7 @@ async function bossenemyturn(){
          case 1:
          case 2:
             log.textContent = humans.enemies[me].name + 'の攻撃';
-            humandamaged('players',me,targetselect,1,1);
+            damage('players',me,targetselect,1,1);
             break;
          case 3:
             log.textContent = humans.enemies[me].name + 'は大きく息を吐いた！';
@@ -4892,7 +4967,7 @@ async function bossenemyturn(){
       //ターン数が偶数: タレットの設置
       //タレットが3つ以上: 攻撃力の3倍のダメージで攻撃、タレットを破壊
       if(enemyturret >= 3){
-         humandamaged('players',me,targetselect,enemyturret,1);
+         damage('players',me,targetselect,enemyturret,1);
          document.querySelector('#EnemyFriendBack').innerHTML = '';
          enemyturret = 0;
          EnemyTurrettekiou();
@@ -4903,9 +4978,9 @@ async function bossenemyturn(){
          EnemyTurrettekiou();
          log.textContent = humans.enemies[me].name+'はturretを設置した!';
       }else{
-         await humandamaged('players',me,targetselect,1,1);
+         await damage('players',me,targetselect,1,1);
       }
-      if(enemyturret > 0){await humandamaged('players',me,targetselect,enemyturret*0.5,1);}
+      if(enemyturret > 0){await damage('players',me,targetselect,enemyturret*0.5,1);}
    }else if(humans.enemies[me].name == 'RailwayGun "Shemata"'){
       //
       //
@@ -4926,7 +5001,7 @@ async function bossenemyturn(){
          case 0:log.textContent = '爆弾は閃光弾だった!!';await buffadd(cam,me,'stan','turn',1,1);y = 0.5;break;
       }
       await delay(1000);
-      await humandamaged('players',me,targetselect,x*y,0);
+      await damage('players',me,targetselect,x*y,0);
    }
    await enemycontidmg(me);
    if(humans.enemies[me].hp < 0){humans.enemies[me].hp = 0};
