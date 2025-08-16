@@ -3846,15 +3846,31 @@ async function NextTurnis(who, are){
    //アンコールの動き
    if(!who == 0){
       y = 1;//luck
-      if(buffhas(who, 'luck')) humans[cam][me].buffs.luck.lv//luck
-      if(y == 0){
-         await addtext('当たりが出たら！！もう一本！！！！');
-         backtoplayerturn(); return;
+      if(buffhas(who, 'luck')){//luck
+         if(probability()){
+            await addtext('当たりが出たら！！もう一本！！！！');
+            backtoplayerturn(); return;
+         }
       }
 
       //継続ダメージの動き
+      let dots = {}; //DamegeOverTimeのdot
       for(let buff of who.buffs){
-         if(buff.name == 'poison'){}
+         let data = Buffs[buff.name];
+      
+         if(hask(data, 'dot')){
+            let dot = data.dot;
+
+            let val = 0;
+            if(data.kind == 'fixe') val = data.lvs[buff.value][dot];
+            if(data.kind == 'free') val = buff.value[dot];
+             if(val.endsWith('%')) val = Math.round(who.maxhp * val.slice(0,-1) / 100);
+
+            
+            if(!dots[dot]) dots[dot] = 0;
+            dots[dot] += val;
+         }
+         //dotがないならそれは継続ダメージではない。
       }
       if (buffhas(cam,me,'poison')){
          let poison = who.buffs.find(a => a.name == 'poison')

@@ -25,15 +25,21 @@ let whatHappend = {
 }
 
 let stage = '1';
-let stagebar = {
-  1:{
+let stagebar = [
+  {
     id:1,
-    height:1,
     1:'normalEnemy',
     2:0,
   } 
-}
+]
 let floor = 0; //今横列の左から何番目か(1~10)
+
+//playerの位置を
+let p = {
+  x:0,
+  y:0,
+  movable:1
+}
 function SetStageBar(){
   const StageButton = document.getElementById('StageButton');
   StageButton.innerHTML = '';
@@ -45,7 +51,7 @@ function SetStageBar(){
     padding: 5px;
     display: block;
     overflow: auto;
-    `
+    `;
     let text = '';
     switch(high){
       case 1:

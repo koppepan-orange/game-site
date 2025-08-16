@@ -8,7 +8,7 @@ const Cards = {
     cool: 1,
     have: [],
     buyable: 0,
-    description: '"何もない"。デジタル絵師ならわかるよね？',
+    description: '"何もない"。デジタル絵師さんのあれ',
     process:async function(c,t){
       let atk = 0;
       atk += eleatk;

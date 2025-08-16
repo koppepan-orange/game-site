@@ -32,7 +32,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "cardgame",
-            "file": "/Users/koppepanorange/orange_bread/game-site/rogue-cardgame/hontai.html"
+            "file": "/Users/koppepanorange/orange_bread/game-site/Spiegel_von_Nacht_Schloss/index.html"
         },
         {
             "type": "chrome",

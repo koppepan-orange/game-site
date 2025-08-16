@@ -141,7 +141,7 @@ let Friends = {
   '飛花レイル':{
     ruby:'ひか れいる',
     name:'飛花レイル',
-    belongto:'', //所属
+    belong:'', //所属
     rare:3,
     description:``, 
     comment:``,
@@ -158,7 +158,7 @@ let Friends = {
   '泡沫アリア':{
     ruby:'うたかた ありあ',
     name:'泡沫アリア',
-    belongto:'',
+    belong:'',
     rare:2,
     description:``, 
     comment:``,
@@ -218,193 +218,435 @@ let Friends = {
 }
 
 let Buffs = {
-  'powerup':{
-    name:'powerup',
-    type:'buff',
-    kind:'turn',
-    addable:1,
-    img:'power',
+  'power':{ //if value < 0, それはデバフ扱い
+    name:'power', //keyと同じものを
+    jpnm:'攻撃倍率',
+    type:'buff', // buff/debuff/handle/unique
+    kind:'free', // turn/stack/actは付与時に決定。kindはfixe（Lv依存で値決定）かfree（付与時の引数で値決定）を定める用に。 poison/deadpoisonはfixe、burnもfixe。cheerupはfixe。atkup等能力値上昇系はfree。
+                 // if(data.kind??'fixed')ってすべきかも。あんまないと思うけど
+     //これは廃止。意味わからんし。turn/actならばvalueが等しいならtimeを増加新を削除、等しくないならば新しいものを追加。stackならばtimeがvalueだからかどうかあがいても加算。同盟が増えるこたぁない。
+    img:'power', //img名を。たいていそのまま
     description:'攻撃倍率が上がる。やったね！',
   },
-  'shellup':{
-    name:'shellup',
+  'shell':{
+    name:'shell',
+    jpnm:'防御倍率',
     type:'buff',
-    kind:'turn',
-    addable:1,
+    kind:'free',
     img:'shell',
     description:'防御倍率が上がる。あんまり実感しづらい。',
   },
   'luck':{
     name:'luck',
+    jpnm:'幸運',
     type:'buff',
-    kind:'turn',
-    addable:0,
+    kind:'fixe',
     img:'luck',
-    description:'ターン終了時、1/6の確率でもう一回行動できる。\n願うと起きやすいです',
-    effect:0
-  },
-  'luck_great':{
-    name:'luck_great',
-    type:'buff',
-    kind:'turn',
-    addable:0,
-    img:'luck',
-    description:'ターン終了時、1/3の確率でもう一回行動できる。\n気分はさながらラスボスですね',
-    effect:0
+    description:'ターン終了時、確率でもう一回行動できる。\nLv7ならば確定。\n願うと起きやすいです',
+    lvs:[
+      {luck:20},
+      {luck:33},
+      {luck:50},
+      {luck:67},
+      {luck:80},
+      {luck:90},
+      {luck:100},
+    ],
+    max:7
   },
   'disappear':{
     name:'disappear',
+    jpnm:'消滅',
     type:'buff',
-    kind:'turn',
-    addable:0,
+    kind:'fixe',
     img:'disappear',
-    description:'姿を消し、攻撃を受けなくなる。\nしかし範囲攻撃はちゃんと当たる。\nlv1ならば範囲攻撃で解除される。',
+    description:'姿を消し、攻撃を受けなくなる。\nしかし範囲攻撃はちゃんと当たる。\nLv1ならば範囲攻撃で解除される。',
   },
   'cheerup':{
     name:'cheerup',
+    jpnm:'応援！',
     type:'buff',
-    kind:'turn',
-    addable:0,
+    kind:'fixe',
     img:'cheerup',
     description:'応援されている状態。攻撃力と速度が上がり会心率が下がる。\nちょっと緊張しちゃうよね、わかる',
-    effect:{
-      'power':1.0,
-      'speed':20.0,
-      'crit':-5.0
-    }
-  },
-  'powerdown':{
-    name:'powerdown',
-    type:'debuff',
-    kind:'turn',
-    addable:1,
-    img:'power',
-    description:'攻撃力が下がる。stackするようにしたいけどまあいっか',
-  },
-  'shelldown':{
-    name:'shelldown',
-    type:'debuff',
-    kind:'turn',
-    addable:1,
-    img:'shell',
-    description:'防御力が下がる。こっちは実感しやすいのよね',
+    lvs:[
+      {
+        power:1.0,
+        speed:20.0,
+        critlate:-5.0
+      },
+      {
+        power: 1.5,
+        speed: 25.0,
+        critlate: -6.0
+      }
+    ],
+    max:2
   },
   'poison':{
     name:'poison',
+    jpnm:'毒',
     type:'debuff',
-    kind:'turn',
-    addable:0,
+    kind:'fixe',
+    dot:'poison',
     img:'poison',
-    description:'ターン終了時割合で防御貫通ダメージ。\n毒の苦しみもお好きなんですね',
+    description:'ターン終了時HP割合で防御貫通ダメージ。\n毒の苦しみもお好きなんですね',
     //ターン終了時体力のx%のダメージ
-    effect:{
-      'poison':0.05 //"毒ダメージ"として5%削れる
-    }
+    lvs:[
+      {poison:'5%'},
+      {poison:'7%'},
+      {poison:'10%'},
+      {poison:'15%'},
+      {poison:'20%'},
+    ],
+    max:5
+  },
+  'poison_deadly':{
+    name:'poison_deadly',
+    jpnm:'猛毒',
+    type:'debuff',
+    kind:'fixe',
+    dot:'poison',
+    img:'poison_deadly',
+    description:'ターン終了時HP割合で防御貫通ダメージ。\nついでにランダムで他のバフ(良)の持続時間を1減少\n徐々〜に蝕まれて終わります。解消を推奨す',
+    lvs:[
+      {poison:'7%'},
+      {poison:'10%'},
+      {poison:'15%'},
+      {poison:'20%'},
+      {poison:'25%'}, //4ターンで死にますね、これ。終わってる
+    ],
+    max:5
   },
   'blood':{
     name:'blood',
+    jpnm:'出血',
     type:'debuff',
-    kind:'turn',
-    addable:0,
+    kind:'fixe',
+    dot:'blood',
     img:'blood',
-    description:'ターン終了時固定ダメージ、徐々に増加。\n増加率は"2倍"\nそのままにしとくと普通に死にます',
-    //ターン終了時xダメージ
-    effect:{
-      'blood':2
-    }
+    description:'ターン終了時固定ダメージ、非攻撃毎に1.5倍に増加。\nそのままにしとくと普通に死にます',
+    //ターン終了時nダメージ、ダメージ喰らい後2倍に増加
+    lvs:[
+      {blood:2},
+      {blood:5},
+      {blood:7},
+      {blood:10},
+      {blood:20},
+      {blood:35},
+    ],
+    max:6
+  },
+  'blood_born':{
+    name:'blood_born', //大怒られしそうな名前だなこれ
+    jpnm:'血の誕生',
+    type:'debuff',
+    kind:'fixe',
+    dot:'blood',
+    img:'blood_born',
+    description:'ターン終了時固定ダメージ、ターン終了毎に2.0倍に増加。\nガチで死にかねん故早めに解除しよう',
+    //ターン終了時nダメージ、ターン終了後2倍に増加
+    lvs:[
+      {blood:5},
+      {blood:7},
+      {blood:10},
+      {blood:20},
+      {blood:35},
+      {blood:50}, //だめだろ。50→100→200→400→800→1600は。殺戮用
+    ],
+    max:6
   },
   'burn':{
     name:'burn',
+    jpnm:'火傷',
     type:'debuff',
-    kind:'turn',
-    addable:0,
-    img:'burn',
-    description:'ターン終了時固定ダメージ。ついでに攻撃力低下。\nまじでこれ嫌い...ww',
-    //ターン終了時xダメージ
-    effect:{
-      'burn':10,
-      'atk':-3
-    }
+    kind:'fixe',
+    dot:'burn',
+    img:'burn', //
+    description:'ターン終了時固定ダメージ\nマイクラだとすごいギリで耐えるか死ぬかのやつよね',
+    //ターン終了時nダメージ
+    lvs:[
+      {burn:5},
+      {burn:10},
+      {burn:20},
+      {burn:35, atk:-5},
+      {burn:50, atk:-10},
+    ],
+    max:5
+  },
+  'burn_out':{
+    name:'burn_out',
+    jpnm:'燃え尽き症候群', //...結構ぴったりよな、俺の雑々ネーミングセンス
+    type:'debuff',
+    kind:'fixe',
+    dot:'burn',
+    img:'burn_out',
+    description:'ターン終了時固定ダメージ。\nあと...このデバフのダメージで死んだ場合、お金が半分燃えて消えます\n珍しいしょ〜〜戦闘外干渉系',
+     //ほんっとお前...もしこのゲームがローグライクカードゲームだったらカードを一枚ランダムに燃やしてたからな？？？ガチ感謝しろよ？？？
+    //ターン終了時nダメージ
+    lvs:[
+      {burn:10},
+      {burn:20},
+      {burn:35, atk:-5},
+      {burn:45, atk:-10},
+      {burn:55, atk:-15},
+      {burn:75, atk:-25},
+    ],
+    max:6
+  },
+  'elec':{
+    name:'elec',
+    jpnm:'帯電',
+    type:'debuff',
+    kind:'fixe',
+    dot:'elec',
+    img:'elec',
+    description:'ターン終了時固定ダメージ\nターン終了時、確率で他の味方に伝染する', //"風邪"とかの方が良かったか...?
+    //ターン終了時n1ダメージ、n2%の確率で他の味方に伝染
+    lvs:[
+      {elec:5, spread:10},
+      {elec:10, spread:20},
+      {elec:20, spread:35},
+      {elec:30, spread:50},
+      {elec:45, spread:80},
+      {elec:60, spread:99},
+    ],
+    max:6
+  },
+  'elec_elec':{
+    name:'elec_elec',
+    jpnm:'帯電・帯電',
+    type:'debuff',
+    kind:'fixe',
+    dot:'elec',
+    img:'elec_elec',
+    description:'ターン終了時固定ダメージ\nターン終了時、確率で他の味方に伝染する\nあと確率で麻痺のデバフを自身に付与します\n帯電・帯電ってなんだよ',
+    //ターン終了時n1ダメージ、n2%の確率で他の味方に伝染
+    lvs:[
+      {elec:10, spread:20, palsy:10},
+      {elec:20, spread:35, palsy:25},
+      {elec:30, spread:50, palsy:33},
+      {elec:45, spread:80, palsy:50},
+      {elec:60, spread:99, palsy:67},
+      {elec:80, spread:100, palsy:100},
+    ],
+    max:6
   },
   'injury':{
     name:'injury',
+    jpnm:'傷口',
     type:'debuff',
-    kind:'turn',
-    addable:0,
+    kind:'fixe',
+    dot:'injury',
     img:'injury',
-    description:'行動時固定ダメージ。\n連続行動ビルドに大打撃',
-    //ターン終了時xダメージ
-    effect:{
-      'injury':12
-    }
+    description:'攻撃毎に固定ダメージ。\n連続攻撃/行動ビルドに大打撃\n私はこのデバフが最も嫌いです。まぢ無理',
+    //攻撃毎にnダメージ
+    lvs:[
+      {injury:10},
+      {injury:25},
+      {injury:40},
+      {injury:55},
+    ],
+    max:4
   },
+  'injury_gore':{
+    name:'injury_gore',
+    jpnm:'裂痕', //れっこん..ほぼ造語。中国語にはあるらしい
+    type:'debuff',
+    kind:'fixe',
+    dot:'injury',
+    img:'injury_gore',
+    description:'行動時固定ダメージ。\nあと被回復量が半減します。\nさっさと解除せんと結構やばいです',
+    //攻撃毎にnダメージ
+    lvs:[
+      {injury:25},
+      {injury:40},
+      {injury:55},
+      {injury:70},
+    ],
+    max:4
+  },
+
   'freeze':{
     name:'freeze',
+    jpnm:'氷結', //レモンサワーじゃないです
     type:'handle',
-    kind:'turn',
-    addable:0,
+    kind:'fixe',
     img:'freeze',
-    description:'凍っている状態。これ燃やされたら解除みたいにしたい',
-    //1/xの確率で解除
+    description:'凍っている状態。\nターン開始時、n%の確率で解除されます\n炎属性の攻撃を受けても解除できます',
+    // n/100の確率で解除
+    lvs:[
+      {freeze:75},
+      {freeze:67},
+      {freeze:50},
+      {freeze:33},
+      {freeze:20},
+      {freeze:5},
+    ],
+    max:5
+  },
+  'freeze_blue':{
+    name:'freeze_blue',
+    jpnm:'凍結', //blueの真意に気づけるかな〜〜？？
+    type:'handle',
+    kind:'fixe',
+    img:'freeze_blue',
+    description:'凍結されている状態。\nターン開始時、n%の確率で解除されます\n炎攻撃を受けても解除不可です',
+    // n/100の確率で解除
+    lvs:[
+      {freeze:67},
+      {freeze:50},
+      {freeze:33},
+      {freeze:20},
+      {freeze:5},
+      {freeze:1},
+    ],
+    max:6
+  },
+  'freeze_eternal':{
+    name:'freeze_eternal',
+    jpnm:'エターナルフリーズ',
+    type:'handle',
+    kind:'fixe',
+    img:'freeze_eternal',
+    description:'エターナルフリーズ！！', //どうあがいても解除不可です。この先、デバフ解除が有効だ
+    // n/100の確率で解除
+    lvs:[
+      {freeze:0}
+    ],
+    max:1
   },
   'palsy':{
     name:'palsy',
+    jpnm:'麻痺',
     type:'handle',
-    kind:'turn',
-    addable:0,
+    kind:'fixe',
     img:'palsy',
     description:'麻痺ですね。これ好き',
-    //1/xの確率で行動不可
+    // n/100の確率で行動不可
+    lvs:[
+      {palsy:20},
+      {palsy:25},
+      {palsy:33},
+      {palsy:50},
+      {palsy:67},
+      {palsy:99},
+    ],
+    max:6
   },
   'stan':{
     name:'stan',
+    jpnm:'スタン',
     type:'handle',
-    kind:'turn',
-    addable:0,
+    kind:'fixe',
     img:'stan',
-    description:'スタンなうです。おつおつお〜',
+    description:'スタンです。\n内部処理的には麻痺の延長',
+    // n/100の確率で行動不可
+    lvs:[
+      {palsy:100}
+    ],
+    max:1
   },
   'skip':{
     name:'skip',
+    jpnm:'スキップ',
     type:'handle',
-    kind:'turn',
-    addable:0,
+    kind:'fixe',
     img:'skip',
-    description:'はいお前スキップ〜〜ww状態です。\nぴえん超えてだっさぁ',
+    description:'はいお前スキップ〜〜笑笑\nぴえん超えてだっさぁですね\nえ？違う？',
   },
-  'sleep':{
-    name:'sleep',
+  'sleepiness':{
+    name:'sleepiness',
+    jpnm:'睡魔',
     type:'handle',
-    kind:'turn',
-    addable:0,
-    img:'sleep',
-    description:'睡眠ですね...いやね....ちょ..っと......w',
+    kind:'fixe',
+    img:'sleepiness',
+    description:'睡魔..微熱魔じゃないです\nターン終了時にsleepyをnstack増加さかせます',
+    // sleepy:sleepyをnstack増加
+    lvs:[
+      {sleepy:5},
+      {sleepy:10},
+      {sleepy:20},
+      {sleepy:25},
+      {sleepy:50},
+      {sleepy:100},
+    ],
+    max:6
   },
+  'sleepy':{
+    name:'sleepy',
+    jpnm:'眠気',
+    type:'handle',
+    kind:'fixe',
+    img:'sleepy',
+    description:'眠くなってる状態..です....\n100stack到達でsleepingに変化します....\n変化後のsleepingのLvはsleepinessに寄りけりです\nあと、行動時に確率でsleepyをnstack減少できます....',
+    lvs:[ //-と捉へよ
+      {sleepy:25},
+      {sleepy:20},
+      {sleepy:15},
+      {sleepy:10},
+      {sleepy:5},
+      {sleepy:1},
+    ]
+  },
+  'sleeping':{
+    name:'sleeping',
+    jpnm:'眠',
+    type:'handle',
+    kind:'fixe',
+    img:'sleeping',
+    description:'攻撃されると..ちょっと....起きます......\nzzz...',
+    lvs:[
+      {sleepy:50},
+      {sleepy:65},
+      {sleepy:80},
+      {sleepy:90},
+      {sleepy:95},
+      {sleepy:100},
+    ],
+  },
+  //この3つ、どれかは固定値にした方がいいかも。これだとLv4, 5が1眠後一緒になる。
+  /*
+    sleepy → sleeping 案
+
+    ・sleepiness（睡魔）[stack]-[デバフ解除]
+    ターン終了時に、sleepyをnstack増加
+
+    ・sleepy（眠気）[stack]-[戦闘終了時解消]
+    行動時にn1%の確率でn2stack減少（眠気の覚め）
+    100stack到達でこのbuffを消去、sleepingを追加。Lvはsleepiness依存
+
+    ・sleeping（睡眠）[stack]-[戦闘終了時解消]
+    行動不能100%
+    ダメージ受けたらn1%の確率で「sleepy(n2stack)に戻る」
+    → これなら"直接解除"じゃないし、眠気が残るから再び寝落ちしやすい
+
+    ↑これ、なんかのボス専用にした方がいいか？..否、それだとふつーのゲームと同じ。普遍を着飾っていこう
+  */
   'anger':{
     name:'anger',
     type:'handle',
-    kind:'stack',
-    addable:0,
+    kind:'fixe',
     img:'anger',
-    description:'すごいイラつかせてくる敵..だからメガさんとかと相性良さそう\nで避けられてさらに煽られるみたいな',
+    description:'すごいイラつかせてくる敵..だからメガさんとかと相性良さそう\nで避けられてさらに煽られるみたいな', //メガさん == メスガキさん
     // stack/100の確率で殴りかかる
   },
+
   'onslime':{
     name:'onslime',
     type:'unique',
-    kind:'turn',
-    addable:0,
+    kind:'fixe',
     img:'onslime',
     description:'スライムが体に粘りついている状態です。やばいね(行動不可)',
-    lv:{
+    lvs:{
       1:1,
     }
   },
   'stickyslime':{
     name:'stickyslime',
     type:'unique',
-    kind:'turn',
-    addable:0,
+    kind:'fixe',
+    
     img:'stickyslime',
     description:'スライムがくっついているおかげで行動するとダメージを受けます',
     //行動時ダメージ(固定)
@@ -412,16 +654,16 @@ let Buffs = {
   'letsthrow':{
     name:'letsthrow',
     type:'unique',
-    kind:'turn',
-    addable:0,
+    kind:'fixe',
+    
     img:'wrench',
     description:'レンチを投げる準備をしている状態。次の攻撃与ダメ2倍',
   },
   'gambling':{
     name:'gambling',
     type:'unique',
-    kind:'turn',
-    addable:0,
+    kind:'fixe',
+    
     img:'gamble',
     description:'次の攻撃が0,2,4倍になる。これぞ醍醐味..ってやつ？',
   }
