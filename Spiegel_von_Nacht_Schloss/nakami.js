@@ -1,5 +1,351 @@
-//#region データとか
+//#region komagome
+function delay(ms){
+  return new Promise(resolve=>setTimeout(resolve,ms));
+};
+async function nicoText(mes){
+  const newDiv = document.createElement('div');
+  newDiv.textContent = mes;
+  newDiv.className = 'nicotext';
+  newDiv.style.top = `calc(${random(0, 100)}vh - 20px)`;
+  newDiv.style.right = '0px';
+  document.querySelector('body').appendChild(newDiv);
+
+  requestAnimationFrame(() => {
+  newDiv.style.right = `${window.innerWidth + newDiv.offsetWidth}px`; //なんか電車の問題解いてるみたいだね
+  });
+  
+  await delay(2000); 
+  newDiv.remove();
+};
+function kaijou(num){
+  if(num == 0) return 0;
+  if(num == 1) return 1;
+  return num * kaijou(num - 1);
+}
+function arraySelect(array){
+  let select = Math.floor(Math.random()*array.length);
+  return array[select];
+};
+function arrayShuffle(array) {
+  for(let i = array.length - 1; i > 0; i--) {
+  const j = Math.floor(Math.random() * (i + 1));
+  [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+};
+function arraySize(array){
+  let res = new Set(array).size;
+  return res;
+};
+function arrayCount(array){
+  const counts = {};
+  for (let value of array) {
+  counts[value] = (counts[value] || 0) + 1;
+  }
+  return counts;
+}
+function arrayMult(array){
+  return array.reduce((a, v) => a * v, 1);
+}
+function arrayGacha(array,probability){
+  if(array.length !== probability.length) throw new Error("長さがあってないっす！先輩、ちゃんとチェックした方がいいっすよ〜？");
+  const total = probability.reduce((sum, p) => sum + p, 0);
+  let random = Math.random() * total;
+  for (let i = 0; i < array.length; i++) {
+    if(random < probability[i]) return array[i];
+    random -= probability[i];
+  }
+};
+function hask(obj, key){
+   let res = obj.hasOwnProperty(key);
+   res = res ? 1 : 0;
+   return res;
+}
+function copy(obj){
+  if(obj === null || typeof obj !== 'object') return obj; // 基本型はそのまま返す
+  if(Array.isArray(obj)) return obj.map(copy); // 配列の各要素を再帰コピー
+  const result = {};
+  for(const key in obj){
+    if (obj.hasOwnProperty(key)) result[key] = copy(obj[key]); // オブジェクトのプロパティを再帰コピー
+  }
+  return result;
+};
+function probability(num){
+  return Math.random()*100 <= num;
+  //例:num == 20 → randomが20以内ならtrue,elseならfalseを返す
+};
+function random(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+function anagramSaySay(text, loop = 10, bet = '<br>'){
+  let menjo = 0;
+  let len = text.length;
+  if(len < 4) menjo = 1, console.log('長さが3以下なんで最大6っす');
+  
+  let optout = text.split('');
+  let optcou = arrayCount(optout);
+  let optvals = [];
+  for(a of Object.keys(optcou)){
+    let b = optcou[a];
+    b = kaijou(b);
+    optvals.push(b);
+  }
+  let optmat = arrayMult(optvals);
+  let cal = (kaijou(len) / optmat) - 1;
+
+  let loopen = loop;
+  console.log(`総数:${cal} 回数:${loopen}`);
+  if(cal < loopen) menjo = 1;
+  
+  let reses = [];
+  while(loopen > 0){
+    loopen -= 1;
+    let res = arrayShuffle(optout).join(''); 
+    if(reses.includes(res)){loopen += 1; continue}
+    
+    if(res == text && !menjo){loopen += 1; continue;}
+
+    if(res == text && menjo && reses.length < cal){loopen += 1; continue}
+    else if(res == text && menjo) res = '[重複エラー]';
+
+    reses.push(res);
+  }
+  
+  return reses.join(bet);
+}
+function setLocalStorage(name, value) {
+  localStorage.setItem(name, value || "");
+}
+function getLocalStorage(name) {
+  return localStorage.getItem(name);
+}
+async function error(){
+  addtext('errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
+  await delay(2000);
+  window.open('about:blank', '_self').close();
+}
+function hoshoku(color) {
+  color = color.replace(/^#/, ''); // #付きなら取る
+
+  if(color.length != 6) return console.log('カラーコードは6、ですよ〜？楽しないでくださいね〜♪')
+
+  // RGB分解
+  const r = parseInt(color.slice(0, 2), 16);
+  const g = parseInt(color.slice(2, 4), 16);
+  const b = parseInt(color.slice(4, 6), 16);
+
+  // 補色：255から引く
+  const compR = (255 - r).toString(16).padStart(2, '0');
+  const compG = (255 - g).toString(16).padStart(2, '0');
+  const compB = (255 - b).toString(16).padStart(2, '0');
+
+  return `#${compR}${compG}${compB}`;
+}
 //#endregion
+//#region log&text
+let textDiv = document.querySelector('#text');
+let autoDelay = 1;
+let skipText = false; // スキップフラグ
+let clearText = false; // テキスト消去フラグ
+let textShowing = 0;
+
+function colorcheck(rawtext) {
+  const text = [];
+  let isRed = false; // ** で囲まれた部分かどうか
+  let isPink = false; // && で囲まれた部分かどうか
+  let isBlue = false; // ^^ で囲まれた部分かどうか
+
+  for(let i = 0; i < rawtext.length; i++){
+    if(rawtext[i] == "*" && rawtext[i + 1] == "*"){
+      isRed = !isRed; // 状態を切り替える
+      i++; // 次の * をスキップ
+    }else if(rawtext[i] == "&" && rawtext[i + 1] == "&"){
+      isPink = !isPink;
+      i++; // 次の & をスキップ
+    }else if(rawtext[i] == "^" && rawtext[i + 1] == "^"){
+      isBlue = !isBlue;
+      i++;
+    }else{
+      let color = null;
+      if(isRed) color = 'red';
+      if(isPink) color = 'pink';
+      if(isBlue) color = 'blue';
+      text.push({
+          char: rawtext[i],
+          color: color
+      });
+    }
+  }
+  return text;
+}
+
+let queueAddtext = [];
+let loopAddtext = 0;
+async function waitforAddtext(){
+  let len = queueAddtext.length;
+
+  if(len == 0) loopAddtext = 0;
+  else loopAddtext = 1;
+
+  if(!loopAddtext) return console.log('loopがないんでしゅーりょー');
+  requestAnimationFrame(waitforAddtext);
+  
+  if(textShowing) return console.log('文字表示されたんでスキップ');
+  
+  let raw = queueAddtext.shift();
+  console.log(`${raw}を送信します`);
+  console.log(`残り: (${len - 1})[${queueAddtext}]`);
+  await addtext(raw);
+}
+async function addtext(raw){
+  if(!raw) return console.log('「内容が？内容が〜〜？ないよ〜〜〜つってwwww直せ」');
+
+  if(textShowing){
+    queueAddtext.push(raw);
+
+    if(!loopAddtext) waitforAddtext();
+    return;
+  }
+  
+  textShowing = 1;
+  text = colorcheck(raw);
+  textDiv.innerHTML = ""; // 中身をリセット
+  textDiv.style.display = "block"; // 表示
+  let index = 0;
+  clearText = false; // 消去フラグをリセット
+
+  return new Promise((resolve) => {
+    async function type(){
+      if(index < text.length){
+        if(skipText){
+          // スキップ処理
+          while(index < text.length){
+            const span = document.createElement("span");
+            span.textContent = text[index].char;
+            if(text[index].color) span.classList.add(`color-${text[index].color}`);
+            textDiv.appendChild(span);
+            index++;
+          }
+          index = text.length; // 全ての文字を表示済みにする
+          skipText = false;
+          setTimeout(type, 10);
+        }else{
+          // 通常の文字表示
+          const span = document.createElement("span");
+          span.textContent = text[index].char;
+          if (text[index].color) span.classList.add(`color-${text[index].color}`);
+          textDiv.appendChild(span);
+
+          index++;
+          setTimeout(type, 80); // 次の文字を表示する間隔
+        }
+      } else {
+        addlog(textDiv.innerHTML);
+        const waitTime = autoDelay * 1000;
+        const timeout = new Promise(resolve => setTimeout(resolve, waitTime));
+        const userAction = new Promise(resolve => {
+          function waitToClear(event){
+            if(event.type === 'click' || event.key === 'z' || event.key === 'Enter'){
+              document.removeEventListener('click', waitToClear);
+              document.removeEventListener('keydown', waitToClear);
+              resolve();
+            }
+          }
+          document.addEventListener('click', waitToClear);
+          document.addEventListener('keydown', waitToClear);
+        });
+
+        Promise.race([timeout, userAction]).then(() => {
+          textDiv.textContent = "";
+          textDiv.style.display = "none";
+          clearText = true;
+          skipText = false
+          textShowing = 0;
+          resolve('end'); // Promiseを解決
+        });
+      }
+    }
+    type();
+  });
+}
+document.addEventListener('keydown', (event) => {
+  if(event.key === 'z' || event.key === 'Enter') skipText = true;
+});
+
+document.addEventListener('keyup', (event) => {
+  if(event.key === 'z' || event.key === 'Enter') skipText = false;
+});
+
+document.addEventListener('click', () => {
+  skipText = true;
+  setTimeout(() => skipText = false, 50); // 一時的にスキップを有効化
+});
+
+let logOOmoto = document.querySelector('#log');
+let log = document.querySelector('#log .log');
+let logOpener = document.querySelector('#log .opener');
+let log_open = (code) => {
+  if((logOOmoto.style.right == '-300px' || code == 'o') && code != 'c'){
+    logOOmoto.style.right = '0px';
+    logOpener.textContent = '>';
+  }else{
+    logOOmoto.style.right = '-300px';
+    logOpener.textContent = '<';
+  }
+}
+logOpener.addEventListener('click', log_open);
+
+function addlog(text){
+  log.innerHTML += text + '<br>';
+  log.scrollTop = log.scrollHeight;
+}
+//#endregion
+//#region description
+let movableDescription = document.getElementById('movableDescription');
+document.addEventListener('mousemove', (e) => {
+  movableDescription.style.left = `${e.clientX + 10}px`;
+  movableDescription.style.top = `${e.clientY + 10}px`;
+});
+document.addEventListener('mouseover', (e) => {
+  const descTarget = e.target.closest('[data-description]');
+  if (descTarget) {
+      const desc = descTarget.dataset.description;
+      movableDescription.innerHTML = desc;
+      movableDescription.style.display = 'block';
+  }
+});
+document.addEventListener('mouseout', (e) => {
+  const descTarget = e.target.closest('[data-description]');
+  if (descTarget) {
+      movableDescription.innerHTML = '';
+      movableDescription.style.display = 'none';
+  }
+});
+//#endregion
+//#region drag
+document.addEventListener('mousedown', e => {
+    // const descTarget = e.target.closest('[data-description]');
+    let div = e.target;
+    if(!div.classList.contains('draggable')) return;
+    offsetX = e.clientX - div.getBoundingClientRect().left;
+    offsetY = e.clientY - div.getBoundingClientRect().top;
+    
+    function onMouseMove(e) {
+        div.style.left = `${e.clientX - offsetX}px`;
+        div.style.top = `${e.clientY - offsetY}px`;
+    }
+
+    function onMouseUp() {
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+    }
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+});
+//#endregion
+
 //#region ステージ構成とか
 let whatHappend = {
   normalEnemy:{
@@ -124,7 +470,7 @@ function SetStageBar(){
     `;
   }
 }
-SetStageBar();
+
 function LetsGoBattle(num,code){
   let irankamo = num;
   irankamo += 1;//ちゃんと道順作るってなったら道程要員になりそう
@@ -148,7 +494,7 @@ function LetsGoBattle(num,code){
   document.getElementById('StageButton').style.display = 'none';
 }
 async function EnemyAppear(num){
-  document.getElementById('GameArea').style.display = 'block';
+  document.getElementById('gameArea').style.display = 'block';
   EnemyNameDeside(num);
   await addtext(enemyname+'が現れた！');
   logOpen();
@@ -338,272 +684,7 @@ function buffclear(){
   tekiou();
 }
 //#endregion
-//#region 扱いやすい子達
-function delay(ms) {return new Promise(resolve => setTimeout(resolve, ms));}
-function tekiou(){
-  Object.keys(humans).forEach(cam =>{
-    let human = humans[cam]
-    let humanDiv = document.getElementById(cam);
 
-    humanDiv.querySelector(`.name`).textContent = human.name
-    if(human.shield !== 0)humanDiv.querySelector('.shield').style.display = 'none';
-      humanDiv.querySelector(`.shield`).textContent = human.shield;
-    humanDiv.querySelector('.health').textContent = human.health;
-    humanDiv.querySelector('.maxhealth').textContent = `/${human.maxhealth}`;
-      humanDiv.querySelector('.healthBar .inner').style.width = `${(human.health / human.maxhealth)*100}%`;
-    if(human.buff.id !== 'none')humanDiv.querySelector('.buff .appear').style.display = 'none';
-      humanDiv.querySelector('.buff .appear .img').src = `assets/buffs/${human.buff.id}`;
-      humanDiv.querySelector('.buff .appear .time').textContent = human.buff.time ?? 0;
-    if(human.debuff.id !== 'none')humanDiv.querySelector('.debuff .appear').style.display = 'none';
-      humanDiv.querySelector('.debuff .appear .img').src = `assets/buffs/${human.debuff.id}`;
-      humanDiv.querySelector('.debuff .appear .time').textContent = human.debuff.time ?? 0;
-    
-
-    document.getElementById(``).innerHTML = `
-    <b>${humans[cam][me].name}</b><br>
-    <span class='shield'>${humans[cam][me][me].shield}</span> HP:${humans[cam][me].health}/${humans[cam][me].maxhealth}<br>
-    <span class='buff'><img class="buff-img" src="assets/buffs/${humans[cam][me].buff.g.id}.png"/>${humans[cam][me].buff.g.time}</span>|<span class='debuff'>${humans[cam][me].buff.b.name}</span> ${humans[cam][me].buff.b.time}
-    `
-  })
-}
-function copy(obj) {
-  if (obj === null || typeof obj !== 'object') {
-    return obj; // 基本型はそのまま返す
-  }
-  if (Array.isArray(obj)) {
-    return obj.map(copy); // 配列の各要素を再帰コピー
-  }
-  const result = {};
-  for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      result[key] = copy(obj[key]); // オブジェクトのプロパティを再帰コピー
-    }
-  }
-  return result;
-}
-
-function arrayRandom(array){
-  return array[Math.floor(Math.random() * array.length)];
-}
-function arrayShuffle(array){
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
-
-document.addEventListener('mousemove', (e) => {
-  const HasDescription = document.getElementById('movabledescription');
-  HasDescription.style.left = `${e.clientX + 10}px`;
-  HasDescription.style.top = `${e.clientY + 10}px`;
-});
-document.addEventListener('mouseover', (e) => {
-  if(e.target.classList.contains('hasd')){
-    const movabledescription = e.target.dataset.description;
-    document.getElementById('movabledescription').innerHTML = movabledescription;
-    document.getElementById('movabledescription').style.display = 'block';
-  }
-});
-document.addEventListener('mouseout', (e) => {
-  if(e.target.classList.contains('hasd')){
-    document.getElementById('movabledescription').innerHTML = '';
-    document.getElementById('movabledescription').style.display = 'none';
-  }
-});
-
-//#endregion
-//#region log&text
-let textDiv = document.getElementById('text');
-let autoDelay = 1;
-let skipText = false; // スキップフラグ
-let clearText = false; // テキスト消去フラグ
-
-function colorcheck(rawtext) {
-  const text = [];
-  let isRed = false; // ** で囲まれた部分かどうか
-  let isPink = false; // && で囲まれた部分かどうか
-  let isBlue = false;
-
-  for (let i = 0; i < rawtext.length; i++) {
-    if(rawtext[i] === "*" && rawtext[i + 1] === "*"){
-      isRed = !isRed; // 状態を切り替える
-      i++; // 次の * をスキップ
-    }else if(rawtext[i] === "&" && rawtext[i + 1] === "&"){
-      isPink = !isPink;
-      i++; // 次の & をスキップ
-    }else if(rawtext[i] === "^" && rawtext[i + 1] === "^"){
-      isBlue = !isBlue;
-      i++;
-    }else{
-      text.push({ char: rawtext[i], color: isRed ? "red" : isPink ? "pink" : isBlue ? "blue" : null });
-    }
-  }
-  return text;
-}
-
-async function addtext(text) {
-  text = colorcheck(text);
-  textDiv.innerHTML = ""; // 中身をリセット
-  textDiv.style.display = "block"; // 表示
-  let index = 0;
-  clearText = false; // 消去フラグをリセット
-
-  return new Promise((resolve) => {
-    async function type() {
-      if (index < text.length) {
-        if (skipText) {
-          // スキップ処理
-          while (index < text.length) {
-            const span = document.createElement("span");
-            span.textContent = text[index].char;
-            if (text[index].color) {
-              span.classList.add(`color-${text[index].color}`);
-            }
-            textDiv.appendChild(span);
-            index++;
-          }
-          index = text.length; // 全ての文字を表示済みにする
-          skipText = false;
-          setTimeout(type, 10);
-        } else {
-          // 通常の文字表示
-          const span = document.createElement("span");
-          span.textContent = text[index].char;
-          if (text[index].color) {
-            span.classList.add(`color-${text[index].color}`);
-          }
-          textDiv.appendChild(span);
-
-          index++;
-          setTimeout(type, 80); // 次の文字を表示する間隔
-        }
-      } else {
-        addlog(textDiv.innerHTML);
-        const waitTime = autoDelay * 1000;
-        const timeout = new Promise(resolve => setTimeout(resolve, waitTime));
-        const userAction = new Promise(resolve => {
-          function waitToClear(event) {
-            if (event.type === 'click' || event.key === 'z' || event.key === 'Enter') {
-              document.removeEventListener('click', waitToClear);
-              document.removeEventListener('keydown', waitToClear);
-              resolve();
-            }
-          }
-          document.addEventListener('click', waitToClear);
-          document.addEventListener('keydown', waitToClear);
-        });
-
-        Promise.race([timeout, userAction]).then(() => {
-          textDiv.textContent = "";
-          textDiv.style.display = "none";
-          clearText = true;
-          skipText = false
-          resolve('end'); // Promiseを解決
-        });
-      }
-    }
-    type();
-  });
-}
-
-document.addEventListener('keydown', (event) => {
-  if (event.key === 'z' || event.key === 'Enter') {
-    skipText = true;
-  }
-});
-
-document.addEventListener('keyup', (event) => {
-  if (event.key === 'z' || event.key === 'Enter') {
-    skipText = false;
-  }
-});
-
-document.addEventListener('click', () => {
-  skipText = true;
-  setTimeout(() => skipText = false, 50); // 一時的にスキップを有効化
-});
-
-let logOOmoto = document.querySelector('#log');
-let log = document.querySelector('#log .log');
-let logOpener = document.querySelector('#log .opener');
-logOpener.addEventListener('click', function(){
-   if(logOOmoto.style.right == '-300px'){
-      logOOmoto.style.right = '0px';
-      logOpener.textContent = '>';
-   }else{
-      logOOmoto.style.right = '-300px';
-      logOpener.textContent = '<';
-   }
-});
-
-function logOpen(){
-  logOOmoto.style.right = '0px';
-  logOpener.textContent = '>';
-}
-function logClose(){
-  logOOmoto.style.right = '-300px';
-  logOpener.textContent = '<';
-}
-
-
-function addlog(text){
-  logDiv.innerHTML += text + '<br>';
-  logDiv.scrollTop = logDiv.scrollHeight;
-}
-
-//#endregion
-//#region sideMenu
-const sideMenu = document.querySelector('#sideMenu');
-const menuToggle = document.querySelector('#menuToggle');
-menuToggle.addEventListener('click', () => {
-  if(sideMenu.style.left == '0px'){
-    sideMenu.style.left = '-265px';
-  }else{
-    sideMenu.style.left = '0px';
-  }
-});
-//#endregion
-//#region Notice
-const noticeButton = document.querySelector('#sideMenu .forgame .notice');
-const noticeMain = document.querySelector('#notice');
-const noticeList = document.querySelector('#notice .list');
-const noticeShow = document.querySelector('#notice .show');
-const noticeShowX = document.querySelector('#notice .x');
-const noticeShowBack = document.querySelector('#notice .back');
-const noticeShowTitle = document.querySelector('#notice .show .title');
-const noticeShowDate = document.querySelector('#notice .show .date');
-const noticeShowBody = document.querySelector('#notice .show .body');
-
-noticeButton.addEventListener('click', event => {
-  gameControl = 0;
-  noticeMain.style.display = 'block';
-  sideMenu.style.left = '-265px';
-
-  noticeList.innerHTML = '';
-  Object.keys(noticeData).forEach(key => {
-    let item = document.createElement('div');
-    item.className = 'item';
-    item.innerText = noticeData[key].title;
-    item.setAttribute('data-id', key);
-    item.addEventListener('click', () => {
-      noticeShowTitle.innerText = noticeData[key].title;
-      noticeShowDate.innerText = noticeData[key].date;
-      noticeShowBody.innerText = noticeData[key].body;
-      noticeList.style.display = 'none';
-      noticeShow.style.display = 'block';
-    })
-    noticeList.appendChild(item);
-  });
-})
-noticeShowX.addEventListener('click', event => {
-  noticeMain.style.display = 'none';
-});
-noticeShowBack.addEventListener('click', event => {
-  noticeShow.style.display = 'none';
-  noticeList.style.display = 'block';
-});
-//#endregion
 
 //#region add/remove Card
 function cardAdd(ids, lv){
@@ -872,7 +953,7 @@ function Phasereset() {
 }
 //#endregion
 //#region エフェクトの動き
-const canvas = document.getElementById('ZentaiMiruo');
+const canvas = document.getElementById('canva');
 const ctx = canvas.getContext('2d');
 const EffectImagesKorehaMemoDesu = [
   'thief',''
