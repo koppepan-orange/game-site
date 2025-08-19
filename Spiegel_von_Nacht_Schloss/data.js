@@ -1,4 +1,18 @@
-const Cards = {
+let mapItems = {
+  //なのです口調のサポーターとかつけたいね〜〜
+  'start':{
+    id: 'start',
+    name: 'すた〜と',
+    desc: 'スタート地点なのです'
+  },
+  'enemy':{
+    id: 'enemy',
+    name: '敵',
+    desc: '敵がいる場所なのです'
+  }
+}
+
+let Cards = {
   'none':{
     id:'none',
     name: 'none',
@@ -465,17 +479,32 @@ const Cards = {
   }
 };
 
-let noticeData = [
-  {
-    date: '2025/3/21',
-    title: 'お知らせ機能、ついに登場〜☆',
-    description: "お知らせ機能を追加したよって話\n中身ほぼゼロ\nブブゼラ",
-    body: "おちゃめ機能つってね\nガハハ\n笑え"
-  },
-  {
-    date: '2025/3/21',
-    title: '更新遅いかもって話',
-    description: "一人身だからね、仕方ないのです",
-    body: "タイトルの通り..って感じですが\n更新頻度が遅いです！！ってお話を\n私今clicker-of-mugenメインで作ってて\nなのでそっち見てくれよな！！って話でした\nこの話終わり"
-  },
-]
+let Buffs = {
+   //こっからbuff
+   'fang':{
+      id:'fang',
+      name:'吸血の牙',
+      type:'buff',
+      description:'相手の体力を減らした時、自身の体力を4回復する',
+   },
+
+   //こっからdebuff
+   'poison':{
+      id:'poison',
+      name:'毒',
+      type:'debuff',
+      description:'ターン最後に自身のの体力を2減らす',
+   },
+   'palsy':{
+      id:'palsy',
+      name:'麻痺',
+      type:'debuff',
+      description:'ターン最後に自身のバフの持続時間を1減らす',
+   },
+   'none':{
+      id:'none',
+      name:'There is nothing',
+      type:'debuff',
+      description:'硬化は "何も" ない。ええ、本当に', //勝ち気要員よね ワンチャンぶっ壊れるかも
+   }
+}

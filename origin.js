@@ -63,21 +63,27 @@ function hask(obj, key){
    res = res ? 1 : 0;
    return res;
 }
-function copy(obj){
-    if (obj === null || typeof obj !== 'object') {
-    return obj; // 基本型はそのまま返す
+function copy(moto) {
+    if(Array.isArray(moto)){
+        let arr = [];
+        for (let i = 0; i < moto.length; i++) {
+            arr.push(copy(moto[i]));
+        }
+        return arr;
     }
-    if (Array.isArray(obj)) {
-    return obj.map(copy); // 配列の各要素を再帰コピー
+    else if(moto != null && typeof moto == 'object'){
+        let obj = {};
+        for (let key in moto) {
+            if (moto.hasOwnProperty(key)) {
+            obj[key] = copy(moto[key]);
+            }
+        }
+        return obj;
     }
-    const result = {};
-    for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
-        result[key] = copy(obj[key]); // オブジェクトのプロパティを再帰コピー
+    else {
+        return moto;
     }
-    }
-    return result;
-};
+}
 function probability(num){
     return Math.random()*100 <= num;
     //例:num == 20 → randomが20以内ならtrue,elseならfalseを返す

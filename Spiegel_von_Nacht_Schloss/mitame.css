@@ -116,7 +116,7 @@ html{
 
 /* こっから今回の */
 body{
-  background-color: #ffffff;
+  background-color: #363636;
   overflow: hidden;
   user-select: none;
 }
@@ -135,11 +135,9 @@ body{
 }
 
 #gameArea{
-  display: none;
+  display: block;
   width:80%;
   height: 550px;
-  border: 2px solid #eee;
-  background-color: #363636;
   opacity: 1;
   padding: 12px;
 }
@@ -147,7 +145,7 @@ body{
   width: 60%;
   margin: 0 auto;
   border: 2px solid #000000;
-  background-color: #fff;
+  background-color: #ffffff;
   padding: 20px;
   padding-left: 5%;
   padding-right:5%;
@@ -162,7 +160,7 @@ body{
   width: 80px;
   height: 100px;
   border-radius: 8px;
-  border: 1px solid #000;
+  border: 1px solid #000000;
   padding: 5px;
   text-align: center;
   z-index: 23;
@@ -175,7 +173,7 @@ body{
 }
 #NoteCardArea{
   width: 90%;
-  border: 1px solid #000;
+  border: 1px solid #000000;
   margin:0 auto;
 
 }
@@ -203,7 +201,7 @@ body{
   width: 40px!important;
   height: 55px;
   border-radius: 8px;
-  border: 1px solid #000;
+  border: 1px solid #000000;
   padding: 5px;
   text-align: center;
   font-size: 20px;
@@ -215,24 +213,13 @@ body{
   display: block;
   z-index: 23;
 }
-.none{background-color: #ddd;}
+.none{background-color: #dddddd;}
 .G{background-color: #575757!important;}
 .N{background-color: #777!important;}
 .R{background-color: #80ee80!important;}
 .SR{background-color: #ffff6b!important;}
 .SSR{background-color: #f64bff!important;}
 .UR{background-color: #ff4060!important;}
-
-.r0{background-color: #dddddd!important;}
-.r1{background-color: #777777!important;}
-.r2{background-color: #575757!important;}
-.r3{background-color: #80ee80!important;}
-.r4{background-color: #3884ff!important;}
-.r5{background-color: #ffff91!important;}
-.r6{background-color: #ffbbf9!important;}
-.r7{background-color: #f64bff!important;}
-.r8{background-color: #d36dff!important;}
-.r9{background-color: #ff4060!important;}
 
 
 #PandEsUI {
@@ -339,7 +326,7 @@ body{
   left:25%;
   right:25%;
   background-color:#777;
-  border:2px solid #000;
+  border:2px solid #000000;
   z-index: 24;
 }
 .hidden {display: none !important;}
