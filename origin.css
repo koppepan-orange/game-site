@@ -1,3 +1,26 @@
+html{
+    margin: -8px;
+}
+body{
+    user-select: none;
+}
+
+:focus{
+    outline: none;
+}
+::-webkit-scrollbar{
+    display: none;
+}
+
+.row{
+    display: flex;
+    flex-direction: row;
+}
+.column{
+    display: flex;
+    flex-direction: column;
+}
+
 /*nicotext*/
 .nicotext{
     position: fixed;

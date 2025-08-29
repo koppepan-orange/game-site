@@ -48,14 +48,12 @@ function arrayMult(array){
     return array.reduce((a, v) => a * v, 1);
 }
 function arrayGacha(array,probability){
-    if(array.length !== probability.length){throw new Error("長さがあってないっす！先輩、ちゃんとチェックした方がいいっすよ〜？");}
+    if(array.length != probability.length) throw new Error("長さがあってないっす！先輩、ちゃんとチェックした方がいいっすよ〜？");
     const total = probability.reduce((sum, p) => sum + p, 0);
     let random = Math.random() * total;
     for (let i = 0; i < array.length; i++) {
-    if(random < probability[i]){
-    return array[i];
-    }
-    random -= probability[i];
+        if(random < probability[i]) return array[i];
+        random -= probability[i];
     }
 };
 function hask(obj, key){
@@ -101,9 +99,9 @@ function anagramSaySay(text, loop = 10, bet = '<br>'){
     let optcou = arrayCount(optout);
     let optvals = [];
     for(a of Object.keys(optcou)){
-    let b = optcou[a];
-    b = kaijou(b);
-    optvals.push(b);
+        let b = optcou[a];
+        b = kaijou(b);
+        optvals.push(b);
     }
     let optmat = arrayMult(optvals);
     let cal = (kaijou(len) / optmat) - 1;
@@ -114,16 +112,16 @@ function anagramSaySay(text, loop = 10, bet = '<br>'){
     
     let reses = [];
     while(loopen > 0){
-    loopen -= 1;
-    let res = arrayShuffle(optout).join(''); 
-    if(reses.includes(res)){loopen += 1; continue}
-    
-    if(res == text && !menjo){loopen += 1; continue;}
+        loopen -= 1;
+        let res = arrayShuffle(optout).join(''); 
+        if(reses.includes(res)){loopen += 1; continue}
+        
+        if(res == text && !menjo){loopen += 1; continue;}
 
-    if(res == text && menjo && reses.length < cal){loopen += 1; continue}
-    else if(res == text && menjo) res = '[重複エラー]';
+        if(res == text && menjo && reses.length < cal){loopen += 1; continue}
+        else if(res == text && menjo) res = '[重複エラー]';
 
-    reses.push(res);
+        reses.push(res);
     }
     
     return reses.join(bet);
@@ -134,27 +132,63 @@ function setLocalStorage(name, value) {
 function getLocalStorage(name) {
     return localStorage.getItem(name);
 }
+let r = {
+    and: function(lef, rig){
+        if(lef && rig) return 1
+        return 0
+    },
+    or: function(lef, rig){
+        if(lef || rig) return 1
+        return 0
+    },
+    xor: function(lef, rig){
+        console.log('排他的論理和発動！！')
+        let l = lef ? 1 : 0
+        let r = rig ? 1 : 0
+        if(l != r) return 1
+        return 0
+    },
+    not: function(lef){
+        if(lef) return 0
+        return 1
+    },
+    nand: function(lef, rig){
+        if(lef && rig) return 0
+        return 1
+    },
+    nor: function(lef, rig){
+        if(lef || rig) return 0
+        return 1
+    },
+    xnor: function(lef, rig){
+        console.log('逆排他的論理和発動！！')
+        let l = lef ? 1 : 0
+        let r = rig ? 1 : 0
+        if(l != r) return 0
+        return 1
+    }
+}
 async function error(){
     addtext('errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
     await delay(2000);
     window.open('about:blank', '_self').close();
 }
 function hoshoku(color) {
-  color = color.replace(/^#/, ''); // #付きなら取る
+    color = color.replace(/^#/, ''); // #付きなら取る
 
-  if(color.length != 6) return console.log('カラーコードは6、ですよ〜？楽しないでくださいね〜♪')
+    if(color.length != 6) return console.log('カラーコードは6桁、ですよ〜？楽しないでくださいね〜♪')
 
-  // RGB分解
-  const r = parseInt(color.slice(0, 2), 16);
-  const g = parseInt(color.slice(2, 4), 16);
-  const b = parseInt(color.slice(4, 6), 16);
+    // RGB分解
+    const r = parseInt(color.slice(0, 2), 16);
+    const g = parseInt(color.slice(2, 4), 16);
+    const b = parseInt(color.slice(4, 6), 16);
 
-  // 補色：255から引く
-  const compR = (255 - r).toString(16).padStart(2, '0');
-  const compG = (255 - g).toString(16).padStart(2, '0');
-  const compB = (255 - b).toString(16).padStart(2, '0');
+    // 補色：255から引く
+    const compR = (255 - r).toString(16).padStart(2, '0');
+    const compG = (255 - g).toString(16).padStart(2, '0');
+    const compB = (255 - b).toString(16).padStart(2, '0');
 
-  return `#${compR}${compG}${compB}`;
+    return `#${compR}${compG}${compB}`;
 }
 //#endregion
 //#region log&text
