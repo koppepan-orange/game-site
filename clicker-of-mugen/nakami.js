@@ -3106,6 +3106,7 @@ function BankWithdraw(code){
 
 async function damage(...arr){
    let [who, ares, value, kind, prop = []] = arr;
+   value /= 100;
 
    let hasa = (whi, name) => whi.ables.includes(name);
    let hasp = (name) => prop.includes(name);
@@ -3171,7 +3172,7 @@ async function damage(...arr){
 
       //攻撃力
       let atkval = kind == 'sh' ? atker.atk : atker.matk;
-      let dmg = (atkval * atker.power * value/100);
+      let dmg = (atkval * atker.power * value);
       if(hasp('fixed')) dmg = value;
 
       //会心
@@ -3194,6 +3195,7 @@ async function damage(...arr){
       dmg = Math.floor(dmg);
       if(defer.hp < dmg) dmg = defer.hp;
       console.log(`予測:: ${defer.hp} => ${defer.hp - dmg} | dmg:${dmg}`);
+      if(!hasp('fixed')) console.log(`dmg:: (${atkval} * ${atker.power} * ${value}) - (${defval} * ${defer.shell}) = ${dmg}`);
 
       // ~~終了~~ atker - defer ~~終了~~ //
       
@@ -3293,7 +3295,7 @@ function isCrit(who, are){
       console.log('確定会心！')
    }else{
       is = Math.random() < (lat - res) / 100;
-      console.log(`${lat - res}%...結果は${is}!!`)
+      console.log(`crit:: ${lat - res}%...結果は${is}!!`)
    }
 
    return is;
@@ -3304,6 +3306,9 @@ function isCrit(who, are){
 async function buffadd(...arr){//誰のバフ/デバフか,バフ/デバフの名前,効果時間,効果量
    let [who, are, buff, time, val] = arr;
    let newbuff = buffMold(buff, time, val);
+
+   //whoがデバフ延長を持っているなら〜的な処理をここで。
+
    are.buffs.push(newbuff);
 }
 function buffMold(buff, time, val){
@@ -3360,45 +3365,48 @@ function buffMold(buff, time, val){
 
    return newbuff;
 }
-function buffremove(tcam,target,buff){
+function buffremove(who, buff){
    //誰のバフ/デバフか,バフ/デバフの名前
-   let defer = humans[tcam][target];
-   let i = defer.buffs.findIndex(e => e.name == buff)
-   defer.buffs.splice(i,1);
+   if(!buffhas(who, buff)) return 0;
+
+   let i = who.buffs.findIndex(e => e.name == buff)
+   who.buffs.splice(i,1);
    tekiou();
+   return 1;
 }
-function buffclear(tcam,target,code){
-   let defer = humans[tcam][target];
+function buffclear(who, code){
    switch(code){
       case 'all':
-         defer.buffs = [];
+         who.buffs = [];
          break;
       case 'turn':
-         defer.buffs = defer.buffs.filter(e => e.kind != 'turn');
+         who.buffs = who.buffs.filter(e => e.kind != 'turn');
          break;
       case 'stack':
-         defer.buffs = defer.buffs.filter(e => e.kind != 'stack');
+         who.buffs = who.buffs.filter(e => e.kind != 'stack');
          break;
       case 'buffs':
-         defer.buffs = defer.buffs.filter(e => e.type == 'buffs');
+         who.buffs = who.buffs.filter(e => e.type == 'buffs');
          break;
       case 'debuffs':
-         defer.buffs = defer.buffs.filter(e => e.type == 'debuffs');
+         who.buffs = who.buffs.filter(e => e.type == 'debuffs');
          break;
       case 'handles':
-         defer.buffs = defer.buffs.filter(e => e.type == 'handles');
+         who.buffs = who.buffs.filter(e => e.type == 'handles');
          break;
       case 'uniques':
-         defer.buffs = defer.buffs.filter(e => e.type == 'uniques');
+         who.buffs = who.buffs.filter(e => e.type == 'uniques');
          break;
       default:
          console.console('codeが違ったからとりあえず同名消したけど、よかった？');
-         defer.buffs = defer.buffs.filter(e => e.name == code);
+         who.buffs = who.buffs.filter(e => e.name == code);
    }
    tekiou();
 }
-function buffhas(tcam,target,buff){
-   return humans[tcam][target].buffs.find(b => b.name === buff);
+function buffhas(who, buff){
+   if(who.buffs.find(b => b.name === buff)) return 1;
+
+   return 0;
 }
 //#endregion
 //#region QTEのやつ
@@ -3872,14 +3880,14 @@ async function NextTurnis(who, are){
          }
          //dotがないならそれは継続ダメージではない。
       }
-      if (buffhas(cam,me,'poison')){
+      if (buffhas(who, 'poison')){
          let poison = who.buffs.find(a => a.name == 'poison')
          x = Math.round(humans[cam][me].maxhp * Buffs[poison.name].lv[poison.lv]);
          humans[cam][me].hp -= x;
          if(humans[cam][me].hp < 0){humans[cam][me].hp = 0};
          await addtext(`${humans[cam][me].name}は毒で${x}のダメージ!`);
       };
-      if(buffhas(cam,me,'burn')){
+      if(buffhas(who, 'burn')){
          let burn = humans[cam][me].buffs.find(a => a.name == 'burn')
          x = Math.round(humans[cam][me].maxhp * Buffs.debuffs[burn.name].lv[burn.lv]);
          humans[cam][me].hp -= x;
@@ -3937,39 +3945,40 @@ async function NextTurnis(who, are){
 
    nowturn = bar.me[acted];
    cam = bar.cam[acted]
-
-   console.log('現在、'+cam+'の'+nowturn+'さんのターンですわ〜');
+   console.log(nowturn, cam)
+   who = humans[cam][nowturn];
+   console.log(`現在、${cam}${nowturn}さんのターンですわ〜`);
 
    if(nowturn == 't'){
       console.log('って、turretやないか〜〜〜い')
       return NextTurnis(0)
    }
 
-   if(buffhas(cam,nowturn,'onslime')){
-      if(Math.floor(Math.random() * Buffs.debuffs.onslime.lv[humans[cam][nowturn].buffs.onslime.lv]) !== 0){
-         buffremove(cam,nowturn,'onslime');
+   if(buffhas(who,'onslime')){
+      if(Math.floor(Math.random() * Buffs.debuffs.onslime.lv[who.buffs.onslime.lv]) !== 0){
+         buffremove(who,'onslime');
          log.textContent = 'なんとかスライムを取り払った!!';
       }else{
          log.textContent = 'スライムが邪魔して動けない!!';//今思ったけどこれやばいのでは...?
          await delay(1000);NextTurnis(0);return;}; 
    }
-   if(buffhas(cam,nowturn,'skip')){
+   if(buffhas(who,'skip')){
       await addtext(`はい${humans[cam][me].name}、お前スキップ〜〜`);
       NextTurnis(cam,me,0,0); return;
    }
-   if(buffhas(cam,nowturn,'stan')){
+   if(buffhas(who,'stan')){
       await addtext(`${humans[cam][me].name}はスタンした！`);
       NextTurnis(cam,me,0,0); return;
    }
-   if(buffhas(cam,nowturn,'freeze')){
-      if(!Math.floor(Math.random() * Buffs.debuffs.freeze.lv[humans[cam][nowturn].buffs.freeze.lv]) !== 0){
-         await addtext(`氷が溶けた!`); buffremove(cam,nowturn,'freeze');
+   if(buffhas(who,'freeze')){
+      if(!random(0,Buffs.debuffs.freeze.lv[who.buffs.freeze.lv]) != 0){
+         await addtext(`氷が溶けた!`); buffremove(who,'freeze');
       }else{
-         await addtext(`${humans[cam][nowturn].name}は凍っている...`);
+         await addtext(`${who.name}は凍っている...`);
          NextTurnis(cam,me,0,0); return;
       }   
    }
-   console.log(`${cam}${nowturn}こと${humans[cam][nowturn].name}、動きます！`);
+   console.log(`${cam}${nowturn}こと${who.name}、動きます！`);
 
    switch(cam){
       case 'players':

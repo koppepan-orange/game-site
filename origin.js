@@ -28,8 +28,8 @@ function arraySelect(array){
 };
 function arrayShuffle(array) {
     for(let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
+    const i2 = Math.floor(Math.random() * (i + 1));
+    [array[i], array[i2]] = [array[i2], array[i]];
     }
     return array;
 };

@@ -442,13 +442,7 @@ let batC = {
 
 
 let stage = 1;
-let stagebar = [
-   {
-      id:1,
-      1:'normalEnemy',
-      2:0,
-   } 
-]
+let stagebar = []
 let floor = 0; //今横列の左から何番目か(1~10)
 
 //playerの位置を
