@@ -988,7 +988,8 @@ function mapmake(code){
          let scores = {};
 
          // 各タイルの初期スコアをセット
-         Stages[stage].tiles.forEach(type => scores[type] = basescore);
+         let dataS = Stages.find(a => a.id == stage);
+         dataS.tiles.forEach(type => scores[type] = basescore);
 
          // 左と上のマスに同じタイルがあったらスコア加算
          if (j > 0) scores[backmap[i][j - 1]] += bonus;
@@ -1131,7 +1132,8 @@ function NextStage(){
 
    while(mts == stage){
       // 1~3の間でランダムにステージを決定
-      stage = arraySelect(Object.keys(Stages));
+      let arr = Stages.map(a => a.id);
+      stage = arraySelect(arr);
    }
    
    floor = 0;
@@ -1431,18 +1433,18 @@ function tekiou(){
 
       result.forEach(effect => {
          //console.log(`${effect.lv}Lvの${effect.time}の${effect.name}。typeは${effect.type}で、kindは${effect.kind}`);
-         let buffData = Object.values(Buffs).find(e => e.name == effect.name);
+         let data = Buffs.find(e => e.name == effect.name);
 
          let Time = effect.kind == 'turn' ? effect.time : (effect.kind == 'stack' ? effect.lv : '？？？');
          let Lv = effect.kind == 'turn' ? `<br>Lv: ${effect.lv}` : '';
 
          let top,bottom;
          if(effect.type == 'debuffs'){
-            top = ` hasd" data-description="${buffData.description}<br>${effect.kind}: ${Time}${Lv}" style="background:url('assets/buffs/${buffData.img}.png') center/cover no-repeat"`;
+            top = ` hasd" data-description="${data.description}<br>${effect.kind}: ${Time}${Lv}" style="background:url('assets/buffs/${data.img}.png') center/cover no-repeat"`;
             bottom = `"`;
          }else{
             top = `"`;
-            bottom = ` hasd" data-description="${buffData.description}<br>${effect.kind}: ${Time}${Lv}" style="background:url('assets/buffs/${buffData.img}.png') center/cover no-repeat"`;
+            bottom = ` hasd" data-description="${data.description}<br>${effect.kind}: ${Time}${Lv}" style="background:url('assets/buffs/${data.img}.png') center/cover no-repeat"`;
          }
 
          apply.push(`
@@ -1508,6 +1510,7 @@ function tekiou(){
 }
 
 function save(){
+   if(!usersRef) return 1;
    updateUI();
    const newData = {
       valorimar: valorimar,
@@ -1525,26 +1528,6 @@ function load(){
       return snapshot.val();
    });
 }
-
-//#region オブザーバー
-// function observeDisplayChangeBlock(targetSelector, callback){ //style="display:block;" を検知するやつ。
-//    const targetNode = document.querySelector(targetSelector);
-//    if (!targetNode) return;
-
-//    const observer = new MutationObserver((mutationsList) => {
-//       for (let mutation of mutationsList) {
-//          if (mutation.attributeName == "style") {
-//             const displayValue = window.getComputedStyle(targetNode).display;
-//             if (displayValue == "block"){
-//                callback();
-//             }
-//          }
-//       }
-//    });
-
-//    observer.observe(targetNode, { attributes: true, attributeFilter: ["style"] });
-// }
-//#endregion
 
 //#region log&text
 let textDiv = document.querySelector('#text');
@@ -3021,92 +3004,10 @@ function BankWithdraw(code){
 
 //#region 非ダメ時モーション(?)
 
-//こちらは旧式。参考にでも
-// async function damage(cam,tcams,me,targets,rate,kind,code){//矛先の陣営、攻撃タイプ(物理||魔法)、自分、矛先、倍率、コード(PS用)
-//    if(!Array.isArray(tcams)){tcams = [tcams];}
-//    if(!Array.isArray(targets)){targets = [targets];}
-//    for(let i = 0; i < tcams.length; i++){
-//       let tcam = tcams[i];
-//       let target = targets[i];
-
-//       let atker = humans[cam][me];
-//       let defer = humans[tcam][target];
-
-//       console.log(`${atker.name} => ${defer.name}; 倍率は${rate}で、種類は${kind}でコードは${code}だってよ`);
-//       console.log(`ついでに言うと攻撃力は${atker.atk}で、防御力は${defer.def}だから計算上ダメージは${(atker.atk * atker.power * rate) - (defer.def * defer.shell)}になるはずだよ`)
-
-//       switch(kind){
-//          case 'sh':
-//             //codeは基本0。sは1、dsは2、solは3、スキルなら's'、アイテムなら'i'(ない)
-   
-//             if(Weapons[atker.weapon.id].pp = 0){
-//                Weapons[atker.weapon.id].process(cam,me,tcam,target,rate,kind,code,1);
-//             }
-   
-//             x = Weapons[atker.weapon.id].power;
-//             if(typeof x == 'string'){x = eval(x);};
-            
-//             x = (atker.atk * atker.power * rate + x);
-//             if(code == 3 && atker.ps == 'highsol'){x *= 3};
-//             if(code == 3 && atker.ps == 'solx5but'){x *= 5};
-//             if(buffhas(cam,me,'improve')){x *= 1.4;};
-//             if(buffhas(cam,me,'letsthrow')){x *= 2; buffclear(cam,me,'letsthrow');};
-//             if(buffhas(cam,me,'gambling')){
-//                z = clowngambling[Math.floor(Math.random() * clowngambling.length)];
-//                x *= z; buffremove(cam,me,'gambling');
-//                await addtext('ダメージは' + z + '倍になった!!')
-//             };
-   
-//             x -= (defer.def * defer.shell);
-         
-//             if(isCrit(atker.critlate, humans[tcam][me].critresist)){
-//                x += (defer.def * defer.shell);
-//                x *= atker.critdmg;
-//                await addtext('会心の一撃！')
-//             };
-
-            
-//             x = Math.ceil(x);
-//             if(x < 0){x = 0};
-//             if(x > defer.hp){x = defer.hp};
-   
-//             y = defer.hp;
-   
-//             defer.hp -= x;
-//             console.log(`damage:${y}->${defer.hp}(${x})`);
-            
-//             if(defer.hp < 0){defer.hp = 0};
-            
-//             if(cam == 'players') atker.ep += Math.floor(10 * atker.epgain * code == 3 ? 2 : 1);
-
-//             tekiou();
-
-//             await addtext(`${defer.name}に${x}のダメージ！`)
-//             if(code == 3 && atker.ps == 'solplaceturret'){turretPlace(cam);}
-   
-//             if(defer.hp <= 0){let result = await killed(cam,me,tcam,target);if(result == 'end'){return 'end';}}
-   
-         
-            
-//             break;
-//          case 'mg':
-//             //codeは基本0。sは1、dsは2、solは3、スキルなら's'、アイテムなら'i'(ない)
-//             x = (atker.matk * atker.power * rate);
-//             x -= (defer.mdef * defer.shell);
-//             x = Math.ceil(x);if(x < 0){x = 0};if(x > defer.hp){x = defer.hp};
-//             defer.hp -= x;
-//             tekiou();
-//             await addtext(`${defer.name}に${x}のダメージ！`)
-//             await delay(1000);
-//             if(defer.hp <= 0){let result = await killed(cam,me,tcam,target);return result;}
-//             break;
-//       }
-//    }   
-// };
-
-async function damage(...arr){
-   let [who, ares, value, kind, prop = []] = arr;
+async function damage(who, ares, value, kind, prop = []){
    value /= 100;
+
+   console.log(ares)
 
    let hasa = (whi, name) => whi.ables.includes(name);
    let hasp = (name) => prop.includes(name);
@@ -3123,8 +3024,8 @@ async function damage(...arr){
 
       let atker = {...who};
       let defer = {...are};
-      // console.log(atker);
-      // console.log(defer);
+      console.log(atker);
+      console.log(defer);
       
       let stats = [
          'atk','matk','def','mdef',
@@ -3134,17 +3035,12 @@ async function damage(...arr){
 
       console.log(`weapon:${atker.weapon.id}, shield:${atker.shield.id}, ear:${atker.ear.id}, ring:${atker.ring.id}, neck:${atker.neck.id}`);
       for(let stat of stats){
-         Object.values(atker.buffs).forEach(buff => {
-            if(!buff.data.addable){
-               if(hask(buff.data.effect, stat)){
-                  atker[stat] += buff.data.effect[stat].value;
-               }
-            }else{
-               if(hask(buff.data.effect, stat)){
-                  atker[stat] += buff.value
-               }
-            }
-         });
+         for(let buff of atker.buffs){
+            let moto = atker[stat];
+            buffKeisan(atker, buff, stat);
+            let huka = moto == atker[stat] ? '(変動なし)' : `(${atker[stat] - moto})`;
+            console.log(`>> ${moto} => ${atker[stat]} ${huka}`);
+         };
          
          for(let bui of ['weapon','shield','ear','ring','neck']){
             let eq = atker[bui];
@@ -3156,18 +3052,10 @@ async function damage(...arr){
             }
          }
 
-         Object.values(defer.buffs).forEach(buff => {
-            if(!buff.data.addable){
-               if(hask(buff.data.effect, stat)){
-                  defer[stat] += buff.data.effect[stat].value;
-               }
-            }
-            if(buff.data.addable){
-               if(hask(buff.data.effect, stat)){
-                  defer[stat] += buff.value
-               }
-            }
-         })
+         for(let buff of defer.buffs){
+            buffKeisan(defer, buff, stat);
+            defer[stat] += val;
+         }
       };
 
       //攻撃力
@@ -3301,67 +3189,95 @@ function isCrit(who, are){
    return is;
 }
 
+function isCri2(name, p){ //いずくりっつー
+   let res = probability(p);
+   console.log(`(${name}):: 成功確率${p}%...結果は${res}！`)
+   if(res) return 1;
+   if(!res) return 0;
+}
+
 //#endregion
 //#region buffの動き
-async function buffadd(...arr){//誰のバフ/デバフか,バフ/デバフの名前,効果時間,効果量
-   let [who, are, buff, time, val] = arr;
-   let newbuff = buffMold(buff, time, val);
+async function buffadd(who, ares, buff, kind, time, val){ //誰のバフ/デバフか,バフ/デバフの名前,効果時間,効果量
+   console.log(buff, kind, time, val)
+   let newbuff = buffMold(buff, kind, time, val);
+   let data = Buffs.find(e => e.name == buff);
 
-   //whoがデバフ延長を持っているなら〜的な処理をここで。
+   // console.log(ares)
 
-   are.buffs.push(newbuff);
+   let hasa = (dare, name) => dare.ables.includes(name);
+
+   if(!Array.isArray(ares)) ares = [ares];
+
+   for(let are of ares){
+      console.log(`buffadd:: ${who.name} => ${are.name}に${val}の${buff}を${time}付与`);
+
+      let isPush = 1;
+      switch(kind){
+         case 'turn':{
+            //すでにある場合の処理
+            let hasbuffIndex = are.buffs.findIndex(e => e.name == buff && e.value == val);
+            if(hasbuffIndex >= 0){
+               are.buffs[hasbuffIndex].time += time;
+               isPush = 0;
+            }
+            tekiou();
+            break;
+         };
+
+         case 'stack':{
+            let hasbuffIndex = are.buffs.findIndex(e => e.name == buff);
+            if(hasbuffIndex >= 0){
+               are.buffs[hasbuffIndex].time += time;
+               are.buffs[hasbuffIndex].value = data.lv[time];
+               isPush = 0;
+            }
+            tekiou();
+            break;
+         };
+      }
+
+      //whoがデバフ延長を持っているなら〜的な処理をここで。
+
+      if(kind == 'turn') are.buffs.push(newbuff);
+   }
 }
-function buffMold(buff, time, val){
-   if(!buff || !time || !val){console.error('要素が足りないぜ！！！');}
-   let buffData = Object.values(Buffs).find(e => e.name == buff);
+function buffMold(buff, kind, time, val){
+   if(!buff || !kind || !time || !val) console.error('要素が足りないぜ！！！', buff, kind, time, val);
+   let data = Buffs.find(e => e.name == buff);
 
-   console.log(`${who.name}に${val}の${buff}を${time}付与します！！`);
+   if(data.mode == 'free') val = {[data.agemono]: val};
+   if(data.mode == 'fixe') val = data.lvs[val]??null;
+   console.log(`[${data.mode}]${buff} val:${val} time:${time}`);
 
    let newbuff = {};
 
-   switch(buffData.kind){
+   switch(kind){
       case 'turn':{
-         //すでにある場合の処理
-         let hasbuffIndex = who.buffs.findIndex(e => e.name == buff && e.value == val);
-         if(hasbuffIndex >= 0){
-            newbuff = who.buffs[hasbuffIndex];
-            who.buffs.splice(hasbuffIndex,1);
-            newbuff.time += time;
-         }else{
-            newbuff = {
-               type: buffData.type,
-               kind: buffData.kind,
-               name: buff,
-               time: time,
-              value: val,
-               data: buffData,
-            };
-         }
-      };
-      tekiou();
-      addtext(`${who.name}は${buff}を${time}turn受けた!`);
-      break;
+         newbuff = {
+            type: data.type,
+            kind: kind,
+            name: buff,
+            time: time,
+            value: val,
+            data: data,
+         };
+         break;
+      }
 
       case 'stack':{
-         let hasbuffIndex = who.buffs.findIndex(e => e.name == buff);
-         if(hasbuffIndex >= 0){
-            who.buffs[hasbuffIndex].time += time;
-            who.buffs[hasbuffIndex].value = buffData.lv[time];
-         }else{
-            newbuff = {
-               type: buffData.type,
-               kind: buffData.kind,
-               name: buff,
-               time: time, // (stack)
-              value: buffData.lv[time],
-               data: buffData,
-            };
-         }
-      };
-      tekiou();
-      addtext(`${who.name}は${buff}を${time}stack受けた!`);
-      break;
+         newbuff = {
+            type: data.type,
+            kind: kind,
+            name: buff,
+            time: time,
+            value: data.lv[time],
+            data: data,
+         };
+         break;
+      }
    }
+   console.log(newbuff)
 
    return newbuff;
 }
@@ -3408,6 +3324,44 @@ function buffhas(who, buff){
 
    return 0;
 }
+function buffKeisan(dare, buff, code){
+   console.log(`Keisan:: [${code}]${buff.name} val:${buff.value} time:${buff.time}`);
+   let data = Buffs.find(a => a.name == buff.name);
+   
+   let val = 0;
+   if(data.mode == 'free'){
+      if(!hask(buff.value, code)) return 0;
+      val = buff.value[code];
+   }
+   if(data.mode == 'fixe'){
+      if(!hask(data.lvs[buff.value], code)) return 0;
+      val = data.lv[buff.value][code];
+   }
+
+   // =+1 =-14 ++24% +-50%
+   let dochi = val.slice(0,1); // =
+   if(dochi != '=') dochi = '+';
+   val = val.slice(1);
+   let puma = val.slice(0,1); // + -
+   if(puma != '+' && puma != '-') puma = '+';
+   val = val.slice(1);
+   if(val.endsWith('%')){
+      val = val.slice(0,-1);
+      val = +dare[code]*(val/100);
+   }
+   else val = +val;
+
+   if(!val) return 1;
+   
+   if(puma == '-') val = -val;
+
+   switch(dochi){
+      case '=': dare[code]  = val; break;
+      case '+': dare[code] += val; break;
+   }
+
+   return 0
+}
 //#endregion
 //#region QTEのやつ
 async function qte(keyLeft, keyRight, limit) {
@@ -3453,9 +3407,11 @@ function backtoplayerturn(){
    commandC.s4B.textContent = 'run';
    //errorcheck();
 }
-async function playerturn(cam,me){
-   if(humans[cam][me].ns.process != undefined && (turncount % Skills.ns[humans[cam][me].ns].ep) == 0){
-      await Skills[humans[cam][me].ns].process(cam,me);
+async function playerturn(who){
+   let nss = Skills.filter(a => a.type == 'ns');
+   let datans = nss.find(a => a.id == who.ns.id);
+   if(who.ns.process != undefined && (turncount % datans.cool) == 0){
+      await data.process(who);
       await delay(1000)
    };
 
@@ -3505,7 +3461,7 @@ commandC.s2B.addEventListener('click', async function(){
    let who = humans.players[0];
    switch(phase){
       case 1:
-         phase = 2;
+         phase = 3;
          commandC.s1B.textContent = who.magic[1].name;
          commandC.s2B.textContent = who.magic[2].name;
          commandC.s3B.textContent = who.magic[3].name;
@@ -3527,10 +3483,10 @@ commandC.s3B.addEventListener('click', async function(){
    let who = humans.players[0];
    switch(phase){
       case 1:
-         phase = 2;
-         commandC.s1B.textContent = who.tool[1];
-         commandC.s2B.textContent = who.tool[2];
-         commandC.s3B.textContent = who.tool[3];
+         phase = 4;
+         commandC.s1B.textContent = who.tool[1].name;
+         commandC.s2B.textContent = who.tool[2].name;
+         commandC.s3B.textContent = who.tool[3].name;
          commandC.s4B.textContent = 'back';
          break;
       case 2:
@@ -3662,9 +3618,11 @@ function LetsTargetSelect(one){
             let n = ns[i];
             console.log(`humans[${c}][${n}]を狙います！`);
             let cn = humans[c][n];
-            console.log(cn);
+            // console.log(cn);
             whoes.push(cn);
          }
+
+         console.log(whoes);
 
          resolve(whoes);
       }
@@ -3699,19 +3657,18 @@ async function Slash(who, num){
       tekiou();
 
       await addtext(`${who.name}の${name}！`);
-      let result = await data.process(who, are);
-      if(result == 'dead') return await killed(who, are);
 
-      NextTurnis(who, are);
+      let result = await data.process(who, are);
+      if(result) return 1;
+      NextTurnis(who);
    }else{
       await addtext('not enough mp...');
-      await delay(1000);
       backtoplayerturn();
    }
 }
 //#endregion
 //#region playerの魔法
-async function Magic(who, num){
+async function Magic(who, num){   
    disappear();
    let mg = who.magic[num]
    if(!mg.name){
@@ -3722,20 +3679,17 @@ async function Magic(who, num){
    let name = mg.name;
    let data = Magics[name]
    if(who.mp >= data.mp){
-      let [tme, tcam] = await LetsTargetSelect();
-      let are = humans[tcam][tme];
+      let are = await LetsTargetSelect();
 
       who.mp -= data.mp;
       tekiou();
 
       await addtext(`${who.name}の${name}！`);
       let result = await data.process(who, are);
-      if(result == 'dead') return await killed(who, are);
-
-      NextTurnis(who, are);
+      if(result) return 1;
+      NextTurnis(who);
    }else{
       await addtext('not enough mp...');
-      await delay(1000);
       backtoplayerturn();
    }
 }
@@ -3746,7 +3700,7 @@ async function Tool(who, num){
    disappear();
    let tl = who.tool[num]
    if(!tl.name){
-      await addtext('you dont have slash...');
+      await addtext('you dont have tool...');
       return backtoplayerturn()
    }
 
@@ -3756,17 +3710,14 @@ async function Tool(who, num){
    if(data.num > 0){
       data.num -= 1;
 
-      let [tme, tcam] = await LetsTargetSelect();
-      let are = humans[tcam][tme];
+      let are = await LetsTargetSelect();
       await addtext(`${who.name}は${name}を使用した!`);
       
       let result = await data.process(who, are);
-
-      if(result == 'dead') return await killed(who, are);
-      NextTurnis(who, are);
+      if(result) return 1;
+      NextTurnis(who);
    }else{
       await addtext('not enough tool...');
-      await delay(1000);
       backtoplayerturn();
    }
 }
@@ -3796,12 +3747,14 @@ async function skillReserve(cam,me){
    }
 }
 async function skillAct(cam,me,skill){
-   let result = await Skills.ex[skill].process(cam,me);
+   let dataex = Skills.filter(a => a.type == 'ex').find(a => a.id == skill);
+   let result = await dataex.process(cam, me);
    await delay(1000);
    return result;
 }
-function skillReset(cam,me){
-   humans[cam][me].ep = 0;
+function skillReset(who){
+   who.ep = 0;
+   tekiou();
 }
 function turretPlace(cam){
    if(!document.querySelector(`#${cam}t`)){
@@ -3848,62 +3801,34 @@ function turretAllClear(){
 //#endregion
 
 //#region next-turn
-async function NextTurnis(who, are){
+async function NextTurnis(who){
+   //もともとはareもいたけど、消えました。存在理由なさすぎて
    phase = 0;
 
-   //アンコールの動き
    if(!who == 0){
-      y = 1;//luck
-      if(buffhas(who, 'luck')){//luck
-         if(probability()){
-            await addtext('当たりが出たら！！もう一本！！！！');
-            backtoplayerturn(); return;
-         }
-      }
-
-      //継続ダメージの動き
-      let dots = {}; //DamegeOverTimeのdot
       for(let buff of who.buffs){
-         let data = Buffs[buff.name];
+         let data = Buffs.find(a => a.name = buff.name);
+         //アンコールの動き
+         if(hask(data, 'luck')){//luck
+            if(isCri2('luck', data.luck)){
+               addlog('当たりが出たらもう一本！！');
+               backtoplayerturn(); return;
+            }
+         }
+
+         //継続ダメージの動き
+         
+         
       
-         if(hask(data, 'dot')){
-            let dot = data.dot;
-
-            let val = 0;
-            if(data.kind == 'fixe') val = data.lvs[buff.value][dot];
-            if(data.kind == 'free') val = buff.value[dot];
-             if(val.endsWith('%')) val = Math.round(who.maxhp * val.slice(0,-1) / 100);
-
-            
-            if(!dots[dot]) dots[dot] = 0;
-            dots[dot] += val;
+         for(const key in who.buffs){
+            who.buffs[key].time -= 1; // -1する
+            if(who.buffs[key].time <= 0){
+               let index = who.buffs.indexOf(key);
+               who.buffs.splice(index, 1)
+            }
          }
-         //dotがないならそれは継続ダメージではない。
+         tekiou();
       }
-      if (buffhas(who, 'poison')){
-         let poison = who.buffs.find(a => a.name == 'poison')
-         x = Math.round(humans[cam][me].maxhp * Buffs[poison.name].lv[poison.lv]);
-         humans[cam][me].hp -= x;
-         if(humans[cam][me].hp < 0){humans[cam][me].hp = 0};
-         await addtext(`${humans[cam][me].name}は毒で${x}のダメージ!`);
-      };
-      if(buffhas(who, 'burn')){
-         let burn = humans[cam][me].buffs.find(a => a.name == 'burn')
-         x = Math.round(humans[cam][me].maxhp * Buffs.debuffs[burn.name].lv[burn.lv]);
-         humans[cam][me].hp -= x;
-         if(humans[cam][me].hp < 0){humans[cam][me].hp = 0}
-         await addtext(`${humans[cam][me].name}は燃えて${x}のダメージ!`);
-      };
-      tekiou();
-      if(humans[cam][me].hp <= 0){let result = killed(0,0,cam,me);if(result !== 'continue'){return result;}}
-   
-      for(const key in humans[cam][me].buffs){
-         humans[cam][me].buffs[key].time -= 1; // -1する
-         if (humans[cam][me].buffs[key].time <= 0){
-            delete humans[cam][me].buffs[key]; // 0以下なら消し去る
-         }
-      }
-      tekiou();
    }
 
    //強制スキルの動き
@@ -3911,23 +3836,24 @@ async function NextTurnis(who, are){
       const nanka = skillQueue.shift(); // 先頭を消してその消したやつを処理する的な機構".shift()"
       let cam = nanka.cam;
       let me = nanka.me;
+      let dare = cm(cam,me);
       let skill = nanka.skill;
-      console.log(`${cam}${me} のスキル:"${skill}"を発動!`);
-      await addtext(`${humans[cam][me].name}は"${Skills.ex[skill].name}"を発動した！！`);
-      let result = await skillAct(cam,me,skill);
-      if(result == 'end'){return 'end';}
+      let data = Skills.find(a => a.id == skill);
+      console.log(`${dare.name}のスキル:"${skill}"を発動!`);
+      await addtext(`${dare.name}は"${data.name}"を発動した！！`);
+      let result = await skillAct(dare, skill);
+      if(result) return 1;
    }
 
    //こっから次のターン行く動き　ここでこの人のターンは終わるって感じだね
 
    acted += 1;
    if(acted >= bar.me.length){
-
       turncount += 1;
       const combined = [...Object.values(humans.players).filter(a => a.status === 1 && a.hp > 0 && a.id != 't'), ...Object.values(humans.enemies)].filter(b => b.status === 1 && b.hp > 0)// オブジェクトをリストに変換して合体
       .sort((a, b) => {// 降順でソート
-         if(b.speed === a.speed){
-            if(a.cam === b.cam){
+         if(b.speed == a.speed){
+            if(a.cam == b.cam){
                return a.me - b.me;  // 同じcamならmeの小さい方が優先
             }
             return a.cam === 'players' ? -1 : 1;  // camが'p'なら優先
@@ -3946,46 +3872,67 @@ async function NextTurnis(who, are){
    nowturn = bar.me[acted];
    cam = bar.cam[acted]
    console.log(nowturn, cam)
-   who = humans[cam][nowturn];
-   console.log(`現在、${cam}${nowturn}さんのターンですわ〜`);
+   are = humans[cam][nowturn];
+   console.log(`現在、${cam}${nowturn}(${are.name})さんのターンですわ〜`);
 
-   if(nowturn == 't'){
-      console.log('って、turretやないか〜〜〜い')
-      return NextTurnis(0)
-   }
+   let dots = {}; //DamegeOverTimeのdot
+   for(let buff of are.buffs){
+      let data = Buffs.find(a => a.name == buff.name)
+      console.log(buff, data)
+      if(hask(data, 'dot')){
+         let dot = data.dot;
 
-   if(buffhas(who,'onslime')){
-      if(Math.floor(Math.random() * Buffs.debuffs.onslime.lv[who.buffs.onslime.lv]) !== 0){
-         buffremove(who,'onslime');
-         log.textContent = 'なんとかスライムを取り払った!!';
-      }else{
-         log.textContent = 'スライムが邪魔して動けない!!';//今思ったけどこれやばいのでは...?
-         await delay(1000);NextTurnis(0);return;}; 
+         let val = 0;
+         if(data.mode == 'fixe') val = data.lvs[buff.value][dot];
+         if(data.mode == 'free') val = buff.value[dot];
+         if(val.endsWith('%')) val = Math.round(are.maxhp * val.slice(0,-1) / 100);
+
+            
+         if(!dots[dot]) dots[dot] = 0;
+            dots[dot] += val;
+      }
+      //dotがないならそれは継続ダメージではない。
+   
+      if(buff.name == 'onslime'){
+         if(isCri2('onslime', buff.value)){
+            buffremove(are, 'onslime');
+            addlog('なんとかスライムを取り払った!!');
+         }else{
+            addlog('スライムが邪魔して動けない!!');//今思ったけどこれやばいのでは...?
+            NextTurnis(0);
+            return;
+         }; 
+      }
+      if(buffhas(are,'skip')){
+         await addtext(`はい${are.name}、お前スキップ〜〜`);
+         NextTurnis(are); return;
+      }
+      if(hask(data, 'palsy')){
+         if(!isCri2('palsy', data.palsy)) continue;
+         data.name != 'stan' 
+         ? addlog(`${are.name}は麻痺している..`)
+         : addlog(`${are.name}はスタンしている....`);
+         NextTurnis(are);
+         return 1;
+      }
+      if(hask(data, 'freeze')){
+         if(!isCri2('freeze', data.freeze)){
+            await addtext(`氷が溶けた!`);
+            buffremove(are,'freeze');
+         }else{
+            await addtext(`${are.name}は凍っている...`);
+            NextTurnis(are); return;
+         }   
+      }
    }
-   if(buffhas(who,'skip')){
-      await addtext(`はい${humans[cam][me].name}、お前スキップ〜〜`);
-      NextTurnis(cam,me,0,0); return;
-   }
-   if(buffhas(who,'stan')){
-      await addtext(`${humans[cam][me].name}はスタンした！`);
-      NextTurnis(cam,me,0,0); return;
-   }
-   if(buffhas(who,'freeze')){
-      if(!random(0,Buffs.debuffs.freeze.lv[who.buffs.freeze.lv]) != 0){
-         await addtext(`氷が溶けた!`); buffremove(who,'freeze');
-      }else{
-         await addtext(`${who.name}は凍っている...`);
-         NextTurnis(cam,me,0,0); return;
-      }   
-   }
-   console.log(`${cam}${nowturn}こと${who.name}、動きます！`);
+   console.log(`${cam}${nowturn}こと${are.name}、動きます！`);
 
    switch(cam){
       case 'players':
-         playerturn('players',nowturn);
+         playerturn(are);
          break;
-      case 'enemies':
-         enemyturn('enemies',nowturn);
+      case 'enemies':top 
+         enemyturn(are);
          break;
    }
 }
@@ -3994,6 +3941,7 @@ async function NextTurnis(who, are){
 //#region enemyturn
 async function enemyturn(who){
    let data = Enemies[who.name];
+   console.log(who)
 
    for(let buff in who.buffs){
       buff.time -= 1;
@@ -4003,26 +3951,30 @@ async function enemyturn(who){
    }
    tekiou();
 
+   let are;
    if(data){
       let act = enemySelectAction(who)
-      await act.process(who);
+      let res = await act.process(who);
+      if(res) return 1;
    }else{
       await addtext(`${who.name}は何かで攻撃した！`)
-      let are = ShallTargetSelect(who, 'phpl');
-      let res = await damage(who, are, 'sh', 1); //areの後、1の前に"何の倍率か"を入れるべき。基本atkかもだけどfixで固定、とかできそう
+      are = ShallTargetSelect(who, 'phpl');
+      let res = await damage(who, are, 1, 'sh'); //areの後、1の前に"何の倍率か"を入れるべき。基本atkかもだけどfixで固定、とかできそう
       if(res) return 1;
    }
 
-   NextTurnis(who, are);
+   NextTurnis(who);
 }
 function enemySelectAction(who){
+   let data = Enemies[who.name];
    let acts = [];
    let pros = [];
 
-   if(who.lasts){
+   if(who)
+   if(who.lasts.length != 0){
       //直前にreを実行していたならば、対応するabを確定実行するやつ
       who.lasts.forEach(last => {
-         who.acts.forEach(a => {
+         data.acts.forEach(a => {
             let props = a.props;
             props.filter(p => p.startsWith('ab') && p.endsWith(last)).forEach(p => {
                console.log(a, p)
@@ -4033,46 +3985,58 @@ function enemySelectAction(who){
       })
       who.lasts = [];
    }else{
-      who.acts.forEach(a => {
+      data.acts.forEach(a => {
          acts.push(a);
          pros.push(a.probable);
       })
    }
-   console.log(acts);
-   console.log(pros);
+   // console.log(acts);
+   // console.log(pros);
 
    //reをするとlastを記録
    let act = arrayGacha(acts, pros);
-   act.prop.forEach(p => {
-      if(p.startsWith('re')) who.lasts.push(p.splice(2)), console.log(p);
+   console.log(act);
+   let props = act.prop ?? [];
+   props.forEach(p => {
+      if(p.startsWith('re')){
+         let item = p.slice(0,2);
+         who.lasts.push(item);
+         console.log(`re:: ${item}を記録しました`);
+      }
    })
 
    return act;
 }
 
-function ShallTargetSelect(who,code,both){
-   let me = who.me
+function ShallTargetSelect(who,code,both = 0){
+   console.log(`ShallTarget!!! ${code}(both:${both})`)
+   let me = who.me;
    //これは敵しか使わないターゲットセレクト。だから陣営とかは考えんでいいよ
    //標的陣営、起動者、コード(e = enemies, p = players | m = most highest, l = most lowest,| atk = 攻撃力, def = 防御力, hp = 体力 || r = random)、両隣にも被害を与えるか0,1
    //,b => b.hp//playerのhp達を、statusが1のやつだけ、小さい順(昇順)に並べてる。
+   let pls = humans.players.filter(c => c.status == 1 && c.hp > 0).map(a => a.me)
    const playerstatus = {
-      me:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.me - p2.me).map(a => a.me),
-   hp:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.hp - p2.hp).map(a => a.me),
-      atk:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.atk - p2.atk).map(a => a.me),
-      def:Object.values(humans.players).filter(c => c.status == 1 && c.hp > 0).sort((p1, p2) => p1.def - p2.def).map(a => a.me),
+      me:pls.sort((p1, p2) => p1.me - p2.me),
+      hp:pls.sort((p1, p2) => p1.hp - p2.hp),
+      at:pls.sort((p1, p2) => p1.atk - p2.atk),
+      de:pls.sort((p1, p2) => p1.def - p2.def),
    }
+   let ens = humans.enemies.filter(c => c.status == 1 && c.hp > 0).map(a => a.me)
    const enemystatus = {
-      me:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.me - e2.me).map(a => a.me),
-   hp:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.hp - e2.hp).map(a => a.me),
-      atk:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.atk - e2.atk).map(a => a.me),
-      def:Object.values(humans.enemies).filter(c => c.status == 1 && c.hp > 0).sort((e1, e2) => e1.def - e2.def).map(a => a.me),
+      me:ens.sort((e1, e2) => e1.me - e2.me),
+      hp:ens.sort((e1, e2) => e1.hp - e2.hp),
+      at:ens.sort((e1, e2) => e1.atk - e2.atk),
+      de:ens.sort((e1, e2) => e1.def - e2.def),
    }
+   // console.log(playerstatus)
+   // console.log(enemystatus)
    let ret = [];
+   let errorMes = 'エラー！ShallでTargetをSelectできませんでした！！'
    switch(code){
       //players
       case 'pr'://random
          x = arraySelect(playerstatus.hp)
-         if(!x){return 'end'}
+         if(x == undefined) return errorMes
          if(both == 0){
             ret.push(x);
          }else{
@@ -4085,7 +4049,7 @@ function ShallTargetSelect(who,code,both){
          break;
       case 'phpl':
          x = playerstatus.hp[0];
-         if(!x){return 'end'}
+         if(x == undefined) return errorMes
          if(both == 0){
             ret.push(x);
          }else{
@@ -4098,7 +4062,7 @@ function ShallTargetSelect(who,code,both){
          break;
       case 'phph':
          x = playerstatus.hp[playerstatus.hp.length - 1];
-         if(!x){return 'end'}
+         if(x == undefined) return errorMes;
          if(both == 0){
             ret.push(x);
          }else{
@@ -4110,8 +4074,8 @@ function ShallTargetSelect(who,code,both){
          }
          break;
       case 'patkl':
-         x = playerstatus.atk[0]
-         if(!x){return 'end'}
+         x = playerstatus.at[0]
+         if(x == undefined) return errorMes;
          if(both == 0){
             ret.push(x);
          }else{
@@ -4123,8 +4087,8 @@ function ShallTargetSelect(who,code,both){
          }
          break;
       case 'patkh':
-         x = playerstatus.atk[playerstatus.atk.length - 1]
-         if(!x){return 'end'}
+         x = playerstatus.at[playerstatus.at.length - 1]
+         if(x == undefined) return errorMes;
          if(both == 0){
             ret.push(x);
          }else{
@@ -4136,8 +4100,8 @@ function ShallTargetSelect(who,code,both){
          }
          break;
       case 'pdefl':
-         x = playerstatus.def[0]
-         if(!x){return 'end'}
+         x = playerstatus.de[0]
+         if(x == undefined) return errorMes;
          if(both == 0){
             ret.push(x);
          }else{
@@ -4149,8 +4113,8 @@ function ShallTargetSelect(who,code,both){
          }
          break;
       case 'pdefh':
-         x = playerstatus.def[playerstatus.def.length - 1]
-         if(!x){return 'end'}
+         x = playerstatus.de[playerstatus.de.length - 1]
+         if(x == undefined) return errorMes;
          if(both == 0){
             ret.push(x);
          }else{
@@ -4163,7 +4127,7 @@ function ShallTargetSelect(who,code,both){
          break;
       case 'pc'://center
          x = [me,me-1,me-2,me+1,me+2].find(n => playerstatus.me.includes(n))||1;
-         if(!x){return 'end'}
+         if(x == undefined) return errorMes;
          if(both == 0){
             ret.push(x);
          }else{
@@ -4176,14 +4140,14 @@ function ShallTargetSelect(who,code,both){
          break;
       case 'pz'://zentai
          x = playerstatus.me;
-         if(!x){return 'end'}
+         if(x == undefined) return errorMes;
          ret.push(x);
          break;
 
       //enemies
       case 'er':
          x = arraySelect(enemystatus.hp)
-         if(!x){return 'end'}
+         if(x == undefined) return errorMes;
          if(both == 0){
             ret.push(x);
          }else{
@@ -4196,7 +4160,7 @@ function ShallTargetSelect(who,code,both){
          break;
       case 'ehpl':
          x = enemystatus.hp[0]
-         if(!x){return 'end'}
+         if(x == undefined) return errorMes;
          if(both == 0){
             ret.push(x);
          }else{
@@ -4209,7 +4173,7 @@ function ShallTargetSelect(who,code,both){
          break;
       case 'ehph':
          x = enemystatus.hp[enemystatus.hp.length - 1]
-         if(!x){return 'end'}
+         if(x == undefined) return errorMes;
          if(both == 0){
             ret.push(x);
          }else{
@@ -4222,7 +4186,7 @@ function ShallTargetSelect(who,code,both){
          break;
       case 'eatkl':
          x = enemystatus.atk[0]
-         if(!x){return 'end'}
+         if(x == undefined) return errorMes;
          if(both == 0){
             ret.push(x);
          }else{
@@ -4235,7 +4199,7 @@ function ShallTargetSelect(who,code,both){
          break;
       case 'eatkh':
          x = enemystatus.atk[enemystatus.atk.length - 1]
-         if(!x){return 'end'}
+         if(x == undefined) return errorMes;
          if(both == 0){
             ret.push(x);
          }else{
@@ -4248,7 +4212,7 @@ function ShallTargetSelect(who,code,both){
          break;
       case 'edefl':
          x = enemystatus.def[0]
-         if(!x){return 'end'}
+         if(x == undefined) return errorMes;
          if(both == 0){
             ret.push(x);
          }else{
@@ -4261,7 +4225,7 @@ function ShallTargetSelect(who,code,both){
          break;
       case 'edefh':
          x = enemystatus.def[enemystatus.def.length - 1]
-         if(!x){return 'end'}
+         if(x == undefined) return errorMes;
          if(both == 0){
             ret.push(x);
          }else{
@@ -4274,7 +4238,7 @@ function ShallTargetSelect(who,code,both){
          break;
       case 'ec'://center..まあ自分よな
          x = me;
-         if(!x){return 'end'}
+         if(x == undefined) return errorMes;
          if(both == 0){
             ret.push(x);
          }else{
@@ -4289,32 +4253,36 @@ function ShallTargetSelect(who,code,both){
    if(code.startsWith('p')){ret.push('players')}
    if(code.startsWith('e')){ret.push('enemies')}
    
+   console.log(ret)
    let ed1 //num
-   if(ret.length > 1) ed1 = [let[0]]
+   if(ret[0].length > 1 && Array.isArray(x)) ed1 = [ret[0]];
    else ed1 = ret[0];
    let ed2 //cam
-   if(ret.length > 1) ed2 = [let[1]];
+   if(ret[1].length > 1 && Array.isArray(x)) ed2 = [ret[1]];
    else ed2 = ret[1];
+   console.log(ed1, ed2)
+
    let whoes;
-   for(let i = 0; i < ed1.length; i++){
-      let a = ed1[i];
-      let b = ed2[i];
-      let ab = humans[b][a];
-      console.log(ab);
-      whoes.push(ab);
+   if(Array.isArray(ed1) && Array.isArray(ed2)){
+      for(let i = 0; i < ed1.length; i++){
+         let dare = humans[ed2[i]][ed1[i]];
+         console.log(dare);
+         whoes.push(dare);
+      }  
+   }else{
+      whoes = humans[ed2][ed1];
    }
+   console.log(whoes)
    
    return whoes;
 }
 //#endregion
 
 //#region 勝利/負けの動き
-async function killed(cam,me,tcam,target){//殺った側cam,meと殺された側tcam,target
-   humans[tcam][target].hp = 0;
-   humans[tcam][target].status = 2;
-   buffclear(tcam,target,'all');tekiou();
-   
-   if(target == 't'){turretBreak(tcam)};//turretだった場合はkazuも減らすのです
+async function killed(who, are){//殺った側cam,meと殺された側tcam,target
+   are.hp = 0;
+   are.status = 2;
+   buffclear(are, 'all');tekiou();
 
    let karix = bar.cam.map((Cam, Num) => Cam === 'p' && bar.me[Num] === 2 ? Num : -1).filter(Num => Num !== -1);
    bar.cam.splice(karix,1);bar.me.splice(karix,1);
@@ -4443,15 +4411,15 @@ async function EnemyAppear(){
    }
    x = arraySelect([1,1,1,1,2,2,3])
    console.log(`敵の数:${x}`);
-   for(i = 1; i < x+1; i++){
+   for(i = 0; i < x; i++){
       humans.enemies[i] = DesideEnemyName(i);
       /**let newDiv = */makeNewEnemy(i);
-      if(humans.enemies[i].prefixe){document.querySelector(`#enemies${i}`).style.backgroundColor = '#fefaff';}//ちょい強敵ってことね
+      if(humans.enemies[i].prefixe) document.querySelector(`#enemies${i}`).style.backgroundColor = '#fefaff';//ちょい強敵ってことね
       tekiou();
    }
    tekiou();
    log_open('o')
-   await addtext(`${humans.enemies[1].name}が現れた!`);
+   await addtext(`${humans.enemies[0].name}が現れた!`);
    
    // bar-create
    bar = {
@@ -4505,7 +4473,9 @@ function DesideEnemyName(target){
    enemy.ex = 'null';
    enemy.ns = 'null';
    enemy.ps = 'null';
-
+   
+   enemy.lasts = [];
+   
    let statuses = ['atk','def','matk','mdef','maxhp','maxmp','critlate','critdmg','critresist','speed'];
    statuses.forEach(statu => {
       if(nameData[statu].startsWith('+') || nameData[statu].startsWith('-')){
@@ -4516,15 +4486,18 @@ function DesideEnemyName(target){
          let me = Number(nameData[statu].slice(1));
          enemy[statu] = me;
       }
-      //'0'なら変動無し
+      ///'0'なら変動無し
    })
 
+   //prefixeのやつ
    enemy.prefixe = '';
    let prefixe = arraySelect(Object.keys(Prefixes));
-   if(probability(20)){
-      console.log(`enemies(${target})、"${Prefixes[prefixe].name}"`);
-      enemy.prefixe = Prefixes[prefixe].name;
-      let arr = Object.entries(Prefixes[prefixe].effects);
+   if(probability(0)){
+      console.log(enemy)
+      let data = Prefixes[prefixe];
+      console.log(`enemies(${target})は"${data.name}"です`);
+      enemy.prefixe = data.name;
+      let arr = Object.entries(data.effects);
       arr.forEach(a => {
          let key = a[0];
          let val = a[1];
@@ -4538,26 +4511,30 @@ function DesideEnemyName(target){
                if(res == 1) res = 3;
             }
             switch(res){
-               case 0:
+               case 0: // =
                   res = +val.slice(1);
                   enemy[key] = res;
                   break;
-               case 1:
+
+               case 1: // +
                   res = +val.slice(1);
                   if(val.startsWith('-')) res *= -1;
                   enemy[key] += res;
                   break;
-               case 2:
+
+               case 2: // =%
                   res = +(val.slice(0,-1))/100; //10% => 0.1
                   enemy[key] *= res; //0.1 => key*0.1
                   res = enemy[key];
                   break;
-               case 3:
+
+               case 3: // +%
                   res = +(val.slice(0, -1) / 100); //10% => 0.1
                   res = enemy[key] * res; //0.1 => key*0.1
                   if(val.startsWith('-')) res *= -1; //if"-" => -(key*0.1)
                   enemy[key] += res;
                   break;
+
                default:
                   break;
             }
@@ -4569,6 +4546,7 @@ function DesideEnemyName(target){
             })
          }
       })
+      console.log(enemy)
    };
 
    enemy.hp = enemy.maxhp;
@@ -4907,7 +4885,7 @@ function makeNewEnemy(me){
 
    return enemyDiv;
 }
-//#endregion
+
 
 //#region　bossの動き
 async function BossEnemyAppear(){
@@ -5250,11 +5228,6 @@ function Campequiptool(code){
 }
 // #endregion
 //#region skillshop
-   const Allskill = [
-      ...Object.values(Skills.ex),
-      ...Object.values(Skills.ns),
-      ...Object.values(Skills.ps)
-   ];
  
 
   function skillshopcreateCard(item){
@@ -5287,7 +5260,7 @@ function Campequiptool(code){
    const cardsContainer = document.querySelector('#skillshopcorner');
    cardsContainer.style.display = 'block';
    cardsContainer.innerHTML = ''; // 前の内容をクリアする
-   const selectedItems = arrayShuffle(Allskill).slice(0, 6);
+   const selectedItems = arrayShuffle(Skills).slice(0, 6);
    selectedItems.forEach(item => {
      const card = skillshopcreateCard(item);
      cardsContainer.appendChild(card);
@@ -5568,5 +5541,4 @@ function UtusenEvent(){
    draw()
    movable = 1;
 }
-// #endregion      
-
+// #endregion
