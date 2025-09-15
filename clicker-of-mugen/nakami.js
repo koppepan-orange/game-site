@@ -525,7 +525,7 @@ let imageNames = {
    'effects':['explosion_1','explosion_2','explosion_3'],
    'enemies':['翠嵐の風刃','蒼白の粘液','燐光の妖花','黄昏の穿影','燦爛する緑夢','紫苑の花姫'],
    'charas':['greenslime','mechanic','clown','magodituono','wretch'],
-   'system':['star1','star2','star3'],
+   'systems':['star1','star2','star3'],
 }
 let imageNamesT = Object.keys(imageNames).map(a => imageNames[a].length).reduce((a, b) => a + b);
 Object.keys(imageNames).forEach(belong => {
@@ -835,7 +835,7 @@ function draw() {
       if('used' in obs.data) src += obs.data.used ? '_off' : '_on';
 
       let img = images[belong][src];
-      if(!img) console.log(`assets/${belong}/${src}.png not found.`), img = images['system']['error'];
+      if(!img) console.log(`assets/${belong}/${src}.png not found.`), img = images['systems']['error'];
 
       if(img) ctx.drawImage(img, x * mass, y * mass, mass, mass);
      }
@@ -853,7 +853,7 @@ function draw() {
       if('used' in obs.data) src += obs.data.used ? '_off' : '_on';
 
       let img = images[belong][src];
-      if(!img) console.log(`assets/${belong}/${src}.png is not found.`), img = images['system']['error'];
+      if(!img) console.log(`assets/${belong}/${src}.png is not found.`), img = images['systems']['error'];
       if(img) ctx.drawImage(img, obs.ox, obs.oy, obs.w, obs.h);
    }
 }
@@ -2018,54 +2018,90 @@ function suteFuri(me,code){
 
 //#endregion
 
-let smartMenu = document.querySelector("#smartMenu");
-let smartPhone = smartMenu.querySelector(".main");
-smartPhone.addEventListener("click", () => {
-   smartMenu.querySelectorAll(".item:not(.main)").forEach(item => {
+//#region smartPhone
+let smartD = document.querySelector("#smartMenu");
+let smartC = {}
+let smartL = [
+   {
+      name:'zishou',
+      img:'assets/enemies/翠嵐の風刃.png'
+   },
+   {
+      name:'notice',
+      img:'assets/systems/notice.png'
+   },
+   {
+      name:'logbo',
+      img:'assets/systems/logbo.png'
+   },
+   {
+      name:'phone',
+      img:'assets/systems/phone.png'
+   }
+]
+for(let sm of smartL){
+   let item = document.createElement("div");
+   item.className = `item ${sm.name}`;
+   if(sm.name != 'phone') item.classList.add('hidden');
+   item.innerHTML = `<img src="${sm.img}">`;
+   smartD.appendChild(item);
+}
+smartC.phone = smartMenu.querySelector(".phone");
+smartC.phone.addEventListener("click", () => {
+   smartD.querySelectorAll(".item:not(.phone)").forEach(item => {
       item.classList.toggle("hidden");
    });
 });
+smartD.querySelector('.zishou').addEventListener('click', () => {
+   let p = cm();
+   if(!p) return nicoText('failed!');
+   if(p.hp > 10) p.hp -= 10;
+   nicoText('successed!!');
+   tekiou();
+})
+//#endregion smartPhone
 
 //#region notice
-const noticeButton = document.querySelector('#smartMenu .notice');
-const noticeMain = document.querySelector('#notice');
-const noticeList = document.querySelector('#notice .list');
-const noticeShow = document.querySelector('#notice .show');
-const noticeShowX = document.querySelector('#notice .x');
-const noticeShowBack = document.querySelector('#notice .back');
-const noticeShowTitle = document.querySelector('#notice .show .title');
-const noticeShowDate = document.querySelector('#notice .show .date');
-const noticeShowBody = document.querySelector('#notice .show .body');
+let noticeD = document.querySelector('#notice');
+let noticeC = {
+   toggleB: document.querySelector('#smartMenu .notice'),
+   listD: noticeD.querySelector('.list'),
+   XD: noticeD.querySelector('.x'),
+   backD: noticeD.querySelector('.back'),
+   showD: noticeD.querySelector('.show'),
+   stitleD: noticeD.querySelector('.show .title'),
+   sdateD: noticeD.querySelector('.show .date'),
+   sbodyD: noticeD.querySelector('.show .body')
+}
 let noticeNow = 0;
 
-noticeButton.addEventListener('click', () => {
+noticeC.toggleB.addEventListener('click', () => {
    noticeNow = 1;
-   noticeMain.style.display = 'block';
-   sideMenu.style.left = '-250px';
+   noticeD.style.display = 'block';
 
-   noticeList.innerHTML = '';
+   noticeC.listD.innerHTML = '';
    Object.keys(noticeData).forEach(key => {
       let item = document.createElement('div');
       item.className = 'item';
       item.innerText = noticeData[key].title;
       item.setAttribute('data-id', key);
       item.addEventListener('click', () => {
-         noticeShowTitle.innerText = noticeData[key].title;
-         noticeShowDate.innerText = noticeData[key].date;
-         noticeShowBody.innerText = noticeData[key].body;
-         noticeList.style.display = 'none';
-         noticeShow.style.display = 'block';
+         noticeC.stitleD.innerText = noticeData[key].title;
+         noticeC.sdateD.innerText = noticeData[key].date;
+         noticeC.sbodyD.innerText = noticeData[key].body;
+         noticeC.listD.style.display = 'none';
+         noticeC.showD.style.display = 'block';
       })
-    noticeList.appendChild(item);
+    noticeC.listD.appendChild(item);
   });
 })
-noticeShowX.addEventListener('click', event => {
-  noticeMain.style.display = 'none';
+noticeC.XD.addEventListener('click', event => {
+  noticeD.style.display = 'none';
   noticeNow = 0;
 });
-noticeShowBack.addEventListener('click', event => {
-  noticeShow.style.display = 'none';
-  noticeList.style.display = 'block';
+noticeC.backD.addEventListener('click', event => {
+  noticeC.showD.style.display = 'none';
+  noticeC.listD.style.display = 'flex';
 });
 
 //#endregion
@@ -2919,7 +2955,7 @@ async function friendRecluit(num, code){ //numは回数、codeは"3"で
             <img class="inner" src="${images['friends'][Friends[i].id].src}">
          </div>
          <div class="rare">
-            <img class="inner" src="${images['system'][`star${Friends[i].rare}`].src}" alt="">
+            <img class="inner" src="${images['systems'][`star${Friends[i].rare}`].src}" alt="">
          </div>
          `;
 
@@ -2929,7 +2965,7 @@ async function friendRecluit(num, code){ //numは回数、codeは"3"で
 
             Detail.querySelector('.name .ruby').textContent = friend.ruby;
             Detail.querySelector('.name .txt').textContent = friend.name;
-            Detail.querySelector('.rare .img').src = images['system'][`star${friend.rare}`].src;
+            Detail.querySelector('.rare .img').src = images['systems'][`star${friend.rare}`].src;
          })
       })
    });
@@ -3138,7 +3174,7 @@ async function heal(who, ares, value, code = 'add', ...prop){
       let val = value;
       if(val.endsWith('%')){
          val = +val.slice(0, -1)/100;
-         comsole.log(`${value}っていう%だったから${val}って値に変えといたぜ`);
+         console.log(`${value}っていう%だったから${val}って値に変えといたぜ`);
          val *= are.maxhp;
       }
       
@@ -3338,10 +3374,10 @@ function buffKeisan(dare, buff, code){
       val = data.lv[buff.value][code];
    }
 
-   // =+1 =-14 ++24% +-50%
+   // =+1 =-14 +24% -50%
    let dochi = val.slice(0,1); // =
    if(dochi != '=') dochi = '+';
-   val = val.slice(1);
+   else val = val.slice(1);
    let puma = val.slice(0,1); // + -
    if(puma != '+' && puma != '-') puma = '+';
    val = val.slice(1);
@@ -3397,6 +3433,13 @@ async function qte(keyLeft, keyRight, limit) {
    });
 }
 //#endregion
+
+//#region これが起きたらこれがある、のs
+async function letsElseed(who, are, act, name){
+   console.log(`letsElsees:: ${act}'s ${name}を実行！`);
+   console.log(`>> ...しかし なにもおこらなかった`);
+}
+//#endregion これが起きたらこれがある、のs
 
 //#region playerturn
 function backtoplayerturn(){
@@ -3801,7 +3844,7 @@ function turretAllClear(){
 //#endregion
 
 //#region next-turn
-async function NextTurnis(who){
+async function NextTurnis(who = 0){
    //もともとはareもいたけど、消えました。存在理由なさすぎて
    phase = 0;
 
@@ -3880,16 +3923,17 @@ async function NextTurnis(who){
       let data = Buffs.find(a => a.name == buff.name)
       console.log(buff, data)
       if(hask(data, 'dot')){
+         // これは hp:'-10'みたいにならなくて、hp:10 で10減る感じ
          let dot = data.dot;
 
          let val = 0;
-         if(data.mode == 'fixe') val = data.lvs[buff.value][dot];
-         if(data.mode == 'free') val = buff.value[dot];
+         val = buff.value[dot];
          if(val.endsWith('%')) val = Math.round(are.maxhp * val.slice(0,-1) / 100);
 
-            
+         //出血の処理はここへ
+         
          if(!dots[dot]) dots[dot] = 0;
-            dots[dot] += val;
+         dots[dot] += val;
       }
       //dotがないならそれは継続ダメージではない。
    
@@ -3899,7 +3943,7 @@ async function NextTurnis(who){
             addlog('なんとかスライムを取り払った!!');
          }else{
             addlog('スライムが邪魔して動けない!!');//今思ったけどこれやばいのでは...?
-            NextTurnis(0);
+            NextTurnis();
             return;
          }; 
       }
@@ -4388,7 +4432,10 @@ async function killedCheck(){
          return 'continue';
       }
    }
-}   
+}
+//#endregion 勝利/負けの動き
+
+//#region 敵/俺作り
 async function EnemyAppear(){
    movable = 0;
    document.querySelector('#overfieldArea').style.display = 'none';
@@ -4427,7 +4474,7 @@ async function EnemyAppear(){
       me:[]
    }
    turncount = 0;
-   NextTurnis(0);
+   NextTurnis();
 }
 
 function DesideEnemyName(target){
@@ -4680,7 +4727,7 @@ async function testEnemyAppear(){
       me:[]
    }
    turncount = 0;
-   NextTurnis(0);
+   NextTurnis();
 }
 
 function makeNewPlayer(me){
@@ -4885,6 +4932,7 @@ function makeNewEnemy(me){
 
    return enemyDiv;
 }
+//#endregion 敵/俺作り
 
 
 //#region　bossの動き
@@ -5227,9 +5275,8 @@ function Campequiptool(code){
    document.querySelector('#toolsdesuwa').innerHTML = x.join('');
 }
 // #endregion
-//#region skillshop
- 
 
+//#region skillshop
   function skillshopcreateCard(item){
    const card = document.createElement('div');
    card.classList.add('card');
@@ -5291,6 +5338,7 @@ function Campequiptool(code){
 // #endregion
 
 //こっからイベントとかそのへん
+
 let Events = {
    'candystand':{
       id:'candystand',
@@ -5320,6 +5368,7 @@ let Events = {
       }
    }
 };
+
 //#region candystand
 let candybar = [];
 async function Candytake(){

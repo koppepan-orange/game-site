@@ -243,13 +243,13 @@ let Buffs = [
     mode:'fixe',
     description:'ターン終了時、確率でもう一回行動できる。\nLv7ならば確定。\n願うと起きやすいです',
     lvs:[
-      {luck:20},
-      {luck:33},
-      {luck:50},
-      {luck:67},
-      {luck:80},
-      {luck:90},
-      {luck:100},
+      {luck:'+20'},
+      {luck:'+33'},
+      {luck:'+50'},
+      {luck:'+67'},
+      {luck:'+80'},
+      {luck:'+90'},
+      {luck:'+100'},
     ],
     max:7
   },
@@ -268,14 +268,14 @@ let Buffs = [
     description:'応援されている状態。攻撃力と速度が上がり会心率が下がる。\nちょっと緊張しちゃうよね、わかる',
     lvs:[
       {
-        power:1.0,
-        speed:20.0,
-        critlate:-5.0
+        power:'+1.0',
+        speed:'+20.0',
+        critlate:'-5.0'
       },
       {
-        power: 1.5,
-        speed: 25.0,
-        critlate: -6.5
+        power: '+1.5',
+        speed: '+25.0',
+        critlate: '+-6.5'
       }
     ],
     max:2
@@ -361,8 +361,8 @@ let Buffs = [
       {burn:5},
       {burn:10},
       {burn:20},
-      {burn:35, atk:-5},
-      {burn:50, atk:-10},
+      {burn:35, atk:'-5'},
+      {burn:50, atk:'-10'},
     ],
     max:5
   },
@@ -378,10 +378,10 @@ let Buffs = [
     lvs:[
       {burn:10},
       {burn:20},
-      {burn:35, atk:-5},
-      {burn:45, atk:-10},
-      {burn:55, atk:-15},
-      {burn:75, atk:-25},
+      {burn:35, atk:'-5'},
+      {burn:45, atk:'-10'},
+      {burn:55, atk:'-15'},
+      {burn:75, atk:'-25'},
     ],
     max:6
   },
@@ -615,9 +615,6 @@ let Buffs = [
     type:'unique',
     mode:'fixe',
     description:'スライムが体に粘りついている状態です。やばいね(行動不可)',
-    lvs:{
-      1:1,
-    }
   },
   {
     name:'stickyslime',
@@ -731,7 +728,7 @@ let Magics = {
     lv:1,
     process:async function(who, are){
         await addtext(`${who.name}はhealを唱えた！`)
-        await heal(who, are, '20%', add)
+        await heal(who, are, '20%', 'add')
         
         return 0;
     }
