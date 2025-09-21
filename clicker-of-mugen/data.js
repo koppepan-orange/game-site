@@ -7,9 +7,12 @@ let Style = {
     main: '#222222',
     sub: '#666666',
   },
+  notice: {
+    border: '#ffffff'
+  },
   tekiou: function() {
     for (let section in this) {
-      if (section === 'apply') continue;
+      if (section == 'apply') continue;
       for (let key in this[section]) {
         document.documentElement.style
           .setProperty(`--${section}-${key}`, this[section][key]);
@@ -30,8 +33,8 @@ let IranMikans = {
     }
 }
 
-let Charas = {
-  'wretch':{
+let Charas = [
+  {
     id:'wretch',
     name:'持たざる者',
     description:'持たざる者。何もないが、何でもあるとも言える。\n平均的で普遍的。普通の凡才でただの人間。',
@@ -52,7 +55,7 @@ let Charas = {
     buttonback:'#999999',
   },
 
-  'greenslime':{
+  {
     id:'greenslime',
     name:'green_slime',
     description:'スライム。...まだできてないから使わない方が吉',
@@ -73,7 +76,7 @@ let Charas = {
     buttonback:'#999999',
   },
 
-  'mechanic':{
+  {
     id:'mechanic',
     name:'アミー',
     description:'メカニック。工具を用いて割となんでも作れる。\nそのせいか助手には大きく慕われている。\n打たれ弱いので繊細にね',
@@ -94,7 +97,7 @@ let Charas = {
     buttonback:'#fcffc0',
   },
   
-  'clown':{
+  {
     id:'clown',
     name:'週末の道化師',
     description:'ピエロさん。ランダム要素多め。\n',
@@ -115,7 +118,7 @@ let Charas = {
     buttonback:'#acf8ff',
   },
   
-  'magodituono':{
+  {
     id:'magodituono',
     name:'スオーノ・フルマイン',
     description:'雷電魔術師。"帯電"を用いて戦う\n将軍ではない。誰だ将軍って言ったやつは',
@@ -135,10 +138,10 @@ let Charas = {
     buttonsolid:'#7f1184',
     buttonback:'#5f4894',
   },
-}
+]
 
-let Friends = {
-  '飛花レイル':{
+let Friends = [
+  {
     ruby:'ひか れいる',
     name:'飛花レイル',
     belong:'', //所属
@@ -150,12 +153,12 @@ let Friends = {
     E:0,
     P:0,
   },
-  '憚羅レイル':{
+  {
     ruby:'はばから れいる',
     name:'憚羅レイル',
     rare:3
   },
-  '泡沫アリア':{
+  {
     ruby:'うたかた ありあ',
     name:'泡沫アリア',
     belong:'',
@@ -167,55 +170,55 @@ let Friends = {
     E:0,
     P:0,
   },
-  'メメント・ラメント':{
+  {
     ruby:'めめんと らめんと',
     name:'メメント・ラメント',
     rare:3
   },
 
-  '小安見ニーク':{
+  {
     ruby:'おやすみ にーく',
     name:'小安見ニーク',
     rare:3,
   },
-  '面戸ガリヤ':{
+  {
     ruby:'めんど がりや',
     name:'面戸ガリヤ',
     rare: 2,
   },
-  '伊辣キキ':{
+  {
     ruby:'いらつ きき',
     name:'伊辣キキ',
     rare: 2,
   },
 
-  '息留河鹿':{
+  {
     ruby:'いきる かしか',
     name:'息留 河鹿',
     rare: 1
   },
-  'ジャンネ マジデ':{
+  {
     ruby:'じゃんね まじで',
     name:'ジャンネ マジデ',
     rare:1
   },
-  '手斧バス':{
+  {
     ruby:'ておの ばす',
     name:'手斧バス',
     rare:1
   },
 
-  '久須田和伊男':{
+  {
     ruby:'くすた わいお',
     name:'久須田 和伊男',
     rare:1,
   },
-  'ゴードン・ソージィ':{
+  {
     ruby:'ごーどん そーじぃ',
     name:'ゴードン・ソージィ',
     rare:3
   }
-}
+]
 
 let Buffs = [
   { //if value < 0, それはデバフ扱い
@@ -637,8 +640,8 @@ let Buffs = [
   }
 ]
 
-let Slashs = {
-  'slash':{
+let Slashs = [
+  {
     id:'slash',
     name:'シンプル斬り',
     description:'必中ー倍単体刹那斬', //そのうち武士作ってこれ作りたい
@@ -660,7 +663,7 @@ let Slashs = {
         return 0;
     }
   },
-  'double slash':{
+  {
     id:'double slash',
     name:'つばめ返し',
     description:'二回攻撃。あたらないこともあるけど現環境最強',
@@ -685,7 +688,7 @@ let Slashs = {
         return 0;
     }
   },
-  'slash of light':{
+  {
     id:'slash of light',
     name:'一閃',//まじん斬り も作りたいね 霹靂一閃も
     description:'初期のロマン技。\n当たれば幸い的な感じで打ったほうが楽',
@@ -717,10 +720,10 @@ let Slashs = {
         return 0;
     }
   }
-}
+]
 
-let Magics = {
-  'heal':{
+let Magics = [
+  {
     id:'heal',
     name:'heal',
     description:'体力を回復する。20%',
@@ -733,7 +736,7 @@ let Magics = {
         return 0;
     }
   },
-  'power':{
+  {
     id:'power',
     name:'power',
     description:'攻撃力が1.25倍になります。やったね！',
@@ -747,7 +750,7 @@ let Magics = {
         return 0;
     }
   },
-  'shell':{
+  {
     id:'shell',
     name:'shell',
     description:'防御力が1.25倍になります！\n実感あんまりないけど..',
@@ -760,7 +763,7 @@ let Magics = {
         return 0;
     }
   },
-  'poison':{
+  {
     id:'poison',
     name:'poison',
     description:'相手を毒にします\n毒ビルド強すぎてやばい',
@@ -773,7 +776,7 @@ let Magics = {
         return 0;
     }
   },
-  'thundee':{
+  {
     id:'thundee',
     name:'サンディ',
     description:'牽制に使われがち',
@@ -787,7 +790,7 @@ let Magics = {
         return 0;
     }
   },
-  'garva':{
+  {
     id:'garva',
     name:'ガーヴァ',
     description:'濁点多いと強そうだよね\nまれに火傷も',
@@ -800,7 +803,7 @@ let Magics = {
         return 0;
     }
   },
-  'healerthan':{
+  {
     id:'healerthan',
     name:'healer than',
     description:'体力を40%回復します。healよりも強い。だから比較のthanなんですね〜',
@@ -811,7 +814,7 @@ let Magics = {
         return 0;
     }
   },
-  'luck':{
+  {
     id:'luck',
     name:'luck',
     description:'二回行動人間になれるかも？なやつ。\n欠けた運を施錠しましょう',
@@ -822,7 +825,7 @@ let Magics = {
         return 0;
     }
   },
-  'thundos':{
+  {
     id:'thundos',
     name:'サンドス',
     description:'二段目。\nサンドじゃないんです許してください',
@@ -835,7 +838,7 @@ let Magics = {
         return 0
     }
   },
-  'morepower':{
+  {
     id:'morepower',
     name:'more power',
     description:'攻撃力が1.5倍になります。power使ってた人いるんかな',
@@ -846,7 +849,7 @@ let Magics = {
         return 0
     }
   },
-  'moreshell':{
+  {
     id:'moreshell',
     name:'more shell',
     description:'防御力が1.5倍になります。けどあんまり実感はないよね',
@@ -857,7 +860,7 @@ let Magics = {
         return 0
     }
   },
-  'deadlypoison':{
+  {
     id:'deadlypoison',
     name:'deadly poison',
     description:'敵を猛毒にします。やったね！！！',
@@ -868,7 +871,7 @@ let Magics = {
         return 0;
     }
   },
-  'garvan':{
+  {
     id:'garvan',
     name:'ガーヴァン',
     description:'\nnotラージャン',
@@ -880,7 +883,7 @@ let Magics = {
         return result
     }
   },
-  'thehealest':{
+  {
     id:'thehealest',
     name:'the healest',
     description:'60%回復。これ以上はない、っていう意味ですね。\nxyzじゃないよ',
@@ -891,7 +894,7 @@ let Magics = {
         return 0
     }
   },
-  'luckgreat':{
+  {
     id:'luckgreat',
     name:'luckgreat',
     description:'luckよりも行動しやすいです。嬉しいね',
@@ -902,7 +905,7 @@ let Magics = {
         return 0
     }
   },
-  'merazoma':{
+  {
     id:'merazoma',
     name:'メラゾーマ',
     description:'ぬわーーっっ!!ってしてやりましょうぜ(炎の大ダメージ)',//対パパス最強にしたいね、これ
@@ -914,7 +917,7 @@ let Magics = {
         return result
     }
   },
-  'thoron':{
+  {
     id:'thoron',
     name:'Thoron',
     description:'当たったらラッキー、シールドでされたら空前で追撃なつよつよ技。\nけどギガサンダーの方が好き(雷の大ダメージ)',
@@ -925,7 +928,7 @@ let Magics = {
         return result
     }
   },
-  'random':{
+  {
     id:'random',
     name:'Random',
     description:'自身が覚えてる魔法からランダム(mpは5固定)。これぞ醍醐味ってやつよな',
@@ -949,14 +952,12 @@ let Magics = {
         return 0;
       }
     }
-  },
-
-  
-}
+  }, 
+]
 
 let Equips = {
-  'weapon':{
-    'none':{
+  'weapon':[
+    {
       name:'なし',
       id:'none',
       num:0, //このnumはいらんとおもう、hasEquip( [] )で管理するし
@@ -967,7 +968,7 @@ let Equips = {
       ap:0,
       ce:0,
     },
-    'woodenstick':{
+    {
       name:'木の棒',
       id:'woodstick',
       num:0,
@@ -979,7 +980,7 @@ let Equips = {
       ce:0,
       
     },
-    'woodensword':{
+    {
       name:'木刀',
       id:'woodsword',
       num:0,
@@ -990,7 +991,7 @@ let Equips = {
       ap:0,
       ce:0,
     },
-    'bamboo_sword':{
+    {
       name:'竹刀',
       id:'bamboo_sword',
       num:0,
@@ -1001,7 +1002,7 @@ let Equips = {
       ap:0,
       ce:0,
     },
-    'stone':{
+    {
       name:'石ころ',
       id:'stone',
       num:0,
@@ -1012,7 +1013,7 @@ let Equips = {
       ap:0,
       ce:0,
     },
-    'bigrock':{
+    {
       name:'大きな石',
       id:'bigrock',
       num:0,
@@ -1023,7 +1024,7 @@ let Equips = {
       ap:0,
       ce:0,
     },
-    'brick':{
+    {
       name:'レンガ',
       id:'brick',
       num:0,
@@ -1034,7 +1035,7 @@ let Equips = {
       ap:0,
       ce:0,
     },
-    'thinpaper':{
+    {
       name:'薄めの紙',
       id:'thinpaper',
       num:0,
@@ -1048,7 +1049,7 @@ let Equips = {
           critlate: 70,
       }
     },
-    'card':{
+    {
       name:'カード',
       id:'card',
       num:0,
@@ -1059,7 +1060,7 @@ let Equips = {
       ap:0,
       ce:0,
     },
-    'scissors':{
+    {
       name:'はさみ',
       id:'scissors',
       num:0,
@@ -1073,7 +1074,7 @@ let Equips = {
           critdmg: 4.0,
       }
     },
-    'knife':{
+    {
       name:'ほんもののナイフ',
       id:'knife',
       num:0,
@@ -1088,7 +1089,7 @@ let Equips = {
       }
     },
 
-    'blooddagger':{
+    {
       name:'ジェン・ソルテ',
       id:'blooddagger',
       num:0,
@@ -1108,7 +1109,7 @@ let Equips = {
       },
       ce:0,
     },
-    'timeontarget':{
+    {
       name:'time on target',
       id:'timeontarget',
       num:0,
@@ -1126,7 +1127,7 @@ let Equips = {
       },
       ce:0,
     },
-    'biggamble':{
+    {
       name:'大博打',
       id:'biggamble',
       num:0,
@@ -1140,7 +1141,7 @@ let Equips = {
           atk: Math.floor(Math.random()*100)+1,
       }
     },
-    'contrarian':{
+    {
       name:'天邪鬼',
       id:'contrarian',
       num:0,
@@ -1154,9 +1155,9 @@ let Equips = {
           critlate: 60
       }
     },
-  },
-  'shield':{
-    'none':{
+  ],
+  'shield':[
+    {
       name:'なし',
       id:'none',
       num:0,
@@ -1166,7 +1167,7 @@ let Equips = {
       buyable:0,
       sp:0
     },
-    'mask':{
+    {
       name:'マスク',
       id:'mask',
       num:0,
@@ -1177,17 +1178,17 @@ let Equips = {
       buyable:1,
       sp:0
     },
-    'thinbook':{
+    {
       name:'薄い本',
       id:'thinbook',
       num:0,
       shell:1,
       price:5,
-      description:'***なのは駄目！！死刑！！！！',//コハルさんなのでセーフ
+      description:'***なのは駄目！！\n死刑！！！！',//コハルなのでセーフ
       buyable:1,
       sp:0
     },
-    'woodenplank':{
+    {
       name:'木の板',
       id:'woodenplank',
       num:0,
@@ -1197,7 +1198,7 @@ let Equips = {
       buyable:1,
       sp:0
     },
-    'ironplate':{
+    {
       name:'テッパン',
       id:'ironplate',
       num:0,
@@ -1207,7 +1208,7 @@ let Equips = {
       buyable:1,
       sp:0
     },
-    'potlid':{
+    {
       name:'鍋の蓋',
       id:'potlid',
       num:0,
@@ -1217,7 +1218,7 @@ let Equips = {
       buyable:1,
       sp:0
     },
-    'thickbook':{
+    {
       name:'厚めの本',
       id:'thickbook',
       num:0,
@@ -1227,7 +1228,7 @@ let Equips = {
       buyable:1,
       sp:0
     },
-    'door':{
+    {
       name:'ドア',
       id:'door',
       num:0,
@@ -1237,7 +1238,7 @@ let Equips = {
       buyable:1,
       sp:0
     },
-    'electricfan':{
+    {
       name:'扇風機',
       id:'electricfan',
       num:0,
@@ -1247,7 +1248,7 @@ let Equips = {
       buyable:1,
       sp:0
     },
-    'perorodoll':{
+    {
       name:'ペロロ様人形',
       id:'perorodoll',
       num:0,
@@ -1257,9 +1258,9 @@ let Equips = {
       buyable:1,
       sp:0
     }
-  },
-  'ear':{
-    'none':{
+  ],
+  'ear':[
+    {
       name:'なし',
       id:'none',
       num:0, //そのうちhasEqでやって管理するようにしよーね
@@ -1270,9 +1271,9 @@ let Equips = {
       buyable:0,
       sp:0
     }
-  },
-  'ring':{
-    'none':{
+  ],
+  'ring':[
+    {
       name:'なし',
       id:'none',
       num:0,
@@ -1283,9 +1284,9 @@ let Equips = {
       buyable:0,
       sp:0
     }
-  },
-  'neck':{
-    'none':{
+  ],
+  'neck':[
+    {
       name:'なし',
       id:'none',
       num:0,
@@ -1296,18 +1297,11 @@ let Equips = {
       buyable:0,
       sp:0
     }
-  }
-}
-let Weapons = {
-  //errored!!
+  ]
 }
 
-let Armors = {
-  //errored!!
-}
-
-let Tools = {
-  'aspirin':{
+let Tools = [
+  {
     id:'aspirin',
     name:'アスピリン',
     price:20,
@@ -1323,7 +1317,7 @@ let Tools = {
         return 0;
     }
   },
-  'pablon':{
+  {
     name:'パブロン',
     id:'pablon',
     price:40,
@@ -1339,7 +1333,7 @@ let Tools = {
         return 0;
     }
   },
-  'trypsin':{
+  {
     name:'トリプシン',
     id:'trypsin',
     price:60,
@@ -1355,39 +1349,34 @@ let Tools = {
         return 0;
     }
   },
-  'lulu':{
+  {
     name:'ルル',
     id:'lulu',
     price:80,
     description:'sick sickな頭痛薬。毒が流るルルですね。',
     num:0,
-    process:async function(cam,me,are){
-        await addtext(`求愛性 孤独 ドク 流るルル♪`)
-        x = Math.round(humans[tcam][target].maxhp * 0.8);
-        if((x + humans[tcam][target].hp) > humans[tcam][target].maxhp){x = humans[tcam][target].maxhp - humans[tcam][target].hp;};
-        humans[tcam][target].hp += x;
-        tekiou();
-        await addtext(`体力が${x}回復した!`);
+    process:async function(who,are){
+        await addtext(`求愛性 孤独 ドク 流るルル`)
+        await heal(who, are, '80%', 'add')
+        if(probably(70)) return 0;
+        await addtext('愛をもっと')
+        await heal(who, are, '20%', 'add')
         return 0;
     }
   },
-  'potion':{
+  {
     name:'魔法薬',
     id:'potion',
     price:100,
     description:'投げつけたい。敵に',
     num:0,
     process:async function(cam,me,are){
-        await addtext(`なんか一番しょうもないよね、これ\nあ、全回復です`)
-        x = Math.round(humans[tcam][target].maxhp);
-        if((x + humans[tcam][target].hp) > humans[tcam][target].maxhp){x = humans[tcam][target].maxhp - humans[tcam][target].hp;};
-        humans[tcam][target].hp += x;
-        tekiou();
-        await addtext(`体力が${x}回復した!`);
+        await addtext(`なんか一番しょうもないよね、これ\nあ、全回復です`);
+        await heal(who, are, '100%', 'set')
         return 0;
     }
   },
-  'throwknife':{
+  {
     name:'投げナイフ',
     id:'throwknife',
     price:20,
@@ -1403,7 +1392,7 @@ let Tools = {
         return 0;
     }
   },
-  'trickyvariables':{
+  {
     name:'トリッキーな変数',
     id:'trickyvariables',
     price:40,
@@ -1427,7 +1416,7 @@ let Tools = {
         return 0;
     }
   },
-  'bottlegrenade':{
+  {
     name:'ボトルグレネード',
     id:'bottlegrenade',
     price:60,
@@ -1444,7 +1433,7 @@ let Tools = {
         return 0;
     }
   },
-  'coveringfire':{
+  {
     name:'援護射撃',
     id:'coveringfire',
     price:80,
@@ -1461,7 +1450,7 @@ let Tools = {
         return 0;
     }
   },
-  'bomb':{
+  {
     name:'爆弾',
     id:'bomb',
     price:100,
@@ -1474,7 +1463,7 @@ let Tools = {
         return 1;
     }
   },
-  'redcard':{
+  {
     name:'レッドカード',
     id:'redcard',
     price:35,
@@ -1486,7 +1475,7 @@ let Tools = {
         return 0;
     }
   },
-  'bluecard':{
+  {
     name:'ブルーカード',
     id:'bluecard',
     price:35,
@@ -1504,7 +1493,7 @@ let Tools = {
         return 0;
     }
   },
-  'greencard':{
+  {
     name:'グリーンカード',
     id:'greencard',
     price:35,
@@ -1521,7 +1510,7 @@ let Tools = {
         return 0;
     }
   },
-  'blackcard':{
+  {
     name:'ブラックカード',
     id:'blackcard',
     price:35,
@@ -1537,14 +1526,14 @@ let Tools = {
         return 0;
     }
   },
-}
+]
 
 let Skills = [
     {
         type:'ex',
         id:'null',
         name:'null',
-        description:'何もないです。まあこれが店頭に並ぶこともないでしょうけどね。はい論破',
+        description:'何もないです。\nまあこれが店頭に並ぶこともないでしょうけどね。\nはい論破',
         price:0,
         buyable:0,
     },
@@ -1556,7 +1545,6 @@ let Skills = [
         price:95,
         buyable:1,
         process:async function(cam,me){
-          console.log('slimeのex発動ですわ〜〜〜')
           return 0;
         }
     },
@@ -1867,19 +1855,178 @@ let Stages = [
   }
 ];
 
-let Enemies = {
-  '蒼白の粘液':{
+let obsAll = {
+  // k == 重音ってことで重複するかどうか on == 乗れるかどうか, p == 確率
+  '草原':[
+      {id:'enemy', k:1, on:0, p:35, data:{name:'蒼白の粘液'}},
+      {id:'enemy', k:1, on:0, p:35, data:{name:'翠嵐の風刃'}},
+      {id:'enemy', k:1, on:0, p:35, data:{name:'黄昏の穿影'}},
+      {id:'enemy', k:1, on:0, p:35, data:{name:'燐光の妖花'}},
+      {id:'fire', k:1, on:1, p:10, data:{used:0}},
+      {id:'shop', k:0, on:1, p:10, data:{type:'skill'}},
+  ],
+}
+
+let Objectdatas = [
+  {
+    id:'none',
+    name:'none',
+    process:async function(){}
+  },
+  {
+    id:'stair',
+    name:'階段',
+    process:async function(){
+      GoNextFloor();
+    }
+  },
+  {
+    id:'door',
+    name:'ドア',
+    process:async function(){
+      NextStage();
+    }
+  },
+  {
+    id:'enemy',
+    name:'敵',
+    w:1, //1 == 1massの意
+    h:1,
+    spd:20,
+    pass:0,
+    process:async function(){
+      EnemyAppear();
+    },
+  },
+  {
+    id:'boss',
+    name:'上司',
+    process:async function(){
+      BossEnemyAppear();
+    }
+  },
+  {
+    id:'fire_on',
+    name:'焚き火',
+    process:async function(){
+      movable = 1;
+      document.querySelector('#overfieldArea').style.display = 'none';
+      document.querySelector('#eventArea').style.display = 'block';
+      document.querySelector('#eventArea').innerHTML = '<button id="CampRest" onclick="Camprest()"></button>\n<button id="CampTrade" onclick="Camptrade()"></button>'
+      log.textContent = '休憩できそうな場所を見つけた！';
+      Camprestper = (Math.floor(Math.random() * 4)+3)/10;
+      document.querySelector('#CampRest').textContent = '朝まで休む(' + Camprestper*100 + '%回復)';//30のときはスキルカード強化みたいなやつあってもいいかも
+      switch(Math.floor(Math.random() * 3)+1){
+        case 1:
+        if(Math.floor(Math.random() * 3)+1) y = 10,document.querySelector('#CampTrade').textContent = '放浪武器商人に話しかける';
+        else  y = 1, document.querySelector('#CampTrade').textContent = '武器商人に話しかける';
+        break;
+        case 2: y = 2; document.querySelector('#CampTrade').textContent = '防具取扱専門家に話しかける'; break;
+        case 3: y = 3; document.querySelector('#CampTrade').textContent = '道具屋24に話しかける'; break;
+      }
+    }
+  },
+  {
+    id:'fire_off',
+    name:'焚き火跡',
+    process:async function(){
+      await addtext(arrayGacha( //この重複感好き
+        ['この焚き火はもう木炭になっている','まだ温かい..この辺りに誰かいるようだ'],
+        [85,15]
+      ));
+    }
+  },
+  {
+    id:'shop_skill',
+    name:'スキルショップ',
+    process:async function(){
+      SkillShopOpen();
+    }
+  },
+  {
+    id:'chest_n',
+    name:'宝箱',
+    process:async function(){
+      OpenChest(1);
+    }
+  },
+  {
+    id:'chest_r',
+    name:'レア宝箱',
+    process:async function(){
+      OpenChest(2);
+    }
+  },
+  {
+    id:'hopebutton',
+    name:'救いのボタン',
+    process:async function(){
+      HopeButtonact();
+    }
+  },
+  {
+    id:'candytray',
+    name:'あめ置き場',
+    process:async function(){
+      Candytake();
+    }
+  },
+  {
+    id:'cookietray',
+    name:'クッキー置き場',
+    process:async function(){
+      Cookietake();
+    }
+  },
+  {
+    id:'scorpion',
+    name:'さそりさん',
+
+    process:async function(){
+      ScorpionAct(1);
+    }
+  },
+  {
+    id:'scorpion',
+    name:'さそりさん2世',
+    process:async function(){
+      ScorpionAct(2);
+    }
+  },
+  {
+    id:'cutrast',
+    name:'さぼてんさん',
+    process:async function(){
+      CatusAct();
+    }
+  },
+  {
+    id:'oasis',
+    name:'おあしす',
+    process:async function(){
+      OasisAct();
+    }
+  },
+  {
+    id:'sandstorm',
+    name:'砂嵐',
+    process:async function(){}
+  },
+]
+
+let Enemies = [
+  {
     name:'蒼白の粘液',
     stage:'草原',
-    maxhp:'+10',
+    maxhp:'+15',
     atk:'+0',
-    def:'-10',
+    def:'-5',
     maxmp:'0',
     matk:'0',
-    mdef:'-20',
-    critlate:'-0.01',
-    critdmg:'-1',
-    critresist:'+1',
+    mdef:'-30',
+    critlate:'=absolute',
+    critdmg:'=0',
+    critresist:'=absolute',
     speed:'40',
     acts:[
       {
@@ -1896,11 +2043,11 @@ let Enemies = {
         }
       },
       {
-        name:'粘液付与',//やばい方のスライムも作りたいね 一緒に溶けよ....? みたいな..ってちょっと癖すぎるか....?よし、技名は自己責任で表示可にしよう その場合セリフは...?
+        name:'粘液付与',
         probable:25,
         num:3,
         process:async function(who){
-          await addtext(`${who.name}は粘液を絡ませてきた！`);//いやこれはこれでやばいか...?いや全然捉えようによってはやばいわ
+          await addtext(`${who.name}は粘液を絡ませてきた！`);
           let are = ShallTargetSelect(who, 'phph', 0);
           await buffadd(who, are,'stickyslime', 'turn' ,2,1);
           return 0;
@@ -1908,16 +2055,16 @@ let Enemies = {
       }
     ]
   },
-  '翠嵐の風刃':{
+  {
     name:'翠嵐の風刃',
     stage:'草原',
-    maxhp:'+10',
+    maxhp:'-20',
     atk:'+10',
-    def:'-10',
+    def:'-20',
     maxmp:'0',
     matk:'+0',
     mdef:'+0',
-    critlate:'+0.3',
+    critlate:'+30',
     critdmg:'+0.5',
     critresist:'+0',
     speed:'75',
@@ -1948,13 +2095,13 @@ let Enemies = {
       }
     ]
   },
-  '黄昏の穿影':{
+  {
     name:'黄昏の穿影',
     stage:'草原',
     maxhp:'-10',
     atk:'+15',
     def:'+0',
-    maxmp:'0',
+    maxmp:'=0',
     matk:'+0',
     mdef:'+0',
     critlate:'+0',
@@ -2004,18 +2151,18 @@ let Enemies = {
       }
     ]
   },
-  '燐光の妖花':{
+  {
     name:'燐光の妖花',
     stage:'草原',
-    maxhp:'-15',
+    maxhp:'+0',
     atk:'-10',
     def:'+0',
-    maxmp:'0',
+    maxmp:'=0',
     matk:'+0',
     mdef:'+15',
     critlate:'+0',
     critdmg:'+0.5',
-    critresist:'+0.1',
+    critresist:'+10',
     speed:'50',
     acts:[
       {
@@ -2050,16 +2197,47 @@ let Enemies = {
         process:async function(who){
           await addtext(`${who.name}は眠り粉を振りかけてきた！`)
           let are = ShallTargetSelect(who, 'patkh',0);
-          await buffadd(who, are, 'sleep', 'turn', 1, 1);
+          await buffadd(who, are, 'sleeping', 'turn', 1, 1);
           return 0;
         }
       }
     ]
   },
-};
+  {
+    name:'茎槍の狩人',
+    stage:'草原',
+    maxhp:'+0',
+    atk:'+10',
+    def:'+2',
+    maxmp:'0',
+    matk:'+0',
+    mdef:'+0',
+    critlate:'+0',
+    critdmg:'+0.5',
+    critresist:'+10',
+    speed:'50',
+    acts:[
+      {
+        name:'急襲',
+        probable:30,
+        type:'',
+        num:3,
+        process:async function(who){
+          let are = ShallTargetSelect(who,'pdefl');
+          let res = await qte(1000,['a','d']); //0が失敗, 1が成功
+          switch(res){
+            case 0:
+              
+          }
+          return 0;
+        }
+      },
+    ]
+  }
+];
 
-let Prefixes = {
-  'furious':{
+let Prefixes = [
+  {
     id:'furious',
     name:'激昂',
     rare:1,
@@ -2069,7 +2247,7 @@ let Prefixes = {
       critrate: '=5'
     }
   },
-  'calm':{
+  {
     id:'calm',
     name:'冷静沈着な',
     rare:1,
@@ -2079,7 +2257,7 @@ let Prefixes = {
       critrate: '=5'
     },
   },
-  'gambler':{
+  {
     id:'gambler',
     name:'ギャンブラーな',
     rare:1,
@@ -2088,7 +2266,7 @@ let Prefixes = {
       maxhp: '=200%'
     }
   },
-  'toudh':{
+  {
     id:'tough',
     name:'守りが固い',
     rare:2,
@@ -2099,7 +2277,7 @@ let Prefixes = {
       def: '=150%',
     }
   },
-  'wise':{
+  {
     id:'wise',
     name:'心眼持ちの',
     rare:3,
@@ -2109,12 +2287,12 @@ let Prefixes = {
       atk: '=30%',
     }
   },
-}
+]
 
-const Quests = {
-  main:{
-    1:{
-      num:1,
+let Quests = {
+  main:[
+    {
+      num:0,
       description:"このゲームを見つけてくれてありがとう！！",
       rewards: 200,
       type:0,
@@ -2122,8 +2300,8 @@ const Quests = {
       act:1,
       acted:1
     },
-    2:{
-      num:2,
+    {
+      num:1,
       description:"敵を3体倒す",
       rewards: 100, 
       type:'k', //敵を倒す
@@ -2131,8 +2309,8 @@ const Quests = {
       act:3,    //必要実行数
       acted:0   //現在実行数
     },
-    3:{
-      num:3,
+    {
+      num:2,
       description:"ダンジョンを一回クリアする",
       rewards: 100,
       type:'dc',
@@ -2140,10 +2318,9 @@ const Quests = {
       act:1,
       acted:0,
     },
-  },
+  ],
   daily:[
     {
-      id: 1,
       description: "ボスを1体倒す",
       rewards: 20,
       type: 'k',
@@ -2152,7 +2329,6 @@ const Quests = {
       acted: 0,
     },
     {
-      id: 1,
       description: "敵を3体倒す",
       rewards: 20,
       type: 'k',
@@ -2161,7 +2337,6 @@ const Quests = {
       acted: 0,
     },
     {
-      id: 1,
       description: "敵を5体倒す",
       rewards: 20,
       type: 'k',
@@ -2170,7 +2345,6 @@ const Quests = {
       acted: 0,
     },
     {
-      id: 1,
       description: "敵を7体倒す",
       rewards: 20,
       type: 'k',
@@ -2179,7 +2353,6 @@ const Quests = {
       acted: 0,
     },
     {
-      id: 1,
       description: "ダンジョンを1回クリアする",
       rewards: 20,
       type: 'dc',
@@ -2199,173 +2372,6 @@ let noticeData = [
   },
 ]
 
-let objProcesses = {
-  'enemy': async function() {
-    
-  }
-}
-let NanigaOkirukana = {
-  'none':{
-    id:'none',
-    name: 'none',
-    process:async function(){},
-  },
-  'stair':{
-    id:'stair',
-    name:'階段',
-    process:async function(){
-      GoNextFloor();
-    },
-  },
-  'enemy':{
-    id:'enemy',
-    name:'敵',
-    process:async function(){
-      EnemyAppear();
-    },
-  },
-  'fire_on':{
-    id:'fire_on',
-    name:'焚き火',
-    process:async function(){
-      movable = 1;
-      document.querySelector('#overfieldArea').style.display = 'none';
-      document.querySelector('#eventArea').style.display = 'block';
-      document.querySelector('#eventArea').innerHTML = '<button id="CampRest" onclick="Camprest()"></button>\n<button id="CampTrade" onclick="Camptrade()"></button>'
-      log.textContent = '休憩できそうな場所を見つけた！';
-      Camprestper = (Math.floor(Math.random() * 4)+3)/10;
-      document.querySelector('#CampRest').textContent = '朝まで休む(' + Camprestper*100 + '%回復)';//30のときはスキルカード強化みたいなやつあってもいいかも
-      switch(Math.floor(Math.random() * 3)+1){
-        case 1:
-        if(Math.floor(Math.random() * 3)+1) y = 10,document.querySelector('#CampTrade').textContent = '放浪武器商人に話しかける';
-        else  y = 1, document.querySelector('#CampTrade').textContent = '武器商人に話しかける';
-        break;
-        case 2: y = 2; document.querySelector('#CampTrade').textContent = '防具取扱専門家に話しかける'; break;
-        case 3: y = 3; document.querySelector('#CampTrade').textContent = '道具屋24に話しかける'; break;
-      }
-    }
-  },
-  'fire_off':{
-    id:'fire_off',
-    name:'焚き火跡',
-    process:async function(){
-      await addtext(arrayGacha( //この重複感好き
-        ['この焚き火はもう木炭になっている','まだ温かい..この辺りに誰かいるようだ'],
-        [85,15]
-      ));
-    }
-  },
-  'shop_skill':{
-    id:'shop_skill',
-    name:'スキルショップ',
-    process:async function(){
-      SkillShopOpen();
-    }
-  },
-  'chest_n':{
-    id:'chest_n',
-    name:'宝箱',
-    process:async function(){
-      if(!objMap.some(row => row.includes(2))){OpenChest(1);}
-    }
-  },
-  'chest_r':{
-    id:'chest_r',
-    name:'レア宝箱',
-    process:async function(){
-      if(!objMap.some(row => row.includes(2))){OpenChest(2);}
-    }
-  },
-  'hopebutton':{
-    id:'hopebutton',
-    name:'救いのボタン',
-    process:async function(){
-      HopeButtonact();
-    },
-  },
-  'candytray':{
-    id:'candytray',
-    name:'あめ置き場',
-    process:async function(){
-      Candytake();
-    }
-  },
-  'cookietray':{
-    id:'cookietray',
-    name:'クッキー置き場',
-    process:async function(){
-      Cookietake();
-    }
-  },
-  'boss':{
-    id:'boss',
-    name:'boss',
-    process:async function(){
-      BossEnemyAppear();
-    }
-  },
-  'door':{
-    id:'door',
-    name:'ドア',
-    process:async function(){
-      if(!objMap.some(row => row.includes(13))){NextStage();}
-    }
-  },
-  16:{
-    name:'chest',
-    process:async function(){
-      if(!objMap.some(row => row.includes(2))){OpenChest(1);}
-    }
-  },
-  17:{
-    name:'rarechest',
-    process:async function(){
-      if(!objMap.some(row => row.includes(2))){OpenChest(2);}
-    }
-  },
-  19:{
-    name:'サソリさん',
-    process:async function(){
-      ScorpionAct(1);
-    }
-  },
-  20:{
-    name:'サボテン', //ついに動いたサボテン
-    process:async function(){
-      CatusAct();
-    }
-  },
-  21:{
-    name:'オアシス',
-    process:async function(){
-      OasisAct();
-    }
-  },
-  22:{
-    name:'砂嵐',
-    process:async function(){
-      console.log('これはなんもないよ')
-    }
-  },
-  23:{
-    name:'サソリさんⅡ',
-    process:async function(){
-      ScorpionAct(2);
-    }
-  },
-}
 
-let Objectdatas = {
-  'enemy':{
-    'none':{
-      id: 'enemy',
-      name: 'none',
-      w: 1, //1 == 1massの意
-      h: 1,
-      spd: 20,
-      pass: 0,
-    }
-  }
-}
 
 
