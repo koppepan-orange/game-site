@@ -12,6 +12,7 @@
       @font-face {font-family: cube12;src: url(clicker-of-mugen/assets/fonts/cube12.ttf);}
       body{
         background-color: #f6fff2;
+        overflow: hidden;
       }
       #main{
         display: flex;
@@ -97,6 +98,16 @@
         background: url('clicker-of-mugen/assets/foods/apple.png') no-repeat center/cover;
         pointer-events: none;
       }
+      #frninScore {
+        display: none;
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        font-size: 24px;
+        font-family: cube12;
+        color: #007ea1;
+        text-shadow: 1.5px 1.5px 3px #000;
+      }
 
       #trail {
         position: fixed;
@@ -140,6 +151,7 @@
     <div class="frnin"><img src="clicker-of-mugen/assets/buffs/power.png"></div>
   </div>
 
+  <div id="frninScore"></div>
   <canvas id="trail"></canvas>
   
 
@@ -161,6 +173,7 @@
     // let frninD = document.getElementById('frnin');
     let frninC = {
       startD: rightD.querySelector('.frnin'),
+      scoreD: document.getElementById('frninScore'),
       playing: 0,
       looped: 0,
       fruits: [],
@@ -178,6 +191,8 @@
       frninC.looped = 0;
       frninC.fruits = [];
       frninC.score = 0;
+      frninC.scoreD.style.display = 'block';
+      frninC.scoreD.textContent = `Score: 00000`;
       frninF.gameloop();
     }
     frninF.end = function(){
@@ -186,8 +201,23 @@
       frninC.startD.style.background = '#ddffd0';
       frninC.startD.removeEventListener('click', frninF.end);
       frninC.startD.addEventListener('click', frninF.start);
+
+      setTimeout(() => {
+        frninC.scoreD.style.display = 'none';
+      }, 3000);
     }
     frninC.startD.addEventListener('click', frninF.start);
+
+    frninF.score = function(num){
+      frninC.score += num;
+
+      if(frninC.score > 99900) frninC.score = 99999;
+
+      if(frninC.score % 3 == 0 || frninC.score.toString().includes('3')) nicoText('ｻｧﾝ');
+      if(frninC.score == 2300) addtext('23！'), addtext('no name社長！23ですぞ！！'), addtext('効果は特にないそうです！');
+      if(frninC.score == 23000) addtext('お、君もしや'), addtext('23があったから230もあるやろ〜'), addtext('とでも思ったのかい？'), addtext('正解だよ'), addtext('ありがとねぇ、こんな終わってるゲームをめっちゃやってくれて'), addtext('裏話していいかい？'), addtext('長くなるけど'), addtext('このゲーム実は補完AIの暴走からできたんですよ'), addtext('補完AIが勝手にfruitNinja由来か果物を出すやつを作り出して'), addtext('それを改良する形でこうなりました'), addtext('すごいよね、なんつーかほぼシンギュラリティよね'), addtext('え違うって？'), addtext('まあとにかく聞いてくれてありがとね'), addtext('これ以上はないとだけ言っておこう')
+      if(frninC.score == 99999) addtext('さては君、暇だね？'), addtext('さながらフラウィーを思い出してしまうね'), addtext('もう何もないから寝るといいよ'), addtext('tx!')
+    }
 
     frninC.Fruits = [
       {
@@ -251,7 +281,7 @@
       //すごい確率！
       let pro2 = pro.map(a => a/100);
       let k = arrayMult(pro2);
-      console.log(`☆ミミ  ${k*100}%の確率を引きました！すごい！！  ☆ミミ`)
+      nicoText(`☆ミミ  ${k*100}%の確率を引きました！すごい！！  ☆ミミ`)
     }
 
     frninF.update = function(){
@@ -271,7 +301,7 @@
                 e.clientY >= rect.top  && e.clientY <= rect.bottom) {
               f.life -= 1;
               if (f.life <= 0) {
-                frninC.score += 1;
+                frninF.score(100);
                 f.div.remove();
                 frninC.fruits.splice(i, 1);
                 i--;
@@ -291,6 +321,9 @@
           i -= 1;
         }
       }
+
+      frninC.scoreD.textContent = `Score: ${frninC.score.toString().padStart(5, '0')}`;
+
     };
     
 
