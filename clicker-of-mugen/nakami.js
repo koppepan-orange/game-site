@@ -513,7 +513,7 @@ let imageNames = {
     'maps':['a','b','c','d','e','f','g'],
     'effects':['explosion_1','explosion_2','explosion_3'],
     'enemies':['翠嵐の風刃','蒼白の粘液','燐光の妖花','黄昏の穿影','燦爛する緑夢','紫苑の花姫'],
-    'charas':['greenslime','mechanic','clown','magodituono','wretch'],
+    'charas':['color_slime_green','color_slime_blue','color_slime_red','color_slime_yellow','color_slime_purple','color_slime_white','color_slime_black','mechanic','clown','magodituono','wretch'],
     'systems':['star1','star2','star3'],
 }
 let imageNamesT = Object.keys(imageNames).map(a => imageNames[a].length).reduce((a, b) => a + b);
@@ -757,8 +757,9 @@ function draw() {
         
         let belong = obs.stage;
         let src = obs.src;
-        if(obs.id == 'player') belong = 'charas', src = obs.data.name;
+        if(obs.id == 'player') belong = 'charas', src = obs.data.img;
         if(obs.id == 'enemy') belong = 'enemies', src = obs.data.name;
+        if('type' in obs.data) src += `_${obs.data.type}`;
         if('used' in obs.data) src += obs.data.used ? '_off' : '_on';
 
         let img = images[belong][src];
@@ -2599,7 +2600,7 @@ async function HomeLetsDungeon(){
         let img = document.createElement('img');
         img.className = 'img';
         img.setAttribute('data-description', chara.description);
-        img.src = `assets/charas/${chara.id}.png`;
+        img.src = `assets/charas/${chara.img}.png`;
         newDiv.appendChild(img);
 
         let name = document.createElement('div')
@@ -2647,6 +2648,7 @@ async function HomeLetsDungeon(){
 
 }
 function HomeGoDungeon(name){
+    let id = name;
     humans.players = [];
     humans.enemies = [];
     
@@ -2654,7 +2656,7 @@ function HomeGoDungeon(name){
         status:1,//0 = none, 1 = alive, 2 = dead
         cam:'players',
         me:0,
-        id:name,
+        id:id,
         name:'supermario wiiiiiiiiiiii',
         level:1,
         exp:0,
@@ -2712,8 +2714,8 @@ function HomeGoDungeon(name){
         who[key] = kihonChan[key];
     })
 
-    let data = Charas.find(a => a.id == name);
-    console.log(name, data)
+    let data = Charas.find(a => a.id == id);
+    console.log(id, data)
     Object.keys(data).forEach(key => { //変更点だけ変更
         who[key] = data[key];
     })
@@ -2743,7 +2745,7 @@ function HomeGoDungeon(name){
     log_open('c')
     document.querySelector('#homeArea').style.display = 'none';
     
-    addob('player', 0, 0, 1, 1, 20, 90, ['move'], {name})
+    addob('player', 0, 0, 1, 1, 20, 90, ['move'], {id, img: data.img})
 
     overfieldArea.style.display = 'block';
     NextStage();
@@ -3037,9 +3039,15 @@ async function damage(who, ares, value, kind, prop = []){
 
         //整え
         dmg = Math.floor(dmg);
-        if(defer.hp < dmg) dmg = defer.hp;
+        let iran = {
+            over: 0,
+            text: ''
+        };
+        if(defer.hp < dmg) dmg = defer.hp, overkill = 1;
         console.log(`予測:: ${defer.hp} => ${defer.hp - dmg} | dmg:${dmg}`);
-        if(!hasp('fixed')) console.log(`dmg:: (${atkval} * ${atker.power} * ${value}) - (${defval} * ${defer.shell}) = ${dmg}`);
+        if(!hasp('fixed')) iran.text = `dmg:: (${atkval} x ${atker.power} x ${value}) - (${defval} x ${defer.shell}) = ${dmg}`;
+        if(iran.over) iran.text += ' (overkillされそうだったんで調整したよ)';
+        if(iran.text) console.log(iran.text);
 
         // ~~終了~~ atker - defer ~~終了~~ //
         
@@ -3333,7 +3341,7 @@ async function qte(limit, seikai, arrkey) {
             4: ["left", "up", "right", "down"]
         };
         let len = arrkey.length;
-        let pos = positions[len] || 'errored'; // サポート外は空
+        let pos = positions[len] || 'errored';
         if(pos == 'errored') return 'errored';
         console.log(pos)
 
@@ -3341,11 +3349,18 @@ async function qte(limit, seikai, arrkey) {
         qteD2.style.display = "block";
         //lenの分だけ要素をqteD2に追加して、a,b,c,dでmitame.cssで指示する感じで。それぞれpolygonで三角にする感じで。
 
-        const elements = arrkey.map((key, i) => {
-            let div = document.createElement("div");
-            div.className = `qt${len} ${pos[i]}`;
-            return el;
-        });
+        let elements = [];
+        for(let i = 0; i < len; i++){
+            let el = document.createElement("div");
+            el.className = `qt${len} ${pos[i]}`;
+            qteD2.appendChild(el);
+            elements.push(el);
+        }
+        // const elements = arrkey.map((key, i) => {
+        //     let div = document.createElement("div");
+        //     div.className = `qt${len} ${pos[i]}`;
+        //     return el;
+        // });
         console.log(elements);
 
         const cleanup = (result) => {
@@ -3405,7 +3420,7 @@ let nowturn = 0;
 let targetselect = 0;
 
 const battleArea = document.querySelector('#battleArea');
-const commandD = battleArea.querySelector('.UIs .commands');
+const commandD = battleArea.querySelector('#UIs .commands');
 let commandC = {
     s1B: commandD.querySelector('.s1'),
     s2B: commandD.querySelector('.s2'),
@@ -4387,8 +4402,9 @@ async function killedCheck(){
         return 'end';
     }else{
         let isZemetu = [1,2,3,4].every(id => {
-            let Player = humans.players[id];
-            return Player.status == 0 || Player.status == 2;
+            let human = humans.players[id];
+            console.log(id, human)
+            return human.status == 0 || human.status == 2;
         })
         if(isZemetu){
             let saydefeats = [`${who.name}は力尽きた...残念でしたね！にはははは〜！`, '残念だったね!すごい惜しかったね!!', 'あ、あれ..？もう負けちゃったんですか....？', 'ほら、負けを認めてください？'];

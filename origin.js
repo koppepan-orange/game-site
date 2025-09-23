@@ -22,6 +22,13 @@ function kaijou(num){
     if(num == 1) return 1;
     return num * kaijou(num - 1);
 }
+function isSosu(num){
+  if (num < 2) return 0;
+  for(let i = 2; i * i <= n; i++){
+    if(n % i == 0) return 0;
+  }
+  return 1;
+}
 function arraySelect(array){
     let select = Math.floor(Math.random()*array.length);
     return array[select];

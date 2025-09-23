@@ -45,7 +45,7 @@ img{
 }
 .button{
   border: 2px solid var(--button-solid);
-  padding: 1px 2px;
+  padding: 5px 8px;
   background: var(--button-back);
   cursor: pointer;
 }
@@ -1087,8 +1087,6 @@ input[type="range"]::-moz-range-thumb {
   background: #ff5858 center/cover no-repeat;
   background-color: #ff5858 !important;
 }
-
-
 .debuffs{
   width: 50px;
   height: 75px;
@@ -1110,7 +1108,6 @@ input[type="range"]::-moz-range-thumb {
   border-right: 25px solid transparent;
   border-top: 25px solid #5858ff;
 }
-
 .handles{
   width: 50px;
   height: 75px;
@@ -1139,6 +1136,32 @@ input[type="range"]::-moz-range-thumb {
   width: 50px;
   height: 50px;
   background: #ffef74 center/cover no-repeat;
+}
+
+#UIs{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+#UIs .commands{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: fit-content;
+  padding: 5px;
+}
+#UIs .commands .button{
+  width: 100px;
+  height: 80px;
+  text-align: center;
 }
 
 

@@ -37,6 +37,7 @@ let Charas = [
   {
     id:'wretch',
     name:'持たざる者',
+    img:'wretch',
     description:'持たざる者。何もないが、何でもあるとも言える。\n平均的で普遍的。普通の凡才でただの人間。',
     ex:'null',
     ns:'null',
@@ -56,8 +57,9 @@ let Charas = [
   },
 
   {
-    id:'greenslime',
-    name:'green_slime',
+    id:'color_slime',
+    name:'color_slime',
+    img:'color_slime_green',
     description:'スライム。...まだできてないから使わない方が吉',
     ex:'null',
     ns:'null',
@@ -79,6 +81,7 @@ let Charas = [
   {
     id:'mechanic',
     name:'アミー',
+    img:'mechanic',
     description:'メカニック。工具を用いて割となんでも作れる。\nそのせいか助手には大きく慕われている。\n打たれ弱いので繊細にね',
     ex:'placeturret',
     ns:'throwwrench',
@@ -100,6 +103,7 @@ let Charas = [
   {
     id:'clown',
     name:'週末の道化師',
+    img:'clown',
     description:'ピエロさん。ランダム要素多め。\n',
     ex:'trickyvaiavles',
     ns:'gambler',
@@ -121,6 +125,7 @@ let Charas = [
   {
     id:'magodituono',
     name:'スオーノ・フルマイン',
+    img:'magodituono',
     description:'雷電魔術師。"帯電"を用いて戦う\n将軍ではない。誰だ将軍って言ったやつは',
     ex:'lightningstorm',
     ns:'elecbarrier',
@@ -228,7 +233,7 @@ let Buffs = [
     mode:'free', // turn/stack/actは付与時に決定。kindはfixe（Lv依存で値決定）かfree（付与時の引数で値決定）を定める用に。 poison/deadpoisonはfixe、burnもfixe。cheerupはfixe。atkup等能力値上昇系はfree。
                  // if(data.kind??'fixed')ってすべきかも。あんまないと思うけど
     agemono:'power',
-     //これは廃止。意味わからんし。turn/actならばvalueが等しいならtimeを増加新を削除、等しくないならば新しいものを追加。stackならばtimeがvalueだからかどうかあがいても加算。同盟が増えるこたぁない。
+     //turn/actならばvalueが等しいならtimeを増加新を削除、等しくないならば新しいものを追加。stackならばtimeがvalueだからかどうかあがいても加算。同盟が増えるこたぁない。
     description:'攻撃倍率が上がる。やったね！',
   },
   {
@@ -547,29 +552,24 @@ let Buffs = [
     description:'睡魔..微熱魔じゃないです\nターン終了時にsleepyをnstack増加さかせます',
     // sleepy:sleepyをnstack増加
     lvs:[
-      {sleepy:5},
-      {sleepy:10},
+      {sleepy:10}, //ほとんど1で。
       {sleepy:20},
       {sleepy:25},
-      {sleepy:50},
-      {sleepy:100},
     ],
-    max:6
+    max:3
   },
   {
     name:'sleepy',
     jpnm:'眠気',
     type:'handle',
     mode:'fixe',
-    description:'眠くなってる状態..です....\n100stack到達でsleepingに変化します....\n変化後のsleepingのLvはsleepinessに寄りけりです\nあと、行動時に確率でsleepyをnstack減少できます....',
+    description:'眠くなってる状態..です....\n100stack到達でsleepingに変化します....\n変化後のsleepingのLvはsleepinessに寄りけりです\nあと、行動時にsleepyをnstack減少できます....',
     lvs:[ //-と捉へよ
-      {sleepy:25},
-      {sleepy:20},
-      {sleepy:15},
-      {sleepy:10},
-      {sleepy:5},
-      {sleepy:1},
-    ]
+      {sleepy:6},
+      {sleepy:9},
+      {sleepy:12},
+    ],
+    max:3
   },
   {
     name:'sleeping',
@@ -1539,11 +1539,12 @@ let Skills = [
     },
     {//変更予定
         type:'ex',
-        id:'50%split',
-        name:'GO!SPLIT!!',
-        description:`自分の体力を最大の50%削り、分身を作りだす`,
-        price:95,
+        id:'',
+        name:'',
+        description:``,
+        price:50,
         buyable:1,
+        exclusive:'color_slime',
         process:async function(cam,me){
           return 0;
         }
