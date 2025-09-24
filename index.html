@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
   <head>
     <meta charset="UTF-8">
     <title>Welcome to...</title>
@@ -134,7 +134,7 @@
     <div id="title">My Game-Park!!</div>
     <div id="links">
       <a href="readme.txt">read.me</a>
-      <a href="farm-game/">farm game</a>
+      <a href="farm-game/index.html">farm game</a>
       <a href="clicker-of-mugen/">clicker of mugen</a>
       <a href="clicker-of-mugen-dungeon/">clicker of mugen dungeons</a>
       <a href="rogue-cardgame/">rogue cardgame</a>
@@ -154,8 +154,6 @@
 
   <div id="frninScore"></div>
   <canvas id="trail"></canvas>
-  
-
   
   
   <script src="origin.js" defer></script>
@@ -209,15 +207,60 @@
     }
     frninC.startD.addEventListener('click', frninF.start);
 
+    frninC.scoreTx = [
+      {
+        num:100,
+        texts: [
+          '初の斬り！',
+          'まさに初狩りってね！！',
+          '\\\\ﾂｸﾃｰﾝ//'
+        ]
+      },
+      {
+        num:2300,
+        texts: [
+          '23！',
+          'no name社長！23ですぞ！！',
+          '効果は特にないそうです！'
+        ]
+      },
+      {
+        num:23000,
+        texts: [
+          'お、君もしや',
+          '23があったから230もあるやろ〜',
+          'とでも思ったのかい？',
+          '正解だよ',
+          'ありがとねぇ、こんな終わってるゲームをめっちゃやってくれて',
+          '裏話していいかい？',
+          '長くなるけど',
+          'このゲーム実は補完AIの暴走からできたんですよ',
+          '補完AIが勝手にfruitNinja由来か果物を出すやつを作り出して',
+          'それを改良する形でこうなりました',
+          'すごいよね、なんつーかほぼシンギュラリティよね',
+          'え違うって？',
+          'まあとにかく聞いてくれてありがとね',
+          'これ以上はないとだけ言っておこう'
+        ]
+      },
+      {
+        num:99999,
+        texts: [
+          'さては君、暇だね？',
+          'さながらフラウィーを思い出してしまうね',
+          'もう何もないから寝るといいよ',
+          'tx!'
+        ]
+      }
+    ]
     frninF.score = function(num){
       frninC.score += num;
 
       if(frninC.score > 99900) frninC.score = 99999;
 
       if(frninC.score % 3 == 0 || frninC.score.toString().includes('3')) nicoText('ｻｧﾝ');
-      if(frninC.score == 2300) addtext('23！'), addtext('no name社長！23ですぞ！！'), addtext('効果は特にないそうです！');
-      if(frninC.score == 23000) addtext('お、君もしや'), addtext('23があったから230もあるやろ〜'), addtext('とでも思ったのかい？'), addtext('正解だよ'), addtext('ありがとねぇ、こんな終わってるゲームをめっちゃやってくれて'), addtext('裏話していいかい？'), addtext('長くなるけど'), addtext('このゲーム実は補完AIの暴走からできたんですよ'), addtext('補完AIが勝手にfruitNinja由来か果物を出すやつを作り出して'), addtext('それを改良する形でこうなりました'), addtext('すごいよね、なんつーかほぼシンギュラリティよね'), addtext('え違うって？'), addtext('まあとにかく聞いてくれてありがとね'), addtext('これ以上はないとだけ言っておこう')
-      if(frninC.score == 99999) addtext('さては君、暇だね？'), addtext('さながらフラウィーを思い出してしまうね'), addtext('もう何もないから寝るといいよ'), addtext('tx!')
+      let item = frninC.scoreTx.find(a => a.num == frninC.score);
+      if(item) for(let t of item.texts){addtext(t)};
     }
 
     frninC.Fruits = [

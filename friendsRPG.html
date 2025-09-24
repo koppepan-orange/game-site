@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Grokの全力RPG（ブラウザ版）</title>
+<style>
+  :root{--bg:#f7fafc;--card:#fff;--muted:#999}
+  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;background:var(--bg);color:#111}
+  .wrap{max-width:980px;margin:28px auto;padding:18px;display:grid;gap:16px}
+  header h1{margin:0;font-size:24px}
+  .card{background:var(--card);border-radius:14px;padding:14px;box-shadow:0 6px 18px rgba(12,12,12,0.06)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .bar{height:10px;background:#e6e6e6;border-radius:999px;overflow:hidden}
+  .hpfill{height:100%;background:linear-gradient(90deg,#34d399,#10b981)}
+  .actions{display:flex;gap:8px;flex-wrap:wrap}
+  button{cursor:pointer;border:0;padding:8px 12px;border-radius:12px;background:#111;color:#fff}
+  button.gray{background:#333}
+  button.indigo{background:#4f46e5}
+  button.disabled{opacity:.4;cursor:default}
+  .small{font-size:13px;color:var(--muted)}
+  .log{max-height:250px;overflow:auto;font-size:14px;line-height:1.6}
+  .monster-sprite{display:flex;align-items:center;justify-content:center;height:120px}
+  .flex-between{display:flex;justify-content:space-between;align-items:center}
+  .badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#fde2e2;color:#b91c1c;font-size:12px}
+  .right-small{font-size:13px;color:#666}
+  input[type="text"]{padding:8px;border-radius:8px;border:1px solid #ddd;width:100%}
+  .muted{color:var(--muted)}
+  .skillbtn{background:#fff;color:#111;border:1px solid #ddd;padding:8px;border-radius:10px;cursor:pointer}
+  .skillbtn.disabled{opacity:.45;cursor:default}
+  footer{font-size:12px;color:#666;text-align:center;margin-top:8px}
+  @media (max-width:720px){ .grid2{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Grokの全力RPG（ブラウザ版）</h1>
+    <div class="small muted">Reactなしで動くように直してある。勝手に改造しても良い。</div>
+  </header>
+
+  <div id="start-area" class="card">
+    <div class="flex-between">
+      <div style="flex:1;margin-right:8px">
+        <div class="small">名前を入力してゲームを開始</div>
+        <input id="name-input" type="text" placeholder="勇者名"/>
+      </div>
+      <div style="width:140px">
+        <button id="start-btn">開始</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="game-area" style="display:none" class="card">
+    <div class="grid2">
+      <div id="player-card" class="card" style="padding:12px">
+        <h3>プレイヤー</h3>
+        <div id="player-status" class="small muted">--</div>
+        <div style="margin-top:8px" class="small">クリ率 <span id="crit-rate">0%</span> / クリ倍率 x<span id="crit-mul">1.5</span></div>
+        <div style="margin-top:8px" class="small">アイテム: ポーション x<span id="potions">0</span> / エリクサー x<span id="elixirs">0</span></div>
+        <div style="margin-top:12px" class="bar"><div id="player-hp" class="hpfill" style="width:100%"></div></div>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap" id="skill-list"></div>
+      </div>
+
+      <div id="enemy-card" class="card" style="padding:12px">
+        <h3>敵</h3>
+        <div class="monster-sprite" id="monster-sprite">--</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div id="monster-name">--</div>
+          <div id="monster-status"></div>
+        </div>
+        <div style="margin-top:8px" class="small" id="monster-hp-txt">--</div>
+        <div style="margin-top:6px" class="bar"><div id="monster-hp" class="hpfill" style="width:100%"></div></div>
+        <div style="margin-top:8px" class="small">次の行動: <strong id="monster-intent">--</strong></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px;padding:12px">
+      <div class="actions" id="action-row">
+        <button id="btn-attack">攻撃</button>
+        <button id="btn-guard" class="gray">防御</button>
+        <button id="btn-skill" class="indigo">スキル</button>
+        <button id="btn-item" class="gray">ポーション</button>
+        <button id="btn-elixir" class="gray">エリクサー</button>
+        <div style="margin-left:auto" class="right-small">進捗: <span id="progress">0/0</span> 体撃破</div>
+      </div>
+
+      <div id="skills-panel" style="display:none;margin-top:12px"></div>
+    </div>
+
+    <div class="card" style="margin-top:12px;padding:12px">
+      <div class="log" id="log"></div>
+    </div>
+
+    <div id="end-area" style="display:none;margin-top:12px" class="card">
+      <div id="end-text">--</div>
+      <div style="margin-top:8px;text-align:right">
+        <button id="reset-btn" class="gray">リセット</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>動作がヘンならコンソールのエラーを貼れ。直してやる。</footer>
+</div>
+
+<script>
+/* ---------- ユーティリティ ---------- */
+function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min }
+const chance = p => Math.random() < p;
+const clone = v => JSON.parse(JSON.stringify(v));
+
+/* ---------- 初期データ ---------- */
+function initialPlayer(name){
+  return {
+    name: name||'勇者',
+    level:1,
+    hp:100,
+    maxHp:100,
+    attack:20,
+    defense:5,
+    exp:0,
+    expToNext:50,
+    items: { 'ポーション':3, 'エリクサー':0 },
+    skills: {
+      '強撃': { cd:0, baseCd:2, desc:'大ダメージ+25%で防御低下(2T)' },
+      '癒し': { cd:0, baseCd:3, desc:'HPを中回復' }
+    },
+    effects: { guard:0, atkUp:0 },
+    critRate:0.15,
+    critMul:1.5
+  };
+}
+
+function initialMonsters(){
+  return [
+    { name:'スライム', hp:50, maxHp:50, attack:10, defense:2, expReward:20, intent:'通常攻撃', turn:0, effects:{ defDown:0, defBuff:0 } },
+    { name:'ゴブリン', hp:80, maxHp:80, attack:15, defense:5, expReward:30, intent:'様子見', turn:0, effects:{ defDown:0, defBuff:0 } },
+    { name:'ドラゴン', hp:120, maxHp:120, attack:25, defense:8, expReward:50, intent:'力を溜めている…', turn:0, effects:{ defDown:0, defBuff:0 } }
+  ];
+}
+
+/* ---------- 描画用スプライト（シンプルSVG） ---------- */
+function getMonsterSVG(name){
+  if(name == 'スライム') return `<svg viewBox="0 0 120 90" width="220" height="90"><path d="M10 60 Q60 5 110 60 Q100 85 60 85 Q20 85 10 60 Z" fill="#06b6d4"/><ellipse cx="45" cy="55" rx="6" ry="10" fill="#071023"/><ellipse cx="75" cy="55" rx="6" ry="10" fill="#071023"/><path d="M40 68 Q60 75 80 68" stroke="#071023" stroke-width="4" fill="none"/></svg>` 
+  if(name == 'ゴブリン') return `<svg viewBox="0 0 140 120" width="260" height="120"><g fill="#84cc16"><path d="M15 45 L55 25 Q70 55 55 75 Z"/><path d="M125 45 L85 25 Q70 55 85 75 Z"/><circle cx="70" cy="60" r="38"/></g><g fill="#071023"><circle cx="55" cy="60" r="6"/><circle cx="85" cy="60" r="6"/></g><path d="M50 85 Q70 95 90 85" stroke="#071023" stroke-width="5" fill="none"/></svg>` 
+  if(name == 'ドラゴン') return `<svg viewBox="0 0 200 120" width="320" height="120"><g fill="#fb7185"><path d="M30 90 Q80 20 150 90 Z"/><circle cx="160" cy="60" r="18"/></g><g fill="#071023"><circle cx="155" cy="55" r="3"/><circle cx="165" cy="55" r="3"/></g><path d="M150 70 Q160 78 170 70" stroke="#071023" stroke-width="4" fill="none"/></svg>` 
+  return '--';
+}
+
+/* ---------- グローバルステート ---------- */
+let player = initialPlayer('');
+let monsters = initialMonsters();
+let mi = 0;
+let started = false;
+let playerTurn = true;
+let gameOver = false;
+let gameClear = false;
+let logArr = [];
+
+/* ---------- DOM参照 ---------- */
+const el = id => document.getElementById(id);
+const $nameInput = el('name-input');
+const $startBtn = el('start-btn');
+const $startArea = el('start-area');
+const $gameArea = el('game-area');
+const $playerStatus = el('player-status');
+const $playerHp = el('player-hp');
+const $monsterName = el('monster-name');
+const $monsterStatus = el('monster-status');
+const $monsterSprite = el('monster-sprite');
+const $monsterHpTxt = el('monster-hp-txt');
+const $monsterHp = el('monster-hp');
+const $monsterIntent = el('monster-intent');
+const $critRate = el('crit-rate');
+const $critMul = el('crit-mul');
+const $potions = el('potions');
+const $elixirs = el('elixirs');
+const $skillList = el('skill-list');
+const $skillsPanel = el('skills-panel');
+const $btnAttack = el('btn-attack');
+const $btnGuard = el('btn-guard');
+const $btnSkill = el('btn-skill');
+const $btnItem = el('btn-item');
+const $btnElixir = el('btn-elixir');
+const $log = el('log');
+const $progress = el('progress');
+const $endArea = el('end-area');
+const $endText = el('end-text');
+const $resetBtn = el('reset-btn');
+
+/* ---------- ヘルパ関数 ---------- */
+function pushLog(line){
+  logArr.push('• ' + line);
+  renderLog();
+}
+function renderLog(){
+  $log.innerHTML = logArr.join('<br>');
+  $log.scrollTop = $log.scrollHeight;
+}
+function calcDamage(atk, def, opts={}){
+  const variance = randInt(-5,10);
+  let raw = Math.max(1, atk + variance - def);
+  if(opts.mult) raw = Math.max(1, Math.floor(raw * opts.mult));
+  if(opts.pierce) raw = Math.max(1, Math.floor((atk + variance) * (opts.mult||1)));
+  if(opts.canCrit && Math.random() < player.critRate){
+    raw = Math.floor(raw * player.critMul);
+    pushLog('🔥 クリティカルヒット！');
+  }
+  return raw;
+}
+function tickCooldowns(skills){
+  const next = clone(skills);
+  Object.keys(next).forEach(k => { if(next[k].cd>0) next[k].cd -= 1 });
+  return next;
+}
+function planEnemyIntent(m){
+  const next = clone(m);
+  next.turn = (next.turn||0) + 1;
+  if(next.name==='スライム') next.intent = 'プルプル攻撃';
+  else if(next.name==='ゴブリン') next.intent = (chance(0.3) ? 'ガード' : '短剣攻撃');
+  else if(next.name==='ドラゴン') next.intent = (next.turn % 3 === 0 ? '灼熱のブレス' : '爪攻撃');
+  return next;
+}
+
+/* ---------- ゲーム処理 ---------- */
+function startGame(){
+  const name = ($nameInput.value || '勇者').trim();
+  player = initialPlayer(name);
+  monsters = initialMonsters();
+  mi = 0;
+  playerTurn = true;
+  started = true;
+  gameOver = false;
+  gameClear = false;
+  logArr = [];
+  pushLog(`🌟 Grokの全力RPGへようこそ！ ${player.name}、準備はいい？`);
+  pushLog(`🗡️ 戦闘開始！ ${monsters[0].name} が現れた！`);
+  $startArea.style.display = 'none';
+  $gameArea.style.display = 'block';
+  $endArea.style.display = 'none';
+  renderAll();
+  monsters[0] = planEnemyIntent(monsters[0]); // intent初期化
+}
+
+function resetGame(){
+  $startArea.style.display = '';
+  $gameArea.style.display = 'none';
+  $endArea.style.display = 'none';
+  $nameInput.value = '';
+  player = initialPlayer('');
+  monsters = initialMonsters();
+  mi = 0;
+  started = false;
+  logArr = [];
+  renderAll();
+}
+
+function renderAll(){
+  // player
+  $playerStatus.textContent = `プレイヤー: ${player.name} (Lv.${player.level}) HP: ${player.hp}/${player.maxHp} 攻:${player.attack} 防:${player.defense}` + (player.effects.guard ? ` [防御+${player.effects.guard}]` : '');
+  $playerHp.style.width = Math.max(0, (player.hp/player.maxHp)*100) + '%';
+  $critRate.textContent = Math.round(player.critRate*100) + '%';
+  $critMul.textContent = player.critMul;
+  $potions.textContent = player.items['ポーション']||0;
+  $elixirs.textContent = player.items['エリクサー']||0;
+
+  // skill list small badges
+  $skillList.innerHTML = '';
+  Object.entries(player.skills).forEach(([k,v])=>{
+    const span = document.createElement('span');
+    span.className = 'small muted';
+    span.textContent = v.cd>0 ? `${k}(${v.cd})` : k;
+    $skillList.appendChild(span);
+  });
+
+  // monster
+  const m = monsters[mi];
+  if(m){
+    $monsterSprite.innerHTML = getMonsterSVG(m.name);
+    $monsterName.textContent = m.name;
+    $monsterStatus.innerHTML = (m.effects?.defDown>0? `<span class="badge">防御低下(${m.effects.defDown})</span>` : '');
+    $monsterHpTxt.textContent = `${m.name} HP: ${m.hp}/${m.maxHp}`;
+    $monsterHp.style.width = Math.max(0,(m.hp/m.maxHp)*100) + '%';
+    $monsterIntent.textContent = m.intent || '--';
+  } else {
+    $monsterSprite.innerHTML = '--';
+    $monsterName.textContent = '--';
+    $monsterHpTxt.textContent = '--';
+    $monsterHp.style.width = '0%';
+    $monsterIntent.textContent = '--';
+  }
+
+  // actions enable/disable
+  const disabled = !playerTurn || gameOver || gameClear;
+  setDisabled($btnAttack, disabled);
+  setDisabled($btnGuard, disabled);
+  setDisabled($btnSkill, disabled);
+  setDisabled($btnItem, disabled || (player.items['ポーション']||0)<=0);
+  setDisabled($btnElixir, disabled || (player.items['エリクサー']||0)<=0);
+
+  // skills panel
+  renderSkillsPanel();
+
+  // progress
+  $progress.textContent = `${mi}/${monsters.length}`;
+
+  renderLog();
+
+  // end area
+  if(gameOver || gameClear){
+    $endArea.style.display = 'block';
+    $endText.textContent = gameOver ? 'ゲームオーバー！もう一度挑戦する？' : `クリア！ 最終レベル: ${player.level}`;
+  } else {
+    $endArea.style.display = 'none';
+  }
+}
+
+function setDisabled(elm, flag){
+  if(flag){ elm.classList.add('disabled'); elm.setAttribute('disabled',''); }
+  else { elm.classList.remove('disabled'); elm.removeAttribute('disabled'); }
+}
+
+function renderSkillsPanel(){
+  $skillsPanel.innerHTML = '';
+  Object.entries(player.skills).forEach(([k,v])=>{
+    const btn = document.createElement('button');
+    btn.className = 'skillbtn' + (v.cd>0 || !playerTurn ? ' disabled' : '');
+    btn.textContent = `${k} ${v.cd>0?`(CD:${v.cd})`:''}`;
+    const desc = document.createElement('div');
+    desc.className = 'small muted';
+    desc.style.marginTop = '4px';
+    desc.textContent = v.desc;
+    btn.onclick = () => { if(v.cd>0 || !playerTurn) return; onSkill(k) };
+    const wrap = document.createElement('div');
+    wrap.style.marginRight = '8px';
+    wrap.appendChild(btn);
+    wrap.appendChild(desc);
+    $skillsPanel.appendChild(wrap);
+  });
+}
+
+/* ---------- ターン処理 ---------- */
+function doEnemyTurn(){
+  const m = monsters[mi];
+  if(!m) return;
+  // enemy action
+  if(m.name==='ゴブリン' && m.intent==='ガード'){
+    pushLog('🛡️ ゴブリンは身構えて防御を固めた！ 次の被ダメ-50%。');
+    monsters[mi].effects.defBuff = Math.max(monsters[mi].effects.defBuff||0, 6);
+    // no damage this turn
+    setTimeout(()=>{ applyEndOfRound(); playerTurn = true; renderAll(); }, 100);
+    return;
+  }
+  if(m.name==='ドラゴン' && m.intent==='灼熱のブレス'){
+    const actual = calcDamage(m.attack + 10, 0, { mult:1.4, pierce:true });
+    player.hp = Math.max(0, player.hp - actual);
+    pushLog(`🔥 ${m.name}の${m.intent}！ ${player.name}に${actual}ダメージ！（防御無視）`);
+    setTimeout(()=>{ if(player.hp<=0){ pushLog(`💀 ${player.name}が倒れた... ゲームオーバー！`); gameOver = true; renderAll(); } else { applyEndOfRound(); playerTurn = true; renderAll(); } }, 100);
+    return;
+  }
+  // normal attack
+  const defBonus = player.effects.guard || 0;
+  const actual = calcDamage(m.attack, player.defense + defBonus);
+  player.hp = Math.max(0, player.hp - actual);
+  pushLog(`${m.name}の攻撃！ ${player.name}に${actual}ダメージ！`);
+  setTimeout(()=>{ if(player.hp<=0){ pushLog(`💀 ${player.name}が倒れた... ゲームオーバー！`); gameOver = true; renderAll(); } else { applyEndOfRound(); playerTurn = true; renderAll(); } }, 100);
+}
+
+function applyEndOfRound(){
+  // tick player skill cooldowns & clear guard
+  player.skills = tickCooldowns(player.skills);
+  if(player.effects.guard > 0) player.effects.guard = 0;
+  // reduce monster defDown and clear defBuff after it applied for one turn
+  if(monsters[mi]){
+    if(monsters[mi].effects.defDown > 0) monsters[mi].effects.defDown -= 1;
+    monsters[mi].effects.defBuff = 0;
+    monsters[mi] = planEnemyIntent(monsters[mi]);
+  }
+}
+
+/* ---------- プレイヤー行動 ---------- */
+function onAttack(){
+  if(!playerTurn || gameOver || gameClear) return;
+  const m = monsters[mi];
+  if(!m) return;
+  const defDown = m.effects.defDown || 0;
+  const actual = calcDamage(player.attack, Math.max(0, m.defense - defDown), { canCrit:true });
+  const remaining = Math.max(0, m.hp - actual);
+  monsters[mi].hp = remaining;
+  pushLog(`${player.name}の攻撃！ ${m.name}に${actual}ダメージ！`);
+  playerTurn = false;
+  setTimeout(()=> afterPlayerAction(actual, remaining), 80);
+}
+function onGuard(){
+  if(!playerTurn || gameOver || gameClear) return;
+  const bonus = randInt(6,12);
+  player.effects.guard = bonus;
+  pushLog(`${player.name}は防御！ このターン防御+${bonus}`);
+  playerTurn = false;
+  setTimeout(()=> afterPlayerAction(0, monsters[mi]?.hp ?? 0), 80);
+}
+function onUseItem(){
+  if(!playerTurn || gameOver || gameClear) return;
+  const pot = player.items['ポーション']||0;
+  if(pot<=0){ pushLog('アイテムがありません！'); return; }
+  const heal = randInt(30,50);
+  player.hp = Math.min(player.maxHp, player.hp + heal);
+  player.items['ポーション'] = pot-1;
+  pushLog(`🧪 ポーション使用！ HPが${heal}回復した。残り: ${pot-1}個`);
+  playerTurn = false;
+  setTimeout(()=> afterPlayerAction(0, monsters[mi]?.hp ?? 0), 80);
+}
+function onUseElixir(){
+  if(!playerTurn || gameOver || gameClear) return;
+  const ex = player.items['エリクサー']||0;
+  if(ex<=0){ pushLog('エリクサーがありません！'); return; }
+  player.hp = player.maxHp;
+  player.items['エリクサー'] = ex-1;
+  pushLog(`✨ エリクサー使用！ HPが全回復した。残り: ${ex-1}個`);
+  playerTurn = false;
+  setTimeout(()=> afterPlayerAction(0, monsters[mi]?.hp ?? 0), 80);
+}
+function onSkill(name){
+  if(!playerTurn || gameOver || gameClear) return;
+  const m = monsters[mi];
+  if(!m) return;
+  const s = player.skills[name];
+  if(!s || s.cd>0) return;
+  if(name==='強撃'){
+    const defDown = m.effects.defDown || 0;
+    const actual = calcDamage(player.attack + 8, Math.max(0, m.defense - defDown), { canCrit:true, mult:1.2 });
+    const remaining = Math.max(0, m.hp - actual);
+    monsters[mi].hp = remaining;
+    if(chance(0.25)){
+      monsters[mi].effects.defDown = Math.max(monsters[mi].effects.defDown||0, 2);
+      pushLog('⬇️ 防御低下を付与！(2T)');
+    }
+    pushLog(`💥 スキル: 強撃！ ${m.name}に${actual}ダメージ！`);
+    player.skills['強撃'].cd = player.skills['強撃'].baseCd;
+    playerTurn = false;
+    setTimeout(()=> afterPlayerAction(actual, remaining), 80);
+    return;
+  }
+  if(name==='癒し'){
+    const heal = randInt(35,55);
+    player.hp = Math.min(player.maxHp, player.hp + heal);
+    player.skills['癒し'].cd = player.skills['癒し'].baseCd;
+    pushLog(`🌿 スキル: 癒し！ HPが${heal}回復した。`);
+    playerTurn = false;
+    setTimeout(()=> afterPlayerAction(0, monsters[mi]?.hp ?? 0), 80);
+    return;
+  }
+}
+
+/* ---------- 経験値・撃破処理 ---------- */
+function gainExp(amount){
+  player.exp += amount;
+  pushLog(`経験値 +${amount}！ 合計EXP: ${player.exp}/${player.expToNext}`);
+  if(player.exp >= player.expToNext){
+    player.exp = 0;
+    levelUp();
+  }
+}
+function levelUp(){
+  player.level += 1;
+  player.maxHp += 20;
+  player.hp = player.maxHp;
+  player.attack += 5;
+  player.defense += 2;
+  player.expToNext += 30;
+  pushLog(`🎉 ${player.name}はレベル${player.level}に上がった！ 能力が成長した！`);
+}
+
+function afterPlayerAction(playerDealt, remainingHp){
+  const m = monsters[mi];
+  const curRem = (typeof remainingHp === 'number') ? remainingHp : (m ? m.hp : 0);
+  if(m && curRem <= 0){
+    pushLog(`🎯 ${m.name}を倒した！`);
+    gainExp(m.expReward);
+    const dropPot = chance(0.3);
+    const dropElixir = chance(0.1);
+    if(dropPot || dropElixir){
+      if(dropPot) player.items['ポーション'] = (player.items['ポーション']||0) + 1;
+      if(dropElixir) player.items['エリクサー'] = (player.items['エリクサー']||0) + 1;
+      pushLog(`🎁 戦利品: ${dropPot ? 'ポーション+1 ' : ''}${dropElixir ? 'エリクサー+1' : ''}`);
+    }
+    const nextIndex = mi + 1;
+    if(nextIndex >= monsters.length){
+      pushLog(`🏆 おめでとう！ ${player.name}はすべてのモンスターを倒した！ 最終レベル: ${player.level}`);
+      gameClear = true;
+      renderAll();
+      return;
+    }
+    // 次の敵へ
+    setTimeout(()=>{
+      mi = nextIndex;
+      monsters[mi] = planEnemyIntent(monsters[mi]);
+      playerTurn = true;
+      renderAll();
+      pushLog(`🗡️ 戦闘開始！ ${monsters[mi].name} が現れた！`);
+    }, 150);
+  } else {
+    // 敵ターン
+    renderAll();
+    setTimeout(()=>{ doEnemyTurn(); renderAll(); }, 150);
+  }
+}
+
+/* ---------- イベントバインド ---------- */
+$startBtn.addEventListener('click', ()=>startGame());
+$resetBtn.addEventListener('click', ()=>{ resetGame(); });
+$btnAttack.addEventListener('click', ()=>onAttack());
+$btnGuard.addEventListener('click', ()=>onGuard());
+$btnItem.addEventListener('click', ()=>onUseItem());
+$btnElixir.addEventListener('click', ()=>onUseElixir());
+$btnSkill.addEventListener('click', ()=>{
+  $skillsPanel.style.display = ($skillsPanel.style.display === 'none' ? 'block' : 'none');
+});
+
+/* ---------- 初期描画 ---------- */
+renderAll();
+
+/* ---------- デバッグ補助（開発時のみ、不要なら消す） ---------- */
+// window._state = () => ({ player, monsters, mi, playerTurn, gameOver, gameClear, logArr });
+</script>
+</body>
+</html>
