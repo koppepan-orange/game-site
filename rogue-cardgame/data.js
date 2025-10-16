@@ -61,8 +61,8 @@ let Cards = {
       atk += ソードeleatk;
       atk += eleatk;
       let result = await attack(c,me,me,target,atk);
-      if(nowturn == 'p'){ソードplayereleatk += 1}; 
-      if(nowturn == 'e'){ソードenemyeleatk += 1};
+      if(nowturn == 'p') ソードplayereleatk += 1
+      if(nowturn == 'e') ソードenemyeleatk += 1;
       return result;
     }
   },

@@ -32,7 +32,19 @@
             "type": "chrome",
             "request": "launch",
             "name": "cardgame",
-            "file": "/Users/koppepanorange/orange_bread/game-site/Spiegel_von_Nacht_Schloss/index.html"
+            "file": "/Users/koppepanorange/orange_bread/game-site/rogue-cardgame/index.html"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "scuro e nero soldato",
+            "file": "/Users/koppepanorange/orange_bread/game-site/Scuro_e_Nero_Soldato/index.html"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "stone trader",
+            "file": "/Users/koppepanorange/orange_bread/game-site/stone-trader/index.html"
         },
         {
             "type": "chrome",
