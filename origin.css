@@ -1,17 +1,12 @@
+@font-face{src:url('assets/fonts/comicsans.ttf');font-family: comicsans;}
+@font-face{src:url("assets/fonts/hangyaku.ttf");font-family: hangyaku;}
+@font-face{src:url('assets/fonts/kurobara.ttf');font-family: kurobara;}
+@font-face{src: url("assets/fonts/misaki.ttf");font-family: misaki;}
 html{
     margin: -8px;
+    overflow: hidden;
+    user-select:none;
 }
-body{
-    user-select: none;
-}
-
-:focus{
-    outline: none;
-}
-::-webkit-scrollbar{
-    display: none;
-}
-
 .row{
     display: flex;
     flex-direction: row;
@@ -20,8 +15,23 @@ body{
     display: flex;
     flex-direction: column;
 }
+.hidden{
+    opacity: 0;
+    pointer-events: none;
+}
 
-/*nicotext*/
+img{
+    /* 画像をドラッグできないようにするやつ */
+    -webkit-user-drag: none;
+}
+::-webkit-scrollbar{
+    display: none;
+}
+:focus{
+    outline: none;
+}
+
+/* #region nicotext */
 .nicotext{
     position: fixed;
     top: 0;
@@ -33,44 +43,45 @@ body{
     white-space: nowrap;
     pointer-events: none;
 }
-/*logとtext*/
+/* #endregion */
+
+/* #region logとtext */
 #log{
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-start;
     width: 320px;
-    height: 200px;
-    border: 1px solid #ffffff;
-    background-color: rgba(0,0,0,0);
+    height: 24vh;
+    border: 2px solid #ffffff;
+     border-left: none;
     position: fixed;
-    bottom: 150px;
-    right: -300px;
+    left: -334px;
     color: #fefefe;
     overflow-y: hidden;
-    transition: right 0.3s;
-    z-index: 254;
+    transition: left 1.0s ease;
+    z-index: 10;
+}
+#log.tog{
+    left: 54px;
 }
 #log .opener{
-    width: 20px;
+    width: 30px;
     height: 100%;
-    background-color: rgba(0,0,0,0.9);
-    color: #fefefe;
+    background-color: #000000ef;
     text-align: center;
     cursor: pointer;
-    z-index: 254;
+    z-index: inherit;
 }
 #log .log{
     width: 300px;
     height: 100%;
-    max-height: 200px;
-    overflow-x: hidden;
-    overflow-y: scroll;
-    background-color: rgba(0,0,0,0.8);
-    color: #fefefe;
+    max-height: 100%;
+    overflow-x: hidden; overflow-y: scroll;
+    background-color: #000000de;
     text-align: left;
     font-size: 14px;
     transition: right 0.3s;
-    z-index: 253;
+    z-index: inherit;
 }
 #text{
     display: none;
@@ -107,8 +118,9 @@ body{
 .color-blue{
     color: #1919ff;
 }
+/* #endregion */
 
-/* description */
+/* #region description */
 #movableDescription{
     display: none;
     position: fixed;
@@ -120,6 +132,16 @@ body{
     border-radius: 5px;
     z-index: 256;
 }
+/* #endregion */
+
+/* #region tk */
+.tk{
+    position: fixed;
+}
+.tk.mostop{
+    z-index: 2147483647;
+}
+/* #endregion */
 
 水色 #f0f8ff, #eaf5ff, #def0ff, #cfe9ff, #b5dcff
 紫色 #f8f6ff, #f5f2ff, #f1edff, #ece8ff, #e9e4ff
@@ -151,4 +173,3 @@ body{
     margin-right: 5px;
     margin-bottom: 5px;
 }
-

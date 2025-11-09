@@ -22,21 +22,14 @@ function kaijou(num){
     if(num == 1) return 1;
     return num * kaijou(num - 1);
 }
-function isSosu(num){
-    if (num < 2) return 0;
-    for(let i = 2; i * i <= num; i++){
-        if(num % i == 0) return 0;
-    }
-    return 1;
-}
 function arraySelect(array){
     let select = Math.floor(Math.random()*array.length);
     return array[select];
 };
 function arrayShuffle(array) {
     for(let i = array.length - 1; i > 0; i--) {
-        const i2 = Math.floor(Math.random() * (i + 1));
-        [array[i], array[i2]] = [array[i2], array[i]];
+    const i2 = Math.floor(Math.random() * (i + 1));
+    [array[i], array[i2]] = [array[i2], array[i]];
     }
     return array;
 };
@@ -64,9 +57,9 @@ function arrayGacha(array,probability){
     }
 };
 function hask(obj, key){
-   let res = obj.hasOwnProperty(key);
-   res = res ? 1 : 0;
-   return res;
+let res = obj.hasOwnProperty(key);
+res = res ? 1 : 0;
+return res;
 }
 function copy(moto) {
     if(Array.isArray(moto)){
@@ -96,6 +89,10 @@ function probability(num){
 function random(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 };
+function fl(num){
+    let res = num ? 1 : 0;
+    return res;
+}
 
 function anagramSaySay(text, loop = 10, bet = '<br>'){
     let menjo = 0;
@@ -178,7 +175,7 @@ let r = {
 async function error(){
     addtext('errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
     await delay(2000);
-    window.open('about:blank', '_self').close();
+    // window.open('about:blank', '_self').close();
 }
 function hoshoku(color) {
     color = color.replace(/^#/, ''); // #付きなら取る
@@ -196,6 +193,25 @@ function hoshoku(color) {
     const compB = (255 - b).toString(16).padStart(2, '0');
 
     return `#${compR}${compG}${compB}`;
+}
+function mixshoku(c1, c2, ratio = 0.5) {
+    const toRGB = c => {
+        c = c.replace('#', '');
+        if (c.length === 3) c = c.split('').map(x => x + x).join('');
+        const n = parseInt(c, 16);
+        return [n >> 16, (n >> 8) & 255, n & 255];
+    };
+
+    const [r1, g1, b1] = toRGB(c1);
+    const [r2, g2, b2] = toRGB(c2);
+
+    const r = Math.round(r1 + (r2 - r1) * ratio);
+    const g = Math.round(g1 + (g2 - g1) * ratio);
+    const b = Math.round(b1 + (b2 - b1) * ratio);
+
+    return (
+        '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('')
+    );
 }
 //#endregion
 //#region log&text
@@ -235,14 +251,6 @@ function colorcheck(rawtext) {
     return text;
 }
 
-// ↓一瞬これにしようとしてた
-// if(textShowing){
-//     queueAddtext.push(text);
-//     while(textShowing){
-//         await delay(10);
-//     }
-// };
-
 let queueAddtext = [];
 let loopAddtext = 0;
 async function waitforAddtext(){
@@ -253,12 +261,12 @@ async function waitforAddtext(){
 
     if(!loopAddtext) return console.log('loopがないんでしゅーりょー');
     requestAnimationFrame(waitforAddtext);
-    
+
     if(textShowing) return console.log('文字表示されたんでスキップ');
     
     let raw = queueAddtext.shift();
-    console.log(`${raw}を送信します`);
-    console.log(`残り: (${len - 1})[${queueAddtext}]`);
+    // console.log(`${raw}を送信します`);
+    // console.log(`残り: (${len - 1})[${queueAddtext}]`);
     await addtext(raw);
 }
 async function addtext(raw){
@@ -336,14 +344,14 @@ async function addtext(raw){
         type();
     });
 }
-document.addEventListener('keydown', (event) => {
-    if(event.key === 'z' || event.key === 'Enter'){
+document.addEventListener('keydown', (e) => {
+    if(e.key === 'z' || e.key === 'Enter'){
         skipText = true;
     }
 });
 
-document.addEventListener('keyup', (event) => {
-    if(event.key === 'z' || event.key === 'Enter'){
+document.addEventListener('keyup', (e) => {
+    if(e.key === 'z' || e.key === 'Enter'){
         skipText = false;
     }
 });
@@ -357,12 +365,13 @@ let logOOmoto = document.querySelector('#log');
 let log = document.querySelector('#log .log');
 let logOpener = document.querySelector('#log .opener');
 let log_open = (code) => {
-    if((logOOmoto.style.right == '-300px' || code == 'o') && code != 'c'){
-        logOOmoto.style.right = '0px';
-        logOpener.textContent = '>';
-    }else{
-        logOOmoto.style.right = '-300px';
+    if((!logOOmoto.classList.contains('tog') || code == 'o') && code != 'c'){
+        logOOmoto.classList.add('tog');
         logOpener.textContent = '<';
+
+    }else{
+        logOOmoto.classList.remove('tog');
+        logOpener.textContent = '>';
     }
 }
 logOpener.addEventListener('click', log_open);
@@ -382,7 +391,7 @@ document.addEventListener('mouseover', (e) => {
     const descTarget = e.target.closest('[data-description]');
     if (descTarget) {
         const desc = descTarget.dataset.description;
-        movableDescription.innerText = desc;
+        movableDescription.innerHTML = desc;
         movableDescription.style.display = 'block';
     }
 });
@@ -394,10 +403,11 @@ document.addEventListener('mouseout', (e) => {
     }
 });
 //#endregion
-//#region drag
+//#region draggable
 document.addEventListener('mousedown', e => {
     // const descTarget = e.target.closest('[data-description]');
     let div = e.target;
+    
     if(!div.classList.contains('draggable')) return;
     offsetX = e.clientX - div.getBoundingClientRect().left;
     offsetY = e.clientY - div.getBoundingClientRect().top;
@@ -415,146 +425,157 @@ document.addEventListener('mousedown', e => {
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
 });
+//#endregion 
+//#region tk
+class tk{
+    constructor(name, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
+        let div = document.createElement('div');
+        div.className = `tk ${name}`;
+
+        let yoko = ['x', 'w'];
+        for(let n of yoko){
+            if(typeof eval(n) != 'string' || typeof eval(n) == 'string' && !eval(n).endsWith('%')) continue;
+            let num = eval(n).slice(0, -1);
+            eval(n) = num * window.innerWidth / 100;
+        }
+
+        let tate = ['y', 'h'];
+        for(let n of tate){
+            if(typeof eval(n) != 'string' || typeof eval(n) == 'string' && !eval(n).endsWith('%')) continue;
+            let num = eval(n).slice(0, -1);
+            eval(n) = num * window.innerHeight / 100;
+        }
+
+        console.log(x, y, w, h);
+
+        div.style.width = `${w}px`;
+        div.style.height = `${h}px`;
+
+        div.style.left = `${x}px`;
+         if(x == 'half') div.style.left = `${window.innerWidth/2 - w/2}px`;
+        div.style.top = `${y}px`;
+         if(y == 'half') div.style.top = `${window.innerHeight/2 - h/2}px`;
+
+        this.div = div;
+    };
+
+    attrAdd(dict = 'none'){
+        if(dict == 'none') return;
+        
+        if(typeof dict == 'string'){
+            //attr: nanka
+            let [key, val] = dict.split(':');
+             key = key.trim();
+             val = val.trim();
+            this.div.setAttribute(key, val);
+            return 0;
+        }
+
+        if(typeof dict != 'object') return 1;
+
+        for(let key in dict) this.div.setAttribute(key, dict[key]);
+
+        return 0;
+    }
+
+    styleAdd(dict){
+        for(let key in dict) this.div.style[key] = dict[key];
+    }
+
+    classAdd(name){this.div.classList.add(name)};
+    classRem(name){this.div.classList.remove(name)};
+    classTog(name){this.div.classList.toggle(name)};
+    classHas(name){
+        let is = this.div.classList.contains(name);
+        return is;
+    }
+
+    evAdd(type, func){
+        this.div.addEventListener(type, func);
+    }
+
+    yousoAdd(type, dict){
+        let youso = document.createElement(type);
+        for(let key in dict){
+            console.log(`[${key}]`, dict[key]);
+            let ban = ['className', 'textContent', 'innerHTML', 'href', 'src', 'style'];
+            let baned = 0;
+            for(let b of ban){
+                if(key == 'style'){
+                    console.log('she is a style')
+                    baned = 1;
+                    let styles0 = dict[key];
+                    let styles = styles0.replace(/ /g, '').replace(/\n/g, '');
+                    let arr = styles.split(';');
+                    for(let style of arr){
+                        let [key, val] = style.split(':');
+                        youso.style[key] = val;
+                        // console.log(`youso.style[${key}] = ${val}`)
+                    }
+                    // for(let key in styles) console.log(key, styles[key]), youso.style[key] = styles[key];
+                    break;
+                }
+
+                if(key == b) youso[key] = dict[key], baned = 1;
+            }
+
+            if(baned) console.log('ban対象！')
+
+            if(!baned) youso.setAttribute(key, dict[key])
+        };
+
+        this.div.appendChild(youso);
+    };
+
+    append(){
+        document.body.appendChild(this.div);
+    };
+
+    remove(){
+        this.div.remove();
+    };
+}
+keys.asd = [];
+
+function tkTest(){
+    let mono = new tk('mono', 'half', 'half')
+    mono.classAdd('draggable')
+    mono.styleAdd({background: '#f0f8ff'})
+
+    mono.yousoAdd('div', {textContent: 'koppepandesu'})
+    mono.yousoAdd('div', {
+        className: 'draggable',
+        style: `
+            width: 100px;
+            height: 100px;
+            background: #cfe9ff
+        `
+    });
+
+    mono.evAdd('click', function(){
+        nicoText('clicked')
+    })
+
+    mono.append();
+}
+
+//#endregion
+//#region observer
+let keys = {}
+document.addEventListener('keydown', e => {
+let key = e.key.toLowerCase();
+if(e.key == ' ') key = 'space';
+keys[key] = true;
+});
+document.addEventListener('keyup', e => {
+let key = e.key.toLowerCase();
+if(e.key == ' ') key = 'space';
+keys[key] = false;
+});
+
+let clicking = false;
+document.addEventListener('mousedown', () => clicking = true);
+document.addEventListener('mouseup', () => clicking = false);
 //#endregion
 
-//#region 変数s
-let x, y, z; 
-let justlook = 0;
-
-let enemyname = '';
-
-let cardstart = ['slash', 'slash', 'sword', 'gamble', 'rushsword', 'soulknife', 'heartseeker', 'shield', 'heal'];
-
-
-let humans = {
-    p:{
-        name:'player',
-        health:40,
-        maxhealth:40,
-        shield:0,
-        eleatk:0,
-        eleshl:0,
-        used:{
-            'sword':{
-                eleatk:0
-            },
-        },
-        buff:{
-            g:{
-
-            },
-            b:{
-
-            }
-        },
-    },
-    e: {
-        name:'enemy',
-        health:20,
-        maxhealth:20,
-        shield:0,
-        eleatk:0,
-        eleshl:0,
-        used:{
-            'sword':{
-                eleatk:0
-            },
-        },
-        buff:{
-            g:{
-
-            },
-            b:{
-                
-            }
-        },
-    }
-};
-
-let CardActList = {
-    card: [],
-    turn: []
-};
-let actcardlist = [];
-
-let actpatnum = 1;
-let barShape = 0;//バーの状態 0 == 特に条件なし
-let barcard = [0,0,0,0];
-
-let round = 0;
-
-//#endregion 変数
-
-
-//#region ステージ構成とか
-let gameAreaD = document.getElementById('gameArea');
-let mapD = gameAreaD.querySelector('#mapmap');
-let mapC = {
-    maxW: 10,
-    maxH: 8,
-}
-let batD = gameAreaD.querySelector('#battle');
-let batC = {
-    placeD: batD.querySelector('.cardPlace'),
-    uisD: batD.querySelector('.uis'),
-    cosD: batD.querySelector('.costs'),
-    drawD: batD.querySelector('.cardDraw'),
-};
-
-
-let stage = 1;
-let stagebar = []
-let floor = 0; //今横列の左から何番目か(1~10)
-
-//playerの位置を
-let p = {
-    x:0,
-    y:0,
-    movable:1
-}
-
-
-function SetStageBar(){
-
-}
-
-function LetsGoBattle(num,code){
-    let irankamo = num;
-    irankamo += 1;//ちゃんと道順作るってなったら道程要員になりそう
-    switch(code){
-        case 1:
-            EnemyAppear(0);
-            break;
-        case 2:
-            EnemyAppear(1);
-            break;
-        case 3:
-            RandomEvent();
-            break;
-        case 4:
-            GoToCamp(0);
-            break;
-        case 5:
-            BossEnemyAppear();
-            break;
-    }
-    document.getElementById('StageButton').style.display = 'none';
-}
-async function EnemyAppear(num){
-    document.getElementById('gameArea').style.display = 'block';
-    enemyNameDeside(num);
-    await addtext(enemyname+'が現れた！');
-    log_open();
-    PlaceNoteCard();
-    BarCardCreate();
-    justlook = 0;
-}
-function enemyNameDeside(num){
-    let enemynames = Object.keys(Enemies).filter(a => Enemies[a].elite == 0 && Enemies[a].appeable == 1).map(a => Enemies[a].name); //a.stage == stageとかもよろ
-    enemyname = enemynames[Math.floor(Math.random() * enemynames.length)];
-    if(num == 1){
-        //エリートの場合
-    }
-    return enemyname;
-}
-//#endregion
+let human = [];
