@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        html{
+            margin: -8px;
+        }
+        body{
+            background-color: #2b2b2b;
+        }
+        #map{
+            display: block;
+            width: 100vw;
+            height: 600px;
+            padding: 40px 20px;
+            background-color: #323232;
+        }
+        #map .coma{
+            width: 30px;
+            aspect-ratio: 2/3;
+            background: #4473ad;
+            clip-path: polygon(0 0, 20% 0, 20% 15%, 40% 15%, 40% 0, 60% 0, 60% 15%, 80% 15%, 80% 0, 100% 0, 100% 40%, 70% 40%, 70% 70%, 100% 70%, 100% 100%, 0 100%, 0 70%, 30% 70%, 30% 40%, 0 40%);
+        }
+        #map .container{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 70%;
+            height: 50%;
+        }
+        #map .container .row{
+            margin-top: -10px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+            height: 100%;
+            gap: 7.5px;
+        }
+        #map .container .row.due{
+            margin-left: 82.5px;
+        }
+        #map .container .mas{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            aspect-ratio: 9/10;
+            background-color: #cfe9ff;
+            clip-path: polygon(50% 0, 100% 20%, 100% 80%, 50% 100%, 0 80%, 0 20%);
+        }
+        #map .container .mas.none{
+            background-color: #00000000;
+        }
+    </style>
+</head>
+<body>
+    <div id="map">
+        <div class="ui"></div>
+
+        <div class="container">
+            <div class="row">
+                <div class="mas m00">
+                    <div class="coma"></div>
+                </div>
+                <div class="mas m01"></div>
+            </div>
+            <div class="row due">
+                <div class="mas m10"></div>
+                <div class="mas m11"></div>
+                <div class="mas m12"></div>
+                <div class="mas m13"></div>
+            </div>
+            <div class="row">
+                <div class="mas m20"></div>
+                <div class="mas none m21"></div>
+                <div class="mas m22"></div>
+                <div class="mas m23"></div>
+            </div>
+            <div class="row due">
+                <div class="mas m30"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let mapD = document.querySelector('#map');
+        let mapC = {
+            conD: document.querySelector('#map .container'),
+            tate:4,
+            mases:[],
+            p:{
+                x:0,
+                y:0,
+                div: document.querySelector('#map .coma')
+            }
+        }
+
+        document.addEventListener('keydown', e => {
+            let key = e.key.toLowerCase();
+            if(key == ' ') key = 'space';
+            
+            switch(key){
+                case 'd':
+                case 'arrowright':{
+                    move(1,0,'add')
+                }
+                break;
+                case 'a':
+                case 'arrowleft':{
+                    move(-1,0,'add')
+                }
+                break;
+                case 'w':
+                case 'arrowup':{
+                    move(0,-1,'add')
+                }
+                break;
+                case 's':
+                case 'arrowdown':{
+                    move(0,1,'add')
+                }
+                break;
+            }
+        })
+
+        function tekiou(){
+            let p = mapC.p;
+            let mono0 = mapC.conD.querySelector(`.mas.iru`);
+            // console.log(mono0)
+            if(mono0) mono0.classList.remove('iru');
+
+            let coma = p.div;
+            coma.remove();
+
+            // console.log(`qS: .mas.m${p.y}${p.x}`)
+            let mono = mapC.conD.querySelector(`.mas.m${p.y}${p.x}`);
+            mono.classList.add('iru');
+            mono.appendChild(coma);
+        }
+
+        function hikiyose(){
+            let mases = mapC.conD.querySelectorAll('.mas');
+            mapC.mases = [];
+            
+            for(let mono0 of mases){
+                let mono = {};
+
+                let clas = mono0.classList;
+                for(let c of clas){
+                    if(c.startsWith('m')) mono.y = c.slice(1,2), mono.x = c.slice(2,3);
+
+                    if(c == 'none') mono.none = 1;
+                }
+
+                mapC.mases.push(mono);
+            }
+        }
+
+        async function move(x, y, mode){
+            let ugoku = {x, y};
+            let ugokuyo0 = ['x', 'y']
+            let ugokuyo = ugokuyo0; //本来はここでugokuyo = ugokuyo0(arrayShuffle)
+
+            if(mode == 'set'){
+                let p = mapC.p;
+                x = x-p.x;
+                y = y-p.y;
+            }
+
+            for(let u of ugokuyo){
+                let kyori = ugoku[u];
+                if(kyori == 0) continue;
+
+                let ippo = Math.sign(kyori);
+                // console.log(`[${u}] ${kyori}m移動予定、一歩は${ippo}m`)
+
+                for(let i=0; i<Math.abs(ugoku[u]); i++){
+                    moving(u, ippo);
+                    tekiou();
+                    //本来はここでawait delay(100);
+                }
+            }
+        }
+        function moving(u, ippo){
+            // console.log('moving!', u, ippo)
+            let p = mapC.p;
+
+            if(u == 'x'){
+                let tugi = p.x + ippo;
+                // console.log(`[${u}] ${p.x} => ${tugi}`);
+                let mono = mapC.mases.find(a => a.x == tugi && a.y == p.y);
+                if(!mono) return 1;
+                if(mono.none) return 1;
+
+                p.x += ippo;
+            }
+            if(u == 'y'){
+                let tugi = p.y + ippo;
+                // console.log(`[${u}] ${p.y} => ${tugi}`);
+                // console.log('妖怪学園Y');
+                let monor = mapC.mases.find(a => a.x == p.x && a.y == tugi);
+                let monol = mapC.mases.find(a => a.x == p.x-1 && a.y == tugi);
+                if(!monol && !monor) return 1;
+                if(monol.none && monor.none) return 1;
+
+                if(!monol.none){
+                    // console.log('monolがあるので左側へ');
+                    p.y += ippo;
+                    return 0;
+                }
+
+                if(!monor.none){
+                    // console.log('(monolはないけど)')
+                    // console.log('monorがあるので右側へ');
+                    p.x += 1;
+                    p.y += ippo;
+                    return 0;
+                }
+            }
+        }
+
+        hikiyose();
+        tekiou();
+    </script>
+</body>
+</html>
