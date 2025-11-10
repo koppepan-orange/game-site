@@ -535,7 +535,6 @@ class tk{
         this.div.remove();
     };
 }
-keys.asd = [];
 
 function tkTest(){
     let mono = new tk('mono', 'half', 'half')

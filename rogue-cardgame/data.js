@@ -19,17 +19,57 @@ let Style = {
 let mapItems = [
     //なのです口調のサポーターとかつけたいね〜〜
     {
-        name: 'すた〜と',
-        img: 'start',
-        desc: 'スタート地点なのです'
+        name: "すた〜と",
+        img: "start",
+        desc: "スタート地点なのです",
+        n:[1,1],
+        p: 0
     },
     
     {
-        name: '敵',
-        img: 'enemy',
-        desc: '敵がいる場所なのです'
+        name: "blank",
+        img: "none",
+        desc: "「　　」",
+        n:[3,2],
+        p: 40
     },
-    //"強敵"はdata.
+
+    {
+        name: "敵",
+        img: "enemy",
+        desc: "敵がいる場所なのです",
+        n:[1,8],
+        p: 30,
+        dataq: {
+            "gachi": 40,
+            "high": 15,
+        }
+    },
+
+    {
+        name: "チェスタァ！！",
+        img: "chest",
+        desc: "チェストなのです",
+        n:[1,4],
+        p:20,
+        dataq: {
+            "a": 25,
+            "b": 25,
+            "c": 25,
+            "d": 25,
+        }
+    },
+
+    {
+        name: "火",
+        img: "fire",
+        desc: "火の場所なのです",
+        n:[1,1],
+        p:15,
+        dataq: {
+            "maki": 100
+        }
+    }
 
 ]
 

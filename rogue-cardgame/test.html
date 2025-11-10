@@ -78,12 +78,14 @@
             </div>
             <div class="row">
                 <div class="mas m20"></div>
-                <div class="mas none m21"></div>
+                <div class="mas m21"></div>
                 <div class="mas m22"></div>
                 <div class="mas m23"></div>
             </div>
             <div class="row due">
                 <div class="mas m30"></div>
+                <div class="mas m31"></div>
+                <div class="mas m32"></div>
             </div>
         </div>
     </div>
@@ -204,21 +206,36 @@
                 let tugi = p.y + ippo;
                 // console.log(`[${u}] ${p.y} => ${tugi}`);
                 // console.log('妖怪学園Y');
-                let monor = mapC.mases.find(a => a.x == p.x && a.y == tugi);
-                let monol = mapC.mases.find(a => a.x == p.x-1 && a.y == tugi);
-                if(!monol && !monor) return 1;
-                if(monol.none && monor.none) return 1;
+                let monol = mapC.mases.find(a => a.x == p.x && a.y == tugi);
+                let monor = mapC.mases.find(a => a.x == p.x+1 && a.y == tugi);
 
-                if(!monol.none){
+                // console.log(monol, monor)
+
+                if(ippo > 0){
+                    monor = monol;
+                    monol = mapC.mases.find(a => a.x == p.x-1 && a.y == tugi);
+
+                    // console.log(monol, monor)
+                }
+
+                if(!monol && !monor) return 1;
+
+                let is = 0;
+                if(monol && monol.none) is += 1;
+                if(monor && monor.none) is += 1;
+                if(is == 2) return 1;
+
+                if(monol && !monol.none){
                     // console.log('monolがあるので左側へ');
+                    if(ippo > 0) p.x -= 1;
                     p.y += ippo;
                     return 0;
                 }
 
-                if(!monor.none){
+                if(monor && !monor.none){
                     // console.log('(monolはないけど)')
                     // console.log('monorがあるので右側へ');
-                    p.x += 1;
+                    if(ippo < 0) p.x += 1;
                     p.y += ippo;
                     return 0;
                 }

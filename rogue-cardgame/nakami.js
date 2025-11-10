@@ -497,12 +497,12 @@ class tk{
     yousoAdd(type, dict){
         let youso = document.createElement(type);
         for(let key in dict){
-            console.log(`[${key}]`, dict[key]);
+            // console.log(`[${key}]`, dict[key]);
             let ban = ['className', 'textContent', 'innerHTML', 'href', 'src', 'style'];
             let baned = 0;
             for(let b of ban){
                 if(key == 'style'){
-                    console.log('she is a style')
+                    // console.log('she is a style')
                     baned = 1;
                     let styles0 = dict[key];
                     let styles = styles0.replace(/ /g, '').replace(/\n/g, '');
@@ -535,7 +535,6 @@ class tk{
         this.div.remove();
     };
 }
-keys.asd = [];
 
 function tkTest(){
     let mono = new tk('mono', 'half', 'half')
@@ -578,4 +577,208 @@ document.addEventListener('mousedown', () => clicking = true);
 document.addEventListener('mouseup', () => clicking = false);
 //#endregion
 
-let human = [];
+
+let humans = [];
+
+let mapD = document.querySelector('#map');
+let mapC = {
+    conD: document.querySelector('#map .container'),
+    tatem:8,
+    yokom:10,
+    mases:[],
+    p:{
+        x:0,
+        y:0,
+        div: document.querySelector('#map .coma')
+    }
+};
+let mapF = {};
+
+document.addEventListener('keydown', e => {
+    let key = e.key.toLowerCase();
+    if(key == ' ') key = 'space';
+    
+    switch(key){
+        case 'd':
+        case 'arrowright':{
+            mapF.move(1,0,'add')
+        }
+        break;
+
+        case 'a':
+        case 'arrowleft':{
+            mapF.move(-1,0,'add')
+        }
+        break;
+
+        case 'w':
+        case 'arrowup':{
+            mapF.move(0,-1,'add')
+        }
+        break;
+
+        case 's':
+        case 'arrowdown':{
+            mapF.move(0,1,'add')
+        }
+        break;
+    }
+})
+
+
+// #region map生成機構
+
+mapF.load = () => {
+    let mases = mapC.conD.querySelectorAll('.mas');
+    mapC.mases = [];
+    
+    for(let mono0 of mases){
+        let mono = {};
+
+        let clas = mono0.classList;
+        for(let c of clas){
+            if(c.startsWith('m')) mono.y = c.slice(1,2), mono.x = c.slice(2,3);
+
+            if(c == 'none') mono.none = 1;
+        }
+
+        mapC.mases.push(mono);
+    }
+}
+
+mapF.make = () => {
+    let yoko = random(mapC.yokom/2, mapC.yokom);
+    let tate = random(mapC.tatem/2, mapC.tatem);
+    let zen = yoko*tate;
+    let nones = random(3, zen/3);
+
+    for(let y=0; y<tate; y++){
+        let row = document.createElement('div');
+        row.className = 'row';
+
+        for(let x=0; x<yoko; x++){
+            let mono = document.createElement('div');
+            mono.className = `mas m${y}${x}`;
+
+            if(nones && probability(40)) mono.classList.add('none'), nones -= 1;
+
+            row.appendChild(mono);
+        }
+
+        mapC.conD.appendChild(row);
+    }
+}
+
+// #endregion
+
+// #region プレイヤーの動き機構
+
+mapF.tekiou = () => {
+    let p = mapC.p;
+    let mono0 = mapC.conD.querySelector(`.mas.iru`);
+    // console.log(mono0)
+    if(mono0) mono0.classList.remove('iru');
+
+    let coma = p.div;
+    coma.remove();
+
+    // console.log(`qS: .mas.m${p.y}${p.x}`)
+    let mono = mapC.conD.querySelector(`.mas.m${p.y}${p.x}`);
+    mono.classList.add('iru');
+    mono.appendChild(coma);
+}
+
+mapF.move = async function(x, y, mode){
+    let p = mapC.p;
+    if(p.moving) return;
+    let ugoku = {x, y};
+    let ugokuyo0 = ['x', 'y']
+    let ugokuyo = arrayShuffle(ugokuyo0);
+
+    if(mode == 'set'){
+        let p = mapC.p;
+        x = x-p.x;
+        y = y-p.y;
+    }
+
+    p.moving = 1;
+    for(let u of ugokuyo){
+        let kyori = ugoku[u];
+        if(kyori == 0) continue;
+
+        let ippo = Math.sign(kyori);
+        // console.log(`[${u}] ${kyori}m移動予定、一歩は${ippo}m`);
+
+        for(let i=0; i<Math.abs(ugoku[u]); i++){
+            mapF.moving(u, ippo);
+            mapF.tekiou();
+            await delay(100);
+        }
+    }
+    
+    p.moving = 0;
+    return 0;
+}
+mapF.moving = (u, ippo) => {
+    // console.log('moving!', u, ippo)
+    let p = mapC.p;
+
+    if(u == 'x'){
+        let tugi = p.x + ippo;
+        // console.log(`[${u}] ${p.x} => ${tugi}`);
+        let mono = mapC.mases.find(a => a.x == tugi && a.y == p.y);
+        if(!mono) return 1;
+        if(mono.none) return 1;
+
+        p.x += ippo;
+    }
+    if(u == 'y'){
+        let tugi = p.y + ippo;
+        // console.log(`[${u}] ${p.y} => ${tugi}`);
+        // console.log('妖怪学園Y');
+        let monol = mapC.mases.find(a => a.x == p.x && a.y == tugi);
+        let monor = mapC.mases.find(a => a.x == p.x+1 && a.y == tugi);
+
+        // console.log(monol, monor)
+
+        if(ippo > 0){
+            monor = monol;
+            monol = mapC.mases.find(a => a.x == p.x-1 && a.y == tugi);
+
+            // console.log(monol, monor)
+        }
+
+        if(!monol && !monor) return 1;
+
+        let is = 0;
+        if(monol && monol.none) is += 1;
+        if(monor && monor.none) is += 1;
+        if(is == 2) return 1;
+
+        if(monol && !monol.none){
+            // console.log('monolがあるので左側へ');
+            if(ippo > 0) p.x -= 1;
+            p.y += ippo;
+            return 0;
+        }
+
+        if(monor && !monor.none){
+            // console.log('(monolはないけど)')
+            // console.log('monorがあるので右側へ');
+            if(ippo < 0) p.x += 1;
+            p.y += ippo;
+            return 0;
+        }
+    }
+}
+
+// #endregion
+
+
+// #region 画像とかのロード機構
+
+// #endregion
+function start(){
+    mapF.load();
+    mapF.tekiou();
+}
