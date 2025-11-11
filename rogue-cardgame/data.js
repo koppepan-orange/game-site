@@ -73,6 +73,19 @@ let mapItems = [
 
 ]
 
+async function attack(who, ares, atk, x){
+    let atk = dec.atk(who, this.atk);
+    let x = dec.x(who, this.x);
+
+    if(!Array.isArray(ares)) ares = [ares];
+
+    //やっぱ単数にするかも？
+
+    for(let are of ares){
+        
+    }
+}
+
 let Cards = [
     {
         name: 'none',
@@ -91,18 +104,17 @@ let Cards = [
     //こっからA
     {
         name: 'スラッシュ',
-        nume: 2,
-        code: 'A',
+        type: 'A',
         rare: 1,
-        cool: 2,
-        have: [], //.lengthで所持枚数、中の数字が残りクールダウン
-        buyable: 0,
-        description: '軽い斬撃。',
-        process:async function(c,t){
-            let atk = 2;
-            atk += eleatk;
-            let result = await attack(c,t,atk,num);
-            return result;
+        atk: 2,
+        x:1,
+        buy: 0,
+        description: '軽い斬撃',
+        process:async function(who, are){
+            let res = await attack(who, are, this.atk, this.x);
+            if(res) return 1;
+            
+            return 0;
         }
     },
     {
