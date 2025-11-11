@@ -774,10 +774,39 @@ mapF.moving = (u, ippo) => {
 
 // #endregion
 
+// #region 戦闘を～
 
-// #region 画像とかのロード機構
+let batD = document.getElementById('battle');
+let batF = {};
+
+
+//#region -攻撃-
+async function attack(who, are, atk, x){
+    console.log(`${who.name} => ${are.name} | 攻撃力${atk} x${x}`);
+
+    atk += who.add.atk;
+    
+    let isb = (name) => {return who.buff == name ? 1 : 0};
+    
+
+    for(let i=0; i<x; i++){
+        
+        
+        if(isb('吸血の牙')) await heal(who, are, 4, 1)
+
+        if(i+1 < x) await delay(500);
+    }
+}
+//#endregion 
 
 // #endregion
+
+// #region 画像とかのロード機構
+let Imgs = {
+    'maps':['enemy', 'enemy_gachi', 'enemy_high', 'fire_maki', 'chest_a', 'chest_b', 'chest_c', 'chest_d']
+}
+// #endregion
+
 function start(){
     mapF.load();
     mapF.tekiou();

@@ -14,55 +14,55 @@
             "type": "chrome",
             "request": "launch",
             "name": "clicker(rpg)",
-            "file": "/Users/koppepanorange/orange_bread/game-site/clicker-of-mugen/index.html"
+            "file": "clicker-of-mugen/index.html"
         },
         {
             "type": "chrome",
             "request": "launch",
             "name": "puyopuyo",
-            "file": "/Users/koppepanorange/orange_bread/game-site/clicker-of-mugen/puyo.html"
+            "file": "clicker-of-mugen/puyo.html"
         },
         {
             "type": "chrome",
             "request": "launch",
             "name": "clicker(dungeon)",
-            "file": "/Users/koppepanorange/orange_bread/game-site/clicker-of-mugen-dungeon/hontai.html"
+            "file": "clicker-of-mugen-dungeon/hontai.html"
         },
         {
             "type": "chrome",
             "request": "launch",
             "name": "cardgame",
-            "file": "/Users/koppepanorange/orange_bread/game-site/rogue-cardgame/index.html"
+            "file": "rogue-cardgame/index.html"
         },
         {
             "type": "chrome",
             "request": "launch",
             "name": "scuro e nero soldato",
-            "file": "/Users/koppepanorange/orange_bread/game-site/Scuro_e_Nero_Soldato/index.html"
+            "file": "Scuro_e_Nero_Soldato/index.html"
         },
         {
             "type": "chrome",
             "request": "launch",
             "name": "stone trader",
-            "file": "/Users/koppepanorange/orange_bread/game-site/stone-trader/index.html"
+            "file": "stone-trader/index.html"
         },
         {
             "type": "chrome",
             "request": "launch",
             "name": "テトリス(歌じゃないよ)",
-            "file": "/Users/koppepanorange/orange_bread/game-site/tetris.html"
+            "file": "tetris.html"
         },
         {
             "type": "chrome",
             "request": "launch",
             "name": "確率ゲート",
-            "file": "/Users/koppepanorange/orange_bread/game-site/probability/index.html"
+            "file": "probability/index.html"
         },
         {
             "type": "chrome",
             "request": "launch",
             "name": "three-test",
-            "file": "/Users/koppepanorange/orange_bread/game-site/three/three.html",
+            "file": "three/three.html",
         },
         {
             "type": "chrome",

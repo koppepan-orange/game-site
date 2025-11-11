@@ -70,21 +70,8 @@ let mapItems = [
             "maki": 100
         }
     }
-
 ]
 
-async function attack(who, ares, atk, x){
-    let atk = dec.atk(who, this.atk);
-    let x = dec.x(who, this.x);
-
-    if(!Array.isArray(ares)) ares = [ares];
-
-    //やっぱ単数にするかも？
-
-    for(let are of ares){
-        
-    }
-}
 
 let Cards = [
     {
@@ -554,3 +541,4 @@ let Buffs = [
         description:'硬化は "何も" ない。ええ、本当に', //勝ち気要員よね ワンチャンぶっ壊れるかも
     }
 ];
+
