@@ -647,16 +647,22 @@ mapF.load = () => {
 }
 
 mapF.make = () => {
-    let yoko = random(mapC.yokom/2, mapC.yokom);
-    let tate = random(mapC.tatem/2, mapC.tatem);
+    mapC.conD.innerHTML = '';
+
+    let yoko = 8;
+    let tate = 8;
     let zen = yoko*tate;
     let nones = random(3, zen/3);
 
     for(let y=0; y<tate; y++){
+        let due = (y+1) % 2 == 0 ? 1 : 0;
+
         let row = document.createElement('div');
         row.className = 'row';
+        if(due) row.classList.add('due');
 
         for(let x=0; x<yoko; x++){
+            if(due && x == yoko-1) continue;
             let mono = document.createElement('div');
             mono.className = `mas m${y}${x}`;
 
@@ -668,6 +674,19 @@ mapF.make = () => {
         mapC.conD.appendChild(row);
     }
 }
+document.addEventListener('keydown', e => {
+    let key = e.key.toLowerCase();
+    if(key == ' ') key = 'space';
+    
+    switch(key){
+        case 'm':{
+            mapF.make();
+            mapF.load();
+            mapF.tekiou();
+        }
+        break;
+    }
+})
 
 // #endregion
 
@@ -802,10 +821,38 @@ async function attack(who, are, atk, x){
 // #endregion
 
 // #region 画像とかのロード機構
+
+let images = {};
 let Imgs = {
     'maps':['enemy', 'enemy_gachi', 'enemy_high', 'fire_maki', 'chest_a', 'chest_b', 'chest_c', 'chest_d']
 }
+let imageA = Object.keys(Imgs).map(a => Imgs[a].length).reduce((a, b) => a + b);
+let imageB = 0;
+for(let belong in Imgs){
+    for(let num of Imgs[belong]){
+        let img = new Image();
+        img.src = `assets/${belong}/${num}.png`;
+
+        img.onload = () => {
+            // console.log(`Image ${belong}/${num} loaded.`);
+            imageB++;
+
+            if(imageB == imageA) start();
+        };
+        img.onerror = () => {
+            console.error(`Image ${belong}/${num} failed to load.`);
+            img.src = `assets/systems/error.png`;
+            imageB++;
+
+            if(imageB == imageA) start();
+        };
+
+        if(!images[belong]) images[belong] = {};
+        images[belong][num] = img;
+    };
+};
 // #endregion
+
 
 function start(){
     mapF.load();
