@@ -652,7 +652,7 @@ mapF.make = () => {
     let yoko = 8;
     let tate = 8;
     let zen = yoko*tate;
-    let nones = random(3, zen/3);
+    let nones = random(3, zen/2);
 
     for(let y=0; y<tate; y++){
         let due = (y+1) % 2 == 0 ? 1 : 0;
@@ -741,6 +741,9 @@ mapF.move = async function(x, y, mode){
 mapF.moving = (u, ippo) => {
     // console.log('moving!', u, ippo)
     let p = mapC.p;
+    let due = (p.y+1) % 2 == 0 ? 1 : 0;
+    // let sei = ippo > 0 ? 1 : 0;
+    // let fuu = ippo < 0 ? 1 : 0;
 
     if(u == 'x'){
         let tugi = p.x + ippo;
@@ -755,17 +758,17 @@ mapF.moving = (u, ippo) => {
         let tugi = p.y + ippo;
         // console.log(`[${u}] ${p.y} => ${tugi}`);
         // console.log('妖怪学園Y');
-        let monol = mapC.mases.find(a => a.x == p.x && a.y == tugi);
-        let monor = mapC.mases.find(a => a.x == p.x+1 && a.y == tugi);
 
+        // console.log(`${sei}/${fuu} ${due}`)
+        let l = 0, r = 1;
+        if(due) l = 0, r = 1;
+        if(!due) l = -1, r = 0;
+
+        let monol = mapC.mases.find(a => a.x == p.x+l && a.y == tugi);
+        let monor = mapC.mases.find(a => a.x == p.x+r && a.y == tugi);
         // console.log(monol, monor)
 
-        if(ippo > 0){
-            monor = monol;
-            monol = mapC.mases.find(a => a.x == p.x-1 && a.y == tugi);
 
-            // console.log(monol, monor)
-        }
 
         if(!monol && !monor) return 1;
 
@@ -776,7 +779,7 @@ mapF.moving = (u, ippo) => {
 
         if(monol && !monol.none){
             // console.log('monolがあるので左側へ');
-            if(ippo > 0) p.x -= 1;
+            p.x += l;
             p.y += ippo;
             return 0;
         }
@@ -784,7 +787,7 @@ mapF.moving = (u, ippo) => {
         if(monor && !monor.none){
             // console.log('(monolはないけど)')
             // console.log('monorがあるので右側へ');
-            if(ippo < 0) p.x += 1;
+            p.x += r;
             p.y += ippo;
             return 0;
         }
