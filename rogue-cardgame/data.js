@@ -19,63 +19,74 @@ let Style = {
 let mapItems = [
     //なのです口調のサポーターとかつけたいね〜〜
     {
-        name: "すた〜と",
-        img: "start",
+        name: "start",
+        jpnm: "すた〜と",
         desc: "スタート地点なのです",
         n:[1,1],
-        p: 0
+        dataq:{},
+        func: () => {}
     },
 
-    // {
-    //     name: "",
-    //     img: "end",
-    //     desc: "エンド地点なのです",
-    //     n:[1,1],
-    //     p: 0
-    // },
+    {
+        name: "boss",
+        jpnm: "上司",
+        desc: "ボスがいる場所なのです。\nここに行ったらこの階層を抜けられます",
+        n:[1,1],
+        dataq:{},
+        func: () => {
+
+        }
+    },
     
     {
-        name: "blank",
-        img: "none",
+        name: "none",
+        jpnm: "blank",
         desc: "「　　」",
-        n:[3,20],
-        p: 40
+        n:[3,32],
+        dataq:{},
+        func: () => {}
     },
 
     {
-        name: "敵",
-        img: "enemy",
+        name: "enemy",
+        jpnm: "敵",
         desc: "敵がいる場所なのです",
-        n:[1,8],
-        p: 30,
+        n:[6,16],
         dataq: {
-            "gachi": 40,
+            "gachi": 5,
             "high": 15,
+        },
+        func: () => {
+
         }
     },
 
     {
-        name: "チェスタァ！！",
-        img: "chest",
+        name: "chest",
+        jpnm: "チェスタァ！！",
         desc: "チェストなのです",
         n:[1,4],
-        p:20,
         dataq: {
             "a": 25,
             "b": 25,
             "c": 25,
             "d": 25,
+        },
+        func: () => {
+            
         }
     },
 
     {
-        name: "火",
-        img: "fire",
+        name: "fire",
+        jpnm: "火",
         desc: "火の場所なのです",
         n:[1,1],
-        p:15,
         dataq: {
             "maki": 100
+        },
+        func: () => {
+
         }
     }
 ]

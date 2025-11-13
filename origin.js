@@ -87,7 +87,8 @@ function probability(num){
     //例:num == 20 → randomが20以内ならtrue,elseならfalseを返す
 };
 function random(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    let num = Math.floor(Math.random() * (max - min + 1)) + min;
+    return Math.floor(num);
 };
 function fl(num){
     let res = num ? 1 : 0;

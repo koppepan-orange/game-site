@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <script>
+
+        let mapItems = [
+    //なのです口調のサポーターとかつけたいね〜〜
+    {
+        name: "すた〜と",
+        img: "start",
+        desc: "スタート地点なのです",
+        n:[1,1],
+        p: 0
+    },
+
+    {
+        name: "上司",
+        img: "boss",
+        desc: "ボスがいる場所なのです。\nここに行ったらこの階層を抜けられます",
+        n:[1,1],
+        p: 0
+    },
+    
+    {
+        name: "blank",
+        img: "none",
+        desc: "「　　」",
+        n:[3,20],
+        p: 40
+    },
+
+    {
+        name: "敵",
+        img: "enemy",
+        desc: "敵がいる場所なのです",
+        n:[1,8],
+        p: 30,
+        dataq: {
+            "gachi": 40,
+            "high": 15,
+        }
+    },
+
+    {
+        name: "チェスタァ！！",
+        img: "chest",
+        desc: "チェストなのです",
+        n:[1,4],
+        p:20,
+        dataq: {
+            "a": 25,
+            "b": 25,
+            "c": 25,
+            "d": 25,
+        }
+    },
+
+    {
+        name: "火",
+        img: "fire",
+        desc: "火の場所なのです",
+        n:[1,1],
+        p:15,
+        dataq: {
+            "maki": 100
+        }
+    }
+]
+    </script>
+</body>
+</html>

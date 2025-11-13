@@ -47,13 +47,13 @@ function arrayCount(array){
 function arrayMult(array){
     return array.reduce((a, v) => a * v, 1);
 }
-function arrayGacha(array,probability){
-    if(array.length != probability.length) throw new Error("長さがあってないっす！先輩、ちゃんとチェックした方がいいっすよ〜？");
-    const total = probability.reduce((sum, p) => sum + p, 0);
+function arrayGacha(array,probs){
+    if(array.length != probs.length) throw new Error("長さがあってないっす！先輩、ちゃんとチェックした方がいいっすよ〜？");
+    const total = probs.reduce((sum, p) => sum + p, 0);
     let random = Math.random() * total;
     for (let i = 0; i < array.length; i++) {
-        if(random < probability[i]) return array[i];
-        random -= probability[i];
+        if(random < probs[i]) return array[i];
+        random -= probs[i];
     }
 };
 function hask(obj, key){
@@ -87,7 +87,8 @@ function probability(num){
     //例:num == 20 → randomが20以内ならtrue,elseならfalseを返す
 };
 function random(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    let num = Math.floor(Math.random() * (max - min + 1)) + min;
+    return Math.floor(num);
 };
 function fl(num){
     let res = num ? 1 : 0;
@@ -584,12 +585,13 @@ let mapD = document.querySelector('#map');
 let mapC = {
     conD: document.querySelector('#map .container'),
     tatem:8,
-    yokom:10,
+    yokom:8,
     mases:[],
     p:{
         x:0,
         y:0,
-        div: document.querySelector('#map .coma')
+        div: document.querySelector('#map .coma'),
+        moving:1,
     }
 };
 let mapF = {};
@@ -628,32 +630,37 @@ document.addEventListener('keydown', e => {
 
 // #region map生成機構
 
-mapF.load = () => {
-    let mases = mapC.conD.querySelectorAll('.mas');
-    mapC.mases = [];
-    
-    for(let mono0 of mases){
-        let mono = {};
+mapF.seikei = () => {
+    let mases = mapC.mases;
 
-        let clas = mono0.classList;
-        for(let c of clas){
-            if(c.startsWith('m')) mono.y = c.slice(1,2), mono.x = c.slice(2,3);
+    let ato = [];
+    for(let y=0; y<mapC.tatem; y++){
+        ato[y] = [];
+        let due = (y+1) % 2 == 0 ? 1 : 0;
+        for(let x=0; x<mapC.yokom; x++){
+            if(due && x == mapC.yokom-1) continue;
 
-            if(c == 'none') mono.none = 1;
+            let mas = mases.find(a => a.x == x && a.y == y);
+            // console.log(mas)
+            ato[y][x] = mas.name ?? null;
         }
-
-        mapC.mases.push(mono);
     }
+
+    return ato
 }
 
-mapF.make = () => {
+mapF.save = (tuyoi = 0) => {
+    let p = mapC.p;
+
+    let objmap;
+    if(tuyoi) objmap = mapC.objmap;
+    else objmap = mapF.seikei();
+    // console.log(objmap)
+
+    let tate = mapC.tatem;
+    let yoko = mapC.yokom;
+    
     mapC.conD.innerHTML = '';
-
-    let yoko = 8;
-    let tate = 8;
-    let zen = yoko*tate;
-    let nones = random(3, zen/2);
-
     for(let y=0; y<tate; y++){
         let due = (y+1) % 2 == 0 ? 1 : 0;
 
@@ -665,24 +672,149 @@ mapF.make = () => {
             if(due && x == yoko-1) continue;
             let mono = document.createElement('div');
             mono.className = `mas m${y}${x}`;
+            if(x == p.x && y == p.y) mono.classList.add('iru');
 
-            if(nones && probability(40)) mono.classList.add('none'), nones -= 1;
+            // console.log(y,x)
+            if(objmap[y][x]){
+                let name = objmap[y][x];
+                mono.classList.add(name);
+                
+                let img = document.createElement('img');
+                img.className = `img ${name}`;
+                img.src = `assets/maps/${name}.png`;
+                mono.appendChild(img);
+            }
 
             row.appendChild(mono);
         }
 
         mapC.conD.appendChild(row);
     }
+
+    mapF.tekiou();
 }
-document.addEventListener('keydown', e => {
+
+mapF.load = () => {
+    let mases = mapC.conD.querySelectorAll('.mas');
+    mapC.mases = [];
+    
+    for(let mono0 of mases){
+        let mono = {};
+
+        let clas = mono0.classList;
+        for(let c of clas){
+            if(c.startsWith('m')) mono.y = c.slice(1,2), mono.x = c.slice(2,3);
+            else if(c != 'iru') mono.name = c;
+
+            if(c == 'none') mono.none = 1;   
+        }
+
+        mapC.mases.push(mono);
+    }
+}
+
+mapF.objMap = async() => {
+    let yoko = mapC.yokom;
+    let tate = mapC.tatem;
+
+    let zen = yoko*tate;
+    let ns = {};
+    for(let a of mapItems){
+        let [min, max] = a.n;
+        if(a.name == 'none') [min, max] = [zen/10, zen/2];
+
+        let n = random(min, max);
+        console.log(`${min}~${max} => ${n}`)
+        ns[a.name] = n;
+    }
+    console.log(ns);
+
+    let objmap = [];
+    for(let y=0; y<tate; y++){
+        objmap[y] = [];
+        for(let x=0; x<yoko; x++) objmap[y][x] = 0
+    }
+
+    let zenbu = Object.values(ns).reduce((a,b) => a+b);
+    console.log(`${zenbu}個、配置予定`)
+    
+    let haiched = 0;
+    for(let ob of Object.keys(ns)){
+        for(let i=0; i<ns[ob]; i++){
+            // do while
+            let y, x;
+            do{
+                await delay(10)
+                y = random(0, tate-1);
+                x = random(0, yoko-1);
+                // console.log('making')
+            } while(objmap[y][x] || ((y + 1) % 2 == 0 && x == yoko - 1));
+            // console.log(`objmap[${y}][${x}]に${ob}を配置します`)
+
+            let data = mapItems.find(a => a.name == ob);
+            let dataq = {...data.dataq};
+            if(!Object.keys(dataq).length) dataq['#コンパス'] = 100;
+
+            let gokei = Object.values(dataq).reduce((a,b) => a+b);
+            if(gokei < 100) dataq['#コンパス'] = 100 - gokei;
+
+            let q = arrayGacha(Object.keys(dataq), Object.values(dataq));
+            // console.log(`付加要素！ >> ${q}`)
+            if(q != '#コンパス') ob += `_${q}`;
+
+            objmap[y][x] = ob;
+            haiched += 1;
+            console.log(`${haiched}/${zenbu}`)
+        }
+    }
+
+    console.log(`置く予定:${zenbu}, 置いた数:${haiched}`)
+    //ここ、だい〜〜ぶずれてる。なんらかの要因でループが止まっている？
+    //https://chatgpt.com/share/6915f9c2-9530-8012-9a95-7b47d531d2f6
+
+    console.log(objmap)
+    mapC.objmap = objmap;
+}
+mapF.make = async() => {
+    await mapF.objMap();
+
+    mapF.save(1);
+    mapF.load();
+}
+
+mapF.nextFloor = async() => {
+    let p = mapC.p;
+    p.moving = 1;
+
+    await mapF.make();
+    mapF.load();
+    mapF.tekiou();
+
+    p.moving = 0;
+
+    mapF.restart();
+
+    return 0;
+}
+
+document.addEventListener('keydown', async(e) => {
     let key = e.key.toLowerCase();
     if(key == ' ') key = 'space';
     
     switch(key){
+        case 'z':{
+            await mapF.act();
+        }
+        break;
+
         case 'm':{
-            mapF.make();
-            mapF.load();
-            mapF.tekiou();
+            await mapF.nextFloor()
+        }
+        break;
+
+        case 'k':{
+            mapF.quake();
+            mapF.save();
         }
         break;
     }
@@ -707,15 +839,23 @@ mapF.tekiou = () => {
     mono.appendChild(coma);
 }
 
-mapF.move = async function(x, y, mode){
+mapF.move = async function(x, y, mode, issyun = 0){
     let p = mapC.p;
     if(p.moving) return;
+
     let ugoku = {x, y};
     let ugokuyo0 = ['x', 'y']
     let ugokuyo = arrayShuffle(ugokuyo0);
 
+    if(mode == 'set' && issyun){
+        // console.log('一瞬！！')
+        p.x = +x;
+        p.y = +y;
+        mapF.tekiou();
+        return 0;
+    }
+    
     if(mode == 'set'){
-        let p = mapC.p;
         x = x-p.x;
         y = y-p.y;
     }
@@ -757,9 +897,8 @@ mapF.moving = (u, ippo) => {
     if(u == 'y'){
         let tugi = p.y + ippo;
         // console.log(`[${u}] ${p.y} => ${tugi}`);
-        // console.log('妖怪学園Y');
+        // console.log('妖怪学園Y')
 
-        // console.log(`${sei}/${fuu} ${due}`)
         let l = 0, r = 1;
         if(due) l = 0, r = 1;
         if(!due) l = -1, r = 0;
@@ -767,8 +906,6 @@ mapF.moving = (u, ippo) => {
         let monol = mapC.mases.find(a => a.x == p.x+l && a.y == tugi);
         let monor = mapC.mases.find(a => a.x == p.x+r && a.y == tugi);
         // console.log(monol, monor)
-
-
 
         if(!monol && !monor) return 1;
 
@@ -794,6 +931,76 @@ mapF.moving = (u, ippo) => {
     }
 }
 
+mapF.restart = () => {
+    let startI = mapC.mases.find(a => a.name == 'start');
+    if(!startI) return;
+
+    mapF.move(startI.x, startI.y, 'set', 1);
+}
+
+mapF.quake = () => {
+    let p = mapC.p;
+    let due = (p.y+1) % 2 == 0 ? 1 : 0;
+
+    // 地殻どーんなSEを
+    let mases = //y, x
+    [ 
+        [0,-1],
+        [-1,-1],
+        [-1,0],
+        [0,1],
+        [1,0],
+        [1,-1],
+    ];
+
+    if(due) mases = [
+        [0,-1],
+        [-1,0],
+        [-1,1],
+        [0,1],
+        [1,1],
+        [1,0],
+    ]
+
+    for(let mas of mases){
+        let y = p.y + mas[0];
+        let x = p.x + mas[1];
+        let mono = mapC.conD.querySelector(`.m${y}${x}`);
+        let youso = mapC.mases.find(a => a.x == x && a.y == y);
+        if(mono){
+            if(youso.name == 'boss') continue;
+            mono.classList.toggle('none');
+            youso.name = 'none';
+            mapF.load();
+            mapF.tekiou();
+        }
+    }
+}
+
+mapF.act = async() => {
+    let p = mapC.p;
+    
+    let mas0 = mapC.mases.find(a => a.x == p.x && a.y == p.y);
+    let mas = {...mas0};
+    if(!mas.name) mas.name = 'none';
+    let name0 = mas.name;
+    if(name0 == 'none') return;
+    // console.log(name0)
+
+    // fire_maki => fire
+    let name = name0.split('_')[0];
+    let ato = '#コンパス';
+    if(name != name0) ato = name0.split('_')[1];
+
+    console.log(`act:: 「${name}」(${ato})`);
+ 
+    let data = mapItems.find(a => a.name == name);
+    // console.log(data)
+    let res = await data.func();
+    if(res) return 1;
+
+    mapF.save();
+}
 // #endregion
 
 // #region 戦闘を～
@@ -801,9 +1008,12 @@ mapF.moving = (u, ippo) => {
 let batD = document.getElementById('battle');
 let batF = {};
 
+batF.tekiou = () => {
+
+}
 
 //#region -攻撃-
-async function attack(who, are, atk, x){
+batF.attack = async(who, are, atk, x) => {
     console.log(`${who.name} => ${are.name} | 攻撃力${atk} x${x}`);
 
     atk += who.add.atk;
@@ -814,8 +1024,21 @@ async function attack(who, are, atk, x){
     for(let i=0; i<x; i++){
         
         
-        if(isb('吸血の牙')) await heal(who, are, 4, 1)
+        if(isb('吸血の牙')) await batF.heal(who, are, 4, 1)
 
+        if(i+1 < x) await delay(500);
+    }
+}
+
+batF.heal = async(who, are, val, x) => {
+    console.log(`${who.name} => ${are.name} | 回復力${hea} x${x}`);
+
+    hea += who.add.hea;
+    
+    for(let i=0; i<x; i++){
+        are.hp += hea;
+        if(are.hp > are.maxhp) are.hp = are.maxhp;
+        
         if(i+1 < x) await delay(500);
     }
 }
@@ -857,7 +1080,6 @@ for(let belong in Imgs){
 // #endregion
 
 
-function start(){
-    mapF.load();
-    mapF.tekiou();
+async function start(){
+    await mapF.nextFloor();
 }
