@@ -62,10 +62,20 @@ let mapItems = [
     },
 
     {
+        name: 'event',
+        jpnm: 'オアシス21',
+        desc:[3,4],
+        dataq: {},
+        func: () => {
+
+        }
+    },
+
+    {
         name: "chest",
         jpnm: "チェスタァ！！",
         desc: "チェストなのです",
-        n:[1,4],
+        n:[3,5],
         dataq: {
             "a": 25,
             "b": 25,
@@ -81,7 +91,7 @@ let mapItems = [
         name: "fire",
         jpnm: "火",
         desc: "火の場所なのです",
-        n:[1,1],
+        n:[2,4],
         dataq: {
             "maki": 100
         },

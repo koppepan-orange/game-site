@@ -80,4 +80,46 @@ costを持ち越し可能にする？
 
 
 
-//↑こんなのがあるんだけど..... これのコメントアウトしてるif(nones && のところあるじゃん？
+
+1~1 => 1
+6.4~32 => 12
+6~16 => 9
+1~4 => 1
+1~1 => 1
+{start: 1, boss: 1, none: 12, enemy: 9, chest: 1, …}
+25個、配置予定
+start
+1
+1/25 (start)
+boss
+1
+2/25 (boss)
+none
+12
+3/25 (none)
+4/25 (none)
+5/25 (none)
+6/25 (none)
+7/25 (none)
+8/25 (none)
+9/25 (none)
+10/25 (none)
+11/25 (none)
+12/25 (none)
+13/25 (none)
+14/25 (none)
+enemy
+9
+15/25 (enemy)
+16/25 (enemy)
+17/25 (enemy)
+18/25 (enemy)
+19/25 (enemy_high)
+chest
+1
+20/25 (chest_d)
+fire
+1
+21/25 (fire_maki)
+置く予定:25, 置いた数:21
+(8) [Array(8), Array(8), Array(8), Array(8), Array(8), Array(8), Array(8), Array(8)]

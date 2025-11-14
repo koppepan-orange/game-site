@@ -250,6 +250,7 @@ body{
     aspect-ratio: 9/10;
     background-color: #cfe9ff;
     clip-path: polygon(50% 0, 100% 20%, 100% 80%, 50% 100%, 0 80%, 0 20%);
+    cursor: url(assets/systems/hammer.png), auto;
     position: relative;
 }
 #map .container .mas.none{

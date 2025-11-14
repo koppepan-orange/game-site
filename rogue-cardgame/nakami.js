@@ -721,13 +721,14 @@ mapF.objMap = async() => {
     let ns = {};
     for(let a of mapItems){
         let [min, max] = a.n;
-        if(a.name == 'none') [min, max] = [zen/10, zen/2];
+        // if(a.name == 'none') [min, max] = [zen/10, zen/2];
+        if(a.name == 'none') [min, max] = [zen/3, zen/3];
 
         let n = random(min, max);
-        console.log(`${min}~${max} => ${n}`)
+        // console.log(`${min}~${max} => ${n}`)
         ns[a.name] = n;
     }
-    console.log(ns);
+    // console.log(ns);
 
     let objmap = [];
     for(let y=0; y<tate; y++){
@@ -736,10 +737,13 @@ mapF.objMap = async() => {
     }
 
     let zenbu = Object.values(ns).reduce((a,b) => a+b);
-    console.log(`${zenbu}個、配置予定`)
+    // console.log(`${zenbu}個、配置予定`)
     
     let haiched = 0;
-    for(let ob of Object.keys(ns)){
+    for(let ob0 of Object.keys(ns)){
+        let ob = ob0;
+        if(ob == 'none') mapC.anone = zen - ns[ob];
+        // console.log(`${ob}: ${ns[ob]}個`);
         for(let i=0; i<ns[ob]; i++){
             // do while
             let y, x;
@@ -758,21 +762,20 @@ mapF.objMap = async() => {
             let gokei = Object.values(dataq).reduce((a,b) => a+b);
             if(gokei < 100) dataq['#コンパス'] = 100 - gokei;
 
+            let ob2 = ob;
             let q = arrayGacha(Object.keys(dataq), Object.values(dataq));
             // console.log(`付加要素！ >> ${q}`)
-            if(q != '#コンパス') ob += `_${q}`;
+            if(q != '#コンパス') ob2 += `_${q}`;
 
-            objmap[y][x] = ob;
+            objmap[y][x] = ob2;
             haiched += 1;
-            console.log(`${haiched}/${zenbu}`)
+            // console.log(`${haiched}/${zenbu} (${ob2})`)
         }
     }
 
-    console.log(`置く予定:${zenbu}, 置いた数:${haiched}`)
-    //ここ、だい〜〜ぶずれてる。なんらかの要因でループが止まっている？
-    //https://chatgpt.com/share/6915f9c2-9530-8012-9a95-7b47d531d2f6
+    // console.log(`置く予定:${zenbu}, 置いた数:${haiched}`)
 
-    console.log(objmap)
+    // console.log(objmap)
     mapC.objmap = objmap;
 }
 mapF.make = async() => {
