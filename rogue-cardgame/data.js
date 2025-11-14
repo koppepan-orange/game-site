@@ -64,8 +64,11 @@ let mapItems = [
     {
         name: 'event',
         jpnm: 'オアシス21',
-        desc:[3,4],
-        dataq: {},
+        desc: 'イベントおきますのです',
+        n:[3,4],
+        dataq: {
+            'break': 3
+        },
         func: () => {
 
         }
