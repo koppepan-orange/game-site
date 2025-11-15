@@ -429,9 +429,9 @@ document.addEventListener('mousedown', e => {
 //#endregion 
 //#region tk
 class tk{
-    constructor(name, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
-        let div = document.createElement('div');
-        div.className = `tk ${name}`;
+    constructor(type, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
+        let youso = document.createElement(type);
+        youso.className = `tk ${type}`;
 
         let yoko = ['x', 'w'];
         for(let n of yoko){
@@ -449,15 +449,17 @@ class tk{
 
         console.log(x, y, w, h);
 
-        div.style.width = `${w}px`;
-        div.style.height = `${h}px`;
+        youso.style.width = `${w}px`;
+        youso.style.height = `${h}px`;
 
-        div.style.left = `${x}px`;
-         if(x == 'half') div.style.left = `${window.innerWidth/2 - w/2}px`;
-        div.style.top = `${y}px`;
-         if(y == 'half') div.style.top = `${window.innerHeight/2 - h/2}px`;
+        youso.style.left = `${x}px`;
+        youso.style.top = `${y}px`;
+        
+        if(x == 'half' && y == 'half') youso.classList.add('cenXY');
+         else if(x == 'half') youso.classList.add('cenX');
+         else if(y == 'half') youso.classList.add('cenY');
 
-        this.div = div;
+        this.youso = youso;
     };
 
     attrAdd(dict = 'none'){
@@ -468,93 +470,59 @@ class tk{
             let [key, val] = dict.split(':');
              key = key.trim();
              val = val.trim();
-            this.div.setAttribute(key, val);
+            this.youso.setAttribute(key, val);
             return 0;
         }
 
         if(typeof dict != 'object') return 1;
 
-        for(let key in dict) this.div.setAttribute(key, dict[key]);
+        for(let key in dict) this.youso.setAttribute(key, dict[key]);
 
         return 0;
     }
 
     styleAdd(dict){
-        for(let key in dict) this.div.style[key] = dict[key];
+        for(let key in dict) this.youso.style[key] = dict[key];
     }
 
-    classAdd(name){this.div.classList.add(name)};
-    classRem(name){this.div.classList.remove(name)};
-    classTog(name){this.div.classList.toggle(name)};
+    classAdd(name){this.youso.classList.add(name)};
+    classRem(name){this.youso.classList.remove(name)};
+    classTog(name){this.youso.classList.toggle(name)};
     classHas(name){
-        let is = this.div.classList.contains(name);
+        let is = this.youso.classList.contains(name);
         return is;
     }
 
     evAdd(type, func){
-        this.div.addEventListener(type, func);
+        this.youso.addEventListener(type, func);
     }
 
-    yousoAdd(type, dict){
-        let youso = document.createElement(type);
-        for(let key in dict){
-            console.log(`[${key}]`, dict[key]);
-            let ban = ['className', 'textContent', 'innerHTML', 'href', 'src', 'style'];
-            let baned = 0;
-            for(let b of ban){
-                if(key == 'style'){
-                    console.log('she is a style')
-                    baned = 1;
-                    let styles0 = dict[key];
-                    let styles = styles0.replace(/ /g, '').replace(/\n/g, '');
-                    let arr = styles.split(';');
-                    for(let style of arr){
-                        let [key, val] = style.split(':');
-                        youso.style[key] = val;
-                        // console.log(`youso.style[${key}] = ${val}`)
-                    }
-                    // for(let key in styles) console.log(key, styles[key]), youso.style[key] = styles[key];
-                    break;
-                }
-
-                if(key == b) youso[key] = dict[key], baned = 1;
-            }
-
-            if(baned) console.log('ban対象！')
-
-            if(!baned) youso.setAttribute(key, dict[key])
-        };
-
-        this.div.appendChild(youso);
-    };
+    yousoAdd(youso){
+        this.youso.appendChild(youso);
+    }
 
     append(){
-        document.body.appendChild(this.div);
+        document.body.appendChild(this.youso);
     };
 
     remove(){
-        this.div.remove();
+        this.youso.remove();
     };
 }
 
 function tkTest(){
-    let mono = new tk('mono', 'half', 'half')
-    mono.classAdd('draggable')
-    mono.styleAdd({background: '#f0f8ff'})
+    let mono = new tk('div', 'half', 'half');
+    mono.classAdd('draggable');
+    mono.styleAdd({background: '#f0f8ff'});
 
-    mono.yousoAdd('div', {textContent: 'koppepandesu'})
-    mono.yousoAdd('div', {
-        className: 'draggable',
-        style: `
-            width: 100px;
-            height: 100px;
-            background: #cfe9ff
-        `
-    });
+    let mono2 = new tk('div', 'half', 'half');
+    mono2.styleAdd({background: '#cfe9ff'});
+
+    mono.yousoAdd(mono2.div);
 
     mono.evAdd('click', function(){
-        nicoText('clicked')
-    })
+        nicoText('clicked');
+    });
 
     mono.append();
 }
