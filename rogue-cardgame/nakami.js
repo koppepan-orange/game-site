@@ -173,10 +173,27 @@ let r = {
         return 1
     }
 }
-async function error(){
-    addtext('errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
-    await delay(2000);
-    // window.open('about:blank', '_self').close();
+// async function error(){
+//     addtext('errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
+//     await delay(2000);
+//     // window.open('about:blank', '_self').close();
+// }
+async function error(text){
+    let mono = new tk('div', 'half', 'half', window.innerWidth/2, 300);
+    mono.styleAdd({background: '#860000'})
+    mono.classAdd('mostop')
+
+    let mono2 = new tk('div', 'half', 'half', window.innerWidth/2, 100);
+    mono2.styleAdd({textAlign: 'center'});
+    mono2.styleAdd({fontSize: '27px'});
+    mono2.youso.innerText = text;
+    mono.yousoAdd(mono2.youso);
+
+    mono.append();
+
+
+    await delay(5000);
+    window.open('about:blank', '_self').close();
 }
 function hoshoku(color) {
     color = color.replace(/^#/, ''); // #付きなら取る
@@ -429,9 +446,9 @@ document.addEventListener('mousedown', e => {
 //#endregion 
 //#region tk
 class tk{
-    constructor(name, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
-        let div = document.createElement('div');
-        div.className = `tk ${name}`;
+    constructor(type, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
+        let youso = document.createElement(type);
+        youso.className = `tk ${type}`;
 
         let yoko = ['x', 'w'];
         for(let n of yoko){
@@ -449,15 +466,17 @@ class tk{
 
         console.log(x, y, w, h);
 
-        div.style.width = `${w}px`;
-        div.style.height = `${h}px`;
+        youso.style.width = `${w}px`;
+        youso.style.height = `${h}px`;
 
-        div.style.left = `${x}px`;
-         if(x == 'half') div.style.left = `${window.innerWidth/2 - w/2}px`;
-        div.style.top = `${y}px`;
-         if(y == 'half') div.style.top = `${window.innerHeight/2 - h/2}px`;
+        youso.style.left = `${x}px`;
+        youso.style.top = `${y}px`;
+        
+        if(x == 'half' && y == 'half') youso.classList.add('cenXY');
+         else if(x == 'half') youso.classList.add('cenX');
+         else if(y == 'half') youso.classList.add('cenY');
 
-        this.div = div;
+        this.youso = youso;
     };
 
     attrAdd(dict = 'none'){
@@ -468,93 +487,59 @@ class tk{
             let [key, val] = dict.split(':');
              key = key.trim();
              val = val.trim();
-            this.div.setAttribute(key, val);
+            this.youso.setAttribute(key, val);
             return 0;
         }
 
         if(typeof dict != 'object') return 1;
 
-        for(let key in dict) this.div.setAttribute(key, dict[key]);
+        for(let key in dict) this.youso.setAttribute(key, dict[key]);
 
         return 0;
     }
 
     styleAdd(dict){
-        for(let key in dict) this.div.style[key] = dict[key];
+        for(let key in dict) this.youso.style[key] = dict[key];
     }
 
-    classAdd(name){this.div.classList.add(name)};
-    classRem(name){this.div.classList.remove(name)};
-    classTog(name){this.div.classList.toggle(name)};
+    classAdd(name){this.youso.classList.add(name)};
+    classRem(name){this.youso.classList.remove(name)};
+    classTog(name){this.youso.classList.toggle(name)};
     classHas(name){
-        let is = this.div.classList.contains(name);
+        let is = this.youso.classList.contains(name);
         return is;
     }
 
     evAdd(type, func){
-        this.div.addEventListener(type, func);
+        this.youso.addEventListener(type, func);
     }
 
-    yousoAdd(type, dict){
-        let youso = document.createElement(type);
-        for(let key in dict){
-            // console.log(`[${key}]`, dict[key]);
-            let ban = ['className', 'textContent', 'innerHTML', 'href', 'src', 'style'];
-            let baned = 0;
-            for(let b of ban){
-                if(key == 'style'){
-                    // console.log('she is a style')
-                    baned = 1;
-                    let styles0 = dict[key];
-                    let styles = styles0.replace(/ /g, '').replace(/\n/g, '');
-                    let arr = styles.split(';');
-                    for(let style of arr){
-                        let [key, val] = style.split(':');
-                        youso.style[key] = val;
-                        // console.log(`youso.style[${key}] = ${val}`)
-                    }
-                    // for(let key in styles) console.log(key, styles[key]), youso.style[key] = styles[key];
-                    break;
-                }
-
-                if(key == b) youso[key] = dict[key], baned = 1;
-            }
-
-            if(baned) console.log('ban対象！')
-
-            if(!baned) youso.setAttribute(key, dict[key])
-        };
-
-        this.div.appendChild(youso);
-    };
+    yousoAdd(youso){
+        this.youso.appendChild(youso);
+    }
 
     append(){
-        document.body.appendChild(this.div);
+        document.body.appendChild(this.youso);
     };
 
     remove(){
-        this.div.remove();
+        this.youso.remove();
     };
 }
 
 function tkTest(){
-    let mono = new tk('mono', 'half', 'half')
-    mono.classAdd('draggable')
-    mono.styleAdd({background: '#f0f8ff'})
+    let mono = new tk('div', 'half', 'half');
+    mono.classAdd('draggable');
+    mono.styleAdd({background: '#f0f8ff'});
 
-    mono.yousoAdd('div', {textContent: 'koppepandesu'})
-    mono.yousoAdd('div', {
-        className: 'draggable',
-        style: `
-            width: 100px;
-            height: 100px;
-            background: #cfe9ff
-        `
-    });
+    let mono2 = new tk('div', 'half', 'half');
+    mono2.styleAdd({background: '#cfe9ff'});
+
+    mono.yousoAdd(mono2.div);
 
     mono.evAdd('click', function(){
-        nicoText('clicked')
-    })
+        nicoText('clicked');
+    });
 
     mono.append();
 }
@@ -586,6 +571,7 @@ let mapC = {
     conD: document.querySelector('#map .container'),
     tatem:8,
     yokom:8,
+    remaked:0,
     mases:[],
     p:{
         x:0,
@@ -713,22 +699,34 @@ mapF.load = () => {
     }
 }
 
-mapF.objMap = async() => {
+mapF.objMap = async(add = 0) => {
+    if(add) mapC.remaked += 1;
+    if(mapC.remaked > 9) return error('深刻なエラーが発生しました')
     let yoko = mapC.yokom;
     let tate = mapC.tatem;
-
     let zen = yoko*tate;
+    
+    let noned = mapItems.find(a => a.name == 'none');
+    let none = zen*noned["none"];
+    let anone = zen - none;
     let ns = {};
+    let nsn = 0;
     for(let a of mapItems){
         let [min, max] = a.n;
         // if(a.name == 'none') [min, max] = [zen/10, zen/2];
         if(a.name == 'none') [min, max] = [zen/3, zen/3];
 
         let n = random(min, max);
-        // console.log(`${min}~${max} => ${n}`)
+        // console.log(`${min}~${max} => ${n}`);
+
+        if(nsn + n > anone) n = anone - nsn;
+         if(n == 0) return console.log(`make error:: ${nsn+n}/${anone}`), mapF.objMap(1);
+
+        if(a.name != 'none') nsn += n;
+        console.log(`making:: ${nsn}/${anone}`);
         ns[a.name] = n;
     }
-    // console.log(ns);
+    console.log(ns);
 
     let objmap = [];
     for(let y=0; y<tate; y++){
@@ -742,7 +740,6 @@ mapF.objMap = async() => {
     let haiched = 0;
     for(let ob0 of Object.keys(ns)){
         let ob = ob0;
-        if(ob == 'none') mapC.anone = zen - ns[ob];
         // console.log(`${ob}: ${ns[ob]}個`);
         for(let i=0; i<ns[ob]; i++){
             // do while
@@ -779,6 +776,7 @@ mapF.objMap = async() => {
     mapC.objmap = objmap;
 }
 mapF.make = async() => {
+    mapC.remaked = 0;
     await mapF.objMap();
 
     mapF.save(1);
@@ -1053,7 +1051,7 @@ batF.heal = async(who, are, val, x) => {
 
 let images = {};
 let Imgs = {
-    'maps':['enemy', 'enemy_gachi', 'enemy_high', 'fire_maki', 'chest_a', 'chest_b', 'chest_c', 'chest_d']
+    'maps':['enemy', 'enemy_gachi', 'enemy_metal', 'enemy_gold', 'enemy-high', 'fire_maki', 'chest_a', 'chest_b', 'chest_c', 'chest_d']
 }
 let imageA = Object.keys(Imgs).map(a => Imgs[a].length).reduce((a, b) => a + b);
 let imageB = 0;

@@ -42,7 +42,8 @@ let mapItems = [
         name: "none",
         jpnm: "blank",
         desc: "「　　」",
-        n:[3,32],
+        none: 0.5,
+        n:[0,0],
         dataq:{},
         func: () => {}
     },
@@ -54,7 +55,8 @@ let mapItems = [
         n:[6,16],
         dataq: {
             "gachi": 5,
-            "high": 15,
+            "metal": 3,
+            "gold": 3
         },
         func: () => {
 
@@ -62,10 +64,22 @@ let mapItems = [
     },
 
     {
+        name: "enemy-high",
+        jpnm: "つよ敵",
+        desc: "つよい敵がいる場所なのです",
+        n:[2,4],
+        dataq: {},
+        func: () => {
+            let data = mapItems.find(a => a.name == 'enemy');
+            data.func();
+        }
+    },
+
+    {
         name: 'event',
         jpnm: 'オアシス21',
-        desc: 'イベントおきますのです',
-        n:[3,4],
+        desc: 'イベントが起きますのです',
+        n:[6,8],
         dataq: {
             'break': 3
         },

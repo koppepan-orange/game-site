@@ -140,7 +140,22 @@ img{
 .tk.mostop{
     z-index: 2147483647;
 }
+.tk.cenXY{
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+}
+.tk.cenX{
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+}
+.tk.cenY{
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+}
 /* #endregion */
+
+
 
 水色 #f0f8ff, #eaf5ff, #def0ff, #cfe9ff, #b5dcff
 紫色 #f8f6ff, #f5f2ff, #f1edff, #ece8ff, #e9e4ff
