@@ -238,11 +238,12 @@ body{
 }
 #map .container{
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: flex-start;
+    align-items: center;
     width: 100%;
     height: fit-content;
-    flex-direction: column;
+    margin: 0 auto;
 }
 #map .container .row{
     margin-top: -10px;
@@ -265,9 +266,34 @@ body{
     aspect-ratio: 9/10;
     background-color: #cfe9ff;
     clip-path: polygon(50% 0, 100% 20%, 100% 80%, 50% 100%, 0 80%, 0 20%);
+    position: relative;
     cursor: url(assets/systems/hammer.png), auto;
     position: relative;
 }
+
+#map .container .mas.consored::before,
+#map .container .mas.consored::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: opacity .2s, transform .25s;
+  border-radius: inherit;
+}
+#map .container .mas.consored::before{
+    /* カクシタワタシ */
+    background: #00000080;
+    opacity: 1;
+    z-index: 10;
+}
+#map .container .mas.consored::after{
+    /* 斜線 */
+    background-image:repeating-linear-gradient(135deg, #ffffff30 0 4px, transparent 4px 8px);
+    mix-blend-mode: screen;
+    opacity: 1;
+    z-index: 11;
+}
+
 #map .container .mas.none{
     background-color: #00000000;
 }
@@ -283,6 +309,10 @@ body{
     left: 50%;
     transform: translate(-50%, -50%);
     overflow: hidden;
+    opacity: 1;
     cursor: pointer;
     z-index: 1;
+}
+#map .container .mas.consored .img{
+    opacity: 0;
 }

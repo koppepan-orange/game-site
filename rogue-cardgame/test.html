@@ -7,20 +7,287 @@
     <title>item BUAAAAAAAAAAAAAAARN</title>
 
     <style>
+        *{
+            user-select: none;
+        }
         .toolC{
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
             width: 70px;
-            aspect-ratio: 1/1;
+            aspect-ratio: 2/3;
             position: fixed;
-            border: 2px solid #2b2b2b;
-            border-radius: 50%;
+            border: 3px solid #2b2b2b;
+            background: #909090;
+            box-shadow: 0px 0px 10px 5px #0afaaa;;
+            /* border-radius: 50%; */
+            overflow: hidden;
+        }
+        .toolC img{
+            width: 90%;
+            aspect-ratio: 1/1;
+            object-fit: contain;
+            object-position: center;
+            pointer-events: none
         }
     </style>
 </head>
 <body>
-    <div class="toolC"></div>
-
+    <div class="toolC">
+        <img src="assets/tools/drill.png">
+    </div>
     <script>
+        //#region komagome
+function delay(ms){
+    return new Promise(resolve=>setTimeout(resolve,ms));
+};
+async function nicoText(mes){
+    const newDiv = document.createElement('div');
+    newDiv.textContent = mes;
+    newDiv.className = 'nicotext';
+    newDiv.style.top = `calc(${random(0, 100)}vh - 20px)`;
+    newDiv.style.right = '0px';
+    document.querySelector('body').appendChild(newDiv);
+
+    requestAnimationFrame(() => {
+    newDiv.style.right = `${window.innerWidth + newDiv.offsetWidth}px`; //なんか電車の問題解いてるみたいだね
+    });
+    
+    await delay(2000); 
+    newDiv.remove();
+};
+function kaijou(num){
+    if(num == 0) return 0;
+    if(num == 1) return 1;
+    return num * kaijou(num - 1);
+}
+function arraySelect(array){
+    let select = Math.floor(Math.random()*array.length);
+    return array[select];
+};
+function arrayShuffle(array) {
+    for(let i = array.length - 1; i > 0; i--) {
+    const i2 = Math.floor(Math.random() * (i + 1));
+    [array[i], array[i2]] = [array[i2], array[i]];
+    }
+    return array;
+};
+function arraySize(array){
+    let res = new Set(array).size;
+    return res;
+};
+function arrayCount(array){
+    const counts = {};
+    for (let value of array) {
+    counts[value] = (counts[value] || 0) + 1;
+    }
+    return counts;
+}
+function arrayMult(array){
+    return array.reduce((a, v) => a * v, 1);
+}
+function arrayGacha(array,probs){
+    if(array.length != probs.length) throw new Error("長さがあってないっす！先輩、ちゃんとチェックした方がいいっすよ〜？");
+    const total = probs.reduce((sum, p) => sum + p, 0);
+    let random = Math.random() * total;
+    for (let i = 0; i < array.length; i++) {
+        if(random < probs[i]) return array[i];
+        random -= probs[i];
+    }
+};
+function hask(obj, key){
+let res = obj.hasOwnProperty(key);
+res = res ? 1 : 0;
+return res;
+}
+function copy(moto) {
+    if(Array.isArray(moto)){
+        let arr = [];
+        for (let i = 0; i < moto.length; i++) {
+            arr.push(copy(moto[i]));
+        }
+        return arr;
+    }
+    else if(moto != null && typeof moto == 'object'){
+        let obj = {};
+        for (let key in moto) {
+            if (moto.hasOwnProperty(key)) {
+            obj[key] = copy(moto[key]);
+            }
+        }
+        return obj;
+    }
+    else {
+        return moto;
+    }
+}
+function probability(num){
+    return Math.random()*100 <= num;
+    //例:num == 20 → randomが20以内ならtrue,elseならfalseを返す
+};
+function random(min, max) {
+    let num = Math.floor(Math.random() * (max - min + 1)) + min;
+    return Math.floor(num);
+};
+function fl(num){
+    let res = num ? 1 : 0;
+    return res;
+}
+
+function anagramSaySay(text, loop = 10, bet = '<br>'){
+    let menjo = 0;
+    let len = text.length;
+    if(len < 4) menjo = 1, console.log('長さが3以下なんで最大6っす');
+    
+    let optout = text.split('');
+    let optcou = arrayCount(optout);
+    let optvals = [];
+    for(a of Object.keys(optcou)){
+        let b = optcou[a];
+        b = kaijou(b);
+        optvals.push(b);
+    }
+    let optmat = arrayMult(optvals);
+    let cal = (kaijou(len) / optmat) - 1;
+
+    let loopen = loop;
+    console.log(`総数:${cal} 回数:${loopen}`);
+    if(cal < loopen) menjo = 1;
+    
+    let reses = [];
+    while(loopen > 0){
+        loopen -= 1;
+        let res = arrayShuffle(optout).join(''); 
+        if(reses.includes(res)){loopen += 1; continue}
         
+        if(res == text && !menjo){loopen += 1; continue;}
+
+        if(res == text && menjo && reses.length < cal){loopen += 1; continue}
+        else if(res == text && menjo) res = '[重複エラー]';
+
+        reses.push(res);
+    }
+    
+    return reses.join(bet);
+}
+function setLocalStorage(name, value) {
+    localStorage.setItem(name, value || "");
+}
+function getLocalStorage(name) {
+    return localStorage.getItem(name);
+}
+let r = {
+    and: function(lef, rig){
+        if(lef && rig) return 1
+        return 0
+    },
+    or: function(lef, rig){
+        if(lef || rig) return 1
+        return 0
+    },
+    xor: function(lef, rig){
+        console.log('排他的論理和発動！！')
+        let l = lef ? 1 : 0
+        let r = rig ? 1 : 0
+        if(l != r) return 1
+        return 0
+    },
+    not: function(lef){
+        if(lef) return 0
+        return 1
+    },
+    nand: function(lef, rig){
+        if(lef && rig) return 0
+        return 1
+    },
+    nor: function(lef, rig){
+        if(lef || rig) return 0
+        return 1
+    },
+    xnor: function(lef, rig){
+        console.log('逆排他的論理和発動！！')
+        let l = lef ? 1 : 0
+        let r = rig ? 1 : 0
+        if(l != r) return 0
+        return 1
+    }
+}
+// async function error(){
+//     addtext('errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
+//     await delay(2000);
+//     // window.open('about:blank', '_self').close();
+// }
+async function error(text){
+    let mono = new tk('div', 'half', 'half', window.innerWidth/2, 300);
+    mono.styleAdd({background: '#860000'})
+    mono.classAdd('mostop')
+
+    let mono2 = new tk('div', 'half', 'half', window.innerWidth/2, 100);
+    mono2.styleAdd({textAlign: 'center'});
+    mono2.styleAdd({fontSize: '27px'});
+    mono2.youso.innerText = text;
+    mono.yousoAdd(mono2.youso);
+
+    mono.append();
+
+
+    await delay(5000);
+    window.open('about:blank', '_self').close();
+}
+function hoshoku(color) {
+    color = color.replace(/^#/, ''); // #付きなら取る
+
+    if(color.length != 6) return console.log('カラーコードは6桁、ですよ〜？楽しないでくださいね〜♪')
+
+    // RGB分解
+    const r = parseInt(color.slice(0, 2), 16);
+    const g = parseInt(color.slice(2, 4), 16);
+    const b = parseInt(color.slice(4, 6), 16);
+
+    // 補色：255から引く
+    const compR = (255 - r).toString(16).padStart(2, '0');
+    const compG = (255 - g).toString(16).padStart(2, '0');
+    const compB = (255 - b).toString(16).padStart(2, '0');
+
+    return `#${compR}${compG}${compB}`;
+}
+function mixshoku(c1, c2, ratio = 0.5) {
+    const toRGB = c => {
+        c = c.replace('#', '');
+        if (c.length === 3) c = c.split('').map(x => x + x).join('');
+        const n = parseInt(c, 16);
+        return [n >> 16, (n >> 8) & 255, n & 255];
+    };
+
+    const [r1, g1, b1] = toRGB(c1);
+    const [r2, g2, b2] = toRGB(c2);
+
+    const r = Math.round(r1 + (r2 - r1) * ratio);
+    const g = Math.round(g1 + (g2 - g1) * ratio);
+    const b = Math.round(b1 + (b2 - b1) * ratio);
+
+    return (
+        '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('')
+    );
+}
+//#endregion
+
+        let lis = ['drill', 'enemy', 'boss', 'event'];
+        async function open(name0 = 0){
+            let name = arraySelect(lis);
+            if(name0) name = name0;
+
+            let div = document.createElement('div');
+            div.className = 'toolC';
+             let img = document.createElement('img');
+             img.src = `assets/tools/${name}.png`;
+             div.appendChild(img);
+            document.body.appendChild(div);
+
+            await delay(1000);
+            div.remove();
+        }
     </script>
 </body>
 </html>

@@ -573,6 +573,7 @@ let mapC = {
     yokom:8,
     remaked:0,
     mases:[],
+    sentk:{},
     p:{
         x:0,
         y:0,
@@ -581,6 +582,26 @@ let mapC = {
     }
 };
 let mapF = {};
+
+mapC.sentk["quake"] = {
+    uni:[ 
+        [0,-1],
+        [-1,-1],
+        [-1,0],
+        [0,1],
+        [1,0],
+        [1,-1],
+    ],
+
+    due:[
+        [0,-1],
+        [-1,0],
+        [-1,1],
+        [0,1],
+        [1,1],
+        [1,0],
+    ]
+}
 
 document.addEventListener('keydown', e => {
     let key = e.key.toLowerCase();
@@ -627,12 +648,15 @@ mapF.seikei = () => {
             if(due && x == mapC.yokom-1) continue;
 
             let mas = mases.find(a => a.x == x && a.y == y);
-            // console.log(mas)
+            let name = mas.name ?? null;
+            // if(mas.consored) name += '_consored';
+            //規制をどうsaveに持ち込むかを！最終手段オブジェクト化を俺は考えているぜっ！
+            // console.log(mas.name)
             ato[y][x] = mas.name ?? null;
         }
     }
 
-    return ato
+    return ato;
 }
 
 mapF.save = (tuyoi = 0) => {
@@ -671,6 +695,10 @@ mapF.save = (tuyoi = 0) => {
                 mono.appendChild(img);
             }
 
+            mono.addEventListener('click', () => {
+                mono.classList.toggle('consored');
+            })
+
             row.appendChild(mono);
         }
 
@@ -689,67 +717,78 @@ mapF.load = () => {
 
         let clas = mono0.classList;
         for(let c of clas){
-            if(c.startsWith('m')) mono.y = c.slice(1,2), mono.x = c.slice(2,3);
-            else if(c != 'iru') mono.name = c;
+            let md = 0
+            if(c.startsWith('m')){
+                mono.y = c.slice(1,2);
+                mono.x = c.slice(2,3);
+                md = 1;
+            }
+            let ban = ['iru', 'consored'];
+            if(!ban.includes(c) && !md) mono.name = c;
 
-            if(c == 'none') mono.none = 1;   
+            if(c == 'none') mono.none = 1;
+            if(c == 'consored') mono.consored = 1;
         }
 
         mapC.mases.push(mono);
     }
 }
 
+let energy = [];
 mapF.objMap = async(add = 0) => {
     if(add) mapC.remaked += 1;
     if(mapC.remaked > 9) return error('深刻なエラーが発生しました')
     let yoko = mapC.yokom;
     let tate = mapC.tatem;
     let zen = yoko*tate;
+    let zahyos = [];
+    for(let i=0; i<yoko; i++)for(let i2=0; i2<tate; i2++)zahyos.push([i,i2]);
+    console.log(`ザッヒョズ「今年で${zahyos.length}ッス！」`)
     
     let noned = mapItems.find(a => a.name == 'none');
-    let none = zen*noned["none"];
+    let none = zen*noned.none;
     let anone = zen - none;
+    console.log(`none:anone = ${none}:${anone}`)
+
     let ns = {};
     let nsn = 0;
-    for(let a of mapItems){
+    for(let a of mapItems.filter(a => a.able)){
         let [min, max] = a.n;
-        // if(a.name == 'none') [min, max] = [zen/10, zen/2];
-        if(a.name == 'none') [min, max] = [zen/3, zen/3];
 
         let n = random(min, max);
+        if(a.name == 'none') n = none;
         // console.log(`${min}~${max} => ${n}`);
 
-        if(nsn + n > anone) n = anone - nsn;
-         if(n == 0) return console.log(`make error:: ${nsn+n}/${anone}`), mapF.objMap(1);
+        if(nsn + n > zen) console.error(`超えたぜ(${a.name})`),n = anone-nsn;
+         if(n == 0) return console.log(`make error:: ${nsn}/${anone} (n == 0)`), mapF.objMap(1);
 
-        if(a.name != 'none') nsn += n;
-        console.log(`making:: ${nsn}/${anone}`);
+        nsn += n;
+        console.log(`making:: ${nsn}/${zen}`);
         ns[a.name] = n;
     }
+    ns['enemy'] = zen - nsn;
+    console.log(`maked:: ${nsn+ns['enemy']}/${zen}`);
     console.log(ns);
+    energy = ns
 
     let objmap = [];
     for(let y=0; y<tate; y++){
         objmap[y] = [];
-        for(let x=0; x<yoko; x++) objmap[y][x] = 0
+        for(let x=0; x<yoko; x++) objmap[y][x] = 0;
     }
 
     let zenbu = Object.values(ns).reduce((a,b) => a+b);
-    // console.log(`${zenbu}個、配置予定`)
+    console.log(`${zenbu}個、配置予定`)
     
     let haiched = 0;
     for(let ob0 of Object.keys(ns)){
         let ob = ob0;
         // console.log(`${ob}: ${ns[ob]}個`);
         for(let i=0; i<ns[ob]; i++){
-            // do while
-            let y, x;
-            do{
-                await delay(10)
-                y = random(0, tate-1);
-                x = random(0, yoko-1);
-                // console.log('making')
-            } while(objmap[y][x] || ((y + 1) % 2 == 0 && x == yoko - 1));
+            let ind = random(0, zahyos.length-1);
+            let [x, y] = zahyos.splice(ind, 1)[0];
+            console.log('making')
+            // do{} while(objmap[y][x] || ((y + 1) % 2 == 0 && x == yoko - 1));
             // console.log(`objmap[${y}][${x}]に${ob}を配置します`)
 
             let data = mapItems.find(a => a.name == ob);
@@ -772,7 +811,7 @@ mapF.objMap = async(add = 0) => {
 
     // console.log(`置く予定:${zenbu}, 置いた数:${haiched}`)
 
-    // console.log(objmap)
+    console.log(objmap)
     mapC.objmap = objmap;
 }
 mapF.make = async() => {
@@ -822,7 +861,6 @@ document.addEventListener('keydown', async(e) => {
 })
 
 // #endregion
-
 // #region プレイヤーの動き機構
 
 mapF.tekiou = () => {
@@ -915,14 +953,20 @@ mapF.moving = (u, ippo) => {
         if(monor && monor.none) is += 1;
         if(is == 2) return 1;
 
-        if(monol && !monol.none){
+        let d;
+        if(due && monol && !monol.none) d = 0;
+   else if(!due && monor && !monor.none) d = 1;
+   else if(due && monor && !monor.none) d = 1;
+   else if(!due && monol && !monol.none) d = 0;
+
+        if(d == 0){
             // console.log('monolがあるので左側へ');
             p.x += l;
             p.y += ippo;
             return 0;
         }
 
-        if(monor && !monor.none){
+        if(d == 1){
             // console.log('(monolはないけど)')
             // console.log('monorがあるので右側へ');
             p.x += r;
@@ -942,26 +986,13 @@ mapF.restart = () => {
 mapF.quake = () => {
     let p = mapC.p;
     let due = (p.y+1) % 2 == 0 ? 1 : 0;
+    
+    let mases = mapC.sentk["quake"].uni;
+    if(due) mases = mapC.sentk["quake"].due;
+
 
     // 地殻どーんなSEを
-    let mases = //y, x
-    [ 
-        [0,-1],
-        [-1,-1],
-        [-1,0],
-        [0,1],
-        [1,0],
-        [1,-1],
-    ];
-
-    if(due) mases = [
-        [0,-1],
-        [-1,0],
-        [-1,1],
-        [0,1],
-        [1,1],
-        [1,0],
-    ]
+    
 
     for(let mas of mases){
         let y = p.y + mas[0];
@@ -1002,6 +1033,11 @@ mapF.act = async() => {
 
     mapF.save();
 }
+// #endregion
+
+// #region mapのUIたちを
+let mapuF = {};
+
 // #endregion
 
 // #region 戦闘を～

@@ -23,6 +23,7 @@ let mapItems = [
         jpnm: "すた〜と",
         desc: "スタート地点なのです",
         n:[1,1],
+        able:1,
         dataq:{},
         func: () => {}
     },
@@ -32,6 +33,7 @@ let mapItems = [
         jpnm: "上司",
         desc: "ボスがいる場所なのです。\nここに行ったらこの階層を抜けられます",
         n:[1,1],
+        able:1,
         dataq:{},
         func: () => {
 
@@ -44,6 +46,7 @@ let mapItems = [
         desc: "「　　」",
         none: 0.5,
         n:[0,0],
+        able:1,
         dataq:{},
         func: () => {}
     },
@@ -52,7 +55,8 @@ let mapItems = [
         name: "enemy",
         jpnm: "敵",
         desc: "敵がいる場所なのです",
-        n:[6,16],
+        n:[1,1],
+        able:0,
         dataq: {
             "gachi": 5,
             "metal": 3,
@@ -67,7 +71,8 @@ let mapItems = [
         name: "enemy-high",
         jpnm: "つよ敵",
         desc: "つよい敵がいる場所なのです",
-        n:[2,4],
+        n:[3,5],
+        able:1,
         dataq: {},
         func: () => {
             let data = mapItems.find(a => a.name == 'enemy');
@@ -79,7 +84,8 @@ let mapItems = [
         name: 'event',
         jpnm: 'オアシス21',
         desc: 'イベントが起きますのです',
-        n:[6,8],
+        n:[6,9],
+        able:1,
         dataq: {
             'break': 3
         },
@@ -93,6 +99,7 @@ let mapItems = [
         jpnm: "チェスタァ！！",
         desc: "チェストなのです",
         n:[3,5],
+        able:1,
         dataq: {
             "a": 25,
             "b": 25,
@@ -108,7 +115,8 @@ let mapItems = [
         name: "fire",
         jpnm: "火",
         desc: "火の場所なのです",
-        n:[2,4],
+        n:[3,4],
+        able:1,
         dataq: {
             "maki": 100
         },
