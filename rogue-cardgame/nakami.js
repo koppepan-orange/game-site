@@ -573,7 +573,7 @@ let mapC = {
     yokom:8,
     remaked:0,
     mases:[],
-    sentk:{},
+    sentk:{}, //[y, x]
     p:{
         x:0,
         y:0,
@@ -648,11 +648,14 @@ mapF.seikei = () => {
             if(due && x == mapC.yokom-1) continue;
 
             let mas = mases.find(a => a.x == x && a.y == y);
-            let name = mas.name ?? null;
-            // if(mas.consored) name += '_consored';
-            //規制をどうsaveに持ち込むかを！最終手段オブジェクト化を俺は考えているぜっ！
-            // console.log(mas.name)
-            ato[y][x] = mas.name ?? null;
+            let m = {}
+            // if(!mas) console.error(`no mas: ${x}, ${y}`);
+            // if(!mas.name) console.error(`no name: ${x}, ${y}`, mas);
+            m.name = mas.name ?? null;
+            
+            if(mas.consored) m.consored = 1;
+
+            ato[y][x] = m;
         }
     }
 
@@ -684,19 +687,21 @@ mapF.save = (tuyoi = 0) => {
             mono.className = `mas m${y}${x}`;
             if(x == p.x && y == p.y) mono.classList.add('iru');
 
-            // console.log(y,x)
-            if(objmap[y][x]){
-                let name = objmap[y][x];
-                mono.classList.add(name);
+            // console.log(x, y, objmap[y][x])
+            if(objmap[y][x] && objmap[y][x].name){
+                let m = objmap[y][x];
+                mono.classList.add(m.name);
+                if(m.consored) mono.classList.add('consored');
                 
                 let img = document.createElement('img');
-                img.className = `img ${name}`;
-                img.src = `assets/maps/${name}.png`;
+                img.className = `img ${m.name}`;
+                img.src = `assets/maps/${m.name}.png`;
                 mono.appendChild(img);
             }
 
             mono.addEventListener('click', () => {
                 mono.classList.toggle('consored');
+                mapF.load()
             })
 
             row.appendChild(mono);
@@ -705,7 +710,7 @@ mapF.save = (tuyoi = 0) => {
         mapC.conD.appendChild(row);
     }
 
-    mapF.tekiou();
+    if(!tuyoi) mapF.tekiou();
 }
 
 mapF.load = () => {
@@ -727,8 +732,9 @@ mapF.load = () => {
             if(!ban.includes(c) && !md) mono.name = c;
 
             if(c == 'none') mono.none = 1;
-            if(c == 'consored') mono.consored = 1;
+            if(c == 'consored') mono.consored = 1
         }
+        if(!mono.name) mono.name = '';
 
         mapC.mases.push(mono);
     }
@@ -743,12 +749,12 @@ mapF.objMap = async(add = 0) => {
     let zen = yoko*tate;
     let zahyos = [];
     for(let i=0; i<yoko; i++)for(let i2=0; i2<tate; i2++)zahyos.push([i,i2]);
-    console.log(`ザッヒョズ「今年で${zahyos.length}ッス！」`)
+    // console.log(`ザッヒョズ「今年で${zahyos.length}ッス！」`)
     
     let noned = mapItems.find(a => a.name == 'none');
     let none = zen*noned.none;
     let anone = zen - none;
-    console.log(`none:anone = ${none}:${anone}`)
+    // console.log(`none:anone = ${none}:${anone}`)
 
     let ns = {};
     let nsn = 0;
@@ -763,22 +769,22 @@ mapF.objMap = async(add = 0) => {
          if(n == 0) return console.log(`make error:: ${nsn}/${anone} (n == 0)`), mapF.objMap(1);
 
         nsn += n;
-        console.log(`making:: ${nsn}/${zen}`);
+        // console.log(`making:: ${nsn}/${zen}`);
         ns[a.name] = n;
     }
     ns['enemy'] = zen - nsn;
-    console.log(`maked:: ${nsn+ns['enemy']}/${zen}`);
+    // console.log(`maked:: ${nsn+ns['enemy']}/${zen}`);
     console.log(ns);
     energy = ns
 
     let objmap = [];
     for(let y=0; y<tate; y++){
         objmap[y] = [];
-        for(let x=0; x<yoko; x++) objmap[y][x] = 0;
+        for(let x=0; x<yoko; x++) objmap[y][x] = {};
     }
 
     let zenbu = Object.values(ns).reduce((a,b) => a+b);
-    console.log(`${zenbu}個、配置予定`)
+    // console.log(`${zenbu}個、配置予定`)
     
     let haiched = 0;
     for(let ob0 of Object.keys(ns)){
@@ -787,7 +793,7 @@ mapF.objMap = async(add = 0) => {
         for(let i=0; i<ns[ob]; i++){
             let ind = random(0, zahyos.length-1);
             let [x, y] = zahyos.splice(ind, 1)[0];
-            console.log('making')
+            // console.log('making')
             // do{} while(objmap[y][x] || ((y + 1) % 2 == 0 && x == yoko - 1));
             // console.log(`objmap[${y}][${x}]に${ob}を配置します`)
 
@@ -803,7 +809,8 @@ mapF.objMap = async(add = 0) => {
             // console.log(`付加要素！ >> ${q}`)
             if(q != '#コンパス') ob2 += `_${q}`;
 
-            objmap[y][x] = ob2;
+            objmap[y][x].name = ob2;
+            objmap[y][x].consored = 1;
             haiched += 1;
             // console.log(`${haiched}/${zenbu} (${ob2})`)
         }
@@ -811,10 +818,11 @@ mapF.objMap = async(add = 0) => {
 
     // console.log(`置く予定:${zenbu}, 置いた数:${haiched}`)
 
-    console.log(objmap)
+    // console.log(objmap)
     mapC.objmap = objmap;
 }
 mapF.make = async() => {
+    console.log('mapつくるお～！！')
     mapC.remaked = 0;
     await mapF.objMap();
 
@@ -828,11 +836,11 @@ mapF.nextFloor = async() => {
 
     await mapF.make();
     mapF.load();
-    mapF.tekiou();
 
     p.moving = 0;
 
     mapF.restart();
+    mapF.tekiou();
 
     return 0;
 }
@@ -860,6 +868,7 @@ document.addEventListener('keydown', async(e) => {
     }
 })
 
+
 // #endregion
 // #region プレイヤーの動き機構
 
@@ -876,6 +885,16 @@ mapF.tekiou = () => {
     let mono = mapC.conD.querySelector(`.mas.m${p.y}${p.x}`);
     mono.classList.add('iru');
     mono.appendChild(coma);
+
+    let quake = copy(mapC.sentk['quake'].uni);
+    if((p.y+1) % 2 == 0) quake = copy(mapC.sentk['quake'].due);
+    quake.push([0, 0]);
+    for(let q of quake){
+        let [y, x] = q;
+        let [ty, tx] = [p.y + y, p.x + x];
+        let mono = mapC.conD.querySelector(`.mas.m${ty}${tx}`);
+        if(mono) mono.classList.remove('consored');
+    }
 }
 
 mapF.move = async function(x, y, mode, issyun = 0){
@@ -1000,13 +1019,16 @@ mapF.quake = () => {
         let mono = mapC.conD.querySelector(`.m${y}${x}`);
         let youso = mapC.mases.find(a => a.x == x && a.y == y);
         if(mono){
+            // console.log(mono, youso)
             if(youso.name == 'boss') continue;
+
             mono.classList.toggle('none');
-            youso.name = 'none';
-            mapF.load();
-            mapF.tekiou();
+            // console.log(mono.classList);
+            if(mono.classList.contains('consored')) console.error('consored!!!!!');
         }
     }
+    mapF.load();
+    mapF.tekiou();
 }
 
 mapF.act = async() => {
@@ -1021,17 +1043,17 @@ mapF.act = async() => {
 
     // fire_maki => fire
     let name = name0.split('_')[0];
-    let ato = '#コンパス';
+    let ato = '';
     if(name != name0) ato = name0.split('_')[1];
 
     console.log(`act:: 「${name}」(${ato})`);
  
     let data = mapItems.find(a => a.name == name);
     // console.log(data)
-    let res = await data.func();
+    let res = await data.func(ato);
     if(res) return 1;
 
-    mapF.save();
+    // mapF.save();
 }
 // #endregion
 

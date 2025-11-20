@@ -280,6 +280,11 @@ body{
   transition: opacity .2s, transform .25s;
   border-radius: inherit;
 }
+#map .container .mas.none.consored::before,
+#map .container .mas.none.consored::after{
+    background: #00000000;
+    opacity: 0;
+}
 #map .container .mas.consored::before{
     /* カクシタワタシ */
     background: #00000080;

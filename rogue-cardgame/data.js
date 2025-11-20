@@ -62,8 +62,9 @@ let mapItems = [
             "metal": 3,
             "gold": 3
         },
-        func: () => {
-
+        func: (fca = '') => {
+            //fca == metalとかgoldとか。
+            
         }
     },
 
