@@ -545,3 +545,4 @@ let clicking = false;
 document.addEventListener('mousedown', () => clicking = true);
 document.addEventListener('mouseup', () => clicking = false);
 //#endregion
+
