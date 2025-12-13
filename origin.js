@@ -392,14 +392,14 @@ document.addEventListener('mouseover', (e) => {
     const descTarget = e.target.closest('[data-description]');
     if (descTarget) {
         const desc = descTarget.dataset.description;
-        movableDescription.innerHTML = desc;
+        movableDescription.innerText = desc;
         movableDescription.style.display = 'block';
     }
 });
 document.addEventListener('mouseout', (e) => {
     const descTarget = e.target.closest('[data-description]');
     if (descTarget) {
-        movableDescription.innerHTML = '';
+        movableDescription.innerText = '';
         movableDescription.style.display = 'none';
     }
 });
