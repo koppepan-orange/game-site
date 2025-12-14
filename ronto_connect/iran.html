@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Level Devil — HTML/CSS/JS Only</title>
+  <style>
+    :root{
+      --bg:#0f1115; --card:#121417; --accent:#ff6b6b; --muted:#9aa3b2; --glass: rgba(255,255,255,0.03);
+      --glass-2: rgba(255,255,255,0.02);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,Arial;
+      background: radial-gradient(1000px 600px at 10% 10%, rgba(255,95,95,0.03), transparent),
+                  linear-gradient(180deg,#0b0c0f, #0f1115 60%);
+      color:#e6eef6; -webkit-font-smoothing:antialiased; padding:28px;
+    }
+    .wrap{max-width:980px;margin:0 auto;display:grid;grid-template-columns:320px 1fr;gap:20px}
+
+    header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between}
+    h1{font-size:20px;margin:0}
+    .sub{color:var(--muted);font-size:13px}
+
+    .panel{background:linear-gradient(180deg,var(--glass),var(--glass-2));border-radius:12px;padding:16px;box-shadow:0 6px 20px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.02)}
+
+    /* left column */
+    .stats{display:flex;flex-direction:column;gap:12px}
+    .stat-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,0.01)}
+    .big{font-weight:700}
+    button{background:linear-gradient(180deg,#1c1f24,#15161a);border:1px solid rgba(255,255,255,0.03);color:inherit;padding:10px 12px;border-radius:10px;cursor:pointer}
+    button:active{transform:translateY(1px)}
+    .muted{color:var(--muted);font-size:13px}
+
+    /* main */
+    .arena{display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;padding:18px;text-align:center}
+    .monster-card{width:100%;max-width:540px;padding:14px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03)}
+    .monster-name{font-weight:700;font-size:18px}
+    .hpbar{height:14px;background:rgba(255,255,255,0.04);border-radius:10px;overflow:hidden;margin-top:10px}
+    .hpfill{height:100%;background:linear-gradient(90deg,var(--accent),#ffb38a);width:100%}
+    .controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+    .attack-btn{font-size:18px;padding:14px 18px;border-radius:12px;background:linear-gradient(90deg,var(--accent),#ff3b6b);box-shadow:0 6px 20px rgba(255,80,80,0.08)}
+
+    .upgrades{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .upgrade{padding:10px;border-radius:10px;background:rgba(255,255,255,0.01);display:flex;flex-direction:column;gap:6px}
+    .price{color:var(--muted);font-size:13px}
+
+    footer{grid-column:1/-1;margin-top:8px;color:var(--muted);font-size:13px}
+
+    .tiny{font-size:12px;color:var(--muted)}
+    .center{display:flex;gap:8px;align-items:center}
+
+    @media(max-width:820px){.wrap{grid-template-columns:1fr}.arena{order:2}.stats{order:1}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Level Devil</h1>
+        <div class="sub">HTML / CSS / JS only — シンプルで遊べる。進行は自動保存。</div>
+      </div>
+      <div class="sub tiny">保存: ブラウザのローカルストレージ</div>
+    </header>
+
+    <aside class="panel stats">
+      <div class="stat-row"><div>プレイヤー</div><div class="muted">ステータス</div></div>
+      <div class="stat-row"><div>レベル</div><div id="pl-level" class="big">1</div></div>
+      <div class="stat-row"><div>経験値</div><div id="pl-xp" class="muted">0 / 10</div></div>
+      <div class="stat-row"><div>攻撃力</div><div id="pl-atk" class="big">1</div></div>
+      <div class="stat-row"><div>最大体力</div><div id="pl-maxhp" class="big">10</div></div>
+      <div class="stat-row"><div>ゴールド</div><div id="pl-gold" class="big">0</div></div>
+      <div class="stat-row"><div>討伐数</div><div id="pl-kills" class="big">0</div></div>
+
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button id="save-btn">手動でセーブ</button>
+        <button id="reset-btn">リセット</button>
+      </div>
+
+      <div style="margin-top:10px" class="muted tiny">※リセットは全データを消します。自動保存は有効です。</div>
+    </aside>
+
+    <main class="panel arena">
+      <div class="monster-card">
+        <div class="monster-name" id="monster-name">Devil Lv 1</div>
+        <div class="muted tiny" id="monster-desc">弱そうな悪魔だ。クリックで攻撃。</div>
+        <div class="hpbar" title="HP">
+          <div class="hpfill" id="monster-hpfill" style="width:100%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:13px">
+          <div class="muted">HP: <span id="monster-hp">10</span> / <span id="monster-maxhp">10</span></div>
+          <div class="muted">XP: <span id="monster-xp">5</span></div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="attack" class="attack-btn">攻撃</button>
+        <button id="auto-toggle">自動攻撃: OFF</button>
+        <button id="fast-attack">速攻（強化）</button>
+      </div>
+
+      <div style="width:100%;max-width:540px;margin-top:8px">
+        <div class="muted tiny">アップグレード</div>
+        <div class="upgrades">
+          <div class="upgrade">
+            <div style="display:flex;justify-content:space-between"><div>攻撃力＋</div><div class="price" id="price-atk">価格: 5</div></div>
+            <div style="display:flex;gap:8px"><button id="buy-atk">購入</button><div class="muted tiny">+1 攻撃力</div></div>
+          </div>
+          <div class="upgrade">
+            <div style="display:flex;justify-content:space-between"><div>最大HP＋</div><div class="price" id="price-hp">価格: 8</div></div>
+            <div style="display:flex;gap:8px"><button id="buy-hp">購入</button><div class="muted tiny">+5 最大HP</div></div>
+          </div>
+          <div class="upgrade">
+            <div style="display:flex;justify-content:space-between"><div>自動速度UP</div><div class="price" id="price-auto">価格: 20</div></div>
+            <div style="display:flex;gap:8px"><button id="buy-auto">購入</button><div class="muted tiny">自動攻撃の間隔が短くなる</div></div>
+          </div>
+          <div class="upgrade">
+            <div style="display:flex;justify-content:space-between"><div>ゴールド増量</div><div class="price" id="price-gold">価格: 30</div></div>
+            <div style="display:flex;gap:8px"><button id="buy-gold">購入</button><div class="muted tiny">討伐報酬が増える</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:100%;max-width:540px;margin-top:12px;display:flex;justify-content:space-between;align-items:center">
+        <div class="muted tiny">クイック操作: スペースで攻撃</div>
+        <div class="muted tiny">※ブラウザを閉じても自動保存</div>
+      </div>
+
+    </main>
+
+    <footer class="panel tiny">
+      <div>ヒント: 敵はレベルが上がると硬くなる。攻撃力と自動化を両方育てると楽。</div>
+    </footer>
+  </div>
+
+  <script>
+  // Level Devil - single-file HTML game
+  (function(){
+    // --- 初期値 ---
+    const DEFAULT = {
+      level:1, xp:0, atk:1, maxhp:10, gold:0, kills:0,
+      autoEnabled:false, autoInterval:1200, autoSpeedLevel:0, goldMulti:1
+    };
+
+    const storageKey = 'level-devil-save-v1';
+    let state = load()||Object.assign({},DEFAULT);
+
+    // Monster generator
+    function makeMonster(playerLevel){
+      const mLevel = playerLevel; // シンプルにプレイヤーに合わせる
+      const baseHP = Math.round(8 * Math.pow(1.28, mLevel-1));
+      const hp = baseHP;
+      const xp = Math.round(4 * Math.pow(1.18, mLevel-1));
+      const gold = Math.round(2 * Math.pow(1.15, mLevel-1));
+      return {level:mLevel, hp:hp, maxhp:hp, xp:xp, gold:gold, name:`Devil Lv ${mLevel}`} ;
+    }
+
+    let monster = makeMonster(state.level);
+
+    // DOM
+    const el = id=>document.getElementById(id);
+    const updateUI = ()=>{
+      el('pl-level').textContent = state.level;
+      el('pl-xp').textContent = `${state.xp} / ${xpToLevel(state.level)}`;
+      el('pl-atk').textContent = state.atk;
+      el('pl-maxhp').textContent = state.maxhp;
+      el('pl-gold').textContent = state.gold;
+      el('pl-kills').textContent = state.kills;
+
+      el('monster-name').textContent = monster.name;
+      el('monster-hp').textContent = monster.hp;
+      el('monster-maxhp').textContent = monster.maxhp;
+      el('monster-xp').textContent = monster.xp;
+      const fill = Math.max(0, Math.min(100, Math.round((monster.hp/monster.maxhp)*100)));
+      el('monster-hpfill').style.width = fill + '%';
+
+      el('price-atk').textContent = '価格: '+priceAtk();
+      el('price-hp').textContent = '価格: '+priceHp();
+      el('price-auto').textContent = '価格: '+priceAuto();
+      el('price-gold').textContent = '価格: '+priceGold();
+
+      el('auto-toggle').textContent = '自動攻撃: ' + (state.autoEnabled? 'ON':'OFF');
+    };
+
+    // XP curve
+    function xpToLevel(lv){ return Math.round(10 * Math.pow(1.4, lv-1)); }
+    function levelUp(){
+      while(state.xp >= xpToLevel(state.level)){
+        state.xp -= xpToLevel(state.level);
+        state.level++;
+        // Level up rewards
+        state.atk += 1; state.maxhp += 3; // small bonuses
+        flash(`${state.level} レベルに到達! 攻撃力と最大HPが増加`);
+      }
+    }
+
+    function gainXP(x){ state.xp += x; levelUp(); }
+
+    // Prices
+    function priceAtk(){ return Math.round(5 * Math.pow(1.25, state.atk-1)); }
+    function priceHp(){ return Math.round(8 * Math.pow(1.22, (state.maxhp-10)/5)); }
+    function priceAuto(){ return 20 + state.autoSpeedLevel * 18; }
+    function priceGold(){ return 30 + state.goldMulti*25; }
+
+    // Actions
+    function attack(){
+      monster.hp -= state.atk;
+      if(monster.hp <= 0){
+        onMonsterDead();
+      }
+      updateUI();
+    }
+
+    function onMonsterDead(){
+      state.kills++;
+      // reward
+      const g = Math.round(monster.gold * state.goldMulti);
+      const xp = monster.xp;
+      state.gold += g; gainXP(xp);
+      flash(`討伐! +${xp} XP, +${g} ゴールド`);
+      // spawn next monster slightly stronger (player level scales it too)
+      monster = makeMonster(state.level + Math.floor(state.kills/5));
+      updateUI();
+      save();
+    }
+
+    // Upgrades
+    function buyAtk(){ const p = priceAtk(); if(state.gold>=p){ state.gold-=p; state.atk+=1; flash('攻撃力が上昇'); save(); updateUI(); } else { flash('ゴールド不足'); }}
+    function buyHp(){ const p = priceHp(); if(state.gold>=p){ state.gold-=p; state.maxhp+=5; state.hp = state.maxhp; flash('最大HPが上昇'); save(); updateUI(); } else { flash('ゴールド不足'); }}
+    function buyAuto(){ const p = priceAuto(); if(state.gold>=p){ state.gold-=p; state.autoSpeedLevel +=1; state.autoInterval = Math.max(200, state.autoInterval - 150); flash('自動攻撃の速度が上がった'); save(); updateUI(); } else { flash('ゴールド不足'); }}
+    function buyGold(){ const p = priceGold(); if(state.gold>=p){ state.gold-=p; state.goldMulti += 0.5; flash('討伐報酬が増加した'); save(); updateUI(); } else { flash('ゴールド不足'); }}
+
+    // flash message
+    let noticeTimer = null;
+    function flash(text){
+      let d = document.createElement('div'); d.textContent = text; d.style.position='fixed'; d.style.right='20px'; d.style.bottom='20px'; d.style.background='rgba(0,0,0,0.6)'; d.style.border='1px solid rgba(255,255,255,0.03)'; d.style.padding='10px 12px'; d.style.borderRadius='8px'; d.style.zIndex=9999; d.style.color='#fff'; d.style.fontSize='13px'; document.body.appendChild(d);
+      setTimeout(()=>{ d.style.transition='opacity 0.5s'; d.style.opacity='0'; setTimeout(()=>d.remove(),500); },1300);
+    }
+
+    // Auto attack loop
+    let autoTimer = null;
+    function startAuto(){ stopAuto(); if(state.autoEnabled){ autoTimer = setInterval(()=>{ attack(); }, state.autoInterval); }}
+    function stopAuto(){ if(autoTimer) clearInterval(autoTimer); autoTimer = null; }
+
+    // Persistence
+    function save(){ try{ localStorage.setItem(storageKey, JSON.stringify(state)); }catch(e){console.warn('保存できません',e);} }
+    function load(){ try{ const s = localStorage.getItem(storageKey); return s? JSON.parse(s):null }catch(e){return null;} }
+
+    // Controls
+    document.getElementById('attack').addEventListener('click',()=>{ attack(); save(); });
+    document.getElementById('auto-toggle').addEventListener('click',()=>{ state.autoEnabled = !state.autoEnabled; if(state.autoEnabled) startAuto(); else stopAuto(); save(); updateUI(); });
+    document.getElementById('fast-attack').addEventListener('click',()=>{ // higher risk quick strike: 2x atk but 30% chance to miss
+      if(Math.random()<0.3){ flash('攻撃が外れた'); } else { monster.hp -= Math.round(state.atk * 2.0); if(monster.hp <= 0) onMonsterDead(); }
+      updateUI(); save();
+    });
+
+    document.getElementById('buy-atk').addEventListener('click', buyAtk);
+    document.getElementById('buy-hp').addEventListener('click', buyHp);
+    document.getElementById('buy-auto').addEventListener('click', buyAuto);
+    document.getElementById('buy-gold').addEventListener('click', buyGold);
+
+    document.getElementById('save-btn').addEventListener('click', ()=>{ save(); flash('セーブ完了'); });
+    document.getElementById('reset-btn').addEventListener('click', ()=>{ if(confirm('全データを初期化します。よろしいですか？')){ localStorage.removeItem(storageKey); state = Object.assign({}, DEFAULT); monster = makeMonster(state.level); save(); updateUI(); flash('初期化しました'); }});
+
+    // Keyboard: space attack
+    window.addEventListener('keydown', (e)=>{ if(e.code==='Space'){ e.preventDefault(); attack(); save(); }});
+
+    // Auto-save every 5 seconds
+    setInterval(save, 5000);
+
+    // Init UI and start auto if needed
+    updateUI(); if(state.autoEnabled) startAuto();
+
+    // If no saved progress (fresh), give a tiny tutorial pop
+    if(!load()){ setTimeout(()=>{ flash('ようこそ: 攻撃ボタンを押して敵を倒して経験値とゴールドを稼ごう'); },600); }
+
+    // expose for console fiddling during development (harmless)
+    window.LD = {state, monster, save, attack};
+  })();
+  </script>
+</body>
+</html>

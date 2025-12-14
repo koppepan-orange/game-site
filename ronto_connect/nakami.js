@@ -546,3 +546,153 @@ document.addEventListener('mousedown', () => clicking = true);
 document.addEventListener('mouseup', () => clicking = false);
 //#endregion
 
+
+//#region ゲーム開始時ログインの動き、チャットのあれこれ
+const firebaseConfig = {
+    apiKey: "AIzaSyBN5V_E6PzwlJn7IwVsluKIWNIyathhxj0",
+    authDomain: "koppepan-orange.firebaseapp.com",
+    databaseURL: "https://koppepan-orange-default-rtdb.firebaseio.com",
+    projectId: "koppepan-orange",
+    storageBucket: "koppepan-orange.appspot.com",
+    messagingSenderId: "730150198097",
+    appId: "1:730150198097:web:076a074a3d406053155170",
+    measurementId: "G-MYKJWD203Z"
+};
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+let chatroom = 1;
+let userData;
+let loginD = document.querySelector('#loginArea');
+let loginC = {
+    nameD: loginD.querySelector('.username'),
+    passD: loginD.querySelector('.password'),
+    sendD: loginD.querySelector('.send'),
+    XD: loginD.querySelector('.x'),
+
+    dolD: loginD.querySelector('.dolphin'),
+     dolDT: loginD.querySelector('.dolphin .text'),
+     dolDI: loginD.querySelector('.dolphin img'),
+    dolP: 0,
+}
+let loginTD = document.querySelector('#upper .login');
+
+let messagesRef = database.ref(`rontoConnect/rooms/${chatroom}/messages`);
+let usersRef = database.ref(`users/null/rontoConnect`);
+
+loginTD.addEventListener('click', () => loginD.classList.add('tog'));
+loginC.XD.addEventListener('click', () => loginD.classList.remove('tog'));
+
+loginC.sendD.addEventListener('click', async function(event){
+    event.preventDefault();
+    username = loginC.nameD.value;
+    let password = loginC.passD.value;
+    let kariusersRef = database.ref(`users/${username}/rontoConnect`);
+
+    // データベースでユーザーが存在するか確認
+    kariusersRef.once('value').then(async function(snapshot){
+        if(snapshot.exists()){
+            userData = snapshot.val();
+            if(userData.password == password){
+                console.log('success')
+                login();
+                setLocalStorage("username", username); // ログイン成功時
+            } else {
+                nicoText('パスワードが間違っています');
+            }
+        }else{
+            usersRef.update({
+                password: password,
+            });
+            
+            valorimar = 0;
+            bankvalorimar = 0;
+            rank = 1;
+            rpt = 0;
+
+            console.log('user maked!!');
+            login();
+            // if(username != 'dolphin') setLocalStorage("username", username);
+            setLocalStorage("username", username);
+        }
+    });
+    
+});
+
+loginC.dolDI.addEventListener('click', () => {
+    switch(loginC.dolP){
+        case 0:
+            loginC.dolDT.innerHTML = '規約に同意する？\n→<a href="assets/txts/dolphin.html" target="_blank">イルカ:利用規約</a>';
+            loginC.dolP = 1;
+            break;
+        
+        case 1:
+            loginC.nameD.value = 'dolphin';
+            loginC.passD.value = 'Iloveirukaice';
+            loginC.sendD.click();
+
+            loginC.dolP = 0;
+            loginC.dolDT.textContent = 'お前を消す方法';
+            break;
+    }
+});
+
+async function login(){
+    usersRef.update({
+        status: 'online'
+    });
+    loginD.classList.remove('tog');
+
+
+    // データを取得する関数)
+    userData = await load();
+    await delay(50)
+
+    valorimar = userData.valorimar??0;
+    bankvalorimar = userData.bankvalorimar??0;
+    rank = userData.rank??1;
+    rpt = userData.rpt??0;
+    maxrpt = rank*100;
+
+    updateUI();
+}
+//#endregion
+
+function save(){
+    if(!usersRef) return 1;
+    updateUI();
+
+    const newData = {
+        valorimar: valorimar,
+        bankvalorimar: bankvalorimar,
+        rank: rank,
+        rpt: rpt,
+    }
+
+    usersRef.update(newData);
+    
+    return 0;
+}
+
+function load(){
+    return usersRef.once('value').then(snapshot => {
+        return snapshot.val();
+    });
+}
+
+
+async function start(){
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    //autoLogin
+    username = getLocalStorage("username");
+    if(username){
+        console.log("自動ログインしました");
+        usersRef = database.ref(`users/${username}/rontoConnect`);
+        nicoText('wait for now...')
+        login();
+    }else{
+        console.log("ログインしてください");
+        loginTD.classList.add('appe')
+    }
+}

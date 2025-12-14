@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
     <meta name="description" content="VRゲーム「ロント・コネクト」が流行した世界観で送る、学園x青春x物語RPG">
     <meta name="keywords" content="ロント・コネクト,ronto_connect,ronto-connect,ゲーム,インディーゲーム,RPG">
     <link rel="stylesheet" href="mitame.css">
@@ -16,13 +19,53 @@
     </div>
     <div id="text"></div>
 
-    <div id="titleArea">
-        <div class="text">ロント・コネクト</div>
-        <div class="buttons"></div>
+    <div id="upper">
+        <div class="login">log log</div>
+    </div>
+
+    <div class="under">
+        <div class="opener">
+            <div class="sen"></div>
+            <div class="sen"></div>
+        </div>
+        <div class="main"></div>            
     </div>
 
     <div id="homeArea">
+    </div>
 
+    <div id="loginArea">
+        <div class="center">
+            <div class="x">
+                <div class="inner"></div>
+            </div>
+            <div class="column">
+                <div class="youso username">
+                    <div class="label">username</div>
+                    <input/>
+                </div>
+                <div class="youso password">
+                    <div class="label">password</div>
+                    <input type="password"/>
+                </div>
+
+                <div class="send">Login</div>
+            </div>
+
+            <div class="dolphin">
+                <div class="fuki">
+                    <div class="text">お前を消す方法</div>
+                </div>
+                <img src="assets/systems/dolphin.png">
+            </div>
+        </div>
+    </div>
+
+    <div id="titleArea">
+        <div class="title">
+            <img src="assets/systems/logo.png"/>
+            <div class="text">ロント・コネクト</div>
+        </div>
     </div>
 
     <div id="gameArea">
