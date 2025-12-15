@@ -347,7 +347,7 @@ img{
 
 /* #region titleArea */
 #titleArea{
-    display: none;
+    display: block;
     width: 100vw;
     height: 100vh;
     background: #001748;
@@ -355,5 +355,17 @@ img{
 }
 #titleArea.tog{
     display: block;
+}
+#titleArea .title{
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+}
+#titleArea .title .text{
+    display: inline-block;
+    background: linear-gradient(345deg, #c5faff 23%, #ffffff 80%);
+    background-clip: text;
+    font-size: 55px;
+    -webkit-text-fill-color: transparent;
 }
 /* #endregion */

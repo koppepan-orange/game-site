@@ -173,10 +173,10 @@ let r = {
         return 1
     }
 }
-async function error(){
-    addtext('errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
+async function error(text = 'errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr'){
+    addtext(text);
     await delay(2000);
-    // window.open('about:blank', '_self').close();
+    window.open('about:blank', '_self').close();
 }
 function hoshoku(color) {
     color = color.replace(/^#/, ''); // #付きなら取る
@@ -547,7 +547,7 @@ document.addEventListener('mouseup', () => clicking = false);
 //#endregion
 
 
-//#region ゲーム開始時ログインの動き、チャットのあれこれ
+//#region ゲーム開始時ログインの動き\
 const firebaseConfig = {
     apiKey: "AIzaSyBN5V_E6PzwlJn7IwVsluKIWNIyathhxj0",
     authDomain: "koppepan-orange.firebaseapp.com",
@@ -581,6 +581,7 @@ let usersRef = database.ref(`users/null/rontoConnect`);
 
 loginTD.addEventListener('click', () => loginD.classList.add('tog'));
 loginC.XD.addEventListener('click', () => loginD.classList.remove('tog'));
+// loginC.XD.addEventListener('click', () => error('では！'));
 
 loginC.sendD.addEventListener('click', async function(event){
     event.preventDefault();
@@ -653,9 +654,8 @@ async function login(){
     rpt = userData.rpt??0;
     maxrpt = rank*100;
 
-    updateUI();
+    uppF.tekiou();
 }
-//#endregion
 
 function save(){
     if(!usersRef) return 1;
@@ -679,10 +679,32 @@ function load(){
     });
 }
 
+//#endregion
+
+//#region アッパーエンジン
+let uppD = document.getElementById('upper');
+let uppC = {
+    homeD: uppD.querySelector('.home'),
+     HnameD: uppD.querySelector('.home .name'),
+     HRankD: uppD.querySelector('.home .rank'),
+      HRbarD: uppD.querySelector('.home .rank .bar'),
+      HRD: uppD.querySelector('.home .rank .val'),
+     HRimiD: uppD.querySelector('.home .rimi'),
+}
+let uppF = {};
+
+uppF.update = () => {
+    // 名前とかレベルのあれを
+}
+
+uppF.tekiou = () => {
+    // ダンジョン中はこっち。
+}
+//#endregion
 
 async function start(){
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    // resizeCanvas();
+    // window.addEventListener('resize', resizeCanvas);
 
     //autoLogin
     username = getLocalStorage("username");
@@ -696,3 +718,107 @@ async function start(){
         loginTD.classList.add('appe')
     }
 }
+
+//画像と音声のロード
+let images = {};
+let sounds = {};
+let loaC = {
+    imgT: 0,
+    imgD: 0,
+    souT: 0,
+    souD: 0
+}
+let loaF = {};
+loaC.imgL = {
+    maps:{},
+    enemies:{
+        // 草原:['蒼白の粘液','翡翠の風刃','顎剛なる草獣','茎槍の狩人','の茎針','攣縮する茎針','共鳴する茎赤黄','黄昏の穿影','燦爛する緑夢','紫苑の花姫','新緑なる剣士']
+    }
+}
+
+loaC.imgT = Object.values(loaC.imgL).map(a => a.length).reduce((a, b) => a + b);
+
+loaC.sonL = {
+    asd:[2]
+}
+loaC.sonT = Object.values(loaC.sonL).map(a => a.length).reduce((a, b) => a + b);
+
+loaF.load = async() => {
+    if(await loaF.loadI()) return 'error';
+    else '終わり'
+}
+loaF.loadI = async() => {
+    let stas0 = Stages.map(a => a.name);
+    let stas = stas0.concat(['すべて']);
+    
+    for(let sta of stas){
+        if(!loaC.imgL.maps[sta]) loaC.imgL.maps[sta] = [];
+        Objects.filter(a => a.in == sta).map(a => a.name).forEach(name => {
+            loaC.imgT += 1;
+            if(sta != 'すべて') loaC.imgL.maps[sta].push(name);
+            
+            else for(let sta2 of stas0) loaC.imgL.maps[sta2].push(name);
+        });
+
+        if(!loaC.imgL.enemies[sta]) loaC.imgL.enemies[sta] = [];
+        Enemies.filter(a => a.in == sta).map(a => a.name).forEach(name => {
+            loaC.imgT += 1;
+            if(sta != 'すべて') loaC.imgL.enemies[sta].push(name);
+            
+            else for(let sta2 of stas0) loaC.imgL.enemies[sta2].push(name);
+        });
+    }
+
+    let loaloa = (arr, route) => {
+        let src = "assets/";
+        for(let r of route) src += `${r}/`;
+        console.log(src)
+
+        let tar = images;
+        for(let r of route) console.log(r, tar), tar[r] = {}, tar = tar[r];
+        console.log("終わり", tar)
+        console.log(arr)
+        console.log(route)
+        console.log(images)
+
+        // return console.log('強制終了'), '強制終了'
+
+        for(let mono of arr){
+            let img = new Image();
+            img.src = `${src}${mono}.png`;
+            img.onload = () => {
+                loaC.imgD++;
+            };
+            img.onerror = () => {
+                console.error(`Image ${route}/${mono}.png failed to load.`);
+                img.src = `assets/systems/error.png`;
+                loaC.imgD++;
+            };
+            
+            tar[mono] = img;
+            if(loaC.imgD == loaC.imgT) loaF.loadS();
+        }
+    }
+
+    let loaloa0 = (mono, route = []) => {
+        console.log("[loaloa0] route:[" + route + "]");
+        console.log('次:monoです')
+        console.log(mono)
+        for(let key in mono){
+            console.log(`key:${key}`)
+            let val = mono[key]??null;
+            if(!val) return console.error('↓↓null↓↓'), console.log(tar), console.log(mono), console.log(key), console.error('↑↑null↑↑');
+            console.log(val)
+
+            route.push(key);
+            console.log("[loaloa0ed] route:[" + route + "]");
+            if(Array.isArray(val)) loaloa(val, route); //arrayなら => ロードへ
+            else loaloa0(val, route); //まだオブジェクトなら => もっかい
+        }
+    }
+    
+
+    loaloa0(loaC.imgL);
+}
+
+// loaF.loadS = async() => {

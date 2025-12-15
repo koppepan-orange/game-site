@@ -84,7 +84,7 @@ let mapItems = [
     {
         name: 'event',
         jpnm: 'オアシス21',
-        desc: 'イベントが起きますのです',
+        desc: 'イベントが起きるのです',
         n:[6,9],
         able:1,
         dataq: {
@@ -131,7 +131,6 @@ let mapItems = [
 let Cards = [
     {
         name: 'none',
-        nume: '',
         code: 'A',
         rare: 1,
         cool: 1,

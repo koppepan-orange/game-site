@@ -35,8 +35,8 @@ let IranMikans = {
 
 let Charas = [
     {
-        id:'wretch',
-        name:'持たざる者',
+        name:'wretch',
+        jpnm:'持たざる者',
         img:'wretch',
         description:'持たざる者。何もないが、何でもあるとも言える。\n平均的で普遍的。普通の凡才でただの人間。',
         ex:'null',
@@ -57,8 +57,8 @@ let Charas = [
     },
 
     {
-        id:'color_slime',
         name:'color_slime',
+        jpnm:'color_slime',
         img:'color_slime_green',
         description:'スライム。...まだできてないから使わない方が吉',
         ex:'null',
@@ -79,8 +79,8 @@ let Charas = [
     },
 
     {
-        id:'mechanic',
-        name:'アミー',
+        name:'mechanic',
+        jpnm:'アミー',
         img:'mechanic',
         description:'メカニック。工具を用いて割となんでも作れる。\nそのせいか助手には大きく慕われている。\n打たれ弱いので繊細にね',
         ex:'placeturret',
@@ -101,8 +101,8 @@ let Charas = [
     },
     
     {
-        id:'clown',
-        name:'週末の道化師',
+        name:'clown',
+        jpnm:'週末の道化師',
         img:'clown',
         description:'ピエロさん。ランダム要素多め。\n',
         ex:'trickyvaiavles',
@@ -123,8 +123,8 @@ let Charas = [
     },
     
     {
-        id:'magodituono',
-        name:'スオーノ・フルマイン',
+        name:'magodituono',
+        jpnm:'スオーノ・フルマイン',
         img:'magodituono',
         description:'雷電魔術師。"帯電"を用いて戦う\n将軍ではない。誰だ将軍って言ったやつは',
         ex:'lightningstorm',
@@ -642,13 +642,13 @@ let Buffs = [
 
 let Slashs = [
     {
-        id:'slash',
-        name:'シンプル斬り',
+        name:'slash',
+        jpnm:'シンプル斬り',
         description:'必中ー倍単体刹那斬', //そのうち武士作ってこれ作りたい
         mp:0,
         lv:1,
         tcam:'players',
-        process:async function(who, are){
+        func:async function(who, are){
             let result = await damage(who, are, 100, 'sh');
             if(result) return 1;
 
@@ -664,13 +664,13 @@ let Slashs = [
         }
     },
     {
-        id:'double slash',
-        name:'つばめ返し',
+        name:'double slash',
+        jpnm:'つばめ返し',
         description:'二回攻撃。あたらないこともあるけど現環境最強',
         mp:0,
         lv:1,
         tcam:'players',
-        process:async function(who, are){
+        func:async function(who, are){
             if(probability(67)){ //端数切り上げは許してくれ
                 let result = await damage(who, are, 100, 'sh');
                 if(result) return 1;
@@ -689,13 +689,13 @@ let Slashs = [
         }
     },
     {
-        id:'slash of light',
-        name:'一閃',//まじん斬り も作りたいね 霹靂一閃も
+        name:'slash of light',
+        jpnm:'一閃',//まじん斬り も作りたいね 霹靂一閃も
         description:'初期のロマン技。\n当たれば幸い的な感じで打ったほうが楽',
         mp:0,
         lv:1,
         tcam:'players',
-        process:async function(who, are){
+        func:async function(who, are){
             let pro = 33;
             if(who.ps == 'highsol') pro = 20;
 
@@ -724,12 +724,12 @@ let Slashs = [
 
 let Magics = [
     {
-        id:'heal',
         name:'heal',
+        jpnm:'heal',
         description:'体力を回復する。20%',
         mp:4,
         lv:1,
-        process:async function(who, are){
+        func:async function(who, are){
             await addtext(`${who.name}はhealを唱えた！`)
             await heal(who, are, '20%', 'add')
             
@@ -737,13 +737,13 @@ let Magics = [
         }
     },
     {
-        id:'power',
         name:'power',
+        jpnm:'power',
         description:'攻撃力が1.25倍になります。やったね！',
         mp:5,
         lv:1,
-        process:async function(who, are){
-            await addtext(`${who.name}はpowerを唱えた！`)
+        func:async function(who, are){
+            await addtext(`${who.jpnm}はpowerを唱えた！`)
             await buffadd(who, are,'power','turn',3,1);
             await letsElseed(are, who, 'magic', 'power'); //読み方はワザップです
             //soldatoのシステム応用しつつで
@@ -751,39 +751,39 @@ let Magics = [
         }
     },
     {
-        id:'shell',
         name:'shell',
+        jpnm:'shell',
         description:'防御力が1.25倍になります！\n実感あんまりないけど..',
         mp:5,
         lv:1,
-        process:async function(who, are){
-            await addtext(`${who.name}はshellを唱えた!`);
+        func:async function(who, are){
+            await addtext(`${who.jpnm}はshellを唱えた!`);
             await buffadd(who, are,'shell','turn',3,1);
             // await letsElseed(tcam, target, cam, me, 'magic', 'shell'); 
             return 0;
         }
     },
     {
-        id:'poison',
         name:'poison',
+        jpnm:'poison',
         description:'相手を毒にします\n毒ビルド強すぎてやばい',
         mp:7,
         lv:3,
-        process:async function(who, are){
-            await addtext(`${who.name}はpoisonを唱えた!`);
+        func:async function(who, are){
+            await addtext(`${who.jpnm}はpoisonを唱えた!`);
             await buffadd(who, are,'poison','turn',4,1);
             await letsElseed(tcam, target, cam, me, 'buff', 'poison'); 
             return 0;
         }
     },
     {
-        id:'thundee',
-        name:'サンディ',
+        name:'thundee',
+        jpnm:'サンディ',
         description:'牽制に使われがち',
         mp:3,
         lv:4,
-        process:async function(who, are){
-            await addtext(`${humans[cam][me].name}はサンディを唱えた!!`);
+        func:async function(who, are){
+            await addtext(`${humans[cam][me].jpnm}はサンディを唱えた!!`);
             let result = await damage(who, are,30,'mg',4);//雷 なんかいい感じにしといて fi,aq,th,wi,da,liみたいな
             if(result) return 1;
             if(probability(2)) buffadd(who, are, 'hirumi' ,'turn' , 1)
@@ -791,12 +791,12 @@ let Magics = [
         }
     },
     {
-        id:'garva',
-        name:'ガーヴァ',
+        name:'garva',
+        jpnm:'ガーヴァ',
         description:'濁点多いと強そうだよね\nまれに火傷も',
         mp:4,
         lv:4,
-        process:async function(who, are){
+        func:async function(who, are){
             let result = await damage(who, are,110,'mg',2);//火
             if(result) return 1;
             if(probability(10)) await buffadd(who, are,'burn','turn',2,1);
@@ -804,146 +804,146 @@ let Magics = [
         }
     },
     {
-        id:'healerthan',
-        name:'healer than',
+        name:'healerthan',
+        jpnm:'healer than',
         description:'体力を40%回復します。healよりも強い。だから比較のthanなんですね〜',
         mp:8,
         lv:6,
-        process:async function(who, are){
+        func:async function(who, are){
             await heal(who, are, '40%', 'add')
             return 0;
         }
     },
     {
-        id:'luck',
         name:'luck',
+        jpnm:'luck',
         description:'二回行動人間になれるかも？なやつ。\n欠けた運を施錠しましょう',
         mp:4,
         lv:7,
-        process:async function(who, are){
+        func:async function(who, are){
             await buffadd(who, are, 'luck', 'turn', 4, 1);
             return 0;
         }
     },
     {
-        id:'thundos',
-        name:'サンドス',
+        name:'thundos',
+        jpnm:'サンドス',
         description:'二段目。\nサンドじゃないんです許してください',
         mp:8,
         lv:8,
-        process:async function(who, are){
+        func:async function(who, are){
             damage(who, are,120,'mg',4);//雷
             if(probability(5)) buffadd(who, are,'hirumi','turn' ,1)
             return 0
         }
     },
     {
-        id:'morepower',
-        name:'more power',
+        name:'morepower',
+        jpnm:'more power',
         description:'攻撃力が1.5倍になります。power使ってた人いるんかな',
         mp:8,
         lv:9,
-        process:async function(who, are){
+        func:async function(who, are){
             await buffadd(who, are,'power','turn' ,3,2)
             return 0
         }
     },
     {
-        id:'moreshell',
-        name:'more shell',
+        name:'moreshell',
+        jpnm:'more shell',
         description:'防御力が1.5倍になります。けどあんまり実感はないよね',
         mp:8,
         lv:9,
-        process:async function(who, are){
+        func:async function(who, are){
             await buffadd(who, are, 'shellup','turn' ,3,2)
             return 0
         }
     },
     {
-        id:'deadlypoison',
-        name:'deadly poison',
+        name:'deadlypoison',
+        jpnm:'deadly poison',
         description:'敵を猛毒にします。やったね！！！',
         mp:12,
         lv:10,
-        process:async function(who, are){
+        func:async function(who, are){
             await buffadd(who, are,'poison','turn',5,2);
             return 0;
         }
     },
     {
-        id:'garvan',
-        name:'ガーヴァン',
+        name:'garvan',
+        jpnm:'ガーヴァン',
         description:'\nnotラージャン',
         mp:10,
         lv:11,
-        process:async function(who, are){
+        func:async function(who, are){
             let result = await damage(who, are,230,'mg',2);//火
             await buffadd(who, are,'burn','turn',2,2);
             return result
         }
     },
     {
-        id:'thehealest',
-        name:'the healest',
+        name:'thehealest',
+        jpnm:'the healest',
         description:'60%回復。これ以上はない、っていう意味ですね。\nxyzじゃないよ',
         mp:12,
         lv:12,
-        process:async function(who, are){
+        func:async function(who, are){
             await heal(who, are, '60%', 'add')
             return 0
         }
     },
     {
-        id:'luckgreat',
         name:'luckgreat',
+        jpnm:'luckgreat',
         description:'luckよりも行動しやすいです。嬉しいね',
         mp:12,
         lv:14,
-        process:async function(who, are){
+        func:async function(who, are){
             await buffadd(who, are,'luck','turn',5,2);
             return 0
         }
     },
     {
-        id:'merazoma',
-        name:'メラゾーマ',
+        name:'merazoma',
+        jpnm:'メラゾーマ',
         description:'ぬわーーっっ!!ってしてやりましょうぜ(炎の大ダメージ)',//対パパス最強にしたいね、これ
         mp:12,
         lv:12,
-        process:async function(who, are){
+        func:async function(who, are){
             let result = await damage(who, are, 3.5, 'mg',4);//雷
             await buffadd(who, are,'burn','turn',3,2);
             return result
         }
     },
     {
-        id:'thoron',
-        name:'Thoron',
+        name:'thoron',
+        jpnm:'Thoron',
         description:'当たったらラッキー、シールドでされたら空前で追撃なつよつよ技。\nけどギガサンダーの方が好き(雷の大ダメージ)',
         mp:20,
         lv:15,
-        process:async function(who, are){
+        func:async function(who, are){
             let result = await damage(who, are,6,'mg',4);//雷
             return result
         }
     },
     {
-        id:'random',
-        name:'Random',
+        name:'random',
+        jpnm:'Random',
         description:'自身が覚えてる魔法からランダム(mpは5固定)。これぞ醍醐味ってやつよな',
         mp:5,
         lv:1,
-        process:async function(who, are){
+        func:async function(who, are){
             // x = Object.keys(Magics).map(a => Magics[a].lv <= humans[cam][me].level ? Magics[a].name : null).filter(Boolean)
             // y = Math.floor(Math.random() * x.length);
             // log.textContent = x[y]+'が出た！';await delay(1000);
             // x[y](who, are);
-            let arr = Object.values(Magics).filter(a => a.lv <= who.level && a.mp <= who.mp).map(a => a.name);
+            let arr = Object.values(Magics).filter(a => a.lv <= who.level && a.mp <= who.mp).map(a => a.jpnm);
             if(arr.length >= 1){
-                let mg = arraySelect(arr).name;
+                let mg = arraySelect(arr);
                 await addtext(`${mg}が出た！`);
                 await delay(500);
-                let res = await Magics[mg].process(who, are);
+                let res = await Magics[mg].func(who, are);
                 return res
             }else{
                 await addtext(`失敗！`)
@@ -957,8 +957,8 @@ let Magics = [
 let Equips = {
     'weapon':[
         {
-            name:'なし',
-            id:'none',
+            jpnm:'なし',
+            name:'none',
             num:0, //このnumはいらんとおもう、hasEquip( [] )で管理するし
             power:0,
             price:0,
@@ -968,8 +968,8 @@ let Equips = {
             ce:0,
         },
         {
-            name:'木の棒',
-            id:'woodstick',
+            jpnm:'木の棒',
+            name:'woodstick',
             num:0,
             power:2,
             price:10,
@@ -980,8 +980,8 @@ let Equips = {
             
         },
         {
-            name:'木刀',
-            id:'woodsword',
+            jpnm:'木刀',
+            name:'woodsword',
             num:0,
             power:4,
             price:20,
@@ -991,8 +991,8 @@ let Equips = {
             ce:0,
         },
         {
-            name:'竹刀',
-            id:'bamboo_sword',
+            jpnm:'竹刀',
+            name:'bamboo_sword',
             num:0,
             power:6,
             price:30,
@@ -1002,8 +1002,8 @@ let Equips = {
             ce:0,
         },
         {
-            name:'石ころ',
-            id:'stone',
+            jpnm:'石ころ',
+            name:'stone',
             num:0,
             power:8,
             price:50,
@@ -1013,8 +1013,8 @@ let Equips = {
             ce:0,
         },
         {
-            name:'大きな石',
-            id:'bigrock',
+            jpnm:'大きな石',
+            name:'bigrock',
             num:0,
             power:10,
             price:80,
@@ -1024,8 +1024,8 @@ let Equips = {
             ce:0,
         },
         {
-            name:'レンガ',
-            id:'brick',
+            jpnm:'レンガ',
+            name:'brick',
             num:0,
             power:12,
             price:100,
@@ -1035,8 +1035,8 @@ let Equips = {
             ce:0,
         },
         {
-            name:'薄めの紙',
-            id:'thinpaper',
+            jpnm:'薄めの紙',
+            name:'thinpaper',
             num:0,
             power:20,
             price:5,
@@ -1044,13 +1044,13 @@ let Equips = {
             buyable:1,
             ap:0,
             ce:1,
-            combatEffect:{ //攻撃前の効果
+            bFunc:{ //攻撃前の効果
                 critlate: 70,
             }
         },
         {
-            name:'カード',
-            id:'card',
+            jpnm:'カード',
+            name:'card',
             num:0,
             power:'Math.floor(Math.random()*13)+1',
             price:7,
@@ -1060,8 +1060,8 @@ let Equips = {
             ce:0,
         },
         {
-            name:'はさみ',
-            id:'scissors',
+            jpnm:'はさみ',
+            name:'scissors',
             num:0,
             power:25,
             price:200,
@@ -1069,13 +1069,13 @@ let Equips = {
             buyable:1,
             ap:0,
             ce:1,
-            combatEffect:{
+            bFunc:{
                 critdmg: 4.0,
             }
         },
         {
-            name:'ほんもののナイフ',
-            id:'knife',
+            jpnm:'ほんもののナイフ',
+            name:'knife',
             num:0,
             power:40,
             price:300,
@@ -1083,21 +1083,21 @@ let Equips = {
             buyable:1,
             ap:0,
             ce:1,
-            combatEffect:{
+            bFunc:{
                 critlate: 10,
             }
         },
 
         {
-            name:'ジェン・ソルテ',
-            id:'blooddagger',
+            jpnm:'ジェン・ソルテ',
+            name:'blooddagger',
             num:0,
             power:0,
             price:150,
-            description:'名前意味わからんランキング第1位。\n攻撃時相手の体力を吸い回復する。\n変換効率は80%..水力発電と同じくらい',
+            description:'紅き鮮血に染まりし剣..\n攻撃時相手の体力を吸い回復する\n変換効率は80%..水力発電とだいたい同じ',
             buyable:1,
             ap:1,
-            afterProcess:async function(cam,me,are,rate,kind,prop,dmg){
+            aFunc:async function(cam,me,are,rate,kind,prop,dmg){
                 x = (dmg * 0.80).toFixed(0);
                 humans[cam][me].hp += x;
                 if(humans[cam][me].hp > humans[cam][me].maxhp){humans[cam][me].hp = humans[cam][me].maxhp;}
@@ -1109,15 +1109,15 @@ let Equips = {
             ce:0,
         },
         {
-            name:'time on target',
-            id:'timeontarget',
+            jpnm:'time on target',
+            name:'timeontarget',
             num:0,
             power:10,
             price:150,
             description:'ナギサ様の手好き',
             buyable:1,
             ap:1,
-            afterProcess:async function(cam,me,are,rate,kind,prop,dmg){
+            aFunc:async function(cam,me,are,rate,kind,prop,dmg){
                 addtext(arraySelect(['トリニティの砲撃術は優秀ですから。','お口に合うと良いのですが..']));
                 let result = await damage(cam,me,are,0.4,kind,['unpursuit']);
                 if(result) return 1;
@@ -1127,8 +1127,8 @@ let Equips = {
             ce:0,
         },
         {
-            name:'大博打',
-            id:'biggamble',
+            jpnm:'大博打',
+            name:'biggamble',
             num:0,
             power:0,
             price:150,
@@ -1136,13 +1136,13 @@ let Equips = {
             buyable:1,
             ap:0,
             ce:1,
-            combatEffect:{
+            bFunc:{
                 atk: Math.floor(Math.random()*100)+1,
             }
         },
         {
-            name:'天邪鬼',
-            id:'contrarian',
+            jpnm:'天邪鬼',
+            name:'contrarian',
             num:0,
             power:80,
             price:150,
@@ -1150,15 +1150,15 @@ let Equips = {
             buyable:0,
             ap:0,
             ce:1,
-            combatEffect:{
+            bFunc:{
                 critlate: 60
             }
         },
     ],
     'shield':[
         {
-            name:'なし',
-            id:'none',
+            jpnm:'なし',
+            name:'none',
             num:0,
             shell:0,
             price:0,
@@ -1167,8 +1167,8 @@ let Equips = {
             sp:0
         },
         {
-            name:'マスク',
-            id:'mask',
+            jpnm:'マスク',
+            name:'mask',
             num:0,
             shell:0,
             price:1,
@@ -1178,8 +1178,8 @@ let Equips = {
             sp:0
         },
         {
-            name:'薄い本',
-            id:'thinbook',
+            jpnm:'薄い本',
+            name:'thinbook',
             num:0,
             shell:1,
             price:5,
@@ -1188,8 +1188,8 @@ let Equips = {
             sp:0
         },
         {
-            name:'木の板',
-            id:'woodenplank',
+            jpnm:'木の板',
+            name:'woodenplank',
             num:0,
             shell:5,
             price:20,
@@ -1198,8 +1198,8 @@ let Equips = {
             sp:0
         },
         {
-            name:'テッパン',
-            id:'ironplate',
+            jpnm:'テッパン',
+            name:'ironplate',
             num:0,
             shell:10,
             price:30,
@@ -1208,8 +1208,8 @@ let Equips = {
             sp:0
         },
         {
-            name:'鍋の蓋',
-            id:'potlid',
+            jpnm:'鍋の蓋',
+            name:'potlid',
             num:0,
             shell:15,
             price:50,
@@ -1218,8 +1218,8 @@ let Equips = {
             sp:0
         },
         {
-            name:'厚めの本',
-            id:'thickbook',
+            jpnm:'厚めの本',
+            name:'thickbook',
             num:0,
             shell:20,
             price:80,
@@ -1228,8 +1228,8 @@ let Equips = {
             sp:0
         },
         {
-            name:'ドア',
-            id:'door',
+            jpnm:'ドア',
+            name:'door',
             num:0,
             shell:25,
             price:100,
@@ -1238,8 +1238,8 @@ let Equips = {
             sp:0
         },
         {
-            name:'扇風機',
-            id:'electricfan',
+            jpnm:'扇風機',
+            name:'electricfan',
             num:0,
             shell:30,
             price:200,
@@ -1248,8 +1248,8 @@ let Equips = {
             sp:0
         },
         {
-            name:'ペロロ様人形',
-            id:'perorodoll',
+            jpnm:'ペロロ様人形',
+            name:'perorodoll',
             num:0,
             shell:50,
             price:400,
@@ -1260,8 +1260,8 @@ let Equips = {
     ],
     'ear':[
         {
-            name:'なし',
-            id:'none',
+            jpnm:'なし',
+            name:'none',
             num:0, //そのうちhasEqでやって管理するようにしよーね
             power:0,
             shell:0,
@@ -1273,8 +1273,8 @@ let Equips = {
     ],
     'ring':[
         {
-            name:'なし',
-            id:'none',
+            jpnm:'なし',
+            name:'none',
             num:0,
             power:0,
             shell:0,
@@ -1286,8 +1286,8 @@ let Equips = {
     ],
     'neck':[
         {
-            name:'なし',
-            id:'none',
+            jpnm:'なし',
+            name:'none',
             num:0,
             power:0,
             shell:0,
@@ -1301,12 +1301,12 @@ let Equips = {
 
 let Tools = [
     {
-        id:'aspirin',
-        name:'アスピリン',
+        name:'aspirin',
+        jpnm:'アスピリン',
         price:20,
         description:'頭痛薬らしいですね、これ。痛み止め薬とか耐えればいらんくね？とかいったら炎上するかな',
         num:5,
-        process:async function(cam,me,are){
+        func:async function(cam,me,are){
             await addtext(`おや、頭が痛いって？痛みに効くのはアスピリン！`);
             x = Math.round(humans[tcam][target].maxhp * 0.2);
             if((x + humans[tcam][target].hp) > humans[tcam][target].maxhp){x = humans[tcam][target].maxhp - humans[tcam][target].hp;};
@@ -1317,12 +1317,12 @@ let Tools = [
         }
     },
     {
-        name:'パブロン',
-        id:'pablon',
+        jpnm:'パブロン',
+        name:'pablon',
         price:40,
         description:'風邪薬。大人とか向けらしいね',
         num:2,
-        process:async function(cam,me,are){
+        func:async function(cam,me,are){
             await addtext(`早めのパブロン♪`);
             x = Math.round(humans[tcam][target].maxhp * 0.4);
             if((x + humans[tcam][target].hp) > humans[tcam][target].maxhp){x = humans[tcam][target].maxhp - humans[tcam][target].hp;};
@@ -1333,12 +1333,12 @@ let Tools = [
         }
     },
     {
-        name:'トリプシン',
-        id:'trypsin',
+        jpnm:'トリプシン',
+        name:'trypsin',
         price:60,
         description:'タンパク質を分解し、アミノ酸にする働きのある消化酵素。所属事務所は膵臓。',
         num:0,
-        process:async function(cam,me,are){
+        func:async function(cam,me,are){
             await addtext(`トリプシンを飲んだ！！え？これは薬じゃないって？`);
             x = Math.round(humans[tcam][target].maxhp * 0.6);
             if((x + humans[tcam][target].hp) > humans[tcam][target].maxhp){x = humans[tcam][target].maxhp - humans[tcam][target].hp;};
@@ -1349,12 +1349,12 @@ let Tools = [
         }
     },
     {
-        name:'ルル',
-        id:'lulu',
+        jpnm:'ルル',
+        name:'lulu',
         price:80,
         description:'sick sickな頭痛薬。毒が流るルルですね。',
         num:0,
-        process:async function(who,are){
+        func:async function(who,are){
             await addtext(`求愛性 孤独 ドク 流るルル`)
             await heal(who, are, '80%', 'add')
             if(probably(70)) return 0;
@@ -1364,40 +1364,40 @@ let Tools = [
         }
     },
     {
-        name:'魔法薬',
-        id:'potion',
+        jpnm:'魔法薬',
+        name:'potion',
         price:100,
         description:'投げつけたい。敵に',
         num:0,
-        process:async function(cam,me,are){
+        func:async function(cam,me,are){
             await addtext(`なんか一番しょうもないよね、これ\nあ、全回復です`);
             await heal(who, are, '100%', 'set')
             return 0;
         }
     },
     {
-        name:'投げナイフ',
-        id:'throwknife',
+        jpnm:'投げナイフ',
+        name:'throwknife',
         price:20,
         description:'シンプルに20%ダメージ。十六夜さんが投げるあれ',
         num:5,
-        process:async function(cam,me,are){
+        func:async function(cam,me,are){
             await addtext('では、ナイフの錆にしてあげましょう');
             x = Math.ceil(humans[tcam][target].hp*0.2);
             let result = await damage(cam,me,are,x,'sh',['unpursuit','fixed'])
             tekiou();
-            await addtext(`${humans[tcam][target].name}に${x}のダメージ！`);
+            await addtext(`${humans[tcam][target].jpnm}に${x}のダメージ！`);
             if(result == 'end'){return 1};
             return 0;
         }
     },
     {
-        name:'トリッキーな変数',
-        id:'trickyvariables',
+        jpnm:'トリッキーな変数',
+        name:'trickyvariables',
         price:40,
         description:'黒崎コユキ、きちゃいました！！なんか面白いことないですか？\n(10%,25%,40%からランダム)',
         num:1,
-        process:async function(cam,me,are){
+        func:async function(cam,me,are){
             x = Math.floor(Math.random() * 3) + 1;
             switch(x){
                 case 1:
@@ -1416,12 +1416,12 @@ let Tools = [
         }
     },
     {
-        name:'ボトルグレネード',
-        id:'bottlegrenade',
+        jpnm:'ボトルグレネード',
+        name:'bottlegrenade',
         price:60,
         description:'殴るついでに燃やす。まじでつよい\nレッドウィンターの問題児にしては上出来すぎる',
         num:0,
-        process:async function(cam,me,are){
+        func:async function(cam,me,are){
             await addtext('これはちょっと、スパイシーなやつだよ');
             let result = await damage(cam,me,are,0.8,'mg',['unpursuit'])
             if(result == 'end'){
@@ -1433,12 +1433,12 @@ let Tools = [
         }
     },
     {
-        name:'援護射撃',
-        id:'coveringfire',
+        jpnm:'援護射撃',
+        name:'coveringfire',
         price:80,
         description:'ダメージ与える。ゴミ箱に隠れてる人。',
         num:0,
-        process:async function(cam,me,are){
+        func:async function(cam,me,are){
                 await addtext('え、援護します...');
             let x = Math.ceil(humans[tcam][target].hp*0.6);
             let result = await damage(cam,me,are,x,'mg',['unpursuit','fixed']);
@@ -1450,12 +1450,12 @@ let Tools = [
         }
     },
     {
-        name:'爆弾',
-        id:'bomb',
+        jpnm:'爆弾',
+        name:'bomb',
         price:100,
         description:'エクスプローージョン！！！\n敵を確殺します。嬉しいね',
         num:1,
-        process:async function(cam,me,are){
+        func:async function(cam,me,are){
             let x = humans[tcam][target].hp;
             let result = await damage(cam,me,are,x,'mg',['unpursuit',"fixed","penetrate"]);
             await addtext('爆発オチなんてサイテー！！');
@@ -1463,24 +1463,24 @@ let Tools = [
         }
     },
     {
-        name:'レッドカード',
-        id:'redcard',
+        jpnm:'レッドカード',
+        name:'redcard',
         price:35,
         description:'退場です。帰れ(スキップ)',
         num:3,
-        process:async function(cam,me,are){
+        func:async function(cam,me,are){
             await buffadd(who, are,'skip','turn' ,1,1);
             await addtext('カードを仕込みました!')
             return 0;
         }
     },
     {
-        name:'ブルーカード',
-        id:'bluecard',
+        jpnm:'ブルーカード',
+        name:'bluecard',
         price:35,
         description:'リバースを召喚！このカードは相手と自分の体力を交換する！！割合だ！！！！',
         num:0,
-        process:async function(who, are){
+        func:async function(who, are){
             x = who.hp/who.maxhp*are.hp;//割合交換(そのうちゲージにする時用)
             y = are.hp/are.hp*who.maxhp;
             are.hp = x;
@@ -1493,12 +1493,12 @@ let Tools = [
         }
     },
     {
-        name:'グリーンカード',
-        id:'greencard',
+        jpnm:'グリーンカード',
+        name:'greencard',
         price:35,
         description:'バフを2個ランダムでつける。つよい',
         num:0,
-        process:async function(cam,me,are){
+        func:async function(cam,me,are){
             let rbuffs = ['power','shellup','luck'];
             rbuffs = arrayShuffle(rbuffs);
             let buff1 = rbuffs[0];
@@ -1510,12 +1510,12 @@ let Tools = [
         }
     },
     {
-        name:'ブラックカード',
-        id:'blackcard',
+        jpnm:'ブラックカード',
+        name:'blackcard',
         price:35,
         description:'デバフを2個つける。割とつよい',
         num:0,
-        process:async function(cam,me,are){
+        func:async function(cam,me,are){
             let rbuffs = ['powerdown','shelldown','poison','burn','freeze'];
             rbuffs = arrayShuffle(rbuffs);
             for(i = 0;i < 2;i++){
@@ -1530,46 +1530,46 @@ let Tools = [
 let Skills = [
         {
             type:'ex',
-            id:'null',
             name:'null',
+            jpnm:'null',
             description:'何もないです。\nまあこれが店頭に並ぶこともないでしょうけどね。\nはい論破',
             price:0,
             buyable:0,
         },
         {//変更予定
             type:'ex',
-            id:'',
             name:'',
+            jpnm:'',
             description:``,
             price:50,
             buyable:1,
             exclusive:'color_slime',
-            process:async function(cam,me){
+            func:async function(cam,me){
                 return 0;
             }
         },
         {
             type:'ex',
-            id:'placeturret',
-            name:'雷ちゃん、召喚',
+            name:'placeturret',
+            jpnm:'雷ちゃん、召喚',
             description:'タレットを1つ配置する',
             price:95,
             buyable:1,
-            process:async function(cam,me){
+            func:async function(cam,me){
                 turretPlace(cam);
                 return 0;
             }
         },
         {
             type:'ex',
-            id:'trickyvariables',
-            name:'トリッキーな変数',
+            name:'trickyvariables',
+            jpnm:'トリッキーな変数',
             description:'爆弾を投げる。効果はランダム',
             price:95,
             buyable:1,
-            process:async function(cam,me){
+            func:async function(cam,me){
                 let [target, tcam] = await LetsTargetSelect();
-                await addtext(`${humans[cam][me].name}は爆弾を投げた...`);
+                await addtext(`${humans[cam][me].jpnm}は爆弾を投げた...`);
                 x = random(0,5)
                 switch(x){
                     case 0:{
@@ -1606,12 +1606,12 @@ let Skills = [
         },
         {
             type:'ex',
-            id:'bigdiamond',
-            name:'私がかけた魔法だよ',
+            name:'bigdiamond',
+            jpnm:'私がかけた魔法だよ',
             description:'敵に攻撃力の150%のダメージを与え、たまに凍らせる',
             price:80,
             buyable:1,
-            process:async function(cam,me){
+            func:async function(cam,me){
                 let [target, tcam] = await LetsTargetSelect();
                 await addtext(
                     arraySelect(
@@ -1630,12 +1630,12 @@ let Skills = [
         },
         {
             type:'ex',
-            id:'lightningstorm',
-            name:'ライニングストーム',
+            name:'lightningstorm',
+            jpnm:'ライニングストーム',
             description:'敵全体に攻撃力の120%のダメージを与え、帯電にする\n帯電:自身の行動時自傷ダメージが入る',
             price:60,
             buyable:1,
-            process:async function(cam,me){
+            func:async function(cam,me){
                 let [target, tcam] = await LetsTargetSelect(3);
                 let result = await damage(cam,me,are,1.5,'sh',4);
                 if(result == 'end'){return 1;}
@@ -1645,12 +1645,12 @@ let Skills = [
         },
         {
             type:'ex',
-            id:'kylieelison',
-            name:'Kylie Eleison',
+            name:'kylieelison',
+            jpnm:'Kylie Eleison',
             description:'敵に攻撃力の200%のダメージ。もし敵の体力が70%以上ならば400%',
             price:110,
             buyable:1,
-            process:async function(cam,me){
+            func:async function(cam,me){
                 phase = 0; disappear();
                 let target = await LetsTargetSelect();
                 x = 2;
@@ -1662,12 +1662,12 @@ let Skills = [
         },
         {
             type:'ex',
-            id:'standrone',
-            name:'自走式閃光ドローン',
+            name:'standrone',
+            jpnm:'自走式閃光ドローン',
             description:'敵に攻撃力の75%のダメージを与え、スタンさせる',
             price:60,
             buyable:1,
-            process:async function(cam,me){
+            func:async function(cam,me){
                 phase = 0; disappear();
                 let target = await LetsTargetSelect();
                 let result = await damage(cam,me,target[1],target,0.75,'sh',4);
@@ -1678,12 +1678,12 @@ let Skills = [
         },
         {//仲間にした方がいいかも
             type:'ex',
-            id:'recievechallenge',
-            name:'挑戦状を受け取ってください!!',
+            name:'recievechallenge',
+            jpnm:'挑戦状を受け取ってください!!',
             description:'敵の防御力を下げ、自身の攻撃力を上げる',
             price:90,
             buyable:1,
-            process:async function(who){
+            func:async function(who){
                 phase = 0; disappear();
                 let [tcam, tme] = await LetsTargetSelect();
                 let result = await damage(cam,me,are,0.2,'sh',4);
@@ -1695,12 +1695,12 @@ let Skills = [
         },
         {//上に同じく
             type:'ex',
-            id:'timedpursuit',
-            name:'小心者の観測',
+            name:'timedpursuit',
+            jpnm:'小心者の観測',
             description:'敵を弱点把握状態を付与する',
             price:50,
             buyable:1,
-            process:async function(cam,me){
+            func:async function(cam,me){
                 phase = 0; disappear();
                 let [tcam, tme] = await LetsTargetSelect();
                 await addtext(arraySelect(['わたしはその辺の小石...','わたしのことなんて、気にしないでください...','すみません、一人にさせてください......']));
@@ -1713,8 +1713,8 @@ let Skills = [
         // ns
         {
             type:'ns',
-            id:'null',
             name:'null',
+            jpnm:'null',
             description:'(まじでnullです。効果無し。外れ。乙)',
             price:0,
             buyable:0,
@@ -1722,13 +1722,13 @@ let Skills = [
         },
         {
             type:'ns',
-            id:'throwslime',
-            name:'Attach!Slime!!',
+            name:'throwslime',
+            jpnm:'Attach!Slime!!',
             description:'敵にスライムをくっつける',
             price:70,
             buyable:1,
             cool:3,
-            process:async function(cam,me){
+            func:async function(cam,me){
                 let are = ShallTargetSelect(cam,me,'er',0);
                 await buffadd(who, are,'onslime', 'turn' ,1,1);
                 await addtext(`${are.name}にスライムが覆い被さった!`);
@@ -1737,13 +1737,13 @@ let Skills = [
         },
         {
             type:'ns',
-            id:'throwwrench',
-            name:'匙を投げる？これはレンチだよ',
+            name:'throwwrench',
+            jpnm:'匙を投げる？これはレンチだよ',
             description:'レンチを投げる準備をし、次の攻撃が二倍になる',
             price:70,
             buyable:1,
             cool:4,
-            process:async function(who){
+            func:async function(who){
                 await buffadd(who, who,'letsthrow', 'turn' ,2,1);
                 await addtext('wrenchを投げる準備ができた!');
                 return 0;
@@ -1751,13 +1751,13 @@ let Skills = [
         },
         {
             type:'ns',
-            id:'gambler',
-            name:'かけ上手',
+            name:'gambler',
+            jpnm:'かけ上手',
             description:'次の攻撃時に0,2,4倍の倍率がかかる',
             price:70,
             buyable:1,
             cool:3,
-            process:async function(who){
+            func:async function(who){
                 await buffadd(who, who,'gambling', 'turn' ,1,1);
                 addtext('さあ、ギャンブルの時間だ!!');
                 return 0;
@@ -1765,13 +1765,13 @@ let Skills = [
         },
         {
             type:'ns',
-            id:'improve',
-            name:'改善が必要だよ',
+            name:'improve',
+            jpnm:'改善が必要だよ',
             description:'攻撃力を1.4倍に上昇させる',//変更予定,
             price:30, //"負荷"みたいにして、stackのbuffをつけて、攻撃力を上げさせる〜とかどう？
             buyable:1,
             cool:5,
-            process:async function(who){
+            func:async function(who){
                 await buffadd(who, who,'improve', 'turn' ,4,1);
                 await addtext('パーツアップグレード。');
                 return 0;
@@ -1779,13 +1779,13 @@ let Skills = [
         },
         {
             type:'ns',
-            id:'elecbarrier',
-            name:'エレクトリックバリア',
+            name:'elecbarrier',
+            jpnm:'エレクトリックバリア',
             description:'体力が最も低い味方に帯電バリアを付与する。\n帯電バリア:被攻撃時相手に帯電を付与する\n帯電:自身の行動時自傷ダメージが入る',
             price:70,
             buyable:1,
             cool:3,
-            process:async function(who){
+            func:async function(who){
                 let are = ShallTargetSelect(who, 'phpl',0);
                 await buffadd(who, are,'elecshield', 'turn' ,2,1);
                 await addtext('帯電バリアを付与しました！');
@@ -1796,48 +1796,48 @@ let Skills = [
         // ps
         {
             type:'ps',
-            id:'null',
             name:'null',
+            jpnm:'null',
             description:'(まじでnullです。効果無し。外れ。乙)',
             price:0,
             buyable:0,
         },
         {
             type:'ps',
-            id:'sthree',
-            name:'DoYourBest!!',
+            name:'sthree',
+            jpnm:'DoYourBest!!',
             description:'slash時、たまに3回攻撃する',
             price:90,
             buyable:1,
         },
         {
             type:'ps',
-            id:'solplaceturret',
-            name:'雷ちゃん、もうちょっと',
+            name:'solplaceturret',
+            jpnm:'雷ちゃん、もうちょっと',
             description:'slash of light命中時、タレットを1つ配置する',
             price:90,
             buyable:1,
         },
         {
             type:'ps',
-            id:'highsol',
-            name:'生粋の勝負師',
+            name:'highsol',
+            jpnm:'生粋の勝負師',
             description:'slash of lightの命中率が下がるが、命中時3倍のダメージ',
             price:90,
             buyable:1,
         },
         {
             type:'ps',
-            id:'enemy50%pursuit',
-            name:'一度限りの取引',
+            name:'enemy50%pursuit',
+            jpnm:'一度限りの取引',
             description:'攻撃によって敵の体力を50%以下だった場合、攻撃力の70%で追撃する',
             price:70,
             buyable:1,
         },
         {
             type:'ps',
-            id:'elecshock',
-            name:'エレクトリック衝撃',
+            name:'elecshock',
+            jpnm:'エレクトリック衝撃',
             description:'会心時、相手に帯電を付与する。\n帯電:自身の行動時自傷ダメージが入る',
             price:90,
             buyable:1,
@@ -1846,69 +1846,76 @@ let Skills = [
 
 let Stages = [
     {
-        name:'創生黎明の原野',
-        id:'草原',
+        name:'草原',
+        jpnm:'創生黎明の原野',
+        able:1,
         tiles: ['a','b'],
-        num:1, //?
-        phase:1, //?
-        enemies:['蒼白の粘液','翠嵐の風刃','黄昏の穿影','燐光の妖花','琥珀の甲羅獣','蒼碧の震鱗','白霧の幻影獣']
+    },
+    {
+        name:'砂漠',
+        jpnm:'ガチェンレイゲスドゥールラート',
+        able:0,
+        tiles: ['b','c','d'],
     }
 ];
 
-let obsAll = {
-    // k == 重音ってことで重複するかどうか on == 乗れるかどうか, p == 確率
-    '草原':[
-            {id:'enemy', k:1, on:0, p:35, data:{name:'蒼白の粘液'}},
-            {id:'enemy', k:1, on:0, p:35, data:{name:'翠嵐の風刃'}},
-            {id:'enemy', k:1, on:0, p:35, data:{name:'黄昏の穿影'}},
-            {id:'enemy', k:1, on:0, p:35, data:{name:'燐光の妖花'}},
-            {id:'fire', k:1, on:1, p:10, data:{used:0}},
-            {id:'shop', k:0, on:1, p:10, data:{type:'skill'}},
-    ],
-}
-
-let Objectdatas = [
+let Objects = [
+    //0|1 able:登場不可|登場可 on:乗れない|乗れる 
     {
-        id:'none',
         name:'none',
-        process:async function(){}
+        jpnm:'none',
+        able:1,
+        on:1,
+        in:'すべて',
+        func:async function(){}
     },
     {
-        id:'stair',
-        name:'階段',
-        process:async function(){
+        name:'stair',
+        jpnm:'階段',
+        able:1,
+        on:1,
+        in:'すべて',
+        func:async function(){
             GoNextFloor();
         }
     },
     {
-        id:'door',
-        name:'ドア',
-        process:async function(){
+        name:'door',
+        jpnm:'ドア',
+        able:1,
+        on:1,
+        in:'すべて',
+        func:async function(){
             NextStage();
         }
     },
     {
-        id:'enemy',
-        name:'敵',
-        w:1, //1 == 1massの意
-        h:1,
-        spd:20,
-        pass:0,
-        process:async function(){
+        name:'enemy',
+        jpnm:'敵',
+        able:1,
+        on:0,
+        in:'すべて',
+        func:async function(){
             EnemyAppear();
         },
     },
     {
-        id:'boss',
-        name:'上司',
-        process:async function(){
+        name:'boss',
+        jpnm:'上司',
+        able:1,
+        on:0,
+        in:'すべて',
+        func:async function(){
             BossEnemyAppear();
         }
     },
     {
-        id:'fire_on',
-        name:'焚き火',
-        process:async function(){
+        name:'fire_on',
+        jpnm:'焚き火',
+        able:1,
+        on:1,
+        in:'すべて',
+        func:async function(){
             movable = 1;
             document.querySelector('#overfieldArea').style.display = 'none';
             document.querySelector('#eventArea').style.display = 'block';
@@ -1927,9 +1934,12 @@ let Objectdatas = [
         }
     },
     {
-        id:'fire_off',
-        name:'焚き火跡',
-        process:async function(){
+        name:'fire_off',
+        jpnm:'焚き火跡',
+        able:1,
+        on:1,
+        in:'すべて',
+        func:async function(){
             await addtext(arrayGacha( //この重複感好き
                 ['この焚き火はもう木炭になっている','まだ温かい..この辺りに誰かいるようだ'],
                 [85,15]
@@ -1937,87 +1947,121 @@ let Objectdatas = [
         }
     },
     {
-        id:'shop_skill',
-        name:'スキルショップ',
-        process:async function(){
+        name:'shop_skill',
+        jpnm:'スキルショップ',
+        able:1,
+        on:1,
+        in:'すべて',
+        func:async function(){
             SkillShopOpen();
         }
     },
     {
-        id:'chest_n',
-        name:'宝箱',
-        process:async function(){
+        name:'chest_n',
+        jpnm:'宝箱',
+        able:1,
+        on:1,
+        in:'すべて',
+        func:async function(){
             OpenChest(1);
         }
     },
     {
-        id:'chest_r',
-        name:'レア宝箱',
-        process:async function(){
+        name:'chest_r',
+        jpnm:'レア宝箱',
+        able:1,
+        on:1,
+        in:'すべて',
+        func:async function(){
             OpenChest(2);
         }
     },
     {
-        id:'hopebutton',
-        name:'救いのボタン',
-        process:async function(){
+        name:'hopebutton',
+        jpnm:'救いのボタン',
+        able:0,
+        on:1,
+        in:'草原',
+        func:async function(){
             HopeButtonact();
         }
     },
     {
-        id:'candytray',
-        name:'あめ置き場',
-        process:async function(){
+        name:'candytray',
+        jpnm:'あめ置き場',
+        able:1,
+        on:1,
+        in:'草原',
+        func:async function(){
             Candytake();
         }
     },
     {
-        id:'cookietray',
-        name:'クッキー置き場',
-        process:async function(){
+        name:'cookietray',
+        jpnm:'クッキー置き場',
+        able:1,
+        on:1,
+        in:'草原',
+        func:async function(){
             Cookietake();
         }
     },
     {
-        id:'scorpion',
-        name:'さそりさん',
-
-        process:async function(){
+        name:'scorpion',
+        jpnm:'さそりさん',
+        able:1,
+        on:1,
+        in:'砂漠',
+        func:async function(){
             ScorpionAct(1);
         }
     },
     {
-        id:'scorpion',
-        name:'さそりさん2世',
-        process:async function(){
+        name:'scorpion2',
+        jpnm:'さそりさん2世',
+        able:1,
+        on:1,
+        in:'砂漠',
+        func:async function(){
             ScorpionAct(2);
         }
     },
     {
-        id:'cutrast',
-        name:'さぼてんさん',
-        process:async function(){
+        name:'cutrast',
+        jpnm:'さぼてんさん',
+        able:1,
+        on:0,
+        in:'砂漠',
+        sei:['接触'],
+        func:async function(){
             CatusAct();
         }
     },
     {
-        id:'oasis',
-        name:'おあしす',
-        process:async function(){
+        name:'oasis',
+        jpnm:'おあしす',
+        able:1,
+        on:1,
+        in:'砂漠',
+        func:async function(){
             OasisAct();
         }
     },
     {
-        id:'sandstorm',
-        name:'砂嵐',
-        process:async function(){}
+        name:'sandstorm',
+        jpnm:'砂嵐',
+        able:0,
+        on:1,
+        in:'砂漠',
+        func:async function(){}
     },
 ]
 
 let Enemies = [
     {
+        able:0,
         name:'蒼白の粘液',
-        stage:'草原',
+        in:'草原',
         maxhp:'+15',
         atk:'+0',
         def:'-5',
@@ -2033,7 +2077,7 @@ let Enemies = [
                 name:'粘液飛ばし',
                 probable:75,
                 num:1,
-                process:async function(who){
+                func:async function(who){
                     await addtext(`${who.name}は粘液を飛ばしてきた！`);
                     let are = ShallTargetSelect(who, 'phph',0);
                     let res = await damage(who, are, 100, 'sh');
@@ -2046,7 +2090,7 @@ let Enemies = [
                 name:'粘液付与',
                 probable:25,
                 num:3,
-                process:async function(who){
+                func:async function(who){
                     await addtext(`${who.name}は粘液を絡ませてきた！`);
                     let are = ShallTargetSelect(who, 'phph', 0);
                     await buffadd(who, are,'stickyslime', 'turn' ,2,1);
@@ -2056,8 +2100,9 @@ let Enemies = [
         ]
     },
     {
+        able:0,
         name:'翠嵐の風刃',
-        stage:'草原',
+        in:'草原',
         maxhp:'-20',
         atk:'+10',
         def:'-20',
@@ -2073,7 +2118,7 @@ let Enemies = [
                 name:'体当たり',
                 probable:70,
                 num:1,
-                process:async function(who){
+                func:async function(who){
                     await addtext(`${who.name}は体当たりを仕掛けてきた！`);
                     let are = ShallTargetSelect(who, 'phpl', 0);
                     let result = await damage(who, are, 100, 'sh');
@@ -2085,7 +2130,7 @@ let Enemies = [
                 name:'体当たり・改',
                 probable:30,
                 num:3,
-                process:async function(who){
+                func:async function(who){
                     await addtext(`${who.name}は回転しながら突進してきた！`);
                     let are = ShallTargetSelect(who,'phpl',0);
                     let result = await damage(who,are,150,'sh');
@@ -2096,8 +2141,9 @@ let Enemies = [
         ]
     },
     {
+        able:0,
         name:'黄昏の穿影',
-        stage:'草原',
+        in:'草原',
         maxhp:'-10',
         atk:'+15',
         def:'+0',
@@ -2115,7 +2161,7 @@ let Enemies = [
                 type:'',
                 prop:['reInvisi'],
                 num:1,
-                process:async function(who){
+                func:async function(who){
                     await addtext(`${who.name}は姿を消..あれどこ行った？`);
                     let are = ShallTargetSelect(who, 'ec', 0);
                     await buffadd(who, are,'disappear', 'turn' ,2,1);
@@ -2128,7 +2174,7 @@ let Enemies = [
                 type:'',
                 prop:['abInvisi'],
                 num:2,
-                process:async function(who){
+                func:async function(who){
                     let x = buffhas(who, 'disappear') ? (buffclear(who, 'disappear'), 200) : 100;
                     await addtext(`${who.name}は突進してきた！`);
                     let are = ShallTargetSelect(who, 'pr',0);
@@ -2141,7 +2187,7 @@ let Enemies = [
                 probable:20,
                 type:'none',
                 num:3,
-                process:async function(who){
+                func:async function(who){
                     await addtext(`${who.name}はローキックしてきた！`)
                     let are = ShallTargetSelect(who,'phpl',0);
                     let result = await damage(who, are, 70, 'sh');
@@ -2152,8 +2198,9 @@ let Enemies = [
         ]
     },
     {
+        able:0,
         name:'燐光の妖花',
-        stage:'草原',
+        in:'草原',
         maxhp:'+0',
         atk:'-10',
         def:'+0',
@@ -2170,7 +2217,7 @@ let Enemies = [
                 probable:30,
                 type:'none',
                 num:1,
-                process:async function(who){
+                func:async function(who){
                     await addtext(`${who.name}は痺れ粉を振りかけてきた！`)
                     let are = ShallTargetSelect(who, 'patkh', 0);
                     await buffadd(who, are, 'palsy', 'turn', 2, 1);
@@ -2182,7 +2229,7 @@ let Enemies = [
                 probable:30,
                 type:'none',
                 num:2,
-                process:async function(who){
+                func:async function(who){
                     await addtext(`${who.name}は毒の粉を振りかけてきた！`)
                     let are = ShallTargetSelect(who, 'phph', 0);
                     await buffadd(who, are, 'poison', 'turn', 2, 1);
@@ -2194,7 +2241,7 @@ let Enemies = [
                 probable:30,
                 type:'none',
                 num:3,
-                process:async function(who){
+                func:async function(who){
                     await addtext(`${who.name}は眠り粉を振りかけてきた！`)
                     let are = ShallTargetSelect(who, 'patkh',0);
                     await buffadd(who, are, 'sleeping', 'turn', 1, 1);
@@ -2204,8 +2251,9 @@ let Enemies = [
         ]
     },
     {
+        able:0,
         name:'茎槍の狩人',
-        stage:'草原',
+        in:'草原',
         maxhp:'+0',
         atk:'+10',
         def:'+2',
@@ -2222,7 +2270,7 @@ let Enemies = [
                 probable:30,
                 type:'',
                 num:3,
-                process:async function(who){
+                func:async function(who){
                     let are = ShallTargetSelect(who,'pdefl');
                     let res = await qte(1000,['a','d']); //0が失敗, 1が成功
                     switch(res){
@@ -2238,8 +2286,8 @@ let Enemies = [
 
 let Prefixes = [
     {
-        id:'furious',
-        name:'激昂',
+        name:'furious',
+        jpnm:'激昂',
         rare:1,
         effects:{
             atk: '=150%',
@@ -2248,8 +2296,8 @@ let Prefixes = [
         }
     },
     {
-        id:'calm',
-        name:'冷静沈着な',
+        name:'calm',
+        jpnm:'冷静沈着な',
         rare:1,
         effects:{
             atk: '=75%',
@@ -2258,8 +2306,8 @@ let Prefixes = [
         },
     },
     {
-        id:'gambler',
-        name:'ギャンブラーな',
+        name:'gambler',
+        jpnm:'ギャンブラーな',
         rare:1,
         effects:{
             critlate: '+4',
@@ -2267,8 +2315,8 @@ let Prefixes = [
         }
     },
     {
-        id:'tough',
-        name:'守りが固い',
+        name:'tough',
+        jpnm:'守りが固い',
         rare:2,
         effects:{
             critresist: '+5',
@@ -2278,8 +2326,8 @@ let Prefixes = [
         }
     },
     {
-        id:'wise',
-        name:'心眼持ちの',
+        name:'wise',
+        jpnm:'心眼持ちの',
         rare:3,
         effects:{
             critlate: '=100',
