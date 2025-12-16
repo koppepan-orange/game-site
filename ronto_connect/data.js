@@ -80,7 +80,7 @@ let Charas = [
 
     {
         name:'mechanic',
-        jpnm:'アミー',
+        jpnm:'なんとか・アミー',
         img:'mechanic',
         description:'メカニック。工具を用いて割となんでも作れる。\nそのせいか助手には大きく慕われている。\n打たれ弱いので繊細にね',
         ex:'placeturret',
@@ -147,9 +147,10 @@ let Charas = [
 
 let Friends = [
     {
+		able:1,
         ruby:'ひか れいる',
         name:'飛花レイル',
-        belong:'', //所属
+        in:'', //所属
         rare:3,
         description:``, 
         comment:``,
@@ -159,14 +160,16 @@ let Friends = [
         P:0,
     },
     {
+		able:1,
         ruby:'はばから れいる',
         name:'憚羅レイル',
-        rare:3
+        rare:3,
+		
     },
     {
         ruby:'うたかた ありあ',
         name:'泡沫アリア',
-        belong:'',
+        in:'',
         rare:2,
         description:``, 
         comment:``,
@@ -180,24 +183,35 @@ let Friends = [
         name:'メメント・ラメント',
         rare:3
     },
+	
+	{
+		ruby:'どうゆう じょうきょう',
+		name:'道遊城京',
+		in:'草原',
+		rare:3
+	},
 
     {
+		able:1,
         ruby:'おやすみ にーく',
         name:'小安見ニーク',
         rare:3,
     },
     {
+		able:1,
         ruby:'めんど がりや',
         name:'面戸ガリヤ',
         rare: 2,
     },
     {
+		able:1,
         ruby:'いらつ きき',
         name:'伊辣キキ',
         rare: 2,
     },
 
     {
+		able:1,
         ruby:'いきる かしか',
         name:'息留 河鹿',
         rare: 1
@@ -223,6 +237,8 @@ let Friends = [
         name:'ゴードン・ソージィ',
         rare:3
     }
+	
+	//memo.htmlのcharaから頼むわ
 ]
 
 let Buffs = [
@@ -233,7 +249,7 @@ let Buffs = [
         mode:'free', // turn/stack/actは付与時に決定。kindはfixe（Lv依存で値決定）かfree（付与時の引数で値決定）を定める用に。 poison/deadpoisonはfixe、burnもfixe。cheerupはfixe。atkup等能力値上昇系はfree。
                                  // if(data.kind??'fixed')ってすべきかも。あんまないと思うけど
         agemono:'power',
-         //turn/actならばvalueが等しいならtimeを増加新を削除、等しくないならば新しいものを追加。stackならばtimeがvalueだからかどうかあがいても加算。同盟が増えるこたぁない。
+         //turn/actならばvalueが等しいならtimeを増加新を削除、等しくないならば新しいものを追加。stackならばtimeがvalueだからかどうかあがいても加算。同名が増えるこたぁない。
         description:'攻撃倍率が上がる。やったね！',
     },
     {
@@ -270,7 +286,7 @@ let Buffs = [
     },
     {
         name:'cheerup',
-        jpnm:'応援！',
+        jpnm:'応援！',//多分「攻撃！」モチーフ
         type:'buff',
         mode:'fixe',
         description:'応援されている状態。攻撃力と速度が上がり会心率が下がる。\nちょっと緊張しちゃうよね、わかる',

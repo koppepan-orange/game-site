@@ -719,7 +719,7 @@ async function start(){
     }
 }
 
-//画像と音声のロード
+//#region 画像と音声のロード
 let images = {};
 let sounds = {};
 let loaC = {
@@ -730,13 +730,12 @@ let loaC = {
 }
 let loaF = {};
 loaC.imgL = {
-    maps:{},
-    enemies:{
-        // 草原:['蒼白の粘液','翡翠の風刃','顎剛なる草獣','茎槍の狩人','の茎針','攣縮する茎針','共鳴する茎赤黄','黄昏の穿影','燦爛する緑夢','紫苑の花姫','新緑なる剣士']
-    }
+    systems:['select','phone','star1','star1_pre','star2','star2_pre','star3','star3_pre'],
+    // 草原:['蒼白の粘液','翡翠の風刃','顎剛なる草獣','茎槍の狩人','の茎針','攣縮する茎針','共鳴する茎赤黄','黄昏の穿影','燦爛する緑夢','紫苑の花姫','新緑なる剣士']
 }
 
 loaC.imgT = Object.values(loaC.imgL).map(a => a.length).reduce((a, b) => a + b);
+console.log(loaC.imgT)
 
 loaC.sonL = {
     asd:[2]
@@ -747,19 +746,23 @@ loaF.load = async() => {
     if(await loaF.loadI()) return 'error';
     else '終わり'
 }
+let eed = 0;
 loaF.loadI = async() => {
     let stas0 = Stages.map(a => a.name);
     let stas = stas0.concat(['すべて']);
     
+    loaC.imgL.maps = {};
     for(let sta of stas){
-        if(!loaC.imgL.maps[sta]) loaC.imgL.maps[sta] = [];
+        if(!loaC.imgL.maps[sta]) loaC.imgL.maps[sta] = ['1'];
         Objects.filter(a => a.in == sta).map(a => a.name).forEach(name => {
             loaC.imgT += 1;
+            console.log(sta)
             if(sta != 'すべて') loaC.imgL.maps[sta].push(name);
             
             else for(let sta2 of stas0) loaC.imgL.maps[sta2].push(name);
         });
 
+        loaC.imgL.enemies = {};
         if(!loaC.imgL.enemies[sta]) loaC.imgL.enemies[sta] = [];
         Enemies.filter(a => a.in == sta).map(a => a.name).forEach(name => {
             loaC.imgT += 1;
@@ -768,8 +771,10 @@ loaF.loadI = async() => {
             else for(let sta2 of stas0) loaC.imgL.enemies[sta2].push(name);
         });
     }
+    console.log('LETS GOOOOOOOOOOO!!')
 
     let loaloa = (arr, route) => {
+        console.log("Arrayでした lets 読み込み")
         let src = "assets/";
         for(let r of route) src += `${r}/`;
         console.log(src)
@@ -777,9 +782,9 @@ loaF.loadI = async() => {
         let tar = images;
         for(let r of route) console.log(r, tar), tar[r] = {}, tar = tar[r];
         console.log("終わり", tar)
-        console.log(arr)
-        console.log(route)
-        console.log(images)
+        console.log(arr);
+        console.log(route);
+        console.log(images);
 
         // return console.log('強制終了'), '強制終了'
 
@@ -791,6 +796,11 @@ loaF.loadI = async() => {
             };
             img.onerror = () => {
                 console.error(`Image ${route}/${mono}.png failed to load.`);
+                eed += 1;
+                if(eed > 20){
+                    console.error('さすがにやりすぎbonus');
+                    return 1;
+                }
                 img.src = `assets/systems/error.png`;
                 loaC.imgD++;
             };
@@ -798,21 +808,29 @@ loaF.loadI = async() => {
             tar[mono] = img;
             if(loaC.imgD == loaC.imgT) loaF.loadS();
         }
+
+        console.log('読み込み完了')
+        return 0;
     }
 
     let loaloa0 = (mono, route = []) => {
+        let sink = route.length ? 1 : 0
+        if(sink) console.log("not Arrayでした lets 再帰");
+        
         console.log("[loaloa0] route:[" + route + "]");
         console.log('次:monoです')
         console.log(mono)
         for(let key in mono){
             console.log(`key:${key}`)
+            route.push(key);
+            // console.log("[loaloa0ed] route:[" + route + "]");
+            
             let val = mono[key]??null;
             if(!val) return console.error('↓↓null↓↓'), console.log(tar), console.log(mono), console.log(key), console.error('↑↑null↑↑');
-            console.log(val)
-
-            route.push(key);
-            console.log("[loaloa0ed] route:[" + route + "]");
-            if(Array.isArray(val)) loaloa(val, route); //arrayなら => ロードへ
+            console.log("次、valです");
+            console.log(val);
+            console.log("↑Arrayかな? 結果=> "+Array.isArray(val));
+            if(Array.isArray(val)) if(loaloa(val, route)) return console.log('南ノ南'); //arrayなら => ロードへ
             else loaloa0(val, route); //まだオブジェクトなら => もっかい
         }
     }
@@ -822,3 +840,6 @@ loaF.loadI = async() => {
 }
 
 // loaF.loadS = async() => {
+
+//#endregion
+
