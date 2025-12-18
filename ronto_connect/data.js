@@ -38,7 +38,7 @@ let Charas = [
         name:'wretch',
         jpnm:'持たざる者',
         img:'wretch',
-        description:'持たざる者。何もないが、何でもあるとも言える。\n平均的で普遍的。普通の凡才でただの人間。',
+        desc:'持たざる者。何もないが、何でもあるとも言える。\n平均的で普遍的。普通の凡才でただの人間。',
         ex:'null',
         ns:'null',
         ps:'null',
@@ -60,7 +60,7 @@ let Charas = [
         name:'color_slime',
         jpnm:'color_slime',
         img:'color_slime_green',
-        description:'スライム。...まだできてないから使わない方が吉',
+        desc:'スライム。...まだできてないから使わない方が吉',
         ex:'null',
         ns:'null',
         ps:'null',
@@ -82,7 +82,7 @@ let Charas = [
         name:'mechanic',
         jpnm:'なんとか・アミー',
         img:'mechanic',
-        description:'メカニック。工具を用いて割となんでも作れる。\nそのせいか助手には大きく慕われている。\n打たれ弱いので繊細にね',
+        desc:'メカニック。工具を用いて割となんでも作れる。\nそのせいか助手には大きく慕われている。\n打たれ弱いので繊細にね',
         ex:'placeturret',
         ns:'throwwrench',
         ps:'solplaceturret',
@@ -104,7 +104,7 @@ let Charas = [
         name:'clown',
         jpnm:'週末の道化師',
         img:'clown',
-        description:'ピエロさん。ランダム要素多め。\n',
+        desc:'ピエロさん。ランダム要素多め。\n',
         ex:'trickyvaiavles',
         ns:'gambler',
         ps:'highsol',
@@ -126,7 +126,7 @@ let Charas = [
         name:'magodituono',
         jpnm:'スオーノ・フルマイン',
         img:'magodituono',
-        description:'雷電魔術師。"帯電"を用いて戦う\n将軍ではない。誰だ将軍って言ったやつは',
+        desc:'雷電魔術師。"帯電"を用いて戦う\n将軍ではない。誰だ将軍って言ったやつは',
         ex:'lightningstorm',
         ns:'elecbarrier',
         ps:'elecshock',
@@ -152,7 +152,7 @@ let Friends = [
         name:'飛花レイル',
         in:'', //所属
         rare:3,
-        description:``, 
+        desc:``, 
         comment:``,
         N:0,
         S:0,
@@ -171,7 +171,7 @@ let Friends = [
         name:'泡沫アリア',
         in:'',
         rare:2,
-        description:``, 
+        desc:``, 
         comment:``,
         N:0,
         S:0,
@@ -187,7 +187,7 @@ let Friends = [
 	{
 		ruby:'どうゆう じょうきょう',
 		name:'道遊城京',
-		in:'草原',
+		in:"草原",
 		rare:3
 	},
 
@@ -250,7 +250,7 @@ let Buffs = [
                                  // if(data.kind??'fixed')ってすべきかも。あんまないと思うけど
         agemono:'power',
          //turn/actならばvalueが等しいならtimeを増加新を削除、等しくないならば新しいものを追加。stackならばtimeがvalueだからかどうかあがいても加算。同名が増えるこたぁない。
-        description:'攻撃倍率が上がる。やったね！',
+        desc:'攻撃倍率が上がる。やったね！',
     },
     {
         name:'shell',
@@ -258,14 +258,14 @@ let Buffs = [
         type:'buff',
         mode:'free',
         agemono:'shell',
-        description:'防御倍率が上がる。あんまり実感しづらい。',
+        desc:'防御倍率が上がる。あんまり実感しづらい。',
     },
     {
         name:'luck',
         jpnm:'幸運',
         type:'buff',
         mode:'fixe',
-        description:'ターン終了時、確率でもう一回行動できる。\nLv7ならば確定。\n願うと起きやすいです',
+        desc:'ターン終了時、確率でもう一回行動できる。\nLv7ならば確定。\n願うと起きやすいです',
         lvs:[
             {luck:'+20'},
             {luck:'+33'},
@@ -282,14 +282,14 @@ let Buffs = [
         jpnm:'消滅',
         type:'buff',
         mode:'fixe',
-        description:'姿を消し、攻撃を受けなくなる。\nしかし範囲攻撃はちゃんと当たる。\nLv1ならば範囲攻撃で解除される。',
+        desc:'姿を消し、攻撃を受けなくなる。\nしかし範囲攻撃はちゃんと当たる。\nLv1ならば範囲攻撃で解除される。',
     },
     {
         name:'cheerup',
         jpnm:'応援！',//多分「攻撃！」モチーフ
         type:'buff',
         mode:'fixe',
-        description:'応援されている状態。攻撃力と速度が上がり会心率が下がる。\nちょっと緊張しちゃうよね、わかる',
+        desc:'応援されている状態。攻撃力と速度が上がり会心率が下がる。\nちょっと緊張しちゃうよね、わかる',
         lvs:[
             {
                 power:'+1.0',
@@ -310,7 +310,7 @@ let Buffs = [
         type:'debuff',
         mode:'fixe',
         dot:'poison',
-        description:'ターン終了時HP割合で防御貫通ダメージ。\n毒の苦しみもお好きなんですね',
+        desc:'ターン終了時HP割合で防御貫通ダメージ。\n毒の苦しみもお好きなんですね',
         //ターン終了時体力のx%のダメージ
         lvs:[
             {poison:'5%'},
@@ -327,7 +327,7 @@ let Buffs = [
         type:'debuff',
         mode:'fixe',
         dot:'poison',
-        description:'ターン終了時HP割合で防御貫通ダメージ。\nついでにランダムで他のバフ(良)の持続時間を1減少\n徐々〜に蝕まれて終わります。解消を推奨す',
+        desc:'ターン終了時HP割合で防御貫通ダメージ。\nついでにランダムで他のバフ(良)の持続時間を1減少\n徐々〜に蝕まれて終わります。解消を推奨す',
         lvs:[
             {poison:'7%'},
             {poison:'10%'},
@@ -343,7 +343,7 @@ let Buffs = [
         type:'debuff',
         mode:'fixe',
         dot:'blood',
-        description:'ターン終了時固定ダメージ、非攻撃毎に1.5倍に増加。\nそのままにしとくと普通に死にます',
+        desc:'ターン終了時固定ダメージ、非攻撃毎に1.5倍に増加。\nそのままにしとくと普通に死にます',
         //ターン終了時nダメージ、ダメージ喰らい後2倍に増加
         lvs:[
             {blood:2},
@@ -361,7 +361,7 @@ let Buffs = [
         type:'debuff',
         mode:'fixe',
         dot:'blood',
-        description:'ターン終了時固定ダメージ、ターン終了毎に2.0倍に増加。\nガチで死にかねん故早めに解除しよう',
+        desc:'ターン終了時固定ダメージ、ターン終了毎に2.0倍に増加。\nガチで死にかねん故早めに解除しよう',
         //ターン終了時nダメージ、ターン終了後2倍に増加
         lvs:[
             {blood:5},
@@ -379,7 +379,7 @@ let Buffs = [
         type:'debuff',
         mode:'fixe',
         dot:'burn',
-        description:'ターン終了時固定ダメージ\nマイクラだとすごいギリで耐えるか死ぬかのやつよね',
+        desc:'ターン終了時固定ダメージ\nマイクラだとすごいギリで耐えるか死ぬかのやつよね',
         //ターン終了時nダメージ
         lvs:[
             {burn:5},
@@ -396,7 +396,7 @@ let Buffs = [
         type:'debuff',
         mode:'fixe',
         dot:'burn',
-        description:'ターン終了時固定ダメージ。\nあと...このデバフのダメージで死んだ場合、お金が半分燃えて消えます\n珍しいしょ〜〜戦闘外干渉系',
+        desc:'ターン終了時固定ダメージ。\nあと...このデバフのダメージで死んだ場合、お金が半分燃えて消えます\n珍しいしょ〜〜戦闘外干渉系',
          //ほんっとお前...もしこのゲームがローグライクカードゲームだったらカードを一枚ランダムに燃やしてたからな？？？ガチ感謝しろよ？？？
         //ターン終了時nダメージ
         lvs:[
@@ -415,7 +415,7 @@ let Buffs = [
         type:'debuff',
         mode:'fixe',
         dot:'elec',
-        description:'ターン終了時固定ダメージ\nターン終了時、確率で他の味方に伝染する', //"風邪"とかの方が良かったか...?
+        desc:'ターン終了時固定ダメージ\nターン終了時、確率で他の味方に伝染する', //"風邪"とかの方が良かったか...?
         //ターン終了時n1ダメージ、n2%の確率で他の味方に伝染
         lvs:[
             {elec:5, spread:10},
@@ -433,7 +433,7 @@ let Buffs = [
         type:'debuff',
         mode:'fixe',
         dot:'elec',
-        description:'ターン終了時固定ダメージ\nターン終了時、確率で他の味方に伝染する\nあと確率で麻痺のデバフを自身に付与します\n帯電・帯電ってなんだよ',
+        desc:'ターン終了時固定ダメージ\nターン終了時、確率で他の味方に伝染する\nあと確率で麻痺のデバフを自身に付与します\n帯電・帯電ってなんだよ',
         //ターン終了時n1ダメージ、n2%の確率で他の味方に伝染
         lvs:[
             {elec:10, spread:20, palsy:10},
@@ -451,7 +451,7 @@ let Buffs = [
         type:'debuff',
         mode:'fixe',
         dot:'injury',
-        description:'攻撃毎に固定ダメージ。\n連続攻撃/行動ビルドに大打撃\n私はこのデバフが最も嫌いです。まぢ無理',
+        desc:'攻撃毎に固定ダメージ。\n連続攻撃/行動ビルドに大打撃\n私はこのデバフが最も嫌いです。まぢ無理',
         //攻撃毎にnダメージ
         lvs:[
             {injury:10},
@@ -467,7 +467,7 @@ let Buffs = [
         type:'debuff',
         mode:'fixe',
         dot:'injury',
-        description:'行動時固定ダメージ。\nあと被回復量が半減します。\nさっさと解除せんと結構やばいです',
+        desc:'行動時固定ダメージ。\nあと被回復量が半減します。\nさっさと解除せんと結構やばいです',
         //攻撃毎にnダメージ
         lvs:[
             {injury:25},
@@ -483,7 +483,7 @@ let Buffs = [
         jpnm:'氷結', //レモンサワーじゃないです
         type:'handle',
         mode:'fixe',
-        description:'凍っている状態。\nターン開始時、n%の確率で解除されます\n炎属性の攻撃を受けても解除できます',
+        desc:'凍っている状態。\nターン開始時、n%の確率で解除されます\n炎属性の攻撃を受けても解除できます',
         // n/100の確率で解除
         lvs:[
             {freeze:75},
@@ -500,7 +500,7 @@ let Buffs = [
         jpnm:'凍結', //blueの真意に気づけるかな〜〜？？
         type:'handle',
         mode:'fixe',
-        description:'凍結されている状態。\nターン開始時、n%の確率で解除されます\n炎攻撃を受けても解除不可です',
+        desc:'凍結されている状態。\nターン開始時、n%の確率で解除されます\n炎攻撃を受けても解除不可です',
         // n/100の確率で解除
         lvs:[
             {freeze:67},
@@ -517,7 +517,7 @@ let Buffs = [
         jpnm:'エターナルフリーズ',
         type:'handle',
         mode:'fixe',
-        description:'エターナルフリーズ！！', //どうあがいても解除不可です。この先、デバフ解除が有効だ
+        desc:'エターナルフリーズ！！', //どうあがいても解除不可です。この先、デバフ解除が有効だ
         // n/100の確率で解除
         lvs:[
             {freeze:0}
@@ -529,7 +529,7 @@ let Buffs = [
         jpnm:'麻痺',
         type:'handle',
         mode:'fixe',
-        description:'麻痺ですね。これ好き',
+        desc:'麻痺ですね。これ好き',
         // n/100の確率で行動不可
         lvs:[
             {palsy:20},
@@ -546,7 +546,7 @@ let Buffs = [
         jpnm:'スタン',
         type:'handle',
         mode:'fixe',
-        description:'スタンです。\n内部処理的には麻痺の延長',
+        desc:'スタンです。\n内部処理的には麻痺の延長',
         // n/100の確率で行動不可
         lvs:[
             {palsy:100}
@@ -558,14 +558,14 @@ let Buffs = [
         jpnm:'スキップ',
         type:'handle',
         mode:'fixe',
-        description:'はいお前スキップ〜〜笑笑\nぴえん超えてだっさぁですね\nえ？違う？',
+        desc:'はいお前スキップ〜〜笑笑\nぴえん超えてだっさぁですね\nえ？違う？',
     },
     {
         name:'sleepiness',
         jpnm:'睡魔',
         type:'handle',
         mode:'fixe',
-        description:'睡魔..微熱魔じゃないです\nターン終了時にsleepyをnstack増加さかせます',
+        desc:'睡魔..微熱魔じゃないです\nターン終了時にsleepyをnstack増加さかせます',
         // sleepy:sleepyをnstack増加
         lvs:[
             {sleepy:10}, //ほとんど1で。
@@ -579,7 +579,7 @@ let Buffs = [
         jpnm:'眠気',
         type:'handle',
         mode:'fixe',
-        description:'眠くなってる状態..です....\n100stack到達でsleepingに変化します....\n変化後のsleepingのLvはsleepinessに寄りけりです\nあと、行動時にsleepyをnstack減少できます....',
+        desc:'眠くなってる状態..です....\n100stack到達でsleepingに変化します....\n変化後のsleepingのLvはsleepinessに寄りけりです\nあと、行動時にsleepyをnstack減少できます....',
         lvs:[ //-と捉へよ
             {sleepy:6},
             {sleepy:9},
@@ -592,7 +592,7 @@ let Buffs = [
         jpnm:'眠',
         type:'handle',
         mode:'fixe',
-        description:'攻撃されると..ちょっと....起きます......\nzzz...',
+        desc:'攻撃されると..ちょっと....起きます......\nzzz...',
         lvs:[
             {sleepy:50},
             {sleepy:65},
@@ -618,13 +618,13 @@ let Buffs = [
         ダメージ受けたらn1%の確率で「sleepy(n2stack)に戻る」
         → これなら"直接解除"じゃないし、眠気が残るから再び寝落ちしやすい
 
-        ↑これ、なんかのボス専用にした方がいいか？..否、それだとふつーのゲームと同じ。普遍を着飾っていこう
+        ↑これ、なんかのボス専用にした方がいいか？..否、それだとふつーのゲームと同じ。普遍を着飾っていこうず
     */
     {
         name:'anger',
         type:'handle',
         mode:'fixe',
-        description:'すごいイラつかせてくる敵..だからメガさんとかと相性良さそう\nで避けられてさらに煽られるみたいな', //メガさん == メスガキさん
+        desc:'すごいイラつかせてくる敵..だからメガさんとかと相性良さそう\nで避けられてさらに煽られるみたいな', //メガさん == メスガキさん
         // 攻撃力が上がり最大体力、防御力が下がる
     },
 
@@ -633,26 +633,26 @@ let Buffs = [
         name:'onslime',
         type:'unique',
         mode:'fixe',
-        description:'スライムが体に粘りついている状態です。やばいね(行動不可)',
+        desc:'スライムが体に粘りついている状態です。やばいね(行動不可)',
     },
     {
         name:'stickyslime',
         type:'unique',
         mode:'fixe',
-        description:'スライムがくっついているおかげで行動するとダメージを受けます',
+        desc:'スライムがくっついているおかげで行動するとダメージを受けます',
         //行動時ダメージ(固定)
     },
     {
         name:'letsthrow',
         type:'unique',
         mode:'fixe',
-        description:'レンチを投げる準備をしている状態。次の攻撃与ダメ2倍',
+        desc:'レンチを投げる準備をしている状態。次の攻撃与ダメ2倍',
     },
     {
         name:'gambling',
         type:'unique',
         mode:'fixe',
-        description:'次の攻撃が0,2,4倍になる。これぞ醍醐味..ってやつ？',
+        desc:'次の攻撃が0,2,4倍になる。これぞ醍醐味..ってやつ？',
     }
 ]
 
@@ -660,46 +660,32 @@ let Slashs = [
     {
         name:'slash',
         jpnm:'シンプル斬り',
-        description:'必中ー倍単体刹那斬', //そのうち武士作ってこれ作りたい
+        desc:'必中ー倍単体刹那斬', //そのうち武士作ってこれ作りたい
         mp:0,
         lv:1,
         tcam:'players',
         func:async function(who, are){
-            let result = await damage(who, are, 100, 'sh');
-            if(result) return 1;
+            if(await damage(who, are, 100, 'sh')) return 1;
 
             //elseesに移行よろ
             if(who.ps == 'sthree' && probability(25)){
                 await addtext(`${who.name}は頑張った!`);
-                result = await damage(who, are, 100, 'sh');
-                if(result) return 1;
-                result = await damage(who, are, 100, 'sh');
-                if(result) return 1;
+                if(await damage(who, are, 100, 'sh')) return 1;
+                if(await damage(who, are, 100, 'sh')) return 1;
             }
+            
             return 0;
         }
     },
     {
         name:'double slash',
         jpnm:'つばめ返し',
-        description:'二回攻撃。あたらないこともあるけど現環境最強',
+        desc:'二回攻撃。あたらないこともあるけど現環境最強',
         mp:0,
         lv:1,
-        tcam:'players',
         func:async function(who, are){
-            if(probability(67)){ //端数切り上げは許してくれ
-                let result = await damage(who, are, 100, 'sh');
-                if(result) return 1;
-            }else{
-                addlog('miss!');
-            }
-
-            if(probability(67)){
-                let result = await damage(who, are, 100, 'sh');
-                if(result) return 1;
-            }else{
-                addlog('miss!');
-            }
+            if(await damage(who, are, 100, 'sh')) return 1;
+            if(await damage(who, are, 100, 'sh')) return 1;
 
             return 0;
         }
@@ -707,10 +693,9 @@ let Slashs = [
     {
         name:'slash of light',
         jpnm:'一閃',//まじん斬り も作りたいね 霹靂一閃も
-        description:'初期のロマン技。\n当たれば幸い的な感じで打ったほうが楽',
+        desc:'初期のロマン技。\n当たれば幸い的な感じで打ったほうが楽',
         mp:0,
         lv:1,
-        tcam:'players',
         func:async function(who, are){
             let pro = 33;
             if(who.ps == 'highsol') pro = 20;
@@ -742,7 +727,7 @@ let Magics = [
     {
         name:'heal',
         jpnm:'heal',
-        description:'体力を回復する。20%',
+        desc:'体力を回復する。20%',
         mp:4,
         lv:1,
         func:async function(who, are){
@@ -755,7 +740,7 @@ let Magics = [
     {
         name:'power',
         jpnm:'power',
-        description:'攻撃力が1.25倍になります。やったね！',
+        desc:'攻撃力が1.25倍になります。やったね！',
         mp:5,
         lv:1,
         func:async function(who, are){
@@ -769,7 +754,7 @@ let Magics = [
     {
         name:'shell',
         jpnm:'shell',
-        description:'防御力が1.25倍になります！\n実感あんまりないけど..',
+        desc:'防御力が1.25倍になります！\n実感あんまりないけど..',
         mp:5,
         lv:1,
         func:async function(who, are){
@@ -782,7 +767,7 @@ let Magics = [
     {
         name:'poison',
         jpnm:'poison',
-        description:'相手を毒にします\n毒ビルド強すぎてやばい',
+        desc:'相手を毒にします\n毒ビルド強すぎてやばい',
         mp:7,
         lv:3,
         func:async function(who, are){
@@ -795,7 +780,7 @@ let Magics = [
     {
         name:'thundee',
         jpnm:'サンディ',
-        description:'牽制に使われがち',
+        desc:'牽制に使われがち',
         mp:3,
         lv:4,
         func:async function(who, are){
@@ -809,7 +794,7 @@ let Magics = [
     {
         name:'garva',
         jpnm:'ガーヴァ',
-        description:'濁点多いと強そうだよね\nまれに火傷も',
+        desc:'濁点多いと強そうだよね\nまれに火傷も',
         mp:4,
         lv:4,
         func:async function(who, are){
@@ -822,7 +807,7 @@ let Magics = [
     {
         name:'healerthan',
         jpnm:'healer than',
-        description:'体力を40%回復します。healよりも強い。だから比較のthanなんですね〜',
+        desc:'体力を40%回復します。healよりも強い。だから比較のthanなんですね〜',
         mp:8,
         lv:6,
         func:async function(who, are){
@@ -833,7 +818,7 @@ let Magics = [
     {
         name:'luck',
         jpnm:'luck',
-        description:'二回行動人間になれるかも？なやつ。\n欠けた運を施錠しましょう',
+        desc:'二回行動人間になれるかも？なやつ。\n欠けた運を施錠しましょう',
         mp:4,
         lv:7,
         func:async function(who, are){
@@ -844,7 +829,7 @@ let Magics = [
     {
         name:'thundos',
         jpnm:'サンドス',
-        description:'二段目。\nサンドじゃないんです許してください',
+        desc:'二段目。\nサンドじゃないんです許してください',
         mp:8,
         lv:8,
         func:async function(who, are){
@@ -856,7 +841,7 @@ let Magics = [
     {
         name:'morepower',
         jpnm:'more power',
-        description:'攻撃力が1.5倍になります。power使ってた人いるんかな',
+        desc:'攻撃力が1.5倍になります。power使ってた人いるんかな',
         mp:8,
         lv:9,
         func:async function(who, are){
@@ -867,7 +852,7 @@ let Magics = [
     {
         name:'moreshell',
         jpnm:'more shell',
-        description:'防御力が1.5倍になります。けどあんまり実感はないよね',
+        desc:'防御力が1.5倍になります。けどあんまり実感はないよね',
         mp:8,
         lv:9,
         func:async function(who, are){
@@ -878,7 +863,7 @@ let Magics = [
     {
         name:'deadlypoison',
         jpnm:'deadly poison',
-        description:'敵を猛毒にします。やったね！！！',
+        desc:'敵を猛毒にします。やったね！！！',
         mp:12,
         lv:10,
         func:async function(who, are){
@@ -889,7 +874,7 @@ let Magics = [
     {
         name:'garvan',
         jpnm:'ガーヴァン',
-        description:'\nnotラージャン',
+        desc:'\nnotラージャン',
         mp:10,
         lv:11,
         func:async function(who, are){
@@ -901,7 +886,7 @@ let Magics = [
     {
         name:'thehealest',
         jpnm:'the healest',
-        description:'60%回復。これ以上はない、っていう意味ですね。\nxyzじゃないよ',
+        desc:'60%回復。これ以上はない、っていう意味ですね。\nxyzじゃないよ',
         mp:12,
         lv:12,
         func:async function(who, are){
@@ -912,7 +897,7 @@ let Magics = [
     {
         name:'luckgreat',
         jpnm:'luckgreat',
-        description:'luckよりも行動しやすいです。嬉しいね',
+        desc:'luckよりも行動しやすいです。嬉しいね',
         mp:12,
         lv:14,
         func:async function(who, are){
@@ -923,7 +908,7 @@ let Magics = [
     {
         name:'merazoma',
         jpnm:'メラゾーマ',
-        description:'ぬわーーっっ!!ってしてやりましょうぜ(炎の大ダメージ)',//対パパス最強にしたいね、これ
+        desc:'ぬわーーっっ!!ってしてやりましょうぜ(炎の大ダメージ)',//対パパス最強にしたいね、これ
         mp:12,
         lv:12,
         func:async function(who, are){
@@ -935,7 +920,7 @@ let Magics = [
     {
         name:'thoron',
         jpnm:'Thoron',
-        description:'当たったらラッキー、シールドでされたら空前で追撃なつよつよ技。\nけどギガサンダーの方が好き(雷の大ダメージ)',
+        desc:'当たったらラッキー、シールドでされたら空前で追撃なつよつよ技。\nけどギガサンダーの方が好き(雷の大ダメージ)',
         mp:20,
         lv:15,
         func:async function(who, are){
@@ -946,7 +931,7 @@ let Magics = [
     {
         name:'random',
         jpnm:'Random',
-        description:'自身が覚えてる魔法からランダム(mpは5固定)。これぞ醍醐味ってやつよな',
+        desc:'自身が覚えてる魔法からランダム(mpは5固定)。これぞ醍醐味ってやつよな',
         mp:5,
         lv:1,
         func:async function(who, are){
@@ -978,7 +963,7 @@ let Equips = {
             num:0, //このnumはいらんとおもう、hasEquip( [] )で管理するし
             power:0,
             price:0,
-            description:'ないです。素手とか念とか自由に解釈しておk',
+            desc:'ないです。素手とか念とか自由に解釈しておk',
             buyable:0,
             ap:0,
             ce:0,
@@ -989,7 +974,7 @@ let Equips = {
             num:0,
             power:2,
             price:10,
-            description:'初期装備あるあるの武器。値段に見合わず割と強い',
+            desc:'初期装備あるあるの武器。値段に見合わず割と強い',
             buyable:1,//購入可能かどうか
             ap:0,
             ce:0,
@@ -1001,7 +986,7 @@ let Equips = {
             num:0,
             power:4,
             price:20,
-            description:'木の棒よりも強い。言うなれば気の剣。',
+            desc:'木の棒よりも強い。言うなれば気の剣。',
             buyable:1,
             ap:0,
             ce:0,
@@ -1012,7 +997,7 @@ let Equips = {
             num:0,
             power:6,
             price:30,
-            description:'さあ、剣道しようぜ！！',
+            desc:'さあ、剣道しようぜ！！',
             buyable:1,
             ap:0,
             ce:0,
@@ -1023,7 +1008,7 @@ let Equips = {
             num:0,
             power:8,
             price:50,
-            description:'石です。よわよわ',
+            desc:'石です。よわよわ',
             buyable:1,
             ap:0,
             ce:0,
@@ -1034,7 +1019,7 @@ let Equips = {
             num:0,
             power:10,
             price:80,
-            description:'岩です。つよつよ',
+            desc:'岩です。つよつよ',
             buyable:1,
             ap:0,
             ce:0,
@@ -1045,7 +1030,7 @@ let Equips = {
             num:0,
             power:12,
             price:100,
-            description:'岩にセメントつけたら強くなるのって意味わからなくね？',
+            desc:'岩にセメントつけたら強くなるのって意味わからなくね？',
             buyable:1,
             ap:0,
             ce:0,
@@ -1056,7 +1041,7 @@ let Equips = {
             num:0,
             power:20,
             price:5,
-            description:'薄い紙です。すって相手に切り付けて｢いたっ..｣ってさせる用です',
+            desc:'薄い紙です。すって相手に切り付けて｢いたっ..｣ってさせる用です',
             buyable:1,
             ap:0,
             ce:1,
@@ -1070,7 +1055,7 @@ let Equips = {
             num:0,
             power:'Math.floor(Math.random()*13)+1',
             price:7,
-            description:'ちょっとした運要素。攻撃方法は切り付けなので弱い',
+            desc:'ちょっとした運要素。攻撃方法は切り付けなので弱い',
             buyable:1,
             ap:0,
             ce:0,
@@ -1081,7 +1066,7 @@ let Equips = {
             num:0,
             power:25,
             price:200,
-            description:'持って｢近づいたら*すよ..?｣っていう用。実際*せない',
+            desc:'持って｢近づいたら*すよ..?｣っていう用。実際*せない',
             buyable:1,
             ap:0,
             ce:1,
@@ -1095,7 +1080,7 @@ let Equips = {
             num:0,
             power:40,
             price:300,
-            description:'つよつよ武器。\n花や骨に向かって振り回しましょう',
+            desc:'つよつよ武器。\n花や骨に向かって振り回しましょう',
             buyable:1,
             ap:0,
             ce:1,
@@ -1110,7 +1095,7 @@ let Equips = {
             num:0,
             power:0,
             price:150,
-            description:'紅き鮮血に染まりし剣..\n攻撃時相手の体力を吸い回復する\n変換効率は80%..水力発電とだいたい同じ',
+            desc:'紅き鮮血に染まりし剣..\n攻撃時相手の体力を吸い回復する\n変換効率は80%..水力発電とだいたい同じ',
             buyable:1,
             ap:1,
             aFunc:async function(cam,me,are,rate,kind,prop,dmg){
@@ -1130,7 +1115,7 @@ let Equips = {
             num:0,
             power:10,
             price:150,
-            description:'ナギサ様の手好き',
+            desc:'ナギサ様の手好き',
             buyable:1,
             ap:1,
             aFunc:async function(cam,me,are,rate,kind,prop,dmg){
@@ -1148,7 +1133,7 @@ let Equips = {
             num:0,
             power:0,
             price:150,
-            description:'大勝負..ってやつ？まじで賭け。がんばえ',
+            desc:'大勝負..ってやつ？まじで賭け。がんばえ',
             buyable:1,
             ap:0,
             ce:1,
@@ -1162,7 +1147,7 @@ let Equips = {
             num:0,
             power:80,
             price:150,
-            description:'名前変更予定。',
+            desc:'名前変更予定。',
             buyable:0,
             ap:0,
             ce:1,
@@ -1178,7 +1163,7 @@ let Equips = {
             num:0,
             shell:0,
             price:0,
-            description:'ないです。\n筋肉とでもフォースとでもなんとでも解釈しておk',
+            desc:'ないです。\n筋肉とでもフォースとでもなんとでも解釈しておk',
             buyable:0,
             sp:0
         },
@@ -1188,8 +1173,8 @@ let Equips = {
             num:0,
             shell:0,
             price:1,
-            // description:'大事ですね。\n防御力は関係ありませんが病気にはならない',
-            description:'防御力はないです..が、\n精神的な防御力は激高です',
+            // desc:'大事ですね。\n防御力は関係ありませんが病気にはならない',
+            desc:'防御力はないです..が、\n精神的な防御力は激高です',
             buyable:1,
             sp:0
         },
@@ -1199,7 +1184,7 @@ let Equips = {
             num:0,
             shell:1,
             price:5,
-            description:'***なのは駄目！！\n死刑！！！！',//コハルなのでセーフ
+            desc:'***なのは駄目！！\n死刑！！！！',//コハルなのでセーフ
             buyable:1,
             sp:0
         },
@@ -1209,7 +1194,7 @@ let Equips = {
             num:0,
             shell:5,
             price:20,
-            description:'これを使って最初はつるはしを作りましょう',
+            desc:'これを使って最初はつるはしを作りましょう',
             buyable:1,
             sp:0
         },
@@ -1219,7 +1204,7 @@ let Equips = {
             num:0,
             shell:10,
             price:30,
-            description:'突進してくるあいつ。こいつに手間取ると他のが来てすぐ*ぬので注意',
+            desc:'突進してくるあいつ。こいつに手間取ると他のが来てすぐ*ぬので注意',
             buyable:1,
             sp:0
         },
@@ -1229,7 +1214,7 @@ let Equips = {
             num:0,
             shell:15,
             price:50,
-            description:'初期装備あるあるⅡですね。多分コスパ最強',
+            desc:'初期装備あるあるⅡですね。多分コスパ最強',
             buyable:1,
             sp:0
         },
@@ -1239,7 +1224,7 @@ let Equips = {
             num:0,
             shell:20,
             price:80,
-            description:'辞書とかなのかな。いや六法全書かも',
+            desc:'辞書とかなのかな。いや六法全書かも',
             buyable:1,
             sp:0
         },
@@ -1249,7 +1234,7 @@ let Equips = {
             num:0,
             shell:25,
             price:100,
-            description:'え？木の板と一緒だって？-\n君は知らないのかい...?\n木の板を6つ並べるとドアが3つできるってことを',
+            desc:'え？木の板と一緒だって？-\n君は知らないのかい...?\n木の板を6つ並べるとドアが3つできるってことを',
             buyable:1,
             sp:0
         },
@@ -1259,7 +1244,7 @@ let Equips = {
             num:0,
             shell:30,
             price:200,
-            description:'涼めるのに便利。\nまた武器にもなり、ついでに敵から身を守れる万能装備',
+            desc:'涼めるのに便利。\nまた武器にもなり、ついでに敵から身を守れる万能装備',
             buyable:1,
             sp:0
         },
@@ -1269,7 +1254,7 @@ let Equips = {
             num:0,
             shell:50,
             price:400,
-            description:'ペロロ様の出番です！！\nhifumi daisuki',
+            desc:'ペロロ様の出番です！！\nhifumi daisuki',
             buyable:1,
             sp:0
         }
@@ -1282,7 +1267,7 @@ let Equips = {
             power:0,
             shell:0,
             price:0,
-            description:'なし',
+            desc:'なし',
             buyable:0,
             sp:0
         }
@@ -1295,7 +1280,7 @@ let Equips = {
             power:0,
             shell:0,
             price:0,
-            description:'なし',
+            desc:'なし',
             buyable:0,
             sp:0
         }
@@ -1308,7 +1293,7 @@ let Equips = {
             power:0,
             shell:0,
             price:0,
-            description:'なし',
+            desc:'なし',
             buyable:0,
             sp:0
         }
@@ -1320,7 +1305,7 @@ let Tools = [
         name:'aspirin',
         jpnm:'アスピリン',
         price:20,
-        description:'頭痛薬らしいですね、これ。痛み止め薬とか耐えればいらんくね？とかいったら炎上するかな',
+        desc:'頭痛薬らしいですね、これ。痛み止め薬とか耐えればいらんくね？とかいったら炎上するかな',
         num:5,
         func:async function(cam,me,are){
             await addtext(`おや、頭が痛いって？痛みに効くのはアスピリン！`);
@@ -1336,7 +1321,7 @@ let Tools = [
         jpnm:'パブロン',
         name:'pablon',
         price:40,
-        description:'風邪薬。大人とか向けらしいね',
+        desc:'風邪薬。大人とか向けらしいね',
         num:2,
         func:async function(cam,me,are){
             await addtext(`早めのパブロン♪`);
@@ -1352,7 +1337,7 @@ let Tools = [
         jpnm:'トリプシン',
         name:'trypsin',
         price:60,
-        description:'タンパク質を分解し、アミノ酸にする働きのある消化酵素。所属事務所は膵臓。',
+        desc:'タンパク質を分解し、アミノ酸にする働きのある消化酵素。所属事務所は膵臓。',
         num:0,
         func:async function(cam,me,are){
             await addtext(`トリプシンを飲んだ！！え？これは薬じゃないって？`);
@@ -1368,7 +1353,7 @@ let Tools = [
         jpnm:'ルル',
         name:'lulu',
         price:80,
-        description:'sick sickな頭痛薬。毒が流るルルですね。',
+        desc:'sick sickな頭痛薬。毒が流るルルですね。',
         num:0,
         func:async function(who,are){
             await addtext(`求愛性 孤独 ドク 流るルル`)
@@ -1383,7 +1368,7 @@ let Tools = [
         jpnm:'魔法薬',
         name:'potion',
         price:100,
-        description:'投げつけたい。敵に',
+        desc:'投げつけたい。敵に',
         num:0,
         func:async function(cam,me,are){
             await addtext(`なんか一番しょうもないよね、これ\nあ、全回復です`);
@@ -1395,7 +1380,7 @@ let Tools = [
         jpnm:'投げナイフ',
         name:'throwknife',
         price:20,
-        description:'シンプルに20%ダメージ。十六夜さんが投げるあれ',
+        desc:'シンプルに20%ダメージ。十六夜さんが投げるあれ',
         num:5,
         func:async function(cam,me,are){
             await addtext('では、ナイフの錆にしてあげましょう');
@@ -1411,7 +1396,7 @@ let Tools = [
         jpnm:'トリッキーな変数',
         name:'trickyvariables',
         price:40,
-        description:'黒崎コユキ、きちゃいました！！なんか面白いことないですか？\n(10%,25%,40%からランダム)',
+        desc:'黒崎コユキ、きちゃいました！！なんか面白いことないですか？\n(10%,25%,40%からランダム)',
         num:1,
         func:async function(cam,me,are){
             x = Math.floor(Math.random() * 3) + 1;
@@ -1435,7 +1420,7 @@ let Tools = [
         jpnm:'ボトルグレネード',
         name:'bottlegrenade',
         price:60,
-        description:'殴るついでに燃やす。まじでつよい\nレッドウィンターの問題児にしては上出来すぎる',
+        desc:'殴るついでに燃やす。まじでつよい\nレッドウィンターの問題児にしては上出来すぎる',
         num:0,
         func:async function(cam,me,are){
             await addtext('これはちょっと、スパイシーなやつだよ');
@@ -1452,7 +1437,7 @@ let Tools = [
         jpnm:'援護射撃',
         name:'coveringfire',
         price:80,
-        description:'ダメージ与える。ゴミ箱に隠れてる人。',
+        desc:'ダメージ与える。ゴミ箱に隠れてる人。',
         num:0,
         func:async function(cam,me,are){
                 await addtext('え、援護します...');
@@ -1469,7 +1454,7 @@ let Tools = [
         jpnm:'爆弾',
         name:'bomb',
         price:100,
-        description:'エクスプローージョン！！！\n敵を確殺します。嬉しいね',
+        desc:'エクスプローージョン！！！\n敵を確殺します。嬉しいね',
         num:1,
         func:async function(cam,me,are){
             let x = humans[tcam][target].hp;
@@ -1482,7 +1467,7 @@ let Tools = [
         jpnm:'レッドカード',
         name:'redcard',
         price:35,
-        description:'退場です。帰れ(スキップ)',
+        desc:'退場です。帰れ(スキップ)',
         num:3,
         func:async function(cam,me,are){
             await buffadd(who, are,'skip','turn' ,1,1);
@@ -1494,7 +1479,7 @@ let Tools = [
         jpnm:'ブルーカード',
         name:'bluecard',
         price:35,
-        description:'リバースを召喚！このカードは相手と自分の体力を交換する！！割合だ！！！！',
+        desc:'リバースを召喚！このカードは相手と自分の体力を交換する！！割合だ！！！！',
         num:0,
         func:async function(who, are){
             x = who.hp/who.maxhp*are.hp;//割合交換(そのうちゲージにする時用)
@@ -1512,7 +1497,7 @@ let Tools = [
         jpnm:'グリーンカード',
         name:'greencard',
         price:35,
-        description:'バフを2個ランダムでつける。つよい',
+        desc:'バフを2個ランダムでつける。つよい',
         num:0,
         func:async function(cam,me,are){
             let rbuffs = ['power','shellup','luck'];
@@ -1529,7 +1514,7 @@ let Tools = [
         jpnm:'ブラックカード',
         name:'blackcard',
         price:35,
-        description:'デバフを2個つける。割とつよい',
+        desc:'デバフを2個つける。割とつよい',
         num:0,
         func:async function(cam,me,are){
             let rbuffs = ['powerdown','shelldown','poison','burn','freeze'];
@@ -1548,7 +1533,7 @@ let Skills = [
             type:'ex',
             name:'null',
             jpnm:'null',
-            description:'何もないです。\nまあこれが店頭に並ぶこともないでしょうけどね。\nはい論破',
+            desc:'何もないです。\nまあこれが店頭に並ぶこともないでしょうけどね。\nはい論破',
             price:0,
             buyable:0,
         },
@@ -1556,7 +1541,7 @@ let Skills = [
             type:'ex',
             name:'',
             jpnm:'',
-            description:``,
+            desc:``,
             price:50,
             buyable:1,
             exclusive:'color_slime',
@@ -1568,7 +1553,7 @@ let Skills = [
             type:'ex',
             name:'placeturret',
             jpnm:'雷ちゃん、召喚',
-            description:'タレットを1つ配置する',
+            desc:'タレットを1つ配置する',
             price:95,
             buyable:1,
             func:async function(cam,me){
@@ -1580,7 +1565,7 @@ let Skills = [
             type:'ex',
             name:'trickyvariables',
             jpnm:'トリッキーな変数',
-            description:'爆弾を投げる。効果はランダム',
+            desc:'爆弾を投げる。効果はランダム',
             price:95,
             buyable:1,
             func:async function(cam,me){
@@ -1624,7 +1609,7 @@ let Skills = [
             type:'ex',
             name:'bigdiamond',
             jpnm:'私がかけた魔法だよ',
-            description:'敵に攻撃力の150%のダメージを与え、たまに凍らせる',
+            desc:'敵に攻撃力の150%のダメージを与え、たまに凍らせる',
             price:80,
             buyable:1,
             func:async function(cam,me){
@@ -1648,7 +1633,7 @@ let Skills = [
             type:'ex',
             name:'lightningstorm',
             jpnm:'ライニングストーム',
-            description:'敵全体に攻撃力の120%のダメージを与え、帯電にする\n帯電:自身の行動時自傷ダメージが入る',
+            desc:'敵全体に攻撃力の120%のダメージを与え、帯電にする\n帯電:自身の行動時自傷ダメージが入る',
             price:60,
             buyable:1,
             func:async function(cam,me){
@@ -1663,7 +1648,7 @@ let Skills = [
             type:'ex',
             name:'kylieelison',
             jpnm:'Kylie Eleison',
-            description:'敵に攻撃力の200%のダメージ。もし敵の体力が70%以上ならば400%',
+            desc:'敵に攻撃力の200%のダメージ。もし敵の体力が70%以上ならば400%',
             price:110,
             buyable:1,
             func:async function(cam,me){
@@ -1680,7 +1665,7 @@ let Skills = [
             type:'ex',
             name:'standrone',
             jpnm:'自走式閃光ドローン',
-            description:'敵に攻撃力の75%のダメージを与え、スタンさせる',
+            desc:'敵に攻撃力の75%のダメージを与え、スタンさせる',
             price:60,
             buyable:1,
             func:async function(cam,me){
@@ -1696,7 +1681,7 @@ let Skills = [
             type:'ex',
             name:'recievechallenge',
             jpnm:'挑戦状を受け取ってください!!',
-            description:'敵の防御力を下げ、自身の攻撃力を上げる',
+            desc:'敵の防御力を下げ、自身の攻撃力を上げる',
             price:90,
             buyable:1,
             func:async function(who){
@@ -1713,7 +1698,7 @@ let Skills = [
             type:'ex',
             name:'timedpursuit',
             jpnm:'小心者の観測',
-            description:'敵を弱点把握状態を付与する',
+            desc:'敵を弱点把握状態を付与する',
             price:50,
             buyable:1,
             func:async function(cam,me){
@@ -1731,7 +1716,7 @@ let Skills = [
             type:'ns',
             name:'null',
             jpnm:'null',
-            description:'(まじでnullです。効果無し。外れ。乙)',
+            desc:'(まじでnullです。効果無し。外れ。乙)',
             price:0,
             buyable:0,
             cool:0
@@ -1740,7 +1725,7 @@ let Skills = [
             type:'ns',
             name:'throwslime',
             jpnm:'Attach!Slime!!',
-            description:'敵にスライムをくっつける',
+            desc:'敵にスライムをくっつける',
             price:70,
             buyable:1,
             cool:3,
@@ -1755,7 +1740,7 @@ let Skills = [
             type:'ns',
             name:'throwwrench',
             jpnm:'匙を投げる？これはレンチだよ',
-            description:'レンチを投げる準備をし、次の攻撃が二倍になる',
+            desc:'レンチを投げる準備をし、次の攻撃が二倍になる',
             price:70,
             buyable:1,
             cool:4,
@@ -1769,7 +1754,7 @@ let Skills = [
             type:'ns',
             name:'gambler',
             jpnm:'かけ上手',
-            description:'次の攻撃時に0,2,4倍の倍率がかかる',
+            desc:'次の攻撃時に0,2,4倍の倍率がかかる',
             price:70,
             buyable:1,
             cool:3,
@@ -1783,7 +1768,7 @@ let Skills = [
             type:'ns',
             name:'improve',
             jpnm:'改善が必要だよ',
-            description:'攻撃力を1.4倍に上昇させる',//変更予定,
+            desc:'攻撃力を1.4倍に上昇させる',//変更予定,
             price:30, //"負荷"みたいにして、stackのbuffをつけて、攻撃力を上げさせる〜とかどう？
             buyable:1,
             cool:5,
@@ -1797,7 +1782,7 @@ let Skills = [
             type:'ns',
             name:'elecbarrier',
             jpnm:'エレクトリックバリア',
-            description:'体力が最も低い味方に帯電バリアを付与する。\n帯電バリア:被攻撃時相手に帯電を付与する\n帯電:自身の行動時自傷ダメージが入る',
+            desc:'体力が最も低い味方に帯電バリアを付与する。\n帯電バリア:被攻撃時相手に帯電を付与する\n帯電:自身の行動時自傷ダメージが入る',
             price:70,
             buyable:1,
             cool:3,
@@ -1814,7 +1799,7 @@ let Skills = [
             type:'ps',
             name:'null',
             jpnm:'null',
-            description:'(まじでnullです。効果無し。外れ。乙)',
+            desc:'(まじでnullです。効果無し。外れ。乙)',
             price:0,
             buyable:0,
         },
@@ -1822,7 +1807,7 @@ let Skills = [
             type:'ps',
             name:'sthree',
             jpnm:'DoYourBest!!',
-            description:'slash時、たまに3回攻撃する',
+            desc:'slash時、たまに3回攻撃する',
             price:90,
             buyable:1,
         },
@@ -1830,7 +1815,7 @@ let Skills = [
             type:'ps',
             name:'solplaceturret',
             jpnm:'雷ちゃん、もうちょっと',
-            description:'slash of light命中時、タレットを1つ配置する',
+            desc:'slash of light命中時、タレットを1つ配置する',
             price:90,
             buyable:1,
         },
@@ -1838,7 +1823,7 @@ let Skills = [
             type:'ps',
             name:'highsol',
             jpnm:'生粋の勝負師',
-            description:'slash of lightの命中率が下がるが、命中時3倍のダメージ',
+            desc:'slash of lightの命中率が下がるが、命中時3倍のダメージ',
             price:90,
             buyable:1,
         },
@@ -1846,7 +1831,7 @@ let Skills = [
             type:'ps',
             name:'enemy50%pursuit',
             jpnm:'一度限りの取引',
-            description:'攻撃によって敵の体力を50%以下だった場合、攻撃力の70%で追撃する',
+            desc:'攻撃によって敵の体力を50%以下だった場合、攻撃力の70%で追撃する',
             price:70,
             buyable:1,
         },
@@ -1854,7 +1839,7 @@ let Skills = [
             type:'ps',
             name:'elecshock',
             jpnm:'エレクトリック衝撃',
-            description:'会心時、相手に帯電を付与する。\n帯電:自身の行動時自傷ダメージが入る',
+            desc:'会心時、相手に帯電を付与する。\n帯電:自身の行動時自傷ダメージが入る',
             price:90,
             buyable:1,
         }
@@ -2043,7 +2028,7 @@ let Objects = [
         }
     },
     {
-        name:'cutrast',
+        name:'cutras',
         jpnm:'さぼてんさん',
         able:1,
         on:0,
@@ -2357,7 +2342,7 @@ let Quests = {
     main:[
         {
             num:0,
-            description:"このゲームを見つけてくれてありがとう！！",
+            desc:"このゲームを見つけてくれてありがとう！！",
             rewards: 200,
             type:0,
             term:[0],
@@ -2366,7 +2351,7 @@ let Quests = {
         },
         {
             num:1,
-            description:"敵を3体倒す",
+            desc:"敵を3体倒す",
             rewards: 100, 
             type:'k', //敵を倒す
             term:[0],     //条件(stage1で〜みたいな)
@@ -2375,7 +2360,7 @@ let Quests = {
         },
         {
             num:2,
-            description:"ダンジョンを一回クリアする",
+            desc:"ダンジョンを一回クリアする",
             rewards: 100,
             type:'dc',
             term:[0],
@@ -2385,7 +2370,7 @@ let Quests = {
     ],
     daily:[
         {
-            description: "ボスを1体倒す",
+            desc: "ボスを1体倒す",
             rewards: 20,
             type: 'k',
             term:[0],
@@ -2393,7 +2378,7 @@ let Quests = {
             acted: 0,
         },
         {
-            description: "敵を3体倒す",
+            desc: "敵を3体倒す",
             rewards: 20,
             type: 'k',
             term:[0],
@@ -2401,7 +2386,7 @@ let Quests = {
             acted: 0,
         },
         {
-            description: "敵を5体倒す",
+            desc: "敵を5体倒す",
             rewards: 20,
             type: 'k',
             term:[0],
@@ -2409,7 +2394,7 @@ let Quests = {
             acted: 0,
         },
         {
-            description: "敵を7体倒す",
+            desc: "敵を7体倒す",
             rewards: 20,
             type: 'k',
             term:[0],
@@ -2417,7 +2402,7 @@ let Quests = {
             acted: 0,
         },
         {
-            description: "ダンジョンを1回クリアする",
+            desc: "ダンジョンを1回クリアする",
             rewards: 20,
             type: 'dc',
             term:[0],

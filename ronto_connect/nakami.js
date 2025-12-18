@@ -734,12 +734,7 @@ loaC.imgL = {
     // 草原:['蒼白の粘液','翡翠の風刃','顎剛なる草獣','茎槍の狩人','の茎針','攣縮する茎針','共鳴する茎赤黄','黄昏の穿影','燦爛する緑夢','紫苑の花姫','新緑なる剣士']
 }
 
-loaC.imgT = Object.values(loaC.imgL).map(a => a.length).reduce((a, b) => a + b);
-console.log(loaC.imgT)
-
-loaC.sonL = {
-    asd:[2]
-}
+loaC.sonL = ['error', 'doom', 'money']
 loaC.sonT = Object.values(loaC.sonL).map(a => a.length).reduce((a, b) => a + b);
 
 loaF.load = async() => {
@@ -747,23 +742,25 @@ loaF.load = async() => {
     else '終わり'
 }
 let eed = 0;
+let eee = 0;
 loaF.loadI = async() => {
     let stas0 = Stages.map(a => a.name);
     let stas = stas0.concat(['すべて']);
     
     loaC.imgL.maps = {};
+    loaC.imgL.enemies = {};
     for(let sta of stas){
-        if(!loaC.imgL.maps[sta]) loaC.imgL.maps[sta] = ['1'];
+        if(!loaC.imgL.maps[sta]) loaC.imgL.maps[sta] = [];
         Objects.filter(a => a.in == sta).map(a => a.name).forEach(name => {
             loaC.imgT += 1;
-            console.log(sta)
             if(sta != 'すべて') loaC.imgL.maps[sta].push(name);
             
             else for(let sta2 of stas0) loaC.imgL.maps[sta2].push(name);
         });
 
-        loaC.imgL.enemies = {};
+        
         if(!loaC.imgL.enemies[sta]) loaC.imgL.enemies[sta] = [];
+        // console.log(Enemies.filter(a => a.in == sta).map(a => a.name))
         Enemies.filter(a => a.in == sta).map(a => a.name).forEach(name => {
             loaC.imgT += 1;
             if(sta != 'すべて') loaC.imgL.enemies[sta].push(name);
@@ -771,20 +768,36 @@ loaF.loadI = async() => {
             else for(let sta2 of stas0) loaC.imgL.enemies[sta2].push(name);
         });
     }
-    console.log('LETS GOOOOOOOOOOO!!')
+    // console.log('LETS GOOOOOOOOOOO!!')
+    let T1 = (Tk) => {
+        let Tv = loaC.imgL[Tk];
+        if(Array.isArray(Tv)) return loaC.imgT += Tv.length;
+        
+        T0(Tv);
+    }
+    let T0 = (moto) => {
+        for(let key in moto){
+            T1(key);
+        }
+    }
 
     let loaloa = (arr, route) => {
-        console.log("Arrayでした lets 読み込み")
+        // console.log("Arrayでした lets 読み込み")
         let src = "assets/";
         for(let r of route) src += `${r}/`;
-        console.log(src)
+        // console.log(src)
 
         let tar = images;
-        for(let r of route) console.log(r, tar), tar[r] = {}, tar = tar[r];
-        console.log("終わり", tar)
-        console.log(arr);
-        console.log(route);
-        console.log(images);
+        for(let r of route){
+            // console.log(r, tar)
+            if(!tar[r]) tar[r] = {};
+            tar = tar[r];
+        }
+        // console.log("終わり", tar)
+        // console.log(images)
+        // console.log(arr);
+        // console.log(route);
+        // console.log(images);
 
         // return console.log('強制終了'), '強制終了'
 
@@ -795,51 +808,106 @@ loaF.loadI = async() => {
                 loaC.imgD++;
             };
             img.onerror = () => {
-                console.error(`Image ${route}/${mono}.png failed to load.`);
+                console.error(`Image ${src}${mono}.png failed to load.`);
                 eed += 1;
-                if(eed > 20){
-                    console.error('さすがにやりすぎbonus');
-                    return 1;
-                }
+                if(eed > 20) return console.error('さすがにやりすぎbonus'), 1;
                 img.src = `assets/systems/error.png`;
                 loaC.imgD++;
             };
             
             tar[mono] = img;
-            if(loaC.imgD == loaC.imgT) loaF.loadS();
+            if(loaC.imgD >= loaC.imgT) loaF.loadS();
         }
 
-        console.log('読み込み完了')
+        // console.log('読み込み完了 これよりユグドラシルに帰還する')
         return 0;
     }
 
-    let loaloa0 = (mono, route = []) => {
+    let skip = 0;
+    // let gensho = Object.keys(loaC.imgL);
+    let loaloa0 = async(mono, route = []) => {
         let sink = route.length ? 1 : 0
-        if(sink) console.log("not Arrayでした lets 再帰");
+        // if(sink) console.log("not Arrayでした lets 再帰");
         
-        console.log("[loaloa0] route:[" + route + "]");
-        console.log('次:monoです')
-        console.log(mono)
+        // console.log("[loaloa0] route:[" + route + "]");
+        // console.log('次:monoです')
+        // console.log(mono)
+        eee += 1;
+        // console.error(`------lets ループ[${eee}]------`)
         for(let key in mono){
-            console.log(`key:${key}`)
+            // console.log(`ループ[${eee}]中.. route:[${route}]`)
+            // console.log(`key:${key} (all:[${Object.keys(mono)}])`)
+            if(key == 'すべて'){
+                // console.error('"すべて"だったのでスキップ');
+                route.pop()
+                continue;
+            }
+
             route.push(key);
             // console.log("[loaloa0ed] route:[" + route + "]");
             
             let val = mono[key]??null;
             if(!val) return console.error('↓↓null↓↓'), console.log(tar), console.log(mono), console.log(key), console.error('↑↑null↑↑');
-            console.log("次、valです");
-            console.log(val);
-            console.log("↑Arrayかな? 結果=> "+Array.isArray(val));
-            if(Array.isArray(val)) if(loaloa(val, route)) return console.log('南ノ南'); //arrayなら => ロードへ
-            else loaloa0(val, route); //まだオブジェクトなら => もっかい
+            // console.log("次、valです");
+            // console.log(val);
+            // console.log("↑Arrayかな? 結果 => "+Array.isArray(val));
+            if(Array.isArray(val)){
+                if(await loaloa(val, route)) return console.error('南ノ南');
+                route.pop()
+                // console.log(`帰還成功、${route.pop()}を排除`)
+            }//arrayなら => ロードへ
+            else await loaloa0(val, route); //まだオブジェクトなら => もっかい
         }
+        // console.error(`------終わり ループ[${eee}]------`)
     }
     
 
     loaloa0(loaC.imgL);
 }
 
-// loaF.loadS = async() => {
+loaF.loadS = async() => {
+    soundsNames.forEach(num => {
+        let sound = new Audio();
+        sound.preload = 'auto';
+        sound.src = `assets/sounds/${num}.mp3`;
+        sound.addEventListener('canplaythrough', () => {
+            soundsLoaded++;
+            if(imgC.imagesLoaded == imgC.imagesTotal && soundsLoaded == totalsounds) start();
+        }, {once: true});
+        sound.onerror = () => {
+            console.error(`Sound ${num} failed to load.`);
+            soundsLoaded++;
+            sound.src = `assets/sounds/error.mp3`;
+        };
+        sounds[num] = sound;
+    });
+}
+
+function soundPlay(name){
+    let sound = sounds[name];
+    if(!sound) return soundPlay("error");
+
+    sound.currentTime = 0;
+    sound.volume = souC.volume;
+    sound.play();
+}
+
+function soundStop(){
+    document.querySelectorAll('audio,video').forEach(el => {
+        el.pause();
+        el.currentTime = 0;
+    });
+}
+
+function soundVolume(val){
+    const v = Math.max(0, Math.min(1, val/100));
+    console.log(`[soundVolume] ${souC.volume??null} => ${v}`);
+    souC.volume = v;
+    document.querySelectorAll('audio,video').forEach(el => {
+        el.volume = v
+    });
+}
+soundVolume(50);
 
 //#endregion
 
