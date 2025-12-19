@@ -21,7 +21,6 @@ html{
 }
 
 img{
-    /* 画像をドラッグできないようにするやつ */
     -webkit-user-drag: none;
 }
 ::-webkit-scrollbar{

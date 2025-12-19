@@ -184,7 +184,7 @@ img{
     left: 0;
     z-index: 255;
 }
-#loginArea.tog{
+#loginArea.appe{
     display: block;
 }
 #loginArea .center{
@@ -353,7 +353,7 @@ img{
     background: #001748;
     z-index: 256;
 }
-#titleArea.tog{
+#titleArea.appe{
     display: block;
 }
 #titleArea .title{
@@ -367,5 +367,18 @@ img{
     background-clip: text;
     font-size: 55px;
     -webkit-text-fill-color: transparent;
+}
+/* #endregion */
+
+/* #region btArea */
+#btArea{
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    background: #001748;
+    z-index: 256;
+}
+#btArea.appe{
+    display: block;
 }
 /* #endregion */
