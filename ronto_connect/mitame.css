@@ -2,6 +2,7 @@
 @font-face{src:url("assets/fonts/hangyaku.ttf");font-family: hangyaku;}
 @font-face{src:url('assets/fonts/kurobara.ttf');font-family: kurobara;}
 @font-face{src: url("assets/fonts/misaki.ttf");font-family: misaki;}
+@font-face{src:url('assets/fonts/cube12.ttf');font-family: cube12;}
 html{
     margin: -8px;
     user-select:none;
@@ -35,7 +36,7 @@ img{
     position: fixed;
     top: 0;
     right: 0;
-    background-color: #f0f8ff80;
+    background: #f0f8ff80;
     color: #000000;
     font-size: 20px;
     transition: right 2.0s linear;
@@ -66,7 +67,7 @@ img{
 #log .opener{
     width: 30px;
     height: 100%;
-    background-color: #000000ef;
+    background: #000000ef;
     text-align: center;
     cursor: pointer;
     z-index: inherit;
@@ -76,7 +77,7 @@ img{
     height: 100%;
     max-height: 100%;
     overflow-x: hidden; overflow-y: scroll;
-    background-color: #000000de;
+    background: #000000de;
     text-align: left;
     font-size: 14px;
     transition: right 0.3s;
@@ -124,7 +125,7 @@ img{
     display: none;
     position: fixed;
     pointer-events: none;
-    background-color: #363636e2;
+    background: #363636e2;
     color: #f0f8ff;
     text-align: left;
     padding: 5px 10px;
@@ -160,7 +161,7 @@ img{
     height: 100px;
     /* aspect-ratio: 1/1; */
     padding: 5px;
-    background-color: #f0f8ff;
+    background: #f0f8ff;
     border: 1px solid #000000;
     color: #000000;
     font-size: 12px;
@@ -173,19 +174,157 @@ img{
     margin-bottom: 5px;
 }
 
-/* #region loginArea */
-#loginArea{
+/* #region area */
+.area{
     display: none;
     width: 100vw;
     height: 100vh;
-    background: #865e00;
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 255;
 }
-#loginArea.appe{
+.area.appe{
     display: block;
+}
+/* #endregion */
+
+/* #region upper 10 */
+#upper{
+    display: block;
+    width: 100vw;
+    height: 80px;
+    background: #bdd0df;
+    opacity: 0.8;
+    position: fixed;
+    top: 0;
+    left: 0;
+    transition: top 0.5s ease, opacity 0.1s ease;
+    box-sizing: border-box;
+    z-index: 10;
+}
+#upper:hover{
+    opacity: 1.0;
+}
+#upper.agari{
+    top: -80px;
+}
+#upper .ue{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    aspect-ratio: 1/1;
+    background: inherit;
+    position: absolute;
+    right: 0;
+    bottom: -40px;
+    cursor: pointer;
+}
+#upper .ue::after{
+    content: '';
+    display: block;
+    width: 80%;
+    height: 80%;
+    background: #0d155b;
+    clip-path: polygon(0 30%, 50% 80%, 100% 30%);
+    transform: rotateX(0deg);
+    transition: transform 0.5s ease;
+}
+#upper.agari .ue::after{
+    transform: rotateX(180deg);
+}
+
+#upper .home{
+    display: block;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+#upper .home .rank .label{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    aspect-ratio: 1/1;
+    font-size: 24px;
+    color: #000000;
+    font-family: cube12;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+}
+#upper .home .rank .label::after{
+    content: '';
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: #c8e4ff;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+
+}
+#upper .home .rank .label::before{
+    content: '';
+    display: block;
+    width: 50%;
+    height: calc(100% + 1px);
+    background: #e3e7eb;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+/* #endregion */
+
+/* #region under 9 */
+#homeArea .under{
+    display: block;
+    width: 100%;
+    height: 80px;
+    position: fixed;
+    bottom: -80px;
+    left: 0;
+    transition: all 0.5s ease;
+    box-sizing: border-box;
+    z-index: 6;
+}
+#homeArea .under.tog{
+    bottom: 0;
+}
+#homeArea .under .opener{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    height: 50px;
+    background: #ffffff;
+    border-top: 2px solid #000000;
+    clip-path: polygon(15% 0, 85% 0, 100% 100%, 0 100%);
+    position: absolute;
+    top: -50px;
+    left: 0;
+    box-sizing: border-box;
+}
+#homeArea .under .main{
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    box-sizing: border-box;
+}
+
+/* #endregion */
+
+/* #region loginArea 5 */
+#loginArea{
+    background: #865e00;
+    z-index: 5;
 }
 #loginArea .center{
     display: flex;
@@ -304,57 +443,17 @@ img{
 }
 /* #endregion */
 
-/* #region under */
-#homeArea .under{
-    display: block;
-    width: 100%;
-    height: 80px;
-    position: fixed;
-    bottom: -80px;
-    left: 0;
-    transition: all 0.5s ease;
-    box-sizing: border-box;
-    z-index: 6;
+/* #region homeArea 2 */
+#homeArea{
+    background: #e3e7eb;
+    z-index: 2;
 }
-#homeArea .under.tog{
-    bottom: 0;
-}
-#homeArea .under .opener{
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 5px;
-    width: 100%;
-    height: 50px;
-    background-color: #ffffff;
-    border-top: 2px solid #000000;
-    clip-path: polygon(15% 0, 85% 0, 100% 100%, 0 100%);
-    position: absolute;
-    top: -50px;
-    left: 0;
-    box-sizing: border-box;
-}
-#homeArea .under .main{
-    display: block;
-    width: 100%;
-    height: 100%;
-    background: #ffffff;
-    box-sizing: border-box;
-}
-
 /* #endregion */
 
-/* #region titleArea */
+/* #region titleArea 7 */
 #titleArea{
-    display: block;
-    width: 100vw;
-    height: 100vh;
     background: #001748;
-    z-index: 256;
-}
-#titleArea.appe{
-    display: block;
+    z-index: 6;
 }
 #titleArea .title{
     display: flex;
@@ -370,15 +469,16 @@ img{
 }
 /* #endregion */
 
-/* #region btArea */
-#btArea{
-    display: block;
-    width: 100vw;
-    height: 100vh;
-    background: #001748;
-    z-index: 256;
+/* #region fieldArea 3 */
+#fieldArea{
+    background: #87ceeb;
+    z-index: 3;
 }
-#btArea.appe{
-    display: block;
+/* #endregion */
+
+/* #region btArea 4 */
+#btArea{
+    background: #001748;
+    z-index: 4;
 }
 /* #endregion */

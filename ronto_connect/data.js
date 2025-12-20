@@ -1,4 +1,7 @@
 let Style = {
+    all:{
+        t0:'#ffffff',
+    },
     button: {
         solid: '#000000',
         back: '#ffffff',

@@ -574,12 +574,12 @@ let loginC = {
      dolDI: loginD.querySelector('.dolphin img'),
     dolP: 0,
 }
-let loginTD = document.querySelector('#upper .login');
+// let loginTD = document.querySelector('#upper .login');
 
 let messagesRef = database.ref(`rontoConnect/rooms/${chatroom}/messages`);
 let usersRef = database.ref(`users/null/rontoConnect`);
 
-loginTD.addEventListener('click', () => loginD.classList.add('appe'));
+// loginTD.addEventListener('click', () => loginD.classList.add('appe'));
 loginC.XD.addEventListener('click', () => loginD.classList.remove('appe'));
 // loginC.XD.addEventListener('click', () => error('では！'));
 
@@ -690,8 +690,14 @@ let uppC = {
       HRbarD: uppD.querySelector('.home .rank .bar'),
       HRD: uppD.querySelector('.home .rank .val'),
      HRimiD: uppD.querySelector('.home .rimi'),
+
+    ueD: uppD.querySelector('.ue'),
+    ue: 0,
 }
 let uppF = {};
+
+uppF.ue = () => uppD.classList.toggle('agari');
+uppC.ueD.addEventListener('click', uppF.ue);
 
 uppF.update = () => {
     // 名前とかレベルのあれを
@@ -702,8 +708,11 @@ uppF.tekiou = () => {
 }
 //#endregion
 
+//#region アンダーニンジャ
+let undD = document.getElementById('under');
+//#endregion
 
-//#region DOM
+//#region battle-DOM
 let batD = document.getElementById('btArea');
 let batC = {
     now: 0,
@@ -729,12 +738,7 @@ batF.clos = () => {
     
     batD.classList.remove('appe')
 };
-
-// 
-//あとはbattle.jsに記述
-
 //#endregion
-
 
 let humans = [];
 let turn = 0;
@@ -891,10 +895,7 @@ async function sele(){
             let name = div.classList[1];
             console.log(name);
             
-            //batC.seleD内要素全消し
-            while(batC.seleD.firstChild){
-                batC.seleD.removeChild(batC.seleD.firstChild);
-            }
+            batC.seleD.replaceChildren();
 
             mis(name)
         }
@@ -2204,6 +2205,7 @@ async function finale(cam){
 
 
 async function start(){
+    console.log("=====Ronto Connect connecten=====")
     // resizeCanvas();
     // window.addEventListener('resize', resizeCanvas);
 
@@ -2216,9 +2218,10 @@ async function start(){
         login();
     }else{
         console.log("ログインしてください");
-        loginTD.classList.add('appe')
+        loginD.classList.add('appe')
     }
 }
+
 
 //#region 画像と音声のロード
 let images = {};
@@ -2227,7 +2230,8 @@ let loaC = {
     imgT: 0,
     imgD: 0,
     souT: 0,
-    souD: 0
+    souD: 0,
+    erd: 0
 }
 let loaF = {};
 loaC.imgL = {
@@ -2235,15 +2239,13 @@ loaC.imgL = {
     // 草原:['蒼白の粘液','翡翠の風刃','顎剛なる草獣','茎槍の狩人','の茎針','攣縮する茎針','共鳴する茎赤黄','黄昏の穿影','燦爛する緑夢','紫苑の花姫','新緑なる剣士']
 }
 
-loaC.sonL = ['error', 'doom', 'money']
-loaC.sonT = Object.values(loaC.sonL).map(a => a.length).reduce((a, b) => a + b);
+loaC.souL = ['error', 'doom', 'money']
+loaC.souT = Object.values(loaC.souL).length;
 
 loaF.load = async() => {
     if(await loaF.loadI()) return 'error';
     else '終わり'
 }
-let eed = 0;
-let eee = 0;
 loaF.loadI = async() => {
     let stas0 = Stages.map(a => a.name);
     let stas = stas0.concat(['すべて']);
@@ -2307,13 +2309,15 @@ loaF.loadI = async() => {
             img.src = `${src}${mono}.png`;
             img.onload = () => {
                 loaC.imgD++;
+                if(loaC.imgD == loaC.imgT) loaF.loadS();
             };
             img.onerror = () => {
                 console.error(`Image ${src}${mono}.png failed to load.`);
-                eed += 1;
-                if(eed > 20) return console.error('さすがにやりすぎbonus'), 1;
+                loaC.erd += 1;
+                if(loaC.erd > 20) return console.error('さすがにやりすぎbonus'), 1;
                 img.src = `assets/systems/error.png`;
                 loaC.imgD++;
+                if(loaC.imgD == loaC.imgT) loaF.loadS();
             };
             
             tar[mono] = img;
@@ -2324,7 +2328,6 @@ loaF.loadI = async() => {
         return 0;
     }
 
-    let skip = 0;
     // let gensho = Object.keys(loaC.imgL);
     let loaloa0 = async(mono, route = []) => {
         let sink = route.length ? 1 : 0
@@ -2333,10 +2336,7 @@ loaF.loadI = async() => {
         // console.log("[loaloa0] route:[" + route + "]");
         // console.log('次:monoです')
         // console.log(mono)
-        eee += 1;
-        // console.error(`------lets ループ[${eee}]------`)
         for(let key in mono){
-            // console.log(`ループ[${eee}]中.. route:[${route}]`)
             // console.log(`key:${key} (all:[${Object.keys(mono)}])`)
             if(key == 'すべて'){
                 // console.error('"すべて"だったのでスキップ');
@@ -2359,29 +2359,38 @@ loaF.loadI = async() => {
             }//arrayなら => ロードへ
             else await loaloa0(val, route); //まだオブジェクトなら => もっかい
         }
-        // console.error(`------終わり ループ[${eee}]------`)
+
     }
     
 
     loaloa0(loaC.imgL);
+
 }
 
 loaF.loadS = async() => {
-    soundsNames.forEach(num => {
+    loaC.souL.forEach(num => {
         let sound = new Audio();
         sound.preload = 'auto';
         sound.src = `assets/sounds/${num}.mp3`;
         sound.addEventListener('canplaythrough', () => {
-            soundsLoaded++;
-            if(imgC.imagesLoaded == imgC.imagesTotal && soundsLoaded == totalsounds) start();
+            // console.log(`Sound ${num} loaded.`);
+            loaC.souD += 1;
+            if(loaC.souD == loaC.souT) start();
         }, {once: true});
         sound.onerror = () => {
             console.error(`Sound ${num} failed to load.`);
-            soundsLoaded++;
+            loaC.erd += 1;
+            if(loaC.erd > 20) return console.error('さすがにやりすぎbonus'), 1;
             sound.src = `assets/sounds/error.mp3`;
+            loaC.souD += 1;
+            if(loaC.souD == loaC.souT) start();
         };
         sounds[num] = sound;
     });
+}
+
+let souC = {
+    volume: 0.5
 }
 
 function soundPlay(name){
@@ -2412,3 +2421,6 @@ soundVolume(50);
 
 //#endregion
 
+document.addEventListener('DOMContentLoaded', async() => {
+    await loaF.load();
+})
