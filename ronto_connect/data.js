@@ -1,16 +1,17 @@
 let Style = {
-    all:{
-        t0:'#ffffff',
+    area:{
+        back: '#e3e7eb',
+        rank: 2,
     },
-    button: {
+    button:{
         solid: '#000000',
         back: '#ffffff',
     },
-    text: {
+    text:{
         main: '#222222',
         sub: '#666666',
     },
-    notice: {
+    notice:{
         border: '#ffffff'
     },
     tekiou: function() {
@@ -35,6 +36,90 @@ let IranMikans = {
             serifs:['まかせロンドン', 'まかせロンドン2階建て', 'まず無いバスラオ', 'ありがとう角砂糖(大パクリ)', 'こいつ好き ビフィズス菌', 'ヨスギルオス', '危なすワロスステゴサウルス', '髪長ザウルス', 'どっちにせよ理論', 'ニョロトノ', '流石にせざるオーエンは彼女なのか？', 'アクセン・クトゥ', 'ヤメトコの杖', '的なテキーラシャンパンタワー'],
         }
 }
+let eneBas = {
+    maxhp: 50,
+    atk: 10,
+    def: 0,
+    matk: 10,
+    mdef: 0,
+    maxmp: 20,
+    crl: 3,
+    crr: 0,
+    crd: 1.5,
+    spd: 25,
+    maxep: 100,
+}
+let Status = [
+    {
+        name:"maxhp",
+        jpnm:"最大体力",
+        desc:"キャラクターの最大体力を示します",
+        bas:100,
+    },
+    {
+        name:"atk",
+        jpnm:"攻撃力",
+        desc:"攻撃！",
+        bas:20,
+    },
+    {
+        name:"def",
+        jpnm:"防御力",
+        desc:"守り力です",
+        bas:0,
+    },
+    {
+        name:"matk",
+        jpnm:"魔攻力",
+        desc:"魔力とも言う",
+        bas:10,
+    },
+    {
+        name:"mdef",
+        jpnm:"魔防力",
+        desc:"魔力（防）とも言う",
+        bas:0,
+    },
+    {
+        name:"maxmp",
+        jpnm:"最大魔力",
+        desc:"キャラクターの最大魔力を示します",
+        bas:50,
+    },
+    {
+        name:"crla",
+        jpnm:"会心率",
+        desc:"",
+        bas:3
+    },
+    {
+        name:"crrs",
+        jpnm:"会心抵抗",
+        desc:"",
+        bas:0
+    },
+    {
+        name:"crdm",
+        jpnm:"会心倍率",
+        desc:"",
+        bas:150
+    },
+
+    {
+        name:"spd",
+        jpnm:"速度",
+        desc:"行動速度のあれ。計算がむずい",
+        bas:50
+    },
+    {
+        name:"maxep",
+        jpnm:"最大ex-pt",
+        desc:"EXを使うための..やつ。"
+    },
+    {
+        
+    }
+]
 
 let Charas = [
     {

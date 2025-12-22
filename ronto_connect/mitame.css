@@ -179,9 +179,11 @@ img{
     display: none;
     width: 100vw;
     height: 100vh;
+    background: var(--area-back);
     position: fixed;
     top: 0;
     left: 0;
+    z-index: var(--area-rank);
 }
 .area.appe{
     display: block;
@@ -194,19 +196,26 @@ img{
     width: 100vw;
     height: 80px;
     background: #bdd0df;
-    opacity: 0.8;
+    opacity: 0.1;
     position: fixed;
     top: 0;
     left: 0;
-    transition: top 0.5s ease, opacity 0.1s ease;
+    transition: top 0.5s ease, opacity 0.3s cubic-bezier(0.25, 0.1, 0.30, 1.0);
     box-sizing: border-box;
     z-index: 10;
 }
 #upper:hover{
     opacity: 1.0;
 }
+/* スマホならずっと表示 */
+@media(width <= 480px){
+    #upper{
+        opacity: 1.0;
+    }
+}
 #upper.agari{
     top: -80px;
+    opacity: 1.0;
 }
 #upper .ue{
     display: flex;
@@ -272,7 +281,7 @@ img{
     display: block;
     width: 50%;
     height: calc(100% + 1px);
-    background: #e3e7eb;
+    background: var(--area-back);
     position: absolute;
     top: 0;
     left: 0;
@@ -323,8 +332,7 @@ img{
 
 /* #region loginArea 5 */
 #loginArea{
-    background: #865e00;
-    z-index: 5;
+    content: 'login';
 }
 #loginArea .center{
     display: flex;
@@ -445,15 +453,13 @@ img{
 
 /* #region homeArea 2 */
 #homeArea{
-    background: #e3e7eb;
-    z-index: 2;
+    content: 'home';
 }
 /* #endregion */
 
 /* #region titleArea 7 */
 #titleArea{
-    background: #001748;
-    z-index: 6;
+    content: 'title';
 }
 #titleArea .title{
     display: flex;
@@ -471,14 +477,12 @@ img{
 
 /* #region fieldArea 3 */
 #fieldArea{
-    background: #87ceeb;
-    z-index: 3;
+    content:'field'
 }
 /* #endregion */
 
 /* #region btArea 4 */
 #btArea{
-    background: #001748;
-    z-index: 4;
+    content:'bt'
 }
 /* #endregion */

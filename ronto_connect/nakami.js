@@ -681,6 +681,64 @@ function load(){
 
 //#endregion
 
+//#region areaについて
+let AreC = {
+    now:null,
+}
+let AreF = {};
+
+AreC.list = [
+    {
+        name:'login',
+        rank:5,
+        back:'#865e00'
+    },
+    {
+        name:'home',
+        rank:2,
+        back:'#e3e7eb'
+    },
+    // title field bt
+    {
+        name:'title',
+        rank:7,
+        back:'#001748'
+    },
+    {
+        name:'field',
+        rank:3,
+        back:'#87ceeb'
+    },
+    {
+        name:'bt',
+        rank:4,
+        back:'#001748'
+    }
+]
+
+AreF.move = (to) => {
+    console.log(`[area移動] ${AreC.now} => ${to}`);
+    let area = AreC.list.find(a => a.name == to);
+    if(!area) return console.log('そんなエリアないっすよ〜？');
+    AreC.now = area;
+    Style.area.back = area.back;
+    Style.area.rank = area.rank;
+    Style.tekiou();
+
+    for(let n of AreC.list){
+        let div = document.getElementById(`${n.name}Area`);
+        if(n.name == to) div.classList.add('appe');
+        else div.classList.remove('appe');
+    }
+}
+AreF.move('home');
+
+//#endregion
+
+//#region ホーム
+
+//#endregion
+
 //#region アッパーエンジン
 let uppD = document.getElementById('upper');
 let uppC = {
@@ -746,19 +804,7 @@ let phase = 0;
 let bar = {me:[], cam:[]};
 let acted = 0;
 
-let eneBas = {
-    maxhp: 50,
-    atk: 10,
-    def: 0,
-    matk: 10,
-    mdef: 0,
-    maxmp: 20,
-    crl: 3,
-    crr: 0,
-    crd: 1.5,
-    spd: 25,
-    maxep: 100,
-}
+
 
 function cm(cam = '指定なし', me = '指定なし'){
     let who = 0;
