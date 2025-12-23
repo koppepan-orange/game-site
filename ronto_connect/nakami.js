@@ -26,8 +26,8 @@ function arraySelect(array){
     let select = Math.floor(Math.random()*array.length);
     return array[select];
 };
-function arrayShuffle(array) {
-    for(let i = array.length - 1; i > 0; i--) {
+function arrayShuffle(array){
+    for(let i = array.length - 1; i > 0; i--){
     const i2 = Math.floor(Math.random() * (i + 1));
     [array[i], array[i2]] = [array[i2], array[i]];
     }
@@ -39,7 +39,7 @@ function arraySize(array){
 };
 function arrayCount(array){
     const counts = {};
-    for (let value of array) {
+    for (let value of array){
     counts[value] = (counts[value] || 0) + 1;
     }
     return counts;
@@ -51,7 +51,7 @@ function arrayGacha(array,probability){
     if(array.length != probability.length) throw new Error("長さがあってないっす！先輩、ちゃんとチェックした方がいいっすよ〜？");
     const total = probability.reduce((sum, p) => sum + p, 0);
     let random = Math.random() * total;
-    for (let i = 0; i < array.length; i++) {
+    for (let i = 0; i < array.length; i++){
         if(random < probability[i]) return array[i];
         random -= probability[i];
     }
@@ -61,24 +61,24 @@ let res = obj.hasOwnProperty(key);
 res = res ? 1 : 0;
 return res;
 }
-function copy(moto) {
+function copy(moto){
     if(Array.isArray(moto)){
         let arr = [];
-        for (let i = 0; i < moto.length; i++) {
+        for (let i = 0; i < moto.length; i++){
             arr.push(copy(moto[i]));
         }
         return arr;
     }
     else if(moto != null && typeof moto == 'object'){
         let obj = {};
-        for (let key in moto) {
-            if (moto.hasOwnProperty(key)) {
+        for (let key in moto){
+            if(moto.hasOwnProperty(key)){
             obj[key] = copy(moto[key]);
             }
         }
         return obj;
     }
-    else {
+    else{
         return moto;
     }
 }
@@ -86,7 +86,7 @@ function probability(num){
     return Math.random()*100 <= num;
     //例:num == 20 → randomが20以内ならtrue,elseならfalseを返す
 };
-function random(min, max) {
+function random(min, max){
     let num = Math.floor(Math.random() * (max - min + 1)) + min;
     return Math.floor(num);
 };
@@ -131,10 +131,10 @@ function anagramSaySay(text, loop = 10, bet = '<br>'){
     
     return reses.join(bet);
 }
-function setLocalStorage(name, value) {
+function setLocalStorage(name, value){
     localStorage.setItem(name, value || "");
 }
-function getLocalStorage(name) {
+function getLocalStorage(name){
     return localStorage.getItem(name);
 }
 let r = {
@@ -178,7 +178,7 @@ async function error(text = 'errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr'){
     await delay(2000);
     window.open('about:blank', '_self').close();
 }
-function hoshoku(color) {
+function hoshoku(color){
     color = color.replace(/^#/, ''); // #付きなら取る
 
     if(color.length != 6) return console.log('カラーコードは6桁、ですよ〜？楽しないでくださいね〜♪')
@@ -195,10 +195,10 @@ function hoshoku(color) {
 
     return `#${compR}${compG}${compB}`;
 }
-function mixshoku(c1, c2, ratio = 0.5) {
+function mixshoku(c1, c2, ratio = 0.5){
     const toRGB = c => {
         c = c.replace('#', '');
-        if (c.length === 3) c = c.split('').map(x => x + x).join('');
+        if(c.length === 3) c = c.split('').map(x => x + x).join('');
         const n = parseInt(c, 16);
         return [n >> 16, (n >> 8) & 255, n & 255];
     };
@@ -218,15 +218,15 @@ function mixshoku(c1, c2, ratio = 0.5) {
 //#region log&text
 let textDiv = document.querySelector('#text');
 let autoDelay = 1;
-let skipText = false; // スキップフラグ
-let clearText = false; // テキスト消去フラグ
+let skipText = 0; // スキップフラグ
+let clearText = 0; // テキスト消去フラグ
 let textShowing = 0;
 
-function colorcheck(rawtext) {
+function colorcheck(rawtext){
     const text = [];
-    let isRed = false; // ** で囲まれた部分かどうか
-    let isPink = false; // && で囲まれた部分かどうか
-    let isBlue = false; // ^^ で囲まれた部分かどうか
+    let isRed = 0; // ** で囲まれた部分かどうか
+    let isPink = 0; // && で囲まれた部分かどうか
+    let isBlue = 0; // ^^ で囲まれた部分かどうか
 
     for(let i = 0; i < rawtext.length; i++){
         if(rawtext[i] == "*" && rawtext[i + 1] == "*"){
@@ -285,30 +285,30 @@ async function addtext(raw){
     textDiv.innerHTML = ""; // 中身をリセット
     textDiv.style.display = "block"; // 表示
     let index = 0;
-    clearText = false; // 消去フラグをリセット
+    clearText = 0; // 消去フラグをリセット
 
     return new Promise((resolve) => {
-        async function type() {
-                if (index < text.length) {
-                if (skipText) {
+        async function type(){
+                if(index < text.length){
+                if(skipText){
                     // スキップ処理
-                    while (index < text.length) {
+                    while (index < text.length){
                             const span = document.createElement("span");
                             span.textContent = text[index].char;
-                            if (text[index].color) {
+                            if(text[index].color){
                             span.classList.add(`color-${text[index].color}`);
                             }
                             textDiv.appendChild(span);
                             index++;
                     }
                     index = text.length; // 全ての文字を表示済みにする
-                    skipText = false;
+                    skipText = 0;
                     setTimeout(type, 10);
-                } else {
+                }else{
                     // 通常の文字表示
                     const span = document.createElement("span");
                     span.textContent = text[index].char;
-                    if (text[index].color) {
+                    if(text[index].color){
                             span.classList.add(`color-${text[index].color}`);
                     }
                     textDiv.appendChild(span);
@@ -316,13 +316,13 @@ async function addtext(raw){
                     index++;
                     setTimeout(type, 80); // 次の文字を表示する間隔
                 }
-                } else {
+                }else{
                 addlog(textDiv.innerHTML);
                 const waitTime = autoDelay * 1000;
                 const timeout = new Promise(resolve => setTimeout(resolve, waitTime));
                 const userAction = new Promise(resolve => {
-                    function waitToClear(event) {
-                            if (event.type === 'click' || event.key === 'z' || event.key === 'Enter') {
+                    function waitToClear(event){
+                            if(event.type === 'click' || event.key === 'z' || event.key === 'Enter'){
                             document.removeEventListener('click', waitToClear);
                             document.removeEventListener('keydown', waitToClear);
                             resolve();
@@ -335,8 +335,8 @@ async function addtext(raw){
                 Promise.race([timeout, userAction]).then(() => {
                     textDiv.textContent = "";
                     textDiv.style.display = "none";
-                    clearText = true;
-                    skipText = false
+                    clearText = 1;
+                    skipText = 0
                     textShowing = 0;
                     resolve('end'); // Promiseを解決
                 });
@@ -347,19 +347,19 @@ async function addtext(raw){
 }
 document.addEventListener('keydown', (e) => {
     if(e.key === 'z' || e.key === 'Enter'){
-        skipText = true;
+        skipText = 1;
     }
 });
 
 document.addEventListener('keyup', (e) => {
     if(e.key === 'z' || e.key === 'Enter'){
-        skipText = false;
+        skipText = 0;
     }
 });
 
 document.addEventListener('click', () => {
-    skipText = true;
-    setTimeout(() => skipText = false, 50); // 一時的にスキップを有効化
+    skipText = 1;
+    setTimeout(() => skipText = 0, 50); // 一時的にスキップを有効化
 });
 
 let logOOmoto = document.querySelector('#log');
@@ -390,7 +390,7 @@ document.addEventListener('mousemove', (e) => {
 });
 document.addEventListener('mouseover', (e) => {
     const descTarget = e.target.closest('[data-description]');
-    if (descTarget) {
+    if(descTarget){
         const desc = descTarget.dataset.description;
         movableDescription.innerText = desc;
         movableDescription.style.display = 'block';
@@ -398,7 +398,7 @@ document.addEventListener('mouseover', (e) => {
 });
 document.addEventListener('mouseout', (e) => {
     const descTarget = e.target.closest('[data-description]');
-    if (descTarget) {
+    if(descTarget){
         movableDescription.innerText = '';
         movableDescription.style.display = 'none';
     }
@@ -413,12 +413,12 @@ document.addEventListener('mousedown', e => {
     offsetX = e.clientX - div.getBoundingClientRect().left;
     offsetY = e.clientY - div.getBoundingClientRect().top;
     
-    function onMouseMove(e) {
+    function onMouseMove(e){
         div.style.left = `${e.clientX - offsetX}px`;
         div.style.top = `${e.clientY - offsetY}px`;
     }
 
-    function onMouseUp() {
+    function onMouseUp(){
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
     }
@@ -533,17 +533,17 @@ let keys = {}
 document.addEventListener('keydown', e => {
     let key = e.key.toLowerCase();
     if(e.key == ' ') key = 'space';
-    keys[key] = true;
+    keys[key] = 1;
 });
 document.addEventListener('keyup', e => {
     let key = e.key.toLowerCase();
     if(e.key == ' ') key = 'space';
-    keys[key] = false;
+    keys[key] = 0;
 });
 
-let clicking = false;
-document.addEventListener('mousedown', () => clicking = true);
-document.addEventListener('mouseup', () => clicking = false);
+let clicking = 0;
+document.addEventListener('mousedown', () => clicking = 1);
+document.addEventListener('mouseup', () => clicking = 0);
 //#endregion
 
 
@@ -597,7 +597,7 @@ loginC.sendD.addEventListener('click', async function(event){
                 console.log('success')
                 login();
                 setLocalStorage("username", username); // ログイン成功時
-            } else {
+            }else{
                 nicoText('パスワードが間違っています');
             }
         }else{
@@ -698,7 +698,6 @@ AreC.list = [
         rank:2,
         back:'#e3e7eb'
     },
-    // title field bt
     {
         name:'title',
         rank:7,
@@ -732,6 +731,22 @@ AreF.move = (to) => {
     }
 }
 AreF.move('home');
+
+
+//右クリックをすると=>fixedなmovlisがマウスの位置に来て、appearをadd。その状態のままマウスを移動させliにmouseoverするとそのliにlightをadd、離れるとremoveする。そして右クリックを離したとき、lightされている要素があるならばそこにAreF.moveする+movlisのappearをremove、lightな要素がなければそのままmovlisのappearをremove
+
+let movlis = document.getElementById('movlis');
+for(let n of AreC.list){
+    let li = document.createElement('div');
+    li.textContent = n.name;
+
+    li.addEventListener('click', () => AreF.move(n.name));
+
+    movlis.appendChild(li);
+}
+movlis.addEventListener('contextmenu', (e) => {
+    
+})
 
 //#endregion
 
@@ -767,7 +782,52 @@ uppF.tekiou = () => {
 //#endregion
 
 //#region アンダーニンジャ
+// JS（pointer events 版）
 let undD = document.getElementById('under');
+let undC = {
+    dragging: 0,
+    kirock: 0,
+    shote: 0,
+    pointerId: null,
+    openD: undD.querySelector('.opener'),
+};
+let undF = {};
+undF.getBottom = (el) => parseFloat(getComputedStyle(el).bottom) || 0;
+undF.clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+undC.openD.addEventListener('pointerdown', (e) => {
+    if(e.button && e.pointerType === 'mouse') return;
+    e.preventDefault();
+    undD.setPointerCapture(e.pointerId);
+    undC.drag = 1;
+    undC.pointerId = e.pointerId;
+    undC.kirock = e.clientY;
+    undC.shote = undF.getBottom(undD);
+});
+
+document.addEventListener('pointermove', (e) => {
+    if(!undC.drag || e.pointerId !== undC.pointerId) return;
+    const dy = e.clientY - undC.kirock;
+    // shote - dy で「上に引っ張ると open（bottom -> 0）」になる
+    let newBottom = undC.shote - dy;
+    let all = undD.offsetHeight;
+    const min = -all; // 完全に隠れた状態
+    const max = -all*0.2; // 完全に表示されている状態
+    newBottom = undF.clamp(newBottom, min, max);
+    undD.style.bottom = `${newBottom}px`;
+});
+
+document.addEventListener('pointerup', (e) => {
+    if(!undC.drag || e.pointerId !== undC.pointerId) return;
+    undC.drag = 0;
+    try{undD.releasePointerCapture(e.pointerId);}catch{}
+    undD.classList.remove('no-transition');
+
+    undC.pointerId = null;
+});
+
+
+
 //#endregion
 
 //#region battle-DOM
@@ -1125,7 +1185,7 @@ async function nextTurn(who = 0){
             }
         }
         */
-        for (let i = who.buffs.length - 1; i >= 0; i--) {
+        for (let i = who.buffs.length - 1; i >= 0; i--){
             who.buffs[i].time -= 1;
             if(who.buffs[i].time <= 0) who.buffs.splice(i, 1);
     }
@@ -1415,7 +1475,7 @@ function LetsTargetSelect(code = 1){
         ];
 
         let target = [];
-        function handleClick(event) {
+        function handleClick(event){
             let div = event.target;
 
             let lis = div.classList;
@@ -1709,7 +1769,7 @@ async function enemyturn(who){
 
     for(let buff in who.buffs){
         buff.time -= 1;
-        if (buff.time <= 0) {
+        if(buff.time <= 0){
             delete who.buffs[buff]; //0以下なら消し去る
         }
     }
@@ -1771,7 +1831,7 @@ function enemySelectAction(who){
 
     return act;
 }
-function ShallTargetSelect(who, code, both = 0) {
+function ShallTargetSelect(who, code, both = 0){
     console.log(`ShallTarget::: ${code}(both:${both})`)
     
     const side = code[0] == 'p' ? 'players' : 'enemies';
@@ -1791,13 +1851,13 @@ function ShallTargetSelect(who, code, both = 0) {
 
     const ret = [];
     if(both == 0) ret.push(target.me);
-    else {
+    else{
         const ids = list.map(c => c.me);
         const i = ids.indexOf(target.me);
         const adj = [];
-        if (i > 0) adj.push(ids[i - 1]);
+        if(i > 0) adj.push(ids[i - 1]);
         adj.push(ids[i]);
-        if (i < ids.length - 1) adj.push(ids[i + 1]);
+        if(i < ids.length - 1) adj.push(ids[i + 1]);
         ret.push(adj);
     }
     // console.log(ret)
@@ -1886,7 +1946,7 @@ async function damage(who, ares, val, type0, props = []){
             [are, Ak, defer]
         ];
         
-        for (let i = 0; i < hyous.length; i++) {
+        for (let i = 0; i < hyous.length; i++){
             const [human, keys, target] = hyous[i];
             // console.log(human, keys, target);
             for(let buff of human.buffs){
@@ -2422,7 +2482,7 @@ loaF.loadS = async() => {
             // console.log(`Sound ${num} loaded.`);
             loaC.souD += 1;
             if(loaC.souD == loaC.souT) start();
-        }, {once: true});
+        }, {once: 1});
         sound.onerror = () => {
             console.error(`Sound ${num} failed to load.`);
             loaC.erd += 1;

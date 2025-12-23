@@ -7,6 +7,10 @@ html{
     margin: -8px;
     user-select:none;
 }
+body{
+    width: 100vw;
+    height: 100vh;
+}
 .row{
     display: flex;
     flex-direction: row;
@@ -290,21 +294,20 @@ img{
 /* #endregion */
 
 /* #region under 9 */
-#homeArea .under{
+#under{
     display: block;
     width: 100%;
-    height: 80px;
+    height: 100vh;
     position: fixed;
-    bottom: -80px;
+    bottom: -100vh;
     left: 0;
-    transition: all 0.5s ease;
+    will-change: bottom;
+    /* transition: all 0.5s ease; */
     box-sizing: border-box;
+    touch-action: none; /* pointer events 対応。スクロール抑制 */
     z-index: 6;
 }
-#homeArea .under.tog{
-    bottom: 0;
-}
-#homeArea .under .opener{
+#under .opener{
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -312,19 +315,21 @@ img{
     gap: 5px;
     width: 100%;
     height: 50px;
-    background: #ffffff;
-    border-top: 2px solid #000000;
-    clip-path: polygon(15% 0, 85% 0, 100% 100%, 0 100%);
+    background: repeating-linear-gradient(to right, #ff4747 0%, #ff4747 7.5%, #ffffff 7.5%, #ffffff 15%);
+    clip-path: polygon(5% 0, 95% 0, 100% 100%, 0 100%);
     position: absolute;
     top: -50px;
     left: 0;
     box-sizing: border-box;
 }
-#homeArea .under .main{
+#under .main{
     display: block;
     width: 100%;
     height: 100%;
     background: #ffffff;
+    border: 4px solid #773000;
+    border-top: 0;
+    border-bottom: 0;
     box-sizing: border-box;
 }
 
