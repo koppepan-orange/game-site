@@ -6,6 +6,7 @@ let Style = {
     button:{
         solid: '#000000',
         back: '#ffffff',
+        wait: 0.1
     },
     text:{
         main: '#222222',
@@ -112,12 +113,21 @@ let Status = [
         bas:50
     },
     {
-        name:"maxep",
-        jpnm:"最大ex-pt",
-        desc:"EXを使うための..やつ。"
+        name:"epa",
+        jpnm:"ep増加量",
+        desc:"EXを使うための..やつの増加量の基礎。"
     },
     {
-        
+        name:"dodge",
+        jpnm:"回避率",
+        desc:"攻撃を回避する確率。\n基本0",
+        bas:0
+    },
+    {
+        name:"targe",
+        jpnm:"命中率",
+        desc:"攻撃が命中する確率。\n基本100",
+        bas:100
     }
 ]
 

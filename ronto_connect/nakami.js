@@ -3,6 +3,7 @@ function delay(ms){
     return new Promise(resolve=>setTimeout(resolve,ms));
 };
 async function nicoText(mes){
+    console.log(`[nico] ${mes}`);
     const newDiv = document.createElement('div');
     newDiv.textContent = mes;
     newDiv.className = 'nicotext';
@@ -57,9 +58,9 @@ function arrayGacha(array,probability){
     }
 };
 function hask(obj, key){
-let res = obj.hasOwnProperty(key);
-res = res ? 1 : 0;
-return res;
+    let res = obj.hasOwnProperty(key);
+    res = res ? 1 : 0;
+    return res;
 }
 function copy(moto){
     if(Array.isArray(moto)){
@@ -94,7 +95,6 @@ function fl(num){
     let res = num ? 1 : 0;
     return res;
 }
-
 function anagramSaySay(text, loop = 10, bet = '<br>'){
     let menjo = 0;
     let len = text.length;
@@ -210,9 +210,9 @@ function mixshoku(c1, c2, ratio = 0.5){
     const g = Math.round(g1 + (g2 - g1) * ratio);
     const b = Math.round(b1 + (b2 - b1) * ratio);
 
-    return (
-        '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('')
-    );
+    let ato = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+
+    return ato;
 }
 //#endregion
 //#region log&text
@@ -544,6 +544,23 @@ document.addEventListener('keyup', e => {
 let clicking = 0;
 document.addEventListener('mousedown', () => clicking = 1);
 document.addEventListener('mouseup', () => clicking = 0);
+
+let ricking = 0;
+document.addEventListener('contextmenu', (e) => ricking = 1);
+document.addEventListener('mouseup', (e) => {
+    if(e.button == 2) ricking = 0;
+})
+
+let mouseX = 0;
+let mouseY = 0;
+// document.addEventListener('mousemove', (e) => {
+//     mouseX = e.clientX;
+//     mouseY = e.clientY;
+// });
+function getMouse(){
+
+}
+
 //#endregion
 
 
@@ -561,11 +578,11 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 let chatroom = 1;
-let userData;
+let userDataGen;
 let loginD = document.querySelector('#loginArea');
 let loginC = {
-    nameD: loginD.querySelector('.username'),
-    passD: loginD.querySelector('.password'),
+    nameD: loginD.querySelector('.username input'),
+    passD: loginD.querySelector('.password input'),
     sendD: loginD.querySelector('.send'),
     XD: loginD.querySelector('.x'),
 
@@ -577,22 +594,23 @@ let loginC = {
 // let loginTD = document.querySelector('#upper .login');
 
 let messagesRef = database.ref(`rontoConnect/rooms/${chatroom}/messages`);
-let usersRef = database.ref(`users/null/rontoConnect`);
+let usersRef = database.ref(`users/null`);
+let rontoRef = database.ref(`users/null/rontoConnect`);
 
 // loginTD.addEventListener('click', () => loginD.classList.add('appe'));
 loginC.XD.addEventListener('click', () => loginD.classList.remove('appe'));
 // loginC.XD.addEventListener('click', () => error('では！'));
 
-loginC.sendD.addEventListener('click', async function(event){
-    event.preventDefault();
+loginC.sendD.addEventListener('click', async function(e){
     username = loginC.nameD.value;
     let password = loginC.passD.value;
-    let kariusersRef = database.ref(`users/${username}/rontoConnect`);
+    usersRef = database.ref(`users/${username}`);
 
     // データベースでユーザーが存在するか確認
-    kariusersRef.once('value').then(async function(snapshot){
+    usersRef.once('value').then(async function(snapshot){
         if(snapshot.exists()){
-            userData = snapshot.val();
+            nicoText('オカエリナサイ マセ');
+            userDataGen = snapshot.val();
             if(userData.password == password){
                 console.log('success')
                 login();
@@ -601,9 +619,13 @@ loginC.sendD.addEventListener('click', async function(event){
                 nicoText('パスワードが間違っています');
             }
         }else{
+            nicoText('初回起動 感謝シマス-- シバシ オ待チヲ  ガピッ');
+            usersRef = database.ref(`users/${username}`);
+            await delay(100);
             usersRef.update({
                 password: password,
             });
+            await delay(50);
             
             valorimar = 0;
             bankvalorimar = 0;
@@ -646,13 +668,8 @@ async function login(){
 
     // データを取得する関数)
     userData = await load();
-    await delay(50)
+    await delay(50);
 
-    valorimar = userData.valorimar??0;
-    bankvalorimar = userData.bankvalorimar??0;
-    rank = userData.rank??1;
-    rpt = userData.rpt??0;
-    maxrpt = rank*100;
 
     uppF.tekiou();
 }
@@ -661,22 +678,26 @@ function save(){
     if(!usersRef) return 1;
     updateUI();
 
-    const newData = {
-        valorimar: valorimar,
-        bankvalorimar: bankvalorimar,
-        rank: rank,
-        rpt: rpt,
-    }
-
     usersRef.update(newData);
     
     return 0;
 }
 
-function load(){
-    return usersRef.once('value').then(snapshot => {
-        return snapshot.val();
-    });
+
+async function load0(){
+    let snapshot = await usersRef.once('value');
+    if(snapshot.exists()){
+        userDataGen = snapshot.child('rontoConnect').val();
+        console.log('rontoConnect:', userDataGen);
+    }else{
+        nicoText('データガ ミツカリマセン デシタ');
+    }
+
+    return userDataGen;
+}
+async function load(){
+    let data = await load0();
+    // rank|rpt|valorimar|euro|bankeuro|
 }
 
 //#endregion
@@ -719,7 +740,7 @@ AreF.move = (to) => {
     console.log(`[area移動] ${AreC.now} => ${to}`);
     let area = AreC.list.find(a => a.name == to);
     if(!area) return console.log('そんなエリアないっすよ〜？');
-    AreC.now = area;
+    AreC.now = area.name;
     Style.area.back = area.back;
     Style.area.rank = area.rank;
     Style.tekiou();
@@ -736,16 +757,27 @@ AreF.move('home');
 //右クリックをすると=>fixedなmovlisがマウスの位置に来て、appearをadd。その状態のままマウスを移動させliにmouseoverするとそのliにlightをadd、離れるとremoveする。そして右クリックを離したとき、lightされている要素があるならばそこにAreF.moveする+movlisのappearをremove、lightな要素がなければそのままmovlisのappearをremove
 
 let movlis = document.getElementById('movlis');
+let movlising = 0;
 for(let n of AreC.list){
     let li = document.createElement('div');
     li.textContent = n.name;
+    li.className = 'item';
 
     li.addEventListener('click', () => AreF.move(n.name));
 
-    movlis.appendChild(li);
+    movlis.querySelector('.list').appendChild(li);
 }
-movlis.addEventListener('contextmenu', (e) => {
-    
+document.addEventListener('keydown', (e) => {
+    if(e.key != 'm' || movlising) return;
+    movlis.style.left = `${mouseX - movlis.offsetWidth/2}px`;
+    movlis.style.top = `${mouseY}px`;
+    movlis.classList.add('tog');
+    movlising = 1;
+})
+document.addEventListener('keyup',e => {
+    if(e.key != 'm') return;
+    movlis.classList.remove('tog');
+    movlising = 0;
 })
 
 //#endregion
@@ -782,7 +814,6 @@ uppF.tekiou = () => {
 //#endregion
 
 //#region アンダーニンジャ
-// JS（pointer events 版）
 let undD = document.getElementById('under');
 let undC = {
     dragging: 0,
@@ -828,6 +859,53 @@ document.addEventListener('pointerup', (e) => {
 
 
 
+//#endregion
+
+//#region Friendについて
+
+
+let FriC = {
+    
+}
+let FriF = {};
+FriF.narabe = () => {
+    const collator = new Intl.Collator('ja', { usage: 'sort', sensitivity: 'variant' });
+
+    const sorted = [...Friends].sort((a, b) => {
+        const ra = (a.ruby || '').normalize('NFKC').replace(/[\u3000\s]+/g, '');
+        const rb = (b.ruby || '').normalize('NFKC').replace(/[\u3000\s]+/g, '');
+        return collator.compare(ra, rb);
+    });
+
+    return sorted;
+}
+FriF.find = (name) => {
+    let fri = Friends.find(a => a.name == name);
+
+    //なかったぽよ...あ、rubyだったのかな？
+    if(!fri) fri = Friends.find(a => a.ruby == name);
+
+    //なかったぽよ...
+    if(!fri) return null;
+
+    return fri;
+}
+
+FriF.num = (name) => {
+    let fri = FriF.find(name);
+    if(!fri) return -1;
+
+    let narabe = FriF.narabe();
+    let num = narabe.findIndex(a => a.name == fri.name);
+
+    return num;
+}
+
+FriF.numold = (num) => {
+    let keta = 2;
+    // toStringでketaに合うようにする 例:01 13
+    let str = num.toString().padStart(keta, '0');
+}
 //#endregion
 
 //#region battle-DOM
@@ -2319,7 +2397,8 @@ async function start(){
     username = getLocalStorage("username");
     if(username){
         console.log("自動ログインしました");
-        usersRef = database.ref(`users/${username}/rontoConnect`);
+        usersRef = database.ref(`users/${username}`);
+        rontoRef = database.ref(`users/${username}/rontoConnect`);
         nicoText('wait for now...')
         login();
     }else{
