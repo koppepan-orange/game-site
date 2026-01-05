@@ -207,14 +207,19 @@ function colorcheck(rawtext) {
     ]
 
     for(let i = 0; i < rawtext.length; i++){
+        let sym = false;
         for(let c of colors){
             if(rawtext[i] == c.sym && rawtext[i + 1] == c.sym){
-                color = c.name;
+                console.log(`→${rawtext[i]}← 発見！ ${c.name}色です`)
+                color = color ? null : c.col;
                 i++;
+                sym = true;
                 break;
             }
         }
         
+        if(sym) continue;
+        if(color) console.log(color)
         text.push({
             char: rawtext[i],
             color: color

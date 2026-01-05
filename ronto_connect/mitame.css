@@ -382,71 +382,6 @@ img{
 
 /* #endregion */
 
-/* #region homeArea 2 */
-#homeArea{
-    content: 'home';
-}
-
-#homeArea .col{
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 15px;
-    width: 100%;
-    height: fit-content;
-    padding: 30px 0;
-}
-#homeArea .col .button{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    scale: 1.0;
-    clip-path: polygon(0 0, 95% 0, 100% 20%, 100% 100%, 0 100%);
-    transition: all calc(var(--button-wait)s) ease;
-    font-size: 22px;
-    cursor: pointer;
-    box-sizing: border-box;
-}
-#homeArea .col .button:hover{
-    scale: 1.1;
-}
-#homeArea .col .button:active{
-    scale: 0.95;
-}
-
-#homeArea .col .button.a{
-    width: 40%;
-    aspect-ratio: 5/1;
-}
-#homeArea .col .button.b{
-    width: 30%;
-    aspect-ratio: 4/1;
-}
-
-#homeArea .col.c1{
-    /* ロント・コネクト */
-    background: #09004b;
-    border: 2px solid #5eff52;
-    box-shadow: 0 0 15px #5eff52b7;
-}
-#homeArea .col.c1 .button{
-    background: #14b13b;
-    color: #85ff4c;
-}
-#homeArea .col.c2 .button{
-    background: #b5791f;
-    color: #f4c836;
-}
-
-#homeArea .col.c2{
-    /* 農業！ */
-    margin-top: 20px;
-    background: #ab8725;
-    border: 2px solid #ffff52;
-}
-/* #endregion */
-
 /* #region loginArea 5 */
 #loginArea{
     content: 'login';
@@ -565,6 +500,77 @@ img{
     width: 100%;
     aspect-ratio: 1/1;
     object-fit: cover;
+}
+/* #endregion */
+
+/* #region homeArea 2 */
+#homeArea{
+    content: 'home';
+}
+
+#homeArea .col{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    height: fit-content;
+    padding: 30px 0;
+}
+#homeArea .col .button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    scale: 1.0;
+    clip-path: polygon(0 0, 95% 0, 100% 20%, 100% 100%, 0 100%);
+    transition: all calc(var(--button-wait)s) ease;
+    font-size: 22px;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+#homeArea .col .button:hover{
+    scale: 1.1;
+}
+#homeArea .col .button:active{
+    scale: 0.95;
+}
+
+#homeArea .col .button.a{
+    width: 40%;
+    aspect-ratio: 5/1;
+}
+#homeArea .col .button.b{
+    width: 30%;
+    aspect-ratio: 4/1;
+}
+
+#homeArea .col.c1{
+    /* ロント・コネクト */
+    background: #09004b;
+    border: 2px solid #5eff52;
+    box-shadow: 0 0 15px #5eff52b7;
+}
+#homeArea .col.c1 .button{
+    background: #14b13b;
+    color: #85ff4c;
+}
+#homeArea .col.c2 .button{
+    background: #b5791f;
+    color: #f4c836;
+}
+
+#homeArea .col.c2{
+    /* 農業！ */
+    margin-top: 20px;
+    background: #ab8725;
+    border: 2px solid #ffff52;
+}
+/* #endregion */
+
+/* #region farmArea 2 */
+#farmArea{
+    content: 'farm';
 }
 /* #endregion */
 

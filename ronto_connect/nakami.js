@@ -222,32 +222,45 @@ let skipText = 0; // スキップフラグ
 let clearText = 0; // テキスト消去フラグ
 let textShowing = 0;
 
-function colorcheck(rawtext){
-    const text = [];
-    let isRed = 0; // ** で囲まれた部分かどうか
-    let isPink = 0; // && で囲まれた部分かどうか
-    let isBlue = 0; // ^^ で囲まれた部分かどうか
+function colorcheck(rawtext) {
+    let text = [];
+    let color = null;
+    let colors = [
+        {
+            name: 'red',
+            sym: '*',
+            col: '#ff4040'
+        },
+        {
+            name: 'pink',
+            sym: '&',
+            col: '#ff80bf'
+        },
+        {
+            name: 'yell',
+            sym: '^',
+            col: '#ffff40'
+        }
+    ]
 
     for(let i = 0; i < rawtext.length; i++){
-        if(rawtext[i] == "*" && rawtext[i + 1] == "*"){
-            isRed = !isRed; // 状態を切り替える
-            i++; // 次の * をスキップ
-        }else if(rawtext[i] == "&" && rawtext[i + 1] == "&"){
-            isPink = !isPink;
-            i++; // 次の & をスキップ
-        }else if(rawtext[i] == "^" && rawtext[i + 1] == "^"){
-            isBlue = !isBlue;
-            i++;
-        }else{
-            let color = null;
-            if(isRed) color = 'red';
-            if(isPink) color = 'pink';
-            if(isBlue) color = 'blue';
-            text.push({
-                char: rawtext[i],
-                color: color
-            });
+        let sym = false;
+        for(let c of colors){
+            if(rawtext[i] == c.sym && rawtext[i + 1] == c.sym){
+                console.log(`→${rawtext[i]}← 発見！ ${c.name}色です`)
+                color = color ? null : c.col;
+                i++;
+                sym = true;
+                break;
+            }
         }
+        
+        if(sym) continue;
+        if(color) console.log(color)
+        text.push({
+            char: rawtext[i],
+            color: color
+        });
     }
     return text;
 }
@@ -289,28 +302,24 @@ async function addtext(raw){
 
     return new Promise((resolve) => {
         async function type(){
-                if(index < text.length){
+            if(index < text.length){
                 if(skipText){
                     // スキップ処理
-                    while (index < text.length){
-                            const span = document.createElement("span");
-                            span.textContent = text[index].char;
-                            if(text[index].color){
-                            span.classList.add(`color-${text[index].color}`);
-                            }
-                            textDiv.appendChild(span);
-                            index++;
+                    while(index < text.length){
+                        const span = document.createElement("span");
+                        span.textContent = text[index].char;
+                        if(text[index].color) span.style.color = text[index].color;
+                        textDiv.appendChild(span);
+                        index++;
                     }
-                    index = text.length; // 全ての文字を表示済みにする
+                    index = text.length;
                     skipText = 0;
                     setTimeout(type, 10);
                 }else{
                     // 通常の文字表示
                     const span = document.createElement("span");
                     span.textContent = text[index].char;
-                    if(text[index].color){
-                            span.classList.add(`color-${text[index].color}`);
-                    }
+                    if(text[index].color) span.style.color = text[index].color;
                     textDiv.appendChild(span);
 
                     index++;
@@ -720,14 +729,24 @@ AreC.list = [
         back:'#e3e7eb'
     },
     {
+        name:'farm',
+        rank:2,
+        back:'#ffc744'
+    },
+    {
         name:'title',
         rank:7,
         back:'#001748'
     },
     {
+        name:'loby',
+        rank:2,
+        back:'#87ceeb'
+    },
+    {
         name:'field',
         rank:3,
-        back:'#87ceeb'
+        back:'#8feb87'
     },
     {
         name:'bt',
@@ -753,8 +772,6 @@ AreF.move = (to) => {
 }
 AreF.move('home');
 
-
-//右クリックをすると=>fixedなmovlisがマウスの位置に来て、appearをadd。その状態のままマウスを移動させliにmouseoverするとそのliにlightをadd、離れるとremoveする。そして右クリックを離したとき、lightされている要素があるならばそこにAreF.moveする+movlisのappearをremove、lightな要素がなければそのままmovlisのappearをremove
 
 let movlis = document.getElementById('movlis');
 let movlising = 0;
@@ -783,7 +800,35 @@ document.addEventListener('keyup',e => {
 //#endregion
 
 //#region ホーム
+let homD = document.getElementById('homeArea');
+let homC = {
+    roZ:homD.querySelector('.col.c1'),
+     goLobyD:homD.querySelector('.launch'),
+     endD:homD.querySelector('.close'),
+    fiZ:homD.querySelector('.col.c2'),
+     goFarmD:homD.querySelector('.farm'),
+}
+let homF = {};
+homF.owarune = () => {
+    error('終わるね。')
+}
+homC.endD.addEventListener('click', homF.owarune);
 
+homF.goLoby = async() => {
+    AreF.move('title');
+    await delay(1500);
+    AreF.move('loby');
+}
+homC.goLobyD.addEventListener('click', homF.goLoby);
+
+homC.goFarmD.addEventListener('click', () => AreF.move('farm'));
+
+//#endregion
+
+//#region ロント・コネクト
+//#endregion
+
+//#region 農業しようぜ！
 //#endregion
 
 //#region アッパーエンジン
