@@ -518,6 +518,18 @@ document.addEventListener('keyup', e => {
 });
 
 let clicking = false;
-document.addEventListener('mousedown', () => clicking = true);
-document.addEventListener('mouseup', () => clicking = false);
+let cricking = false;
+document.addEventListener('pointerdown', (e) => {
+    if(e.buttons == 0) clicking = true;
+    if(e.buttons == 2) cricking = true;
+});
+document.addEventListener('pointerup', (e) => {
+    if(e.buttons == 0) clicking = false;
+    if(e.buttons == 2) cricking = false;
+});
+document.addEventListener('pointercancel', (e) => {
+    if(e.buttons == 0) clicking = false;
+    if(e.buttons == 2) cricking = false;
+});
+window.addEventListener('blur', () => { clicking = cricking = false; });
 //#endregion
