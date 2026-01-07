@@ -1,7 +1,3 @@
-@font-face{src:url('assets/fonts/comicsans.ttf');font-family: comicsans;}
-@font-face{src:url("assets/fonts/hangyaku.ttf");font-family: hangyaku;}
-@font-face{src:url('assets/fonts/kurobara.ttf');font-family: kurobara;}
-@font-face{src: url("assets/fonts/misaki.ttf");font-family: misaki;}
 html{
     margin: -8px;
     overflow: hidden;
@@ -43,6 +39,23 @@ img{
     pointer-events: none;
 }
 /* #endregion */
+
+/* #region tobitext */
+.tobitext{
+    opacity: 1;
+    padding: 4px 8px;
+    background: rgba(0,0,0,0.72);
+    border-radius: 8px;
+    transform: translate(-50%, -50%) translateY(0px);
+    white-space: nowrap;
+    color: #ffffff;
+    position: absolute;
+    transition: none;
+    z-index: 2147483647;
+    pointer-events: none;
+}
+/* #endregion */
+
 
 /* #region logとtext */
 #log{
@@ -120,7 +133,7 @@ img{
 /* #endregion */
 
 /* #region description */
-#movableDescription{
+#mobileDesc{
     display: none;
     position: fixed;
     pointer-events: none;
@@ -130,6 +143,9 @@ img{
     padding: 5px 10px;
     border-radius: 5px;
     z-index: 256;
+}
+#mobileDesc.show{
+    display: block;
 }
 /* #endregion */
 

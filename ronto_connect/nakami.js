@@ -1,4 +1,4 @@
-//#region komagome
+z//#region komagome
 function delay(ms){
     return new Promise(resolve=>setTimeout(resolve,ms));
 };
@@ -562,13 +562,10 @@ document.addEventListener('mouseup', (e) => {
 
 let mouseX = 0;
 let mouseY = 0;
-// document.addEventListener('mousemove', (e) => {
-//     mouseX = e.clientX;
-//     mouseY = e.clientY;
-// });
-function getMouse(){
-
-}
+document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+});
 
 //#endregion
 

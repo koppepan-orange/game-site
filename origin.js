@@ -17,6 +17,44 @@ async function nicoText(mes){
     await delay(2000); 
     newDiv.remove();
 };
+function tobiText(youso, mes) {
+    let el = youso;
+    if(typeof el == 'string') el = document.querySelector(youso);
+    if(!el) return console.error('せんぱ〜い？この要素壊れてますよ〜〜？');
+
+    let rect = el.getBoundingClientRect();
+    let left = rect.left + window.scrollX + rect.width / 2;
+    let top = rect.top + window.scrollY + rect.height / 2;
+
+    let node = document.createElement('div');
+    node.className = 'tobitext';
+    node.textContent = mes;
+    node.style.top = `${top}px`;
+    node.style.left = `${left}px`;
+
+    document.body.appendChild(node);
+
+    let duration = 1200;
+    let distance = -48;
+    let jitter = (Math.random() - 0.5) * 10;
+
+    let start = performance.now();
+
+    function easeOutCubic(t){return 1 - Math.pow(1 - t, 3);}
+
+    function frame(now){
+        let t = Math.min(1, (now - start) / duration);
+        let e = easeOutCubic(t);
+        let tsY = distance * e;
+        let tsX = jitter * (1 - e);
+        node.style.transform = `translate(-50%, -50%) translateY(${tsY}px) translateX(${tsX}px)`;
+        node.style.opacity = String(1 - t);
+        if(t < 1) requestAnimationFrame(frame);
+        else node.remove();
+    }
+
+    requestAnimationFrame(frame);
+}
 function kaijou(num){
     if(num == 0) return 0;
     if(num == 1) return 1;
@@ -28,8 +66,8 @@ function arraySelect(array){
 };
 function arrayShuffle(array) {
     for(let i = array.length - 1; i > 0; i--) {
-    let i2 = Math.floor(Math.random() * (i + 1));
-    [array[i], array[i2]] = [array[i2], array[i]];
+        let i2 = Math.floor(Math.random() * (i + 1));
+        [array[i], array[i2]] = [array[i2], array[i]];
     }
     return array;
 };
@@ -39,21 +77,21 @@ function arraySize(array){
 };
 function arrayCount(array){
     let counts = {};
-    for (let value of array) {
-    counts[value] = (counts[value] || 0) + 1;
+    for(let value of array){
+        counts[value] = (counts[value] || 0) + 1;
     }
     return counts;
 }
 function arrayMult(array){
     return array.reduce((a, v) => a * v, 1);
 }
-function arrayGacha(array,probability){
-    if(array.length != probability.length) throw new Error("長さがあってないっす！先輩、ちゃんとチェックした方がいいっすよ〜？");
-    let total = probability.reduce((sum, p) => sum + p, 0);
+function arrayGacha(array, prob){
+    if(array.length != prob.length) throw new Error("長さがあってないっす！先輩、ちゃんとチェックした方がいいっすよ〜？");
+    let total = prob.reduce((sum, p) => sum + p, 0);
     let random = Math.random() * total;
     for (let i = 0; i < array.length; i++) {
-        if(random < probability[i]) return array[i];
-        random -= probability[i];
+        if(random < prob[i]) return array[i];
+        random -= prob[i];
     }
 };
 function hask(obj, key){
@@ -64,7 +102,7 @@ function hask(obj, key){
 function copy(moto) {
     if(Array.isArray(moto)){
         let arr = [];
-        for (let i = 0; i < moto.length; i++) {
+        for(let i = 0; i < moto.length; i++){
             arr.push(copy(moto[i]));
         }
         return arr;
@@ -72,7 +110,7 @@ function copy(moto) {
     else if(moto != null && typeof moto == 'object'){
         let obj = {};
         for(let key in moto){
-            if (moto.hasOwnProperty(key)){
+            if(moto.hasOwnProperty(key)){
                 obj[key] = copy(moto[key]);
             }
         }
@@ -90,8 +128,8 @@ function random(min, max) {
     let num = Math.floor(Math.random() * (max - min + 1)) + min;
     return Math.floor(num);
 };
-function fl(num){
-    let res = num ? 1 : 0;
+function fl(val, arr = [0, 1]){
+    let res = val == arr[0] ? arr[1] : arr[0];
     return res;
 }
 function anagramSaySay(text, loop = 10, bet = '<br>'){
@@ -111,7 +149,7 @@ function anagramSaySay(text, loop = 10, bet = '<br>'){
     let cal = (kaijou(len) / optmat) - 1;
 
     let loopen = loop;
-    console.log(`総数:${cal} 回数:${loopen}`);
+    // console.log(`総数:${cal} 回数:${loopen}`);
     if(cal < loopen) menjo = 1;
     
     let reses = [];
@@ -130,14 +168,29 @@ function anagramSaySay(text, loop = 10, bet = '<br>'){
     
     return reses.join(bet);
 }
+function anagramCan(mae, ato){
+    if(mae.length != ato.length) return 0;
+
+    let count = {};
+    for(let ch of mae){
+        count[ch] = (count[ch] || 0) + 1;
+    }
+
+    for(let ch of ato){
+        if(!count[ch]) return 0;
+        count[ch] -= 1;
+    }
+
+    return 1;
+}
 function setLocalStorage(name, value) {
     localStorage.setItem(name, value || "");
 }
 function getLocalStorage(name) {
     return localStorage.getItem(name);
 }
-async function error(){
-    addtext('errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
+async function error(text = 'errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr'){
+    addtext(text)
     await delay(2000);
     // window.open('about:blank', '_self').close();
 }
@@ -156,7 +209,7 @@ function hoshoku(color) {
 
     let ato = `#${compR}${compG}${compB}`
 
-    return ;
+    return ato;
 }
 function mixshoku(c1, c2, ratio = 0.5) {
     let toRGB = c => {
@@ -359,24 +412,24 @@ function addlog(text){
 }
 //#endregion
 //#region description
-let movableDescription = document.getElementById('movableDescription');
+let mobileDesc = document.getElementById('mobileDesc');
 document.addEventListener('mousemove', (e) => {
-    movableDescription.style.left = `${e.clientX + 10}px`;
-    movableDescription.style.top = `${e.clientY + 10}px`;
+    mobileDesc.style.left = `${e.clientX + 10}px`;
+    mobileDesc.style.top = `${e.clientY + 10}px`;
 });
 document.addEventListener('mouseover', (e) => {
     let descTarget = e.target.closest('[data-description]');
-    if (descTarget) {
+    if(descTarget){
         let desc = descTarget.dataset.description;
-        movableDescription.innerText = desc;
-        movableDescription.style.display = 'block';
+        mobileDesc.innerText = desc;
+        mobileDesc.classList.add('show');
     }
 });
 document.addEventListener('mouseout', (e) => {
     let descTarget = e.target.closest('[data-description]');
-    if (descTarget) {
-        movableDescription.innerText = '';
-        movableDescription.style.display = 'none';
+    if(descTarget){
+        mobileDesc.innerText = '';
+        mobileDesc.classList.remove('show');
     }
 });
 //#endregion
@@ -532,4 +585,40 @@ document.addEventListener('pointercancel', (e) => {
     if(e.buttons == 2) cricking = false;
 });
 window.addEventListener('blur', () => { clicking = cricking = false; });
+
+let mouseX = 0;
+let mouseY = 0;
+document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+});
+//#endregion
+//#region fonts
+const Fonts = [
+    // {src:'comicsans', type:'ttf'},
+];
+function fontsLoad(){
+    let id = "font_load_css";
+    let existing = document.getElementById(id);
+    if(existing) existing.remove();
+
+    let css = Fonts.map(f => {
+        let src = `url('assets/${f.src}.${f.type}')`;
+        let weight = f.weight ?? 'normal';
+        return `@font-face{
+            font-family:'${f.src}';
+            src: ${src};
+            font-weight: ${weight};
+            font-style: normal;
+            font-display: swap;
+        }`;
+    }).join('\n');
+
+    let el = document.createElement('style');
+    el.id = id;
+    el.type = 'text/css';
+    el.appendChild(document.createTextNode(css));
+    document.head.appendChild(el);
+}
+fontsLoad();
 //#endregion
