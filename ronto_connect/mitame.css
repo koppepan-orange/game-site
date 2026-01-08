@@ -174,10 +174,23 @@ img{
     top: 0;
     left: 0;
     animation: fadeIn 0.5s ease forwards;
-    z-index: 999;
+    z-index: 23;
     margin-right: 5px;
     margin-bottom: 5px;
 }
+
+/* #region hakaisatsu */
+#hakaisatsu{
+    height: 120vh;
+    aspect-ratio: 1/1;
+    position: fixed;
+    top: -10vh;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2147483647;
+    pointer-events: none;
+}
+/* #endregion */
 
 /* #region area */
 .area{
@@ -571,6 +584,39 @@ img{
 /* #region farmArea 2 */
 #farmArea{
     content: 'farm';
+}
+#farmArea .farm{
+    /* canvas */
+    display: block;
+    background: #ffe19c;
+    margin: 15px auto;
+}
+#farmArea .BTS{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+#farmArea .BTS .bt{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80px;
+    aspect-ratio: 2 / 1;
+    scale: 1.0;
+    border-radius: 15px 0 15px 0;
+    background: #14b13b;
+    color: #b7ff95;
+    font-size: 18px;
+    transition: all 0.1s ease;
+    cursor: pointer;
+}
+#farmArea .BTS .bt:hover{
+    scale: 1.1;
+}
+#farmArea .BTS .bt:active{
+    scale: 0.95;
 }
 /* #endregion */
 

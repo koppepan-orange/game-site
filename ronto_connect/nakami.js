@@ -1,4 +1,4 @@
-z//#region komagome
+//#region komagome
 function delay(ms){
     return new Promise(resolve=>setTimeout(resolve,ms));
 };
@@ -568,6 +568,122 @@ document.addEventListener('mousemove', (e) => {
 });
 
 //#endregion
+//#region セクラテス
+let secrates = [
+    {
+        ind:0,
+        name:'koppepan',
+        arr:['k','o','p','p','e','p','a','n'],
+        limit:3,
+        func: async function(){
+            nicoText('なんにも起こらない＝ヨーン');
+        }
+    },
+    {
+        ind:0,
+        name:'darkness',
+        arr:['d','a','r','k','n','e','s','s'],
+        limit:'n',
+        func: async function(){
+            buffadd(cm(), cm(), 'pow', 2, 1);
+            buffadd(cm(), cm(), 'she', 2, 1);
+            buffadd(cm(), cm(), 'burn', 2, 1);
+            buffadd(cm(), cm(), 'poison', 2, 1);
+            buffadd(cm(), cm(), 'palsy', 2, 1);
+            buffadd(cm(), cm(), 'freeze', 2, 1);
+        }
+    },
+    {
+        ind:0,
+        name:'givememoney',
+        arr:['g','i','v','e','m','e','m','o','n','e','y'],
+        limit:'n',
+        func: async function(){
+            // if(probability(60)) nicoText('乞食成功！'), euroF.add(100);
+            // else nicoText('乞食失敗');
+        }
+    },
+    {
+        ind:0,
+        name:'re',
+        arr:['r','e'],
+        limit:1,
+        func: async function(){
+            let img = document.createElement('img');
+            img.id = 'hakaisatsu';
+            img.src = 'assets/images/systems/hakai[1].png'
+            img.dataset.phase = 1;
+            document.querySelector('body').appendChild(img);
+
+            setTimeout(() => {
+                img.remove();
+                this.ind = 0;
+                this.limit = 1;
+            }, 3000)
+
+            return 0;
+        }
+    },
+    {
+        ind:0,
+        name:'rere',
+        arr:['r','e','r','e'],
+        limit:1,
+        func: async function(){
+            let img = document.getElementById('hakaisatsu');
+            if(!img) return;
+
+            img.src = 'assets/images/systems/hakai[2].png'
+            img.dataset.phase = 2;
+
+            setTimeout(() => {
+                img.remove();
+                this.ind = 0;
+                this.limit = 1;
+            }, 3000)
+
+            return 0;
+        }
+    },
+    {
+        ind:0,
+        name:'rerere',
+        arr:['r','e','r','e','r','e'],
+        limit:1,
+        func: async function(){
+            let img = document.getElementById('hakaisatsu');
+            if(!img) return 1;
+            console.log(img.dataset.phase);
+            if(img.dataset.phase != '2') return 1;
+            location.reload();
+        }
+    },
+]
+document.addEventListener('keydown', async function(e){
+    let key = e.key.toLowerCase();
+    if(key == 'escape') loop = 0;
+
+
+    //これ以降はinput内では機能しない
+    if(document.activeElement.tagName == 'INPUT') return;
+    if(document.activeElement.tagName == 'TEXTAREA') return;
+
+    for(let sec of secrates){
+        let nke = sec.arr[sec.ind];
+        // console.log(`必要は${nke}、押されたは${key}！`);
+        if(key == nke){
+            sec.ind += 1;
+            if(sec.ind == sec.arr.length && sec.limit){
+                console.log(`ジャンゴ！ ${sec.name}発動！！`);
+                sec.ind = 0;
+                let res = await sec.func();
+                if(!res && sec.limit != 'n') sec.limit -= 1;
+            }
+        }
+        else sec.ind = 0;
+    }
+})
+//#endregion
 
 
 //#region ゲーム開始時ログインの動き\
@@ -826,6 +942,22 @@ homC.goFarmD.addEventListener('click', () => AreF.move('farm'));
 //#endregion
 
 //#region 農業しようぜ！
+let farmD = document.getElementById('farmArea');
+let farmC = {
+    c: farmD.querySelector('.farm'),
+    ctx: farmD.querySelector('.farm').getContext('2d'),
+}
+let farmF = {};
+
+farmF.resize = () => {
+    let widrey = window.innerWidth;
+    widrey *= 0.8;
+    farmC.c.width = widrey;
+    farmC.c.height = widrey;
+}
+farmF.resize();
+window.addEventListener('resize', farmF.resize);
+
 //#endregion
 
 //#region アッパーエンジン
@@ -2513,7 +2645,7 @@ loaF.loadI = async() => {
 
     let loaloa = (arr, route) => {
         // console.log("Arrayでした lets 読み込み")
-        let src = "assets/";
+        let src = "assets/images/";
         for(let r of route) src += `${r}/`;
         // console.log(src)
 
@@ -2542,7 +2674,7 @@ loaF.loadI = async() => {
                 console.error(`Image ${src}${mono}.png failed to load.`);
                 loaC.erd += 1;
                 if(loaC.erd > 20) return console.error('さすがにやりすぎbonus'), 1;
-                img.src = `assets/systems/error.png`;
+                img.src = `assets/images/systems/error.png`;
                 loaC.imgD++;
                 if(loaC.imgD == loaC.imgT) loaF.loadS();
             };
