@@ -1,7 +1,12 @@
+/* #region スターターパック */
 html{
     margin: -8px;
     overflow: hidden;
     user-select:none;
+}
+body{
+    width: 100vw;
+    height: 100vh;
 }
 .row{
     display: flex;
@@ -121,15 +126,6 @@ img{
         opacity: 1;
     }
 }
-.color-red{
-    color: #ff1919;
-}
-.color-pink{
-    color: #ff56e9;
-}
-.color-blue{
-    color: #1919ff;
-}
 /* #endregion */
 
 /* #region description */
@@ -201,3 +197,5 @@ img{
     margin-right: 5px;
     margin-bottom: 5px;
 }
+/* #endregion */
+

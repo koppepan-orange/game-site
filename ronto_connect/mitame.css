@@ -586,10 +586,14 @@ img{
     content: 'farm';
 }
 #farmArea .farm{
-    /* canvas */
-    display: block;
-    background: #ffe19c;
-    margin: 15px auto;
+    display: grid;
+    gap: 5px;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    width: 80%;
+    aspect-ratio: 1/1;
+    background: #ffe096;
+    margin: 0 auto;
 }
 #farmArea .BTS{
     display: flex;

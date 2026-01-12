@@ -37,6 +37,12 @@
         {
             "type": "chrome",
             "request": "launch",
+            "name": "farm game",
+            "file": "farm-game/index.html"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
             "name": "stone trader",
             "file": "stone-trader/index.html"
         },

@@ -60,6 +60,22 @@ function kaijou(num){
     if(num == 1) return 1;
     return num * kaijou(num - 1);
 }
+function kaikyu(sta, end, row, val){
+    if(typeof sta != 'number' || typeof end != 'number' || typeof row != 'number' || typeof val != 'number') return console.error('えっと、できれば..引数は全て数字にして欲しい...です......');
+    if(row <= 0) return console.error(`row${row}でしたけど...大丈夫ですか？`);
+    if(sta > end) return console.error('え、えっと...多分、逆です......')
+    if(val < sta || val > end) return console.error('こ、この値..枠から外れてます....');
+
+    let kari = Math.floor((val-sta) / row);
+    let sta2 = sta + kari*row;
+    let end2 = sta + row-1;
+    if(end2 > end) end2 = end;
+
+    let arr = [];
+    for(let i = sta2; i <= end2; i++) arr.push(i);
+
+    return arr;
+}
 function arraySelect(array){
     let select = Math.floor(Math.random()*array.length);
     return array[select];
@@ -229,6 +245,13 @@ function mixshoku(c1, c2, ratio = 0.5) {
     let ato = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
 
     return ato;
+}
+function ranshoku(){
+    let r = random(0, 255);
+    let g = random(0, 255);
+    let b = random(0, 255);
+    let ato = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+    return ato
 }
 //#endregion
 //#region log&text

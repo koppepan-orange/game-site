@@ -1,466 +1,772 @@
-let loc = 'farm';
-let x = 0;
-let y = 0;
-let phase = 1;
-let euro = 100;
-let bet = 0;//共通
-let base = 1;//1,10,100 //ほぼほぼスロット用
-function delay(ms){return new Promise(resolve => setTimeout(resolve, ms));}
-function Back(){
-    const name = document.getElementById('BackButton');
-    switch(loc){
-        case 'farm':
-            loc = 'loby';
-            name.textContent = 'back to field';
-            document.getElementById('MiniGameArea').innerHTML = `<button class="casinobutton" onclick="InTheCasinoSelect('BJ')">Black Jack</button><br><button class="casinobutton" onclick="InTheCasinoSelect('SLa')">Slot-1€</button> <button class="casinobutton" onclick="InTheCasinoSelect('SLb')">Slot-10€</button> <button class="casinobutton" onclick="InTheCasinoSelect('SLc')">Slot-100€</button><br></br>`;
-            document.getElementById('log').textContent = '';
-            break;
-        case 'loby':
-            loc = 'farm';
-            name.textContent = 'go to casino';
-            document.getElementById('MiniGameArea').innerHTML = `<div style="display: flex;"><div id="UIinfo"><img src='assets/wheat.png' style='width: 15px; height: 15px;'>0<br><img src='assets/carrot.png' style='width: 15px; height: 15px;'>0<br><img src='assets/potato.png' style='width: 15px; height: 15px;'>0<br><img src='assets/apple.png' style='width: 15px; height: 15px;'>0<br><img src='assets/goldapple.png' style='width: 15px; height: 15px;'>0</div><div id="UIfield"></div></div><hr noshade="true"><div id="shops" style="text-align: left;">SHOP<br><button class="farmbutton" onclick="BuyTool()">Buy<img src="assets/hoe.png" style="width: 15px; height: 15px;"><span id="Toolprice">200€</span></button><br><button class="farmbutton" onclick="BuyField()">Buy field<img src="assets/field.png" style="width: 15px; height: 15px;"><span id="Fieldprice">100€</span></button><br><button class="farmbutton" onclick="SellAll()">Sell all<img src="assets/euro.png" style="width: 15px; height: 15px;"></button></div>`
-            for(let i = 0; i < had; i++){
-                const Nunber = i + 1;
-                const Zone = document.getElementById('UIfield');
-                const messageElement = document.createElement('button')
-                const br = document.createElement('br');
-                messageElement.textContent = `Farm ${Nunber}`;
-                messageElement.id = `farming-${Nunber}`;
-                messageElement.className = 'farmbutton';
-                messageElement.setAttribute('onclick', `farming('${Nunber}')`);
-                requestAnimationFrame(() => {
-                    Zone.appendChild(messageElement);
-                    if((Nunber % 3) == 0){Zone.appendChild(br);}
-                });
-            }
-            ftekiou();
-            document.getElementById("Fieldprice").innerHTML = fieldprice+"€";
-            document.getElementById("Toolprice").innerHTML = toolprices[equip-1]+"€";
-            document.getElementById('log').textContent = '';
-            break;
-        case 'bj':
-            loc = 'loby';
-            name.textContent = 'back to field';
-            document.getElementById('MiniGameArea').innerHTML = `<button class="casinobutton" onclick="InTheCasinoSelect('BJ')">Black Jack</button><br><button class="casinobutton" onclick="InTheCasinoSelect('SLa')">Slot-1€</button> <button class="casinobutton" onclick="InTheCasinoSelect('SLb')">Slot-10€</button> <button class="casinobutton" onclick="InTheCasinoSelect('SLc')">Slot-100€</button><br></br>`;
-            document.getElementById('log').textContent = '';
-            break;
-        case 'sl'://もしかしたらslaみたいにするかも
-            loc = 'loby';
-            name.textContent = 'back to field';
-            document.getElementById('MiniGameArea').innerHTML = `<button class="casinobutton" onclick="InTheCasinoSelect('BJ')">Black Jack</button><br><button class="casinobutton" onclick="InTheCasinoSelect('SLa')">Slot-1€</button> <button class="casinobutton" onclick="InTheCasinoSelect('SLb')">Slot-10€</button> <button class="casinobutton" onclick="InTheCasinoSelect('SLc')">Slot-100€</button><br></br>`;
-            document.getElementById('log').textContent = '';
-            break;
+//#region komagome
+function delay(ms){
+    return new Promise(resolve=>setTimeout(resolve,ms));
+};
+async function nicoText(mes){
+    let newDiv = document.createElement('div');
+    newDiv.textContent = mes;
+    newDiv.className = 'nicotext';
+    newDiv.style.top = `calc(${random(0, 100)}vh - 20px)`;
+    newDiv.style.right = '0px';
+    document.querySelector('body').appendChild(newDiv);
+
+    requestAnimationFrame(() => {
+    newDiv.style.right = `${window.innerWidth + newDiv.offsetWidth}px`; //なんか電車の問題解いてるみたいだね
+    });
+    
+    await delay(2000); 
+    newDiv.remove();
+};
+function tobiText(youso, mes) {
+    let el = youso;
+    if(typeof el == 'string') el = document.querySelector(youso);
+    if(!el) return console.error('せんぱ〜い？この要素壊れてますよ〜〜？');
+
+    let rect = el.getBoundingClientRect();
+    let left = rect.left + window.scrollX + rect.width / 2;
+    let top = rect.top + window.scrollY + rect.height / 2;
+
+    let node = document.createElement('div');
+    node.className = 'tobitext';
+    node.textContent = mes;
+    node.style.top = `${top}px`;
+    node.style.left = `${left}px`;
+
+    document.body.appendChild(node);
+
+    let duration = 1200;
+    let distance = -48;
+    let jitter = (Math.random() - 0.5) * 10;
+
+    let start = performance.now();
+
+    function easeOutCubic(t){return 1 - Math.pow(1 - t, 3);}
+
+    function frame(now){
+        let t = Math.min(1, (now - start) / duration);
+        let e = easeOutCubic(t);
+        let tsY = distance * e;
+        let tsX = jitter * (1 - e);
+        node.style.transform = `translate(-50%, -50%) translateY(${tsY}px) translateX(${tsX}px)`;
+        node.style.opacity = String(1 - t);
+        if(t < 1) requestAnimationFrame(frame);
+        else node.remove();
     }
+
+    requestAnimationFrame(frame);
+}
+function kaijou(num){
+    if(num == 0) return 0;
+    if(num == 1) return 1;
+    return num * kaijou(num - 1);
+}
+function kaikyu(sta, end, row, val){
+    if(typeof sta != 'number' || typeof end != 'number' || typeof row != 'number' || typeof val != 'number') return console.error('えっと、できれば..引数は全て数字にして欲しい...です......');
+    if(row <= 0) return console.error(`row${row}でしたけど...大丈夫ですか？`);
+    if(sta > end) return console.error('え、えっと...多分、逆です......')
+    if(val < sta || val > end) return console.error('こ、この値..枠から外れてます....');
+
+    let kari = Math.floor((val-sta) / row);
+    let sta2 = sta + kari*row;
+    let end2 = sta2 + row-1;
+    if(end2 > end) end2 = end;
+
+    let arr = [];
+    for(let i = sta2; i <= end2; i++) arr.push(i);
+
+    return arr;
+}
+function arraySelect(array){
+    let select = Math.floor(Math.random()*array.length);
+    return array[select];
+};
+function arrayShuffle(array) {
+    for(let i = array.length - 1; i > 0; i--) {
+        let i2 = Math.floor(Math.random() * (i + 1));
+        [array[i], array[i2]] = [array[i2], array[i]];
+    }
+    return array;
+};
+function arraySize(array){
+    let res = new Set(array).size;
+    return res;
+};
+function arrayCount(array){
+    let counts = {};
+    for(let value of array){
+        counts[value] = (counts[value] || 0) + 1;
+    }
+    return counts;
+}
+function arrayMult(array){
+    return array.reduce((a, v) => a * v, 1);
+}
+function arrayGacha(array, prob){
+    if(array.length != prob.length) throw new Error("長さがあってないっす！先輩、ちゃんとチェックした方がいいっすよ〜？");
+    let total = prob.reduce((sum, p) => sum + p, 0);
+    let random = Math.random() * total;
+    for (let i = 0; i < array.length; i++) {
+        if(random < prob[i]) return array[i];
+        random -= prob[i];
+    }
+};
+function hask(obj, key){
+    let res = obj.hasOwnProperty(key);
+    res = res ? 1 : 0;
+    return res;
+}
+function copy(moto) {
+    if(Array.isArray(moto)){
+        let arr = [];
+        for(let i = 0; i < moto.length; i++){
+            arr.push(copy(moto[i]));
+        }
+        return arr;
+    }
+    else if(moto != null && typeof moto == 'object'){
+        let obj = {};
+        for(let key in moto){
+            if(moto.hasOwnProperty(key)){
+                obj[key] = copy(moto[key]);
+            }
+        }
+        return obj;
+    }
+    else{
+        return moto;
+    }
+}
+function probability(num){
+    return Math.random()*100 <= num;
+    //例:num == 20 → randomが20以内ならtrue,elseならfalseを返す
+};
+function random(min, max) {
+    let num = Math.floor(Math.random() * (max - min + 1)) + min;
+    return Math.floor(num);
+};
+function fl(val, arr = [0, 1]){
+    let res = val == arr[0] ? arr[1] : arr[0];
+    return res;
+}
+function anagramSaySay(text, loop = 10, bet = '<br>'){
+    let menjo = 0;
+    let len = text.length;
+    if(len < 4) menjo = 1, console.log('長さが3以下なんで最大6っす');
+    
+    let optout = text.split('');
+    let optcou = arrayCount(optout);
+    let optvals = [];
+    for(a of Object.keys(optcou)){
+        let b = optcou[a];
+        b = kaijou(b);
+        optvals.push(b);
+    }
+    let optmat = arrayMult(optvals);
+    let cal = (kaijou(len) / optmat) - 1;
+
+    let loopen = loop;
+    // console.log(`総数:${cal} 回数:${loopen}`);
+    if(cal < loopen) menjo = 1;
+    
+    let reses = [];
+    while(loopen > 0){
+        loopen -= 1;
+        let res = arrayShuffle(optout).join(''); 
+        if(reses.includes(res)){loopen += 1; continue}
+        
+        if(res == text && !menjo){loopen += 1; continue;}
+
+        if(res == text && menjo && reses.length < cal){loopen += 1; continue}
+        else if(res == text && menjo) res = '[重複エラー]';
+
+        reses.push(res);
+    }
+    
+    return reses.join(bet);
+}
+function anagramCan(mae, ato){
+    if(mae.length != ato.length) return 0;
+
+    let count = {};
+    for(let ch of mae){
+        count[ch] = (count[ch] || 0) + 1;
+    }
+
+    for(let ch of ato){
+        if(!count[ch]) return 0;
+        count[ch] -= 1;
+    }
+
+    return 1;
+}
+function setLocalStorage(name, value) {
+    localStorage.setItem(name, value || "");
+}
+function getLocalStorage(name) {
+    return localStorage.getItem(name);
+}
+async function error(text = 'errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr'){
+    addtext(text)
+    await delay(2000);
+    // window.open('about:blank', '_self').close();
+}
+function hoshoku(color) {
+    color = color.replace(/^#/, '');
+
+    if(color.length != 6) return console.log('カラーコードは6桁、ですよ〜？楽しないでくださいね♪')
+
+    let r = parseInt(color.slice(0, 2), 16);
+    let g = parseInt(color.slice(2, 4), 16);
+    let b = parseInt(color.slice(4, 6), 16);
+
+    let compR = (255 - r).toString(16).padStart(2, '0');
+    let compG = (255 - g).toString(16).padStart(2, '0');
+    let compB = (255 - b).toString(16).padStart(2, '0');
+
+    let ato = `#${compR}${compG}${compB}`
+
+    return ato;
+}
+function mixshoku(c1, c2, ratio = 0.5) {
+    let toRGB = c => {
+        c = c.replace('#', '');
+        if (c.length === 3) c = c.split('').map(x => x + x).join('');
+        let n = parseInt(c, 16);
+        return [n >> 16, (n >> 8) & 255, n & 255];
+    };
+
+    let [r1, g1, b1] = toRGB(c1);
+    let [r2, g2, b2] = toRGB(c2);
+
+    let r = Math.round(r1 + (r2 - r1) * ratio);
+    let g = Math.round(g1 + (g2 - g1) * ratio);
+    let b = Math.round(b1 + (b2 - b1) * ratio);
+
+    let ato = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+
+    return ato;
+}
+function ranshoku(){
+    let r = random(0, 255);
+    let g = random(0, 255);
+    let b = random(0, 255);
+    let ato = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+    return ato
+}
+//#endregion
+//#region log&text
+let textDiv = document.querySelector('#text');
+let autoDelay = 1;
+let skipText = false;
+let clearText = false;
+let textShowing = 0;
+
+function colorcheck(rawtext) {
+    let text = [];
+    let color = null;
+    let colors = [
+        {
+            name: 'red',
+            sym: '*',
+            col: '#ff4040'
+        },
+        {
+            name: 'pink',
+            sym: '&',
+            col: '#ff80bf'
+        },
+        {
+            name: 'yell',
+            sym: '^',
+            col: '#ffff40'
+        }
+    ]
+
+    for(let i = 0; i < rawtext.length; i++){
+        let sym = false;
+        for(let c of colors){
+            if(rawtext[i] == c.sym && rawtext[i + 1] == c.sym){
+                console.log(`→${rawtext[i]}← 発見！ ${c.name}色です`)
+                color = color ? null : c.col;
+                i++;
+                sym = true;
+                break;
+            }
+        }
+        
+        if(sym) continue;
+        if(color) console.log(color)
+        text.push({
+            char: rawtext[i],
+            color: color
+        });
+    }
+    return text;
 }
 
-//このへん農業。まあ基礎というか基盤というか...
-let crop = {
-    wheat: 0,
-    carrot: 0,
-    potato: 0,
-    apple: 0,
-    goldapple: 0,
+let queueAddtext = [];
+let loopAddtext = 0;
+async function waitforAddtext(){
+    let len = queueAddtext.length;
+
+    if(len == 0) loopAddtext = 0;
+    else loopAddtext = 1;
+
+    if(!loopAddtext) return console.log('loopがないんでしゅーりょー');
+    requestAnimationFrame(waitforAddtext);
+
+    if(textShowing) return console.log('文字表示されたんでスキップ');
+    
+    let raw = queueAddtext.shift();
+    // console.log(`${raw}を送信します`);
+    // console.log(`残り: (${len - 1})[${queueAddtext}]`);
+    await addtext(raw);
 }
-let dofarm = [
-    {
-        crop:['wheat','carrot'],
-        nume:['5.1','3.0'],
-    },
-    {
-        crop:['wheat','carrot','potato'],
-        nume:['10.3','5.1','3.0'],
-    },
-    {
-        crop:['wheat','carrot','potato','apple'],
-        nume:['15.5','10.3','5.1','3.0'],
-    },
-    {
-        crop:['wheat','carrot','potato','apple'],
-        nume:['20.7','15.5','10.3','5.1'],
-    },
-    {
-        crop:['wheat','carrot','potato','apple','goldapple'],
-        nume:['25.10','20.7','15.5','10.3','2.0'],
-    },
-    {
-        crop:['wheat','carrot','potato','apple','goldapple'],
-        nume:['30.17','25.10','20.7','15.5','10.3'],
-    },
-    {
-        crop:['wheat','carrot','potato','apple','goldapple'],
-        nume:['40.20','30.20','25.10','20.7','15.5'],
-    },
-]
-let equip = 1;
-let had = 0;
-let toolprices = [200, 500, 1000, 3000, 5000, 10000];
-let fieldprice = 100;
-function ftekiou(){
-    document.getElementById("PlayerMoney").innerHTML = "euro:" + euro + "€";
-    document.getElementById("UIinfo").innerHTML = "<img src='assets/wheat.png' style='width: 15px; height: 15px;'>" + crop.wheat + "<br><img src='assets/carrot.png' style='width: 15px; height: 15px;'>" + crop.carrot + "<br><img src='assets/potato.png' style='width: 15px; height: 15px;'>" + crop.potato + "<br><img src='assets/apple.png' style='width: 15px; height: 15px;'>" + crop.apple + "<br><img src='assets/goldapple.png' style='width: 15px; height: 15px;'>" + crop.goldapple;
-}
-async function farming(code) {
-    let ZatuZatuNum = 0;
-    for(let SakuMotu of dofarm[equip-1].crop){
-        ZatuZatuNum++
-        x = dofarm[equip-1].nume[ZatuZatuNum-1].split(".");
-        let N1 = +x[0];
-        let N2 = +x[1];
-        x = Math.floor(Math.random()*N1)+N2;
-        eval('crop.'+SakuMotu+' += x');
+async function addtext(raw){
+    if(!raw) return console.log('「内容が？内容が〜〜？ないよ〜〜〜つってwwww直せ」');
+
+    if(textShowing){
+        queueAddtext.push(raw);
+
+        if(!loopAddtext) waitforAddtext();
+        return;
     }
-    ftekiou();
-    document.getElementById(`farming-${code}`).style.display = 'none';
-    await delay(2500);
-    if(document.getElementById(`farming-${code}`)){document.getElementById(`farming-${code}`).style.display = 'inline'};
+    
+    textShowing = 1;
+    text = colorcheck(raw);
+    textDiv.innerHTML = ""; // 中身をリセット
+    textDiv.style.display = "block"; // 表示
+    let index = 0;
+    clearText = false; // 消去フラグをリセット
+
+    return new Promise((resolve) => {
+        async function type() {
+                if (index < text.length) {
+                if (skipText) {
+                    // スキップ処理
+                    while (index < text.length) {
+                            let span = document.createElement("span");
+                            span.textContent = text[index].char;
+                            if (text[index].color) {
+                            span.classList.add(`color-${text[index].color}`);
+                            }
+                            textDiv.appendChild(span);
+                            index++;
+                    }
+                    index = text.length; // 全ての文字を表示済みにする
+                    skipText = false;
+                    setTimeout(type, 10);
+                } else {
+                    // 通常の文字表示
+                    let span = document.createElement("span");
+                    span.textContent = text[index].char;
+                    if (text[index].color) {
+                            span.classList.add(`color-${text[index].color}`);
+                    }
+                    textDiv.appendChild(span);
+
+                    index++;
+                    setTimeout(type, 80); // 次の文字を表示する間隔
+                }
+                } else {
+                addlog(textDiv.innerHTML);
+                let waitTime = autoDelay * 1000;
+                let timeout = new Promise(resolve => setTimeout(resolve, waitTime));
+                let userAction = new Promise(resolve => {
+                    function waitToClear(event) {
+                            if (event.type === 'click' || event.key === 'z' || event.key === 'Enter') {
+                            document.removeEventListener('click', waitToClear);
+                            document.removeEventListener('keydown', waitToClear);
+                            resolve();
+                            }
+                    }
+                    document.addEventListener('click', waitToClear);
+                    document.addEventListener('keydown', waitToClear);
+                });
+
+                Promise.race([timeout, userAction]).then(() => {
+                    textDiv.textContent = "";
+                    textDiv.style.display = "none";
+                    clearText = true;
+                    skipText = false
+                    textShowing = 0;
+                    resolve('end'); // Promiseを解決
+                });
+                }
+        }
+        type();
+    });
 }
-function BuyTool() {
-    if(toolprices[equip-1] <= euro) {
-        euro -= toolprices[equip-1];
-        equip += 1;
-        document.getElementById("Toolprice").innerHTML = toolprices[equip-1]+"€";
-        ftekiou();
+document.addEventListener('keydown', (e) => {
+    if(e.key === 'z' || e.key === 'Enter'){
+        skipText = true;
+    }
+});
+
+document.addEventListener('keyup', (e) => {
+    if(e.key === 'z' || e.key === 'Enter'){
+        skipText = false;
+    }
+});
+
+document.addEventListener('click', () => {
+    skipText = true;
+    setTimeout(() => skipText = false, 50); // 一時的にスキップを有効化
+});
+
+let logOOmoto = document.querySelector('#log');
+let log = document.querySelector('#log .log');
+let logOpener = document.querySelector('#log .opener');
+let log_open = (code) => {
+    if((!logOOmoto.classList.contains('tog') || code == 'o') && code != 'c'){
+        logOOmoto.classList.add('tog');
+        logOpener.textContent = '<';
+
+    }else{
+        logOOmoto.classList.remove('tog');
+        logOpener.textContent = '>';
     }
 }
-function BuyField(){
-    if (euro >= fieldprice) {
-        euro -= fieldprice;
-        had += 1;
+logOpener.addEventListener('click', log_open);
+
+function addlog(text){
+    log.innerHTML += text + '<br>';
+    log.scrollTop = log.scrollHeight;
+}
+//#endregion
+//#region description
+let mobileDesc = document.getElementById('mobileDesc');
+document.addEventListener('mousemove', (e) => {
+    mobileDesc.style.left = `${e.clientX + 10}px`;
+    mobileDesc.style.top = `${e.clientY + 10}px`;
+});
+document.addEventListener('mouseover', (e) => {
+    let descTarget = e.target.closest('[data-description]');
+    if(descTarget){
+        let desc = descTarget.dataset.description;
+        mobileDesc.innerText = desc;
+        mobileDesc.classList.add('show');
+    }
+});
+document.addEventListener('mouseout', (e) => {
+    let descTarget = e.target.closest('[data-description]');
+    if(descTarget){
+        mobileDesc.innerText = '';
+        mobileDesc.classList.remove('show');
+    }
+});
+//#endregion
+//#region draggable
+document.addEventListener('mousedown', e => {
+    // let descTarget = e.target.closest('[data-description]');
+    let div = e.target;
+    
+    if(!div.classList.contains('draggable')) return;
+    offsetX = e.clientX - div.getBoundingClientRect().left;
+    offsetY = e.clientY - div.getBoundingClientRect().top;
+    
+    function onMouseMove(e) {
+        div.style.left = `${e.clientX - offsetX}px`;
+        div.style.top = `${e.clientY - offsetY}px`;
+    }
+
+    function onMouseUp() {
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+    }
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+});
+//#endregion 
+//#region tk
+class tk{
+    letructor(type, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
+        let youso = document.createElement(type);
+        youso.className = `tk ${type}`;
+
+        let yoko = ['x', 'w'];
+        for(let n of yoko){
+            if(typeof eval(n) != 'string' || typeof eval(n) == 'string' && !eval(n).endsWith('%')) continue;
+            let num = eval(n).slice(0, -1);
+            eval(n) = num * window.innerWidth / 100;
+        }
+
+        let tate = ['y', 'h'];
+        for(let n of tate){
+            if(typeof eval(n) != 'string' || typeof eval(n) == 'string' && !eval(n).endsWith('%')) continue;
+            let num = eval(n).slice(0, -1);
+            eval(n) = num * window.innerHeight / 100;
+        }
+
+        console.log(x, y, w, h);
+
+        youso.style.width = `${w}px`;
+        youso.style.height = `${h}px`;
+
+        youso.style.left = `${x}px`;
+        youso.style.top = `${y}px`;
         
-        ftekiou();
-        const Zone = document.getElementById('UIfield');
-        const messageElement = document.createElement('button'), br = document.createElement('br');
-        messageElement.textContent = `Farm ${had}`;
-        messageElement.id = `farming-${had}`;
-        messageElement.className = 'farmbutton';
-        messageElement.setAttribute('onclick', `farming('${had}')`);
-        requestAnimationFrame(() => {
-            Zone.appendChild(messageElement);
-            if((had % 3) == 0){Zone.appendChild(br);}
-        });
-        fieldprice += 100;
-        document.getElementById("Fieldprice").innerHTML = fieldprice+"€";
+        if(x == 'half' && y == 'half') youso.classList.add('cenXY');
+         else if(x == 'half') youso.classList.add('cenX');
+         else if(y == 'half') youso.classList.add('cenY');
+
+        this.youso = youso;
+    };
+
+    attrAdd(dict = 'none'){
+        if(dict == 'none') return;
+        
+        if(typeof dict == 'string'){
+            //attr: nanka
+            let [key, val] = dict.split(':');
+             key = key.trim();
+             val = val.trim();
+            this.youso.setAttribute(key, val);
+            return 0;
+        }
+
+        if(typeof dict != 'object') return 1;
+
+        for(let key in dict) this.youso.setAttribute(key, dict[key]);
+
+        return 0;
     }
+
+    styleAdd(dict){
+        for(let key in dict) this.youso.style[key] = dict[key];
+    }
+
+    classAdd(name){this.youso.classList.add(name)};
+    classRem(name){this.youso.classList.remove(name)};
+    classTog(name){this.youso.classList.toggle(name)};
+    classHas(name){
+        let is = this.youso.classList.contains(name);
+        return is;
+    }
+
+    evAdd(type, func){
+        this.youso.addEventListener(type, func);
+    }
+
+    yousoAdd(youso){
+        this.youso.appendChild(youso);
+    }
+
+    append(){
+        document.body.appendChild(this.youso);
+    };
+
+    remove(){
+        this.youso.remove();
+    };
 }
-function SellAll() {
-    euro += crop.wheat;
-    euro += crop.carrot * 2;
-    euro += crop.potato * 3;
-    euro += crop.apple * 4;
-    euro += crop.goldapple * 5;
-    crop.wheat = 0;
-    crop.carrot = 0;
-    crop.potato = 0;
-    crop.apple = 0;
-    crop.goldapple = 0;
-    ftekiou();
+
+function tkTest(){
+    let mono = new tk('div', 'half', 'half');
+    mono.classAdd('draggable');
+    mono.styleAdd({background: '#f0f8ff'});
+
+    let mono2 = new tk('div', 'half', 'half');
+    mono2.styleAdd({background: '#cfe9ff'});
+
+    mono.yousoAdd(mono2.div);
+
+    mono.evAdd('click', function(){
+        nicoText('clicked');
+    });
+
+    mono.append();
+}
+
+//#endregion
+//#region observer
+let keys = {}
+document.addEventListener('keydown', e => {
+    let key = e.key.toLowerCase();
+    if(e.key == ' ') key = 'space';
+    keys[key] = true;
+});
+document.addEventListener('keyup', e => {
+    let key = e.key.toLowerCase();
+    if(e.key == ' ') key = 'space';
+    keys[key] = false;
+});
+
+let clicking = false;
+let cricking = false;
+document.addEventListener('pointerdown', (e) => {
+    if(e.buttons == 0) clicking = true;
+    if(e.buttons == 2) cricking = true;
+});
+document.addEventListener('pointerup', (e) => {
+    if(e.buttons == 0) clicking = false;
+    if(e.buttons == 2) cricking = false;
+});
+document.addEventListener('pointercancel', (e) => {
+    if(e.buttons == 0) clicking = false;
+    if(e.buttons == 2) cricking = false;
+});
+window.addEventListener('blur', () => { clicking = cricking = false; });
+
+let mouseX = 0;
+let mouseY = 0;
+document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+});
+//#endregion
+//#region fonts
+const Fonts = [
+    // {src:'comicsans', type:'ttf'},
+];
+function fontsLoad(){
+    let id = "font_load_css";
+    let existing = document.getElementById(id);
+    if(existing) existing.remove();
+
+    let css = Fonts.map(f => {
+        let src = `url('assets/${f.src}.${f.type}')`;
+        let weight = f.weight ?? 'normal';
+        return `@font-face{
+            font-family:'${f.src}';
+            src: ${src};
+            font-weight: ${weight};
+            font-style: normal;
+            font-display: swap;
+        }`;
+    }).join('\n');
+
+    let el = document.createElement('style');
+    el.id = id;
+    el.type = 'text/css';
+    el.appendChild(document.createTextNode(css));
+    document.head.appendChild(el);
+}
+fontsLoad();
+//#endregion
+
+
+//#region 農業しようぜ！
+let farmD = document.getElementById('farmArea');
+let farmC = {
+    main:farmD.querySelector('.main'),
+    block: 0,
+    blocks: 9,
+    row: 3, //正方形なんでcolは無し
+    fieR: 4 //畑の方のrow こちらも正方形
     
 }
+farmC.Blocks = [];
+let farmF = {};
 
-//こっからCasino。メイン
-function InTheCasino(){
-    document.getElementById('MiniGameArea').innerHTML = `<button class="casinobutton" onclick="InTheCasinoSelect('BJ')">Black Jack</button><br><button class="casinobutton" onclick="InTheCasinoSelect('SLa')">Slot-1€</button> <button class="casinobutton" onclick="InTheCasinoSelect('SLb')">Slot-10€</button> <button class="casinobutton" onclick="InTheCasinoSelect('SLc')">Slot-100€</button><br></br>`;
-}  
-function InTheCasinoSelect(name){
-    switch(name){
-        case 'BJ':
-            loc = 'bj';
-            document.getElementById('BackButton').textContent = 'back to loby';
-            document.getElementById('MiniGameArea').innerHTML = `<b>dealer</b><br><span id="DealerValue">0</span><br><br><b>player</b><br><span id="PlayerValue">0</span><hr noshade="true"><div><span id="BJCommandButtons"><button class="casinobutton" onclick="BJrestart()">start</button></span></div><span id="log">pless "start" to game start</span><hr noshade="true"><span id="PlayerBJP">0p</span><div id="Items">Items<br><button class="casinobutton" onclick="BJBuyItem('incr')">incr-card</button><br><button class="casinobutton" onclick="BJBuyItem('decr')">decr-card</button><br></div>`;
-            break;
-        case 'SLa':
-            loc = 'sl';
-            document.getElementById('BackButton').textContent = 'back to loby';
-            base = 1;
-            phase = 1;
-            bet = 1;
-            document.getElementById('MiniGameArea').innerHTML = `<div id="SLmain"><span id="sl0-0"></span> <span id="sl0-1"></span> <span id="sl0-2"></span> <span id="sl0-3"></span> <span id="sl0-4"></span><br><span id="sl1-0"></span> <span id="sl1-1"></span> <span id="sl1-2"></span> <span id="sl1-3"></span> <span id="sl1-4"></span><br><span id="sl2-0"></span> <span id="sl2-1"></span> <span id="sl2-2"></span> <span id="sl2-3"></span> <span id="sl2-4"></span><br></div><div id="SLCommandButtons"><button id="casinobutton" onclick="bet += 1; if(bet > 3){bet = 1;}; SLbettekiou();">Bet</button> <button class="casinobutton" onclick="SLstart()">start</button>  <button class="casinobutton" onclick="InTheCasino()">exit</button></div>`
-            document.getElementById('log').textContent = 'betTime!!';
-            SLtekiou(); SLbettekiou();
-            break;
-        case 'SLb':
-            loc = 'sl';
-            document.getElementById('BackButton').textContent = 'back to loby';
-            base = 10;
-            phase = 1;
-            bet = 1;
-            document.getElementById('MiniGameArea').innerHTML = `<div id="SLmain"><span id="sl0-0"></span> <span id="sl0-1"></span> <span id="sl0-2"></span> <span id="sl0-3"></span> <span id="sl0-4"></span><br><span id="sl1-0"></span> <span id="sl1-1"></span> <span id="sl1-2"></span> <span id="sl1-3"></span> <span id="sl1-4"></span><br><span id="sl2-0"></span> <span id="sl2-1"></span> <span id="sl2-2"></span> <span id="sl2-3"></span> <span id="sl2-4"></span><br></div><div id="SLCommandButtons"><button id="casinobutton" onclick="bet += 1; if(bet > 3){bet = 1;}; SLbettekiou();">Bet</button> <button class="casinobutton" onclick="SLstart()">start</button>  <button class="casinobutton" onclick="InTheCasino()">exit</button></div>`
-            document.getElementById('log').textContent = 'betTime!!';
-            SLtekiou(); SLbettekiou();
-            break;
-        case 'SLc':
-            loc = 'sl';
-            document.getElementById('BackButton').textContent = 'back to loby';
-            base = 100;
-            phase = 1;
-            bet = 1;
-            document.getElementById('MiniGameArea').innerHTML = `<div id="SLmain"><span id="sl0-0"></span> <span id="sl0-1"></span> <span id="sl0-2"></span> <span id="sl0-3"></span> <span id="sl0-4"></span><br><span id="sl1-0"></span> <span id="sl1-1"></span> <span id="sl1-2"></span> <span id="sl1-3"></span> <span id="sl1-4"></span><br><span id="sl2-0"></span> <span id="sl2-1"></span> <span id="sl2-2"></span> <span id="sl2-3"></span> <span id="sl2-4"></span><br></div><div id="SLCommandButtons"><button id="casinobutton" onclick="bet += 1; if(bet > 3){bet = 1;}; SLbettekiou();">Bet</button> <button class="casinobutton" onclick="SLstart()">start</button>  <button class="casinobutton" onclick="InTheCasino()">exit</button></div>`
-            document.getElementById('log').textContent = 'betTime!!';
-            SLtekiou(); SLbettekiou();
-            break;
-    }
-}
+farmF.load = () => {
+    for(let i=0; i<farmC.row; i++){ //flex
+        let div02 = document.createElement('div');
+        div02.className = `row`;
 
-//ここからBJ(ブラックジャック)
-let dealervalue = 0;
-let playervalue = 0;
-let bjp = 0;//black jack point
-async function BJrestart(){
-    dealervalue = 0;
-    playervalue = 0;
-    phase = 1;
-    bet = 0;
-    document.getElementById('log').textContent = 'betTime!!';
-    document.getElementById('BJCommandButtons').innerHTML = '<input type="number" id="bet" min="1" max="100" placeholder="bet"><button class="casinobutton" id="BetButton" onclick="BJbettimeEnd()">OK</button>';
-    BJtekiou();
-    //document.getElementById('bet').value = 5;
-}
-function BJbettimeEnd(){
-    bet = document.getElementById('bet').value;
-    if (bet <= euro && bet > 0){
-    document.getElementById('log').textContent = 'beted!!';
-    document.getElementById('BJCommandButtons').innerHTML = '';
-    euro -= bet;
-    x = Math.floor(Math.random() * 10) + 1;
-    dealervalue += x;
-    document.getElementById('log').textContent = 'dealerは' + x + 'のカードを引きました！';
-    BJtekiou()
-    document.getElementById('BJCommandButtons').innerHTML = '<button class="casinobutton" id="BJhit" onclick="BJhit()">hit</button>  <button class="casinobutton" id="BJstand" onclick="BJstand()">stand</button>';
-    }else{document.getElementById('BJCommandButtons').innerHTML = '<input type="number" id="bet" min="1" max="100" placeholder="bet"><button class="casinobutton" id="BetButton" onclick="BJbettimeEnd()">OK</button>';}
-}
-function BJtekiou(){
-    document.getElementById('PlayerValue').textContent = playervalue;
-    document.getElementById('DealerValue').textContent = dealervalue;
-    document.getElementById('PlayerMoney').textContent = 'euto:'+euro+'€';
-    document.getElementById('PlayerBJP').textContent = bjp + 'p';
-}
-function BJhit(){
-    if(phase == 1){
-    x = Math.floor(Math.random()*10)+1;
-    playervalue += x;
-    BJtekiou();
-    document.getElementById('log').textContent = 'playerは' + x + 'のカードを引きました！';
-    if(playervalue > 21||playervalue == 21){window.setTimeout(BJResult(playervalue,dealervalue), 1000);}
-    }}
-async function BJstand(){
-    phase = 2
-    document.getElementById('BJCommandButtons').innerHTML = '';
-    while(dealervalue < 17){    
-        x = Math.floor(Math.random()*10)+1;
-        dealervalue += x;
-        BJtekiou();
-        document.getElementById('log').textContent = 'dealerは' + x + 'のカードを引きました！';
-        await delay(1000);
-    }
-    BJResult(playervalue,dealervalue);
-}
-function BJResult(pv,dv){
-    phase = 3;
-    document.getElementById('BJCommandButtons').innerHTML = '';
-    if(pv == 21||dv > 21||dv < pv&&dv < 21&&pv < 21){
-        document.getElementById('log').textContent = 'youwin!';
-        x = 2; bjp += 1; if(pv == 21){x = 3; bjp += 1;};
-        euro += +(bet * x);
-    }else if(dv == 21||pv > 21||pv < dv&&pv < 21&&dv < 21){
-        document.getElementById('log').textContent = 'youlose...';
-    }else if(pv == dv){
-        document.getElementById('log').textContent = 'draw!';
-        euro += +bet;
-    }else{
-        document.getElementById('log').textContent = 'fuckyou!!!';
-        euro = 0;
-    }
-    BJtekiou()
-    document.getElementById('BJCommandButtons').innerHTML = '<button class="casinobutton" id="reset" onclick="BJrestart()">restart</button>';
-
-}
-// こっからDLC。アイテムとか作ってくよ
-function BJBuyItem(name){
-    switch(name){
-        case 'incr':
-            if(playervalue <= 16){
-                playervalue += 5; BJtekiou();
-                bjp -= 1;
-                document.getElementById('log').textContent = 'increased points just five!';
-                if(playervalue >= 21){window.setTimeout(BJResult(playervalue,dealervalue), 1000);}
-            } else {document.getElementById('log').textContent = 'want less points...';}
-            break;
-        case 'decr':
-            if(playervalue >= 5){
-                playervalue -= 5; BJtekiou();
-                bjp += 1;
-                document.getElementById('log').textContent = 'decreased points just five!';
-            }else{document.getElementById('log').textContent = 'want more points...';}
-            break;
-    }
-}
-
-// ここからSL(スロット)
-let slrolling = 0;
-let slp = 0;
-let slpt = ["wheat","carrot","potato","apple","euro","wheat","carrot","potato","apple","goldapple"];//0~9
-let sls = [
-    [9,9,9,9,9],
-    [0,0,0,0,0],
-    [1,1,1,1,1]
-]
-let slspt = [
-    ["goldapple","goldapple","goldapple","goldapple","goldapple"],
-    ["wheat","wheat","wheat","wheat","wheat"],
-    ["carrot","carrot","carrot","carrot","carrot"]
-]
-function SLrestart(){
-    phase = 1;
-    bet = 1;
-    document.getElementById('log').textContent = 'betTime!!';
-    document.getElementById('SLCommandButtons').innerHTML = `<button id="casinobutton" onclick="bet += 1; if(bet > 3){bet = 1;}; SLbettekiou();">Bet</button> <button class="casinobutton" onclick="SLstart()">start</button>  <button class="casinobutton" onclick="InTheCasino()">exit</button>`;
-    SLtekiou();
-    SLbettekiou();
-}
-function SLbettekiou(){
-    switch(bet){
-        case 1:
-            document.getElementById('SLmain').style.backgroundColor = '#80ee80';
-            break;
-        case 2:
-            document.getElementById('SLmain').style.backgroundColor = '#ffff6b';
-            break;
-        case 3:
-            document.getElementById('SLmain').style.backgroundColor = '#f64bff';
-            break;
-    }
-}
-function SLtekiou(){
-    document.getElementById('PlayerMoney').textContent = 'euro:'+euro+'€';
-    slspt[0][0] = slpt[sls[0][0]];
-    slspt[0][1] = slpt[sls[0][1]];
-    slspt[0][2] = slpt[sls[0][2]];
-    slspt[0][3] = slpt[sls[0][3]];
-    slspt[0][4] = slpt[sls[0][4]];
-
-    slspt[1][0] = slpt[sls[1][0]];
-    slspt[1][1] = slpt[sls[1][1]];
-    slspt[1][2] = slpt[sls[1][2]];
-    slspt[1][3] = slpt[sls[1][3]];
-    slspt[1][4] = slpt[sls[1][4]];
-
-    slspt[2][0] = slpt[sls[2][0]];
-    slspt[2][1] = slpt[sls[2][1]];
-    slspt[2][2] = slpt[sls[2][2]];
-    slspt[2][3] = slpt[sls[2][3]];
-    slspt[2][4] = slpt[sls[2][4]];
-
-    document.getElementById('sl0-0').innerHTML = "<img src='assets/"+slpt[sls[0][0]]+".png' style='width: 15px; height: 15px;'>";
-    document.getElementById('sl0-1').innerHTML = "<img src='assets/"+slpt[sls[0][1]]+".png' style='width: 15px; height: 15px;'>";
-    document.getElementById('sl0-2').innerHTML = "<img src='assets/"+slpt[sls[0][2]]+".png' style='width: 15px; height: 15px;'>";
-    document.getElementById('sl0-3').innerHTML = "<img src='assets/"+slpt[sls[0][3]]+".png' style='width: 15px; height: 15px;'>";
-    document.getElementById('sl0-4').innerHTML = "<img src='assets/"+slpt[sls[0][4]]+".png' style='width: 15px; height: 15px;'>";
-
-    document.getElementById('sl1-0').innerHTML = "<img src='assets/"+slpt[sls[1][0]]+".png' style='width: 15px; height: 15px;'>";
-    document.getElementById('sl1-1').innerHTML = "<img src='assets/"+slpt[sls[1][1]]+".png' style='width: 15px; height: 15px;'>";
-    document.getElementById('sl1-2').innerHTML = "<img src='assets/"+slpt[sls[1][2]]+".png' style='width: 15px; height: 15px;'>";
-    document.getElementById('sl1-3').innerHTML = "<img src='assets/"+slpt[sls[1][3]]+".png' style='width: 15px; height: 15px;'>";
-    document.getElementById('sl1-4').innerHTML = "<img src='assets/"+slpt[sls[1][4]]+".png' style='width: 15px; height: 15px;'>";
-
-    document.getElementById('sl2-0').innerHTML = "<img src='assets/"+slpt[sls[2][0]]+".png' style='width: 15px; height: 15px;'>";
-    document.getElementById('sl2-1').innerHTML = "<img src='assets/"+slpt[sls[2][1]]+".png' style='width: 15px; height: 15px;'>";
-    document.getElementById('sl2-2').innerHTML = "<img src='assets/"+slpt[sls[2][2]]+".png' style='width: 15px; height: 15px;'>";
-    document.getElementById('sl2-3').innerHTML = "<img src='assets/"+slpt[sls[2][3]]+".png' style='width: 15px; height: 15px;'>";
-    document.getElementById('sl2-4').innerHTML = "<img src='assets/"+slpt[sls[2][4]]+".png' style='width: 15px; height: 15px;'>";
-
-
-}
-async function SLstart(){
-    document.getElementById('log').textContent = '';
-    if(bet*base <= euro){
-        document.getElementById('SLCommandButtons').innerHTML = `<button class="SLbutton" onclick="slrolling+=1;">stop</button>`;
-        euro -= bet*base;
-        slrolling = 0;
-        sls[1][0] = Math.floor(Math.random()*10);
-        sls[1][1] = Math.floor(Math.random()*10);
-        sls[1][2] = Math.floor(Math.random()*10);
-        sls[1][3] = Math.floor(Math.random()*10);
-        sls[1][4] = Math.floor(Math.random()*10);
-        SLtekiou();
-        while(slrolling < 5){
-            if(slrolling <= 0){
-                sls[1][0] += 1;
-                if(sls[1][0] == 10){sls[1][0] = 0;}
-                sls[0][0] = sls[1][0]-1;
-                if(sls[0][0] == -1){sls[0][0] = 9;}
-                sls[2][0] = sls[1][0]+1;
-                if(sls[2][0] == 10){sls[2][0] = 0;} 
+        for(let i2=0; i2<farmC.row; i2++){
+            let block = {};
+            let div0 = document.createElement('div'); //grid
+            div0.className = `block b${i}${i2}`;
+            div0.style.backgroundColor = ranshoku()
+            
+            block.mases = [];
+            for(let i3=0; i3<farmC.fieR**2; i3++){
+                console.log('mas')
+                let div = document.createElement('div'); //block
+                div.className = `mas m${i3}`;
+                div0.appendChild(div);
+                block.mases.push(div);
             }
-            if(slrolling <= 1){
-                sls[1][1] += 1;
-                if(sls[1][1] == 10){sls[1][1] = 0;}
-                sls[0][1] = sls[1][1]-1;
-                if(sls[0][1] == -1){sls[0][1] = 9;}
-                sls[2][1] = sls[1][1]+1;
-                if(sls[2][1] == 10){sls[2][1] = 0;}
-            }
-            if(slrolling <= 2){
-                sls[1][2] += 1;
-                if(sls[1][2] == 10){sls[1][2] = 0;}
-                sls[0][2] = sls[1][2]-1;
-                if(sls[0][2] == -1){sls[0][2] = 9;}
-                sls[2][2] = sls[1][2]+1;
-                if(sls[2][2] == 10){sls[2][2] = 0;}
-            }
-            if(slrolling <= 3){
-                sls[1][3] += 1;
-                if(sls[1][3] == 10){sls[1][3] = 0;}
-                sls[0][3] = sls[1][3]-1;
-                if(sls[0][3] == -1){sls[0][3] = 9;}
-                sls[2][3] = sls[1][3]+1;
-                if(sls[2][3] == 10){sls[2][3] = 0;}
-            }
-            if(slrolling <= 4){
-                sls[1][4] += 1;
-                if(sls[1][4] == 10){sls[1][4] = 0;}
-                sls[0][4] = sls[1][4]-1;
-                if(sls[0][4] == -1){sls[0][4] = 9;}
-                sls[2][4] = sls[1][4]+1;
-                if(sls[2][4] == 10){sls[2][4] = 0;}
-            }
-            SLtekiou();
-            await delay(100);//ここで速さいじれる
+
+            block.div = div0;
+            farmC.Blocks.push(block);
+            // farmC.main.querySelector('.contain').appendChild(div0);
+            div02.appendChild(div0);
         }
-        if(bet >= 2&&slspt[0][0] == slspt[0][1]&&slspt[0][1] == slspt[0][2]&&slspt[0][2] == slspt[0][3]&&slspt[0][3] == slspt[0][4]){SLmath(sls[0][0]);}
-        if(bet >= 1&&slspt[1][0] == slspt[1][1]&&slspt[1][1] == slspt[1][2]&&slspt[1][2] == slspt[1][3]&&slspt[1][3] == slspt[1][4]){SLmath(sls[1][0]);}
-        if(bet >= 3&&slspt[2][0] == slspt[2][1]&&slspt[2][1] == slspt[2][2]&&slspt[2][2] == slspt[2][3]&&slspt[2][3] == slspt[2][4]){SLmath(sls[2][0]);}
-        document.getElementById('SLCommandButtons').innerHTML = `<button class="SLbutton" onclick="SLstart()">reset</button>  <button class="SLbutton" onclick="SLrestart()">end</button>`;
 
-
-    }else{
-        bet = 1;
-        document.getElementById('log').textContent = 'betTime!!';
-        document.getElementById('SLCommandButtons').innerHTML = `<button id="casinobutton" onclick="bet += 1; if(bet > 3){bet = 1;}; SLbettekiou();">Bet</button> <button class="casinobutton" onclick="SLstart()">start</button>`;
-        SLtekiou();
-        SLbettekiou();
+        farmC.main.querySelector('.contain').appendChild(div02);
     }
 }
-function SLmath(num){
-    console.log('計算、'+num);
-    switch(num){
-        case 0:case 5://wheat
-            euro += bet*base*5;
-            break;
-        case 1:case 6://carrot
-            euro += bet*base*10;
-            break;
-        case 2:case 7://potato
-            euro += bet*base*50;
-            break;
-        case 3:case 8://apple
-            euro += bet*base*100;
-            break;
-        case 4://euro
-            euro += bet*base*1;
-            break;
-        case 9://goldapple
-            euro += bet*base*777;
-    }
-    SLtekiou();
-    document.getElementById('log').textContent = 'success!!';
+    
+farmF.move = (xv = 0, yv = 0) => {
+    if(typeof xv != 'number' || typeof yv != 'number') return console.error(`引数は全部数字にしてねっ！ xv:${xv} yv:${yv}`);
+    let now = farmC.block;
+    let row = farmC.row;
+
+    // 現在の座標 (x: 列, y: 行)
+    let x = now % row;
+    let y = Math.floor(now / row);
+
+    let dx = xv
+    let dy = yv
+
+    let nx = ((x + dx) % row + row) % row;
+    let ny = ((y + dy) % row + row) % row;
+
+    let next = ny*row + nx;
+
+    if(next < 0 || row**2 <= next) console.error('...それ、範囲外ですよ？');
+
+    console.log(`[move] (${x}, ${y}) => (${nx}, ${ny})`);
+
+    farmC.block = next;
+    farmF.moveto(next);
 }
+
+farmF.moveto = (id = NaN) => {
+    if(isNaN(id)) return console.error('id が渡されてない...');
+    if(id < 0 || id >= farmC.blocks) return console.error('id が範囲外:', id);
+
+    let container = farmC.main.querySelector('.contain');
+
+    let cols = farmC.row;
+    let col = id % cols;
+    let row = Math.floor(id / cols);
+    console.log(row, col, cols)
+
+    let tx = -col * 1/3*100;
+    let ty = -row * 100;
+
+    container.style.transform = `translate3d(${tx}%, ${ty}%, 0)`;
+
+    console.log(`{debug} ${id} に移動しました (col:${col}, row:${row})`);
+}
+//#endregion
+
+//#region 画像と音声のロード
+let images = {};
+let Imgs = {
+    systems:['error','star1','star2','star3'],
+    farms:['apple','carrot','apple_gold','hoe','potato','wheat']
+}
+let imageA = Object.keys(Imgs).map(a => Imgs[a].length).reduce((a, b) => a + b);
+let imageB = 0;
+for(let belong in Imgs){
+    for(let num of Imgs[belong]){
+        let img = new Image();
+        img.src = `assets/${belong}/${num}.png`;
+
+        img.onload = () => {
+            // console.log(`Image ${belong}/${num} loaded.`);
+            imageB++;
+
+            // if(imageB == imageA) start();
+            if(imageB == imageA) farmF.load();
+        };
+        img.onerror = () => {
+            console.error(`Image ${belong}/${num} failed to load.`);
+            img.src = `assets/systems/error.png`;
+            imageB++;
+
+            // if(imageB == imageA) start();
+            if(imageB == imageA) farmF.load();
+        };
+
+        if(!images[belong]) images[belong] = {};
+        images[belong][num] = img;
+    };
+};
+// #endregion
+

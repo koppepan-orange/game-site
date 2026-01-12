@@ -1106,7 +1106,6 @@ batF.heal = async(who, are, val, x) => {
 // #endregion
 
 // #region 画像とかのロード機構
-
 let images = {};
 let Imgs = {
     'maps':['enemy', 'enemy_gachi', 'enemy_metal', 'enemy_gold', 'enemy-high', 'fire_maki', 'chest_a', 'chest_b', 'chest_c', 'chest_d']
