@@ -1085,22 +1085,26 @@ function isCrit(crl, crr = 0){
     return 0;
 }
 
-async function damage(who, ares, val, type0, props = []){
+async function damage(who, ares, val, type, props = []){
     let hasp = (name) => {return props.includes(name)}
-    if(!Array.isArray(ares)) ares = [ares];
 
-    // console.log(`${who.cam}${who.me}`, ares.map(c => `${c.cam}${c.me}`), val, type0, props);
+    // console.log(`${who.cam}${who.me}`, ares.map(c => `${c.cam}${c.me}`), val, type, props);
+
+    let atky, defy;
+    if(type == 'sh') atky = 'atk', defy = 'def';
+    if(type == 'mg') atky = 'matk', defy = 'mdef';
 
     if(typeof val == 'string' && val.endsWith('%')){
         let key = props.find(a => a.startsWith("%!"));
         if(key) key = key.substring(2);
-        else key = "hp";
+        else key = atky;
 
         let roka = +val.substring(0, val.length - 1);
         if(isNaN(roka)) roka = 0;
         val = who[key] * roka/100;
     }
     
+    if(!Array.isArray(ares)) ares = [ares];
     for(let are of ares){
         let atker = {...who};
         atker.pow = 1;
@@ -1167,19 +1171,17 @@ async function damage(who, ares, val, type0, props = []){
         let shied = Equips['shield'].find(a => a.id == shi);
 
         //計算
-        let type, type2;
-        if(type0 == 'sh') type = 'atk', type2 = 'def';
-        if(type0 == 'mg') type = 'matk', type2 = 'mdef';
         
-        console.log(`(damage) ${type0} ::`);
+        
+        console.log(`(damage) ${type} ::`);
 
         // (攻撃力+武器攻撃力) * 攻撃倍率
-        let dmg = ((atker[type]+weped.atk) * (atker.pow));
-        console.log(`dmg:: (${atker[type]} + ${weped[type]}) * (${atker.pow}) = ${dmg}`);
+        let dmg = ((atker[atky]+weped.atk) * (atker.pow));
+        console.log(`dmg:: (${atker[atky]} + ${weped[type]}) * (${atker.pow}) = ${dmg}`);
         
         // (防御力+盾防御力) * 防御倍率 + ダメージカット
-        let rer = ((defer[type2]+shied.def)*(defer.she)) + defer.cut;
-        console.log(`rer:: (${defer[type2]} + ${shied[type2]}) * (${defer.she}) + (${defer.cut}) = ${rer}`);
+        let rer = ((defer[defy]+shied.def)*(defer.she)) + defer.cut;
+        console.log(`rer:: (${defer[defy]} + ${shied[defy]}) * (${defer.she}) + (${defer.cut}) = ${rer}`);
         
         //crit
         let crit = isCrit((atker.crl + weped.crl), (defer.crr + shied.crr));
@@ -1202,7 +1204,7 @@ async function damage(who, ares, val, type0, props = []){
             console.log(`(体力超過) damage - ${sa}`);
         }
         console.log(`==> damage: ${dmg2}`);
-        if(type0 == 'sh') await eFf.slash(are);
+        if(type == 'sh') await eFf.slash(are);
         are.hp -= dmg2;
         tekiou();
         let criten = crit ? '！' : '';
