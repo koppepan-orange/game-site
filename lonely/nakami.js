@@ -68,7 +68,7 @@ function kaikyu(sta, end, row, val){
 
     let kari = Math.floor((val-sta) / row);
     let sta2 = sta + kari*row;
-    let end2 = sta2 + row-1;
+    let end2 = sta + row-1;
     if(end2 > end) end2 = end;
 
     let arr = [];
@@ -607,7 +607,7 @@ document.addEventListener('pointercancel', (e) => {
     if(e.buttons == 0) clicking = false;
     if(e.buttons == 2) cricking = false;
 });
-window.addEventListener('blur', () => { clicking = cricking = false; });
+window.addEventListener('blur', () => {clicking = cricking = false});
 
 let mouseX = 0;
 let mouseY = 0;
@@ -618,7 +618,9 @@ document.addEventListener('mousemove', (e) => {
 //#endregion
 //#region fonts
 const Fonts = [
-    // {src:'comicsans', type:'ttf'},
+    {src:'misaki', type:'ttf'},
+    {src:'cube12', type:'ttf'},
+    {src:'starrysky', type:'otf'},
 ];
 function fontsLoad(){
     let id = "font_load_css";
@@ -626,7 +628,7 @@ function fontsLoad(){
     if(existing) existing.remove();
 
     let css = Fonts.map(f => {
-        let src = `url('assets/${f.src}.${f.type}')`;
+        let src = `url('assets/fonts/${f.src}.${f.type}')`;
         let weight = f.weight ?? 'normal';
         return `@font-face{
             font-family:'${f.src}';
@@ -646,311 +648,399 @@ function fontsLoad(){
 fontsLoad();
 //#endregion
 
+document.addEventListener('contextmenu', e => e.preventDefault()); //今回は使い所がないので禁止
 
-//#region 農業しようぜ！
-let farmD = document.getElementById('farmArea');
-let farmC = {
-    main:farmD.querySelector('.main'),
-    joyst:farmD.querySelector('.joyst'),
-    block: 0,
-    row: 16, //正方形なんでcolは無し
-    mx: 0,
-    my: 0
+let main = document.getElementById('main');
+let areC = {
+    now:null
 }
-farmC.Crops = [
-	{
-		name:'wheat',
-		jpnm:'小麦',
-		desc:'パンやらお菓子になる万能炭水化物。\n四毒の一味',
-		time:'60',
-		org:"seed", //if this.org == "seed": ${this.name}_seed
-		res:1,
-	},
-	{
-		
-	}
+let areF = {};
+areF.move = (to) => {
+    console.log(`[move] ${areC.now} => ${to}`);
+    areC.now = to;
+    
+    main.querySelectorAll('.area').forEach(el => el.classList.remove('show'));
+    main.querySelector(`#${to}.area`).classList.add('show');
+}
+
+// #region title
+let titD = document.getElementById('title');
+let titC = {
+    startD: titD.querySelector('.start'),
+    achD: titD.querySelector('.achieve'),
+    setD: titD.querySelector('.set'),
+}
+let titF = {};
+titC.startD.addEventListener('click', () => {areF.move('select')});
+// #endregion
+
+// #region select
+let seleD = document.getElementById('select');
+let seleC = {
+    listD: seleD.querySelector('.list'),
+}
+seleC.list = [
+    {
+        name:"2x2",
+        level:"☆☆☆★★",
+        desc:'最初はこれをやってみよう！\n慣れないうちは絶対戸惑うと思う'
+    },
+    {
+        name:"3x3",
+        level:"☆★★★★",
+        desc:'2x2には慣れたかい？じゃあこちらを！\n難易度があほほど上がるので注意\n'
+    },
+    {
+        name:"4x4",
+        level:"★★★★★",
+        desc:'んも〜〜ここをマスターできたらあんたは天才だ\nちなみに作者のハイスコアは2です'
+    }
 ]
-let farmF = {};
+let seleF = {};
+seleF.load = () => {
+    for(let sele of seleC.list){
+        let div = document.createElement('div');
+        div.className = `sele s_${sele.name}`;
 
-/* 無し: #d4a174 */
-/* 枯れ: #a57245 */
-/* 濡れ: #713b0b */
-farmF.load = () => {
-    for(let i=0; i<farmC.row; i++){ //flex
-        let div0 = document.createElement('div');
-        div0.className = `row`;
+        div.innerHTML = `
+            <div class="upper">
+                <div class="name">${sele.name}</div>
+                <div class="column">
+                    <div class="high">${NaN}</div>
+                    <div class="level">${sele.level}</div>
+                </div>
+            </div>
 
-        for(let i2=0; i2<farmC.row; i2++){
-            console.log('mas')
-            let div = document.createElement('div'); //block
-            div.className = `mas m${i}${i2}`;
-            div0.appendChild(div);
+            <div class="under">
+                <div class="desc"></div>
+                <div class="start">Go</div>
+            </div>
+        `
+        div.querySelector('.desc').innerText = sele.desc;
+
+        div.querySelector('.upper').addEventListener('click', () => seleF.tog(sele.name));
+
+        div.querySelector('.start').addEventListener('click', () => {
+            areF.move('play');
+            plaF.start(sele.name);
+        });
+
+        seleC.listD.appendChild(div);
+    }
+}
+seleF.tog = (name) => {
+    seleC.listD.querySelectorAll('.tog').forEach(el => el.classList.remove('tog'));
+    seleC.listD.querySelector(`.sele.s_${name}`).classList.add('tog');
+}
+// #endregion
+
+// #region play
+let plaD = document.getElementById('play');
+let plaC = {
+    upperD: plaD.querySelector('.upper'),
+     nameD: plaD.querySelector('.upper .name'),
+     timeD: plaD.querySelector('.upper .time'),
+     scoreD: plaD.querySelector('.upper .score'),
+    mainD: plaD.querySelector('.main'),
+    logD: plaD.querySelector('.log'),
+
+    time: 0,
+    timer: null, //eventListener
+
+    list:[]
+}
+let plaF = {};
+
+plaF.timer = (code) => {
+    if(!code) return console.log('codeがないですわ〜〜！！')
+    switch(code){
+        case 'tekiou':{
+            let [hun, byo] = [plaC.time%60, Math.floor(plaC.time/60)]
+                .map(a => a.toFixed(0).padStart(2, '0'));
+            plaC.timeD.textContent = `${byo}:${hun}`;
+            break;
         }
 
-        farmC.main.querySelector('.contain').appendChild(div0);
-    }
+        case 'start':{
+            plaC.timer = setInterval(() => {
+                plaC.time += 1;
+                plaF.timer('tekiou');
+            }, 1000);
+            break;
+        }
 
-    farmF.recalcBounds();
-    farmF.setOffset(0,0);
-    farmF.initJoystick();
+        case 'stop':{
+            if(plaC.timer) clearInterval(plaC.timer);
+            break;
+        }
+
+        case 'reset':{
+            if(plaC.timer) clearInterval(raceC.timer);
+            plaC.time = 0;
+            break;
+        }
+    }
 }
+
+plaF.start = (name) => {
+    plaC.nameD.innerText = name;
+    plaC.scoreD.innerText = 0;
+    plaF.timer('reset');
+    plaF.timer('tekiou');
+    plaF.timer('start');
+
+    let size = +name.slice(0,1) + 1;
+
+    plaF.build(size);
+}
+
+plaF.build = (size) => {
+    let num = size**2;
+    plaC.list = Array(num).fill(false);
+
+    for(let i=0; i<num; i++){
+        let div = document.createElement('div');
+        div.className = `mar m${i}`;
+
+        div.addEventListener('click', () => {
+            plaF.tog(i);
+        })
+
+        plaC.mainD.appendChild(div);
+    }
     
-/* // made by 俺
-farmF.move = (xv = 0, yv = 0) => {
-    if(typeof xv != 'number' || typeof yv != 'number') return console.error(`引数は全部数字にしてねっ！ xv:${xv} yv:${yv}`);
-    let now = farmC.block;
-    let row = farmC.row;
-
-    // 現在の座標 (x: 列, y: 行)
-    let x = now % row;
-    let y = Math.floor(now / row);
-
-    let dx = xv
-    let dy = yv
-
-    let nx = ((x + dx) % row + row) % row;
-    let ny = ((y + dy) % row + row) % row;
-
-    let next = ny*row + nx;
-
-    if(next < 0 || row**2 <= next) console.error('...それ、範囲外ですよ？');
-
-    console.log(`[move] (${x}, ${y}) => (${nx}, ${ny})`);
-
-    farmC.block = next;
-    farmF.moveto(next);
 }
-farmF.moveto = (id = NaN) => {
-    if(isNaN(id)) return console.error('id が渡されてない...');
-    if(id < 0 || id >= farmC.blocks) return console.error('id が範囲外:', id);
+plaF.tog = (i) => {
+    let mar = document.querySelector(`.mar.m${i}`);
+    mar.classList.toggle('tog');
+    plaC.list[i] = !plaC.list[i];
 
-    let container = farmC.main.querySelector('.contain');
-
-    let cols = farmC.row;
-    let col = id % cols;
-    let row = Math.floor(id / cols);
-    console.log(row, col, cols)
-
-    let tx = -col * 1/3*100;
-    let ty = -row * 1/3*100;
-
-    container.style.transform = `translate3d(${tx}%, ${ty}%, 0)`;
-
-    console.log(`{debug} ${id} に移動しました (col:${col}, row:${row})`);
+    /* クリックされたとき、波紋状にborderの色で波が広がるanimation */
+    jump:{
+        if(mar.classList.contains('hamon')) break jump;
+        mar.classList.add('hamon');
+        mar.addEventListener('animationend', () => mar.classList.remove('hamon'));
+        return;
+    }
+    mar.classList.add('hamon2')
+    mar.addEventListener('animationend', () => mar.classList.remove('hamon2'));
 }
-*/
 
 
-farmF.recalcBounds = () => {
-    let viewport = farmC.main;
-    let container = farmC.main.querySelector('.contain');
-    if(!viewport || !container) return console.error('DOM 構造が見つからない');
+// #endregion
 
-    let totalW = container.offsetWidth;
-    let totalH = container.offsetHeight;
-    let vw = viewport.clientWidth;
-    let vh = viewport.clientHeight;
+function start(){
+    console.log('load完了ed');
+    Style.tekiou();
+    seleF.load();
 
-    let maxOffsetX = Math.min(0, vw - totalW); // 負または0
-    let maxOffsetY = Math.min(0, vh - totalH);
-
-    farmC.bounds = {
-        minX: 0,
-        minY: 0,
-        maxX: maxOffsetX,
-        maxY: maxOffsetY,
-        viewportW: vw,
-        viewportH: vh,
-        totalW: totalW,
-        totalH: totalH
-    };
-};
-
-farmF.setOffset = (mx = NaN, my = NaN) => {
-    if(!farmC.bounds) farmF.recalcBounds();
-    let b = farmC.bounds;
-
-    if(isNaN(mx)) mx = farmC.mx;if(isNaN(my)) my = farmC.my;
-    mx = Math.max(b.maxX, Math.min(b.minX, mx));
-    my = Math.max(b.maxY, Math.min(b.minY, my));
-    
-    farmC.mx = mx;
-    farmC.my = my;
-
-    let container = farmC.main.querySelector('.contain');
-    container.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
-};
-
-farmF.moveBy = (dx = 0, dy = 0) => {
-    farmF.setOffset(farmC.mx + dx, farmC.my + dy);
-};
-
-farmF.moveto = (id = NaN) => {
-    if(isNaN(id)) return console.error('id が渡されてない...');
-    let container = farmC.main.querySelector('.contain');
-    if(!container) return console.error('container が無い');
-
-    // 行数・列数を DOM から算出（load が作る構造に依存）
-    let rowsEls = Array.from(container.children);
-    let rowsCount = rowsEls.length || 1;
-    let colsCount = rowsEls[0] ? rowsEls[0].children.length : farmC.row || 1;
-
-    let blocks = colsCount * rowsCount;
-    if(id < 0 || id >= blocks) return console.error('id が範囲外やで', id);
-
-    let col = id % colsCount;
-    let row = Math.floor(id / colsCount);
-
-    let cellW = container.scrollWidth / colsCount;
-    let cellH = container.scrollHeight / rowsCount;
-
-    let tx = -Math.round(col * cellW);
-    let ty = -Math.round(row * cellH);
-
-    farmF.setOffset(tx, ty);
-    console.log(`{debug} ${id} に移動しました (col:${col}, row:${row})`);
-};
-
-// --- アナログスティック（仮想） ---
-// 呼び出し: farmF.initJoystick(); を一度実行すること
-farmF.initJoystick = () => {
-    if(!farmC.main) return console.error('farmC.main が見つからない');
-    if(farmC._joystickInited) return;
-    farmC._joystickInited = true;
-
-    let joyst = farmC.joyst;
-    let base = joyst.querySelector('.base');
-    let knob = base.querySelector('.knob');
-
-    let radius = 48; // px, ノブ移動の最大半径（見た目）
-    let maxPanSpeed = 800; // px/秒 の最大速度。好みで調整して。
-
-    let active = false;
-    let ptrId = null;
-    let norm = {x:0, y:0};
-    let lastTs = performance.now();
-    let loopId = null;
-
-    function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
-
-    function applyStep(now){
-        let dt = Math.max(1, now - lastTs) / 1000; // 秒
-        lastTs = now;
-        // norm は -1..1
-        let dx = -norm.x * maxPanSpeed * dt;
-        let dy = -norm.y * maxPanSpeed * dt;
-        farmF.moveBy(dx, dy);
-        loopId = requestAnimationFrame(applyStep);
-    }
-
-    base.addEventListener('pointerdown', (e) => {
-        base.setPointerCapture(e.pointerId);
-        ptrId = e.pointerId;
-        active = true;
-        lastTs = performance.now();
-        if(!loopId) loopId = requestAnimationFrame(applyStep);
-    });
-
-    base.addEventListener('pointermove', (e) => {
-        if(!active || e.pointerId != ptrId) return;
-        let r = base.getBoundingClientRect();
-        let cx = r.left + r.width/2;
-        let cy = r.top + r.height/2;
-        let dx = e.clientX - cx;
-        let dy = e.clientY - cy;
-        let dist = Math.hypot(dx, dy) || 1;
-        let mx = dx / dist * Math.min(dist, radius);
-        let my = dy / dist * Math.min(dist, radius);
-        knob.style.transform = `translate(${mx}px, ${my}px)`;
-        norm.x = clamp(mx / radius, -1, 1);
-        norm.y = clamp(my / radius, -1, 1);
-    });
-
-    base.addEventListener('pointerup', (e) => {
-        if(e.pointerId != ptrId) return;
-        base.releasePointerCapture(ptrId);
-        ptrId = null;
-        active = false;
-        // 戻すアニメーション（即戻したければコメントアウト）
-        knob.style.transition = 'transform 0.12s';
-        knob.style.transform = 'translate(0, 0)';
-        norm.x = 0; norm.y = 0;
-        setTimeout(()=> knob.style.transition = '', 130);
-        if(loopId){ cancelAnimationFrame(loopId); loopId = null; }
-    });
-
-    // --- キーボードサポート（WASD / 矢印） ---
-    farmC._keyState = { up:false, down:false, left:false, right:false };
-    let keyMap = {
-        'ArrowUp':'up','w':'up','W':'up',
-        'ArrowDown':'down','s':'down','S':'down',
-        'ArrowLeft':'left','a':'left','A':'left',
-        'ArrowRight':'right','d':'right','D':'right'
-    };
-
-    function updateNormFromKeys(){
-        let k = farmC._keyState;
-        let nx = (k.right?1:0) - (k.left?1:0);
-        let ny = (k.down?1:0) - (k.up?1:0);
-        if(nx == 0 && ny == 0) return norm.x = 0, norm.y = 0
-        let mag = Math.hypot(nx, ny) ?? 1;
-        norm.x = nx / mag;
-        norm.y = ny / mag;
-        knob.style.transform = `translate(${norm.x * radius}px, ${norm.y * radius}px)`;
-    }
-
-    window.addEventListener('keydown', (e) => {
-        let k = keyMap[e.key];
-        if(!k) return;
-        farmC._keyState[k] = true;
-        updateNormFromKeys();
-        if(!loopId) lastTs = performance.now(), loopId = requestAnimationFrame(applyStep);
-    });
-
-    window.addEventListener('keyup', (e) => {
-        let k = keyMap[e.key];
-        if(!k) return;
-        farmC._keyState[k] = false;
-        updateNormFromKeys();
-        if(norm.x == 0 && norm.y == 0 && loopId) cancelAnimationFrame(loopId), loopId = null;
-        if(norm.x == 0 && norm.y == 0) knob.style.transform = 'translate(0,0)';
-    });
-};
-
-//#endregion
+    areF.move('title');
+    main.classList.remove('ban');
+}
 
 //#region 画像と音声のロード
 let images = {};
-let Imgs = {
-    systems:['error','star1','star2','star3'],
-    farms:['apple','carrot','apple_gold','hoe','potato','wheat']
+let sounds = {};
+let loaC = {
+    imgT: 0,
+    imgD: 0,
+    souT: 0,
+    souD: 0,
+    erd: 0
 }
-let imageA = Object.keys(Imgs).map(a => Imgs[a].length).reduce((a, b) => a + b);
-let imageB = 0;
-for(let belong in Imgs){
-    for(let num of Imgs[belong]){
-        let img = new Image();
-        img.src = `assets/${belong}/${num}.png`;
+let loaF = {};
+loaC.imgL = {
+    systems:['error'],
+}
 
-        img.onload = () => {
-            // console.log(`Image ${belong}/${num} loaded.`);
-            imageB++;
+loaC.souL = ['error', 'break', 'break_fast']
+loaC.souT = Object.values(loaC.souL).length;
 
-            // if(imageB == imageA) start();
-            if(imageB == imageA) farmF.load();
+loaF.load = async() => {
+    if(await loaF.loadI()) return 'error';
+    else '終わり'
+}
+loaF.loadI = async() => {
+    let loaloa = (arr, route) => {
+        // console.log("Arrayでした lets 読み込み")
+        let src = "assets/images/";
+        for(let r of route) src += `${r}/`;
+        // console.log(src)
+
+        let tar = images;
+        for(let r of route){
+            // console.log(r, tar)
+            if(!tar[r]) tar[r] = {};
+            tar = tar[r];
+        }
+        for(let mono of arr){
+            let img = new Image();
+            img.src = `${src}${mono}.png`;
+            img.onload = () => {
+                loaC.imgD++;
+                if(loaC.imgD == loaC.imgT) loaF.loadS();
+            };
+            img.onerror = () => {
+                console.error(`Image ${src}${mono}.png failed to load.`);
+                loaC.erd += 1;
+                if(loaC.erd > 20) return console.error('さすがにやりすぎbonus'), 1;
+                img.src = `assets/images/systems/error.png`;
+                loaC.imgD++;
+                if(loaC.imgD == loaC.imgT) loaF.loadS();
+            };
+            
+            tar[mono] = img;
+            if(loaC.imgD >= loaC.imgT) loaF.loadS();
+        }
+
+        // console.log('読み込み完了 これよりユグドラシルに帰還する')
+        return 0;
+    }
+
+    // let gensho = Object.keys(loaC.imgL);
+    let loaloa0 = async(mono, route = []) => {
+        let sink = route.length ? 1 : 0
+        // if(sink) console.log("not Arrayでした lets 再帰");
+        
+        // console.log("[loaloa0] route:[" + route + "]");
+        // console.log('次:monoです')
+        // console.log(mono)
+        for(let key in mono){
+            // console.log(`key:${key} (all:[${Object.keys(mono)}])`)
+            if(key == 'すべて'){
+                // console.error('"すべて"だったのでスキップ');
+                route.pop()
+                continue;
+            }
+
+            route.push(key);
+            // console.log("[loaloa0ed] route:[" + route + "]");
+            
+            let val = mono[key]??null;
+            if(!val) return console.error('↓↓null↓↓'), console.log(tar), console.log(mono), console.log(key), console.error('↑↑null↑↑');
+            // console.log("次、valです");
+            // console.log(val);
+            // console.log("↑Arrayかな? 結果 => "+Array.isArray(val));
+            if(Array.isArray(val)){
+                if(await loaloa(val, route)) return console.error('南ノ南');
+                route.pop()
+                // console.log(`帰還成功、${route.pop()}を排除`)
+            }//arrayなら => ロードへ
+            else await loaloa0(val, route); //まだオブジェクトなら => もっかい
+        }
+
+    }
+    
+
+    loaloa0(loaC.imgL);
+
+}
+
+loaF.loadS = async() => {
+    loaC.souL.forEach(name => {
+        let sound = new Audio();
+        sound.preload = 'auto';
+        sound.src = `assets/sounds/${name}.mp3`;
+        if(name.startsWith('bgm_')){
+            sound.loop = true;
+            sound.dataset.type = 'bgm';
+            sound.volume = souC.bgm;
+        }
+        else{
+            sound.dataset.type = 'se';
+            sound.volume = souC.se;
+        }
+        sound.addEventListener('canplaythrough', () => {
+            // console.log(`Sound ${num} loaded.`);
+            loaC.souD += 1;
+            if(loaC.souD == loaC.souT) start();
+        }, {once: 1});
+        sound.onerror = () => {
+            console.error(`Sound assets/sounds/${name} failed to load.`);
+            loaC.erd += 1;
+            if(loaC.erd > 20) return console.error('さすがにやりすぎbonus'), 1;
+            sound.src = `assets/sounds/error.mp3`;
+            loaC.souD += 1;
+            if(loaC.souD == loaC.souT) start();
         };
-        img.onerror = () => {
-            console.error(`Image ${belong}/${num} failed to load.`);
-            img.src = `assets/systems/error.png`;
-            imageB++;
+        sounds[name] = sound;
+    });
+}
 
-            // if(imageB == imageA) start();
-            if(imageB == imageA) farmF.load();
-        };
+let souC = {
+    se: 0.5,
+    bgm: 0.5,
+    nowBgm: null
+}
 
-        if(!images[belong]) images[belong] = {};
-        images[belong][num] = img;
-    };
-};
-// #endregion
+function soundPlay(name){
+    if(!sounds[name]) return soundPlay('error');
+    let proto = sounds[name];
+    if(proto.dataset.type == 'bgm'){
+        if(souC.nowBgm == name && !proto.paused) return;
+        if(souC.nowBgm && sounds[souC.nowBgm] && !sounds[souC.nowBgm].paused){
+            sounds[souC.nowBgm].pause();
+            sounds[souC.nowBgm].currentTime = 0;
+        }
+        proto.volume = souC.bgm;
+        proto.play().catch(e => console.warn('BGM 再生エラー', e));
+        souC.nowBgm = name;
+    }else{
+        let clone = proto.cloneNode(true);
+        clone.volume = souC.se;
+        clone.dataset.type = 'se';
+        clone.addEventListener('ended', ()=> {
+            try{clone.src = '';}catch(e){}
+        });
+        clone.play().catch(e => console.warn('SE 再生エラー', e));
+    }
+}
+
+
+function soundStop(){
+    // sounds オブジェクトに入ってる原型は止めてリセット
+    Object.keys(sounds).forEach(k => {
+        try{
+            sounds[k].pause();
+            sounds[k].currentTime = 0;
+        }catch(e){}
+    });
+    souC.nowBgm = null;
+
+    // ページ上の他の <audio> を全部止めたいなら下を有効に
+    // document.querySelectorAll('audio,video').forEach(el => { el.pause(); el.currentTime = 0; });
+}
+
+function soundVolume(code, val){
+    if(typeof code == 'number' && typeof val == 'undefined'){
+        val = code;
+        code = 'both';
+    }
+    if(typeof val !== 'number') return console.error('val は数値にして');
+    let v = val;
+    if(v > 1) v = Math.max(0, Math.min(1, v/100)); // 0-100 指定を 0-1 に
+    v = Math.max(0, Math.min(1, v));
+
+    if(code == 'se' || code == 'both'){
+        souC.se = v;
+        Object.keys(sounds).forEach(k => {
+            if(sounds[k].dataset.type == 'se') sounds[k].volume = souC.se;
+        });
+    }
+    if(code == 'bgm' || code == 'both'){
+        souC.bgm = v;
+        Object.keys(sounds).forEach(k => {
+            if(sounds[k].dataset.type == 'bgm') sounds[k].volume = souC.bgm;
+        });
+        if(souC.nowBgm && sounds[souC.nowBgm]) sounds[souC.nowBgm].volume = souC.bgm;
+    }
+
+    console.log(`[soundVolume] se:${souC.se} bgm:${souC.bgm}`);
+}
+soundVolume(50);
+
+//#endregion
+document.addEventListener('DOMContentLoaded', async() => {
+    await loaF.load();
+})
 

@@ -607,7 +607,7 @@ document.addEventListener('pointercancel', (e) => {
     if(e.buttons == 0) clicking = false;
     if(e.buttons == 2) cricking = false;
 });
-window.addEventListener('blur', () => { clicking = cricking = false; });
+window.addEventListener('blur', () => {clicking = cricking = false});
 
 let mouseX = 0;
 let mouseY = 0;
@@ -626,7 +626,7 @@ function fontsLoad(){
     if(existing) existing.remove();
 
     let css = Fonts.map(f => {
-        let src = `url('assets/${f.src}.${f.type}')`;
+        let src = `url('assets/fonts/${f.src}.${f.type}')`;
         let weight = f.weight ?? 'normal';
         return `@font-face{
             font-family:'${f.src}';

@@ -7,6 +7,9 @@ html{
 body{
     width: 100vw;
     height: 100vh;
+    margin: 0;
+    white-space: nowrap;
+    touch-action: none;
 }
 .row{
     display: flex;
@@ -199,110 +202,220 @@ img{
 }
 /* #endregion */
 
-.area{
+#main{
+    display: block;
     width: 100vw;
     height: 100vh;
-    background: #ffc744;
-    padding: 30px;
-    box-sizing: border-box;
-}
-
-/* #region farmArea 2 */
-#farmArea{
-    content: 'farm';   
-}   
-#farmArea .main{
-    display: block;
-    margin: 0 auto;
-    width: 80%;
-    aspect-ratio: 1/1;
-    background: #ffe096;
+    background: var(--back-color);
+    position: fixed;
+    top: 0;
+    left: 0;
+    white-space: nowrap;
     overflow: hidden;
 }
-#farmArea .main .contain{
+#main.ban{
+    pointer-events: none;
+}
+/* #fff4ca #ffefaf #ffe98f */
+#main .area{
+    display: none;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 30px 0;
+    background: var(--back-color);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2;
+}
+#main .area.show{
+    display: flex;
+}
+
+/* #region title */
+#title{
+    content: "title";
+}
+#title .column{
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
     gap: 10px;
-    width: 300%;
-    aspect-ratio: 1/1;
-    padding: 5px;
-    background: #cd9666;
-    transition: transform 2000ms cubic-bezier(.2,.8,.2,1);
-    will-change: transform;
-    box-sizing: border-box;
+    width: 70%;
+    height: fit-content;
 }
-#farmArea .main .contain .row{
+#title .column .col{
+    width: fit-content;
+    position: relative;
+    text-align: center;
+    font-size: 42px;
+    font-family: cube12;
+    color: var(--back-font);
+}
+#title .column .col.title{
+    font-size: 52px;
+    font-family: misaki;
+    margin-bottom: 10px;
+}
+#title .column .col:not(.title):hover::after{
+    content: "";
+    display: block;
+    width: 0%;
+    height: 2px;
+    background: var(--back-under);
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: underLine 0.5s ease forwards;
+}
+@keyframes underLine {
+    0%{width: 0%}
+    100%{width: 100%}
+}
+/* #endregion */
+
+/* #region select */
+#select{
+    content: "select";
+}
+#select .list{
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    width: 100%;
     gap: 10px;
+    width: 65%;
+    height: fit-content;
 }
-#farmArea .main .contain .mas{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-    aspect-ratio: 1/1;
-    background: #d4a174 ;
+#select .list .sele{
+    width: 100%;
+    transition: max-height 0.5s ease;
+    box-sizing: border-box;
 }
-
-#farmArea .joyst{
-    position:absolute;
-    right:14px;
-    bottom:14px;
-    user-select:none;
-    touch-action:none;
-    z-index:999;
-}
-#farmArea .joyst .base{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:120px;
-    height:120px;
-    border-radius:999px;
-    background:rgba(0,0,0,0.14);
-    position:relative;
-}
-#farmArea .joyst .knob{
-    width:44px;
-    height:44px;
-    border-radius:999px;
-    background:#ffffffca;
-    box-shadow:0 6px 18px rgba(0,0,0,0.25);
-    transform:translate(0,0);
-    transition: transform 0.04s linear;
-}
-#farmArea .BTS{
-    margin-top: 15px;
+#select .list .sele .upper{
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    gap: 10px;
+    width: 100%;
+    aspect-ratio: 6/1;
+    border-radius: 15px 15px 0 0;
+    padding: 0 20px;
+    background: #949494;
+    z-index: 4;
 }
-#farmArea .BTS .bt{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 80px;
-    aspect-ratio: 5 / 3;
-    scale: 1.0;
-    border-radius: 15px 0 15px 0;
-    background: #14b13b;
-    color: #b7ff95;
+#select .list .sele .upper .name{
+    font-size: 35px;
+    font-family: cube12;
+}
+#select .list .sele .upper .column{
+    text-align: right;
+}
+#select .list .sele .upper .column div{
     font-size: 18px;
-    transition: all 0.1s ease;
+}
+#select .list .sele .under{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-height: 0;
+    padding: 5px 10px;
+    background: #b2b2b2;
+    transition: max-height 0.5s ease;
+    will-change: max-height;
+    box-sizing: border-box;
+    overflow: hidden;
+    z-index: 3;
+}
+#select .list .sele.tog .under{
+    max-height: 100%;
+}
+#select .list .sele .under .desc{
+    font-size: 16px;
+}
+#select .list .sele .under .start{
+    display: block;
+    opacity: 0;
+    background: #8e8e8e;
+    border-radius: 5px;
+    font-size: 20px;
+    padding: 5px;
+    color: #e0e0e0;
+    transition: opacity 0.5s ease;
+}
+#select .list .sele.tog .under .start{
+    opacity: 1;
+}
+/* #endregion */
+
+/* #region play */
+#play{
+    content: "play";
+}
+#play .upper{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 100%;
+    padding: 0 20px;
+    color: #000000;
+    font-size: 40px;
+    font-family: cube12;
+    z-index: 3
+}
+#play .main{
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 30%;
+    width: 65%;
+    aspect-ratio: 1/1;
+    padding-top: 40px;
+    margin: 0 auto;
+    /* background: #dadaff; */
+}
+#play .main .mar{
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: var(--play-back0);
+    border: 5px solid var(--play-bor);
+    border-radius: 50%;
+    position: relative;
     cursor: pointer;
+    box-sizing: border-box;
+    /* overflow: hidden; */
 }
-#farmArea .BTS .bt:hover{
-    scale: 1.1;
+    /* クリックされたとき、波紋状にborderの色で波が広がるanimation */
+#play .main .mar.hamon::after,
+#play .main .mar.hamon2::before{
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: #00000000;
+    border: 5px solid var(--play-bor);
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    animation: ripple 0.3s ease forwards;
+    box-sizing: border-box;
 }
-#farmArea .BTS .bt:active{
-    scale: 0.95;
+@keyframes ripple {
+    0%{transform: scale(1); opacity: 1}
+    100%{transform: scale(2); opacity: 0}
+}
+#play .main .mar.tog{
+    background: var(--play-back)
 }
 /* #endregion */
