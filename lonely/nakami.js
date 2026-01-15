@@ -742,6 +742,8 @@ let plaC = {
      timeD: plaD.querySelector('.upper .time'),
      scoreD: plaD.querySelector('.upper .score'),
     mainD: plaD.querySelector('.main'),
+     dotsD: plaD.querySelector('.main .dots'),
+     numsD: plaD.querySelector('.main .nums'),
     logD: plaD.querySelector('.log'),
 
     time: 0,
@@ -806,7 +808,7 @@ plaF.build = (size) => {
             plaF.tog(i);
         })
 
-        plaC.mainD.appendChild(div);
+        plaC.dotsD.appendChild(div);
     }
     
 }
