@@ -6,7 +6,7 @@ html{
 }
 body{
     width: 100vw;
-    height: 100vh;
+    height: 100vh;！｛
     margin: 0;
     white-space: nowrap;
     touch-action: none;
@@ -371,7 +371,7 @@ img{
     font-family: cube12;
     z-index: 3
 }
-#play .main{
+#play .main .dots{
     display: grid;
     justify-items: center;
     align-items: center;
@@ -384,7 +384,7 @@ img{
     margin: 0 auto;
     /* background: #dadaff; */
 }
-#play .main .mar{
+#play .main .dots .mar{
     width: 100%;
     aspect-ratio: 1/1;
     background: var(--play-back0);
@@ -396,8 +396,8 @@ img{
     /* overflow: hidden; */
 }
     /* クリックされたとき、波紋状にborderの色で波が広がるanimation */
-#play .main .mar.hamon::after,
-#play .main .mar.hamon2::before{
+#play .main .dots .mar.hamon::after,
+#play .main .dots .mar.hamon2::before{
     content: "";
     display: block;
     width: 100%;
@@ -415,7 +415,7 @@ img{
     0%{transform: scale(1); opacity: 1}
     100%{transform: scale(2); opacity: 0}
 }
-#play .main .mar.tog{
+#play .main .dots .mar.tog{
     background: var(--play-back)
 }
 /* #endregion */
