@@ -580,6 +580,95 @@ function tkTest(){
 }
 
 //#endregion
+//#region alertD
+class alertD{
+    constructor(text, elses = {}){
+        this.text = text;
+        for(let key in elses) this[key] = elses[key];
+        /*
+            back: 背景色
+            barc: barの色
+        */
+    }
+    x(aru){
+        this.x = aru;
+    }
+    appear(){
+        let back = this.back || '#ffffff'
+        let barc = this.barc || '#80ff80'
+
+        let div = document.createElement('div');
+        div.classList.add('alertD');
+        div.style.background = back;
+        div.style.boxShadow = `${hoshoku(back)} 5px 5px 20px`;
+
+        let row = document.createElement('div');
+        row.classList.add('row');
+         let icon = document.createElement('div');
+         icon.classList.add('icon');
+         icon.style.background = barc;
+         icon.style.color = back;
+         icon.textContent = '！';
+         row.appendChild(icon);
+
+         let text = document.createElement('div');
+         text.innerText = this.text;
+         text.style.color = hoshoku(back);
+         row.appendChild(text);
+        div.appendChild(row);
+
+        let x = document.createElement('div');
+        x.className = 'x';
+        x.innerText = '×';
+        x.style.color = hoshoku(back);
+        x.addEventListener('click', () => {
+            div.remove();
+        });
+        div.appendChild(x);
+        
+        let bar = document.createElement('div');
+        bar.classList.add('bar');
+         let inner = document.createElement('div');
+         inner.classList.add('inner');
+         inner.style.background = barc;
+         bar.appendChild(inner);
+        div.appendChild(bar);
+
+        document.body.appendChild(div);
+        this.div = div;
+
+        setTimeout(() => {
+            div.classList.add('show');
+        }, 100);
+
+        // pointerが乗ってる間はthis.loopを0にする
+        div.addEventListener('pointerenter', () => {
+            this.loop = 0;
+        });
+        div.addEventListener('pointerleave', () => {
+            this.loop = 1;
+        });
+
+        let time = 0;
+        let limit = 500;
+        this.loop = 1;
+        this.interval = setInterval(() => {
+            if(this.loop) time++;
+            inner.style.width = `${time/limit*100}%`;
+            
+            if(time == limit) this.delete();
+        }, 10);
+    }
+    delete(){
+        clearInterval(this.interval);
+        let div = this.div;
+        div.classList.remove('show');
+        setTimeout(() => {
+            div.remove();
+        }, 1000);
+    }
+}
+//#endregion
 //#region observer
 let keys = {}
 document.addEventListener('keydown', e => {
