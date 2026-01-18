@@ -371,6 +371,14 @@ img{
     font-family: cube12;
     z-index: 3
 }
+#play .main{
+    display: block;
+    width: 65%;
+    aspect-ratio: 1/1;
+    padding: 0 20px;
+    margin: 0 auto;
+    z-index: 3;
+}
 #play .main .dots{
     display: grid;
     justify-items: center;
@@ -378,11 +386,8 @@ img{
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
     gap: 30%;
-    width: 65%;
-    aspect-ratio: 1/1;
-    padding-top: 40px;
-    margin: 0 auto;
-    /* background: #dadaff; */
+    width: 100%;
+    height: 100%;
 }
 #play .main .dots .mar{
     width: 100%;
@@ -417,5 +422,16 @@ img{
 }
 #play .main .dots .mar.tog{
     background: var(--play-back)
+}
+
+#play .main .nums{
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 0;
+    width: 100%;
+    height: 100%;
 }
 /* #endregion */

@@ -792,12 +792,21 @@ plaF.start = (name) => {
     plaF.timer('start');
 
     let size = +name.slice(0,1) + 1;
+    plaC.size = size;
 
-    plaF.build(size);
+    plaF.build();
+    
+    plaF.next();
 }
 
-plaF.build = (size) => {
-    let num = size**2;
+plaF.build = () => {
+    plaC.dotsD.style.gridTemplateColumns = `repeat(${plaC.size}, 1fr)`;
+    plaC.dotsD.style.gridTemplateRows = `repeat(${plaC.size}, 1fr)`;
+
+    plaC.numsD.style.gridTemplateColumns = `repeat(${plaC.size-1}, 1fr)`;
+    plaC.numsD.style.gridTemplateRows = `repeat(${plaC.size-1}, 1fr)`;
+    
+    let num = plaC.size**2;
     plaC.list = Array(num).fill(false);
 
     for(let i=0; i<num; i++){
@@ -828,6 +837,10 @@ plaF.tog = (i) => {
     mar.addEventListener('animationend', () => mar.classList.remove('hamon2'));
 }
 
+plaF.next = () => {
+    let size = plaC.size;
+    let 
+}
 
 // #endregion
 

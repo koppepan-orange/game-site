@@ -653,7 +653,7 @@ let farmC = {
     main:farmD.querySelector('.main'),
     joyst:farmD.querySelector('.joyst'),
     block: 0,
-    row: 16, //正方形なんでcolは無し
+    row: 32, //正方形なんでcolは無し
     mx: 0,
     my: 0
 }
@@ -694,52 +694,6 @@ farmF.load = () => {
     farmF.setOffset(0,0);
     farmF.initJoystick();
 }
-    
-/* // made by 俺
-farmF.move = (xv = 0, yv = 0) => {
-    if(typeof xv != 'number' || typeof yv != 'number') return console.error(`引数は全部数字にしてねっ！ xv:${xv} yv:${yv}`);
-    let now = farmC.block;
-    let row = farmC.row;
-
-    // 現在の座標 (x: 列, y: 行)
-    let x = now % row;
-    let y = Math.floor(now / row);
-
-    let dx = xv
-    let dy = yv
-
-    let nx = ((x + dx) % row + row) % row;
-    let ny = ((y + dy) % row + row) % row;
-
-    let next = ny*row + nx;
-
-    if(next < 0 || row**2 <= next) console.error('...それ、範囲外ですよ？');
-
-    console.log(`[move] (${x}, ${y}) => (${nx}, ${ny})`);
-
-    farmC.block = next;
-    farmF.moveto(next);
-}
-farmF.moveto = (id = NaN) => {
-    if(isNaN(id)) return console.error('id が渡されてない...');
-    if(id < 0 || id >= farmC.blocks) return console.error('id が範囲外:', id);
-
-    let container = farmC.main.querySelector('.contain');
-
-    let cols = farmC.row;
-    let col = id % cols;
-    let row = Math.floor(id / cols);
-    console.log(row, col, cols)
-
-    let tx = -col * 1/3*100;
-    let ty = -row * 1/3*100;
-
-    container.style.transform = `translate3d(${tx}%, ${ty}%, 0)`;
-
-    console.log(`{debug} ${id} に移動しました (col:${col}, row:${row})`);
-}
-*/
-
 
 farmF.recalcBounds = () => {
     let viewport = farmC.main;
@@ -811,7 +765,6 @@ farmF.moveto = (id = NaN) => {
     console.log(`{debug} ${id} に移動しました (col:${col}, row:${row})`);
 };
 
-// --- アナログスティック（仮想） ---
 // 呼び出し: farmF.initJoystick(); を一度実行すること
 farmF.initJoystick = () => {
     if(!farmC.main) return console.error('farmC.main が見つからない');

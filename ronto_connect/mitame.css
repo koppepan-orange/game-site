@@ -1,15 +1,15 @@
-@font-face{src:url('assets/fonts/comicsans.ttf');font-family: comicsans;}
-@font-face{src:url("assets/fonts/hangyaku.ttf");font-family: hangyaku;}
-@font-face{src:url('assets/fonts/kurobara.ttf');font-family: kurobara;}
-@font-face{src: url("assets/fonts/misaki.ttf");font-family: misaki;}
-@font-face{src:url('assets/fonts/cube12.ttf');font-family: cube12;}
+/* #region スターターパック */
 html{
     margin: -8px;
+    overflow: hidden;
     user-select:none;
 }
 body{
     width: 100vw;
     height: 100vh;
+    margin: 0;
+    white-space: nowrap;
+    touch-action: none;
 }
 .row{
     display: flex;
@@ -25,7 +25,6 @@ body{
 }
 
 img{
-    /* 画像をドラッグできないようにするやつ */
     -webkit-user-drag: none;
 }
 ::-webkit-scrollbar{
@@ -40,13 +39,28 @@ img{
     position: fixed;
     top: 0;
     right: 0;
-    background: #f0f8ff80;
+    background-color: #f0f8ff80;
     color: #000000;
     font-size: 20px;
     transition: right 2.0s linear;
     white-space: nowrap;
     pointer-events: none;
+}
+/* #endregion */
+
+/* #region tobitext */
+.tobitext{
+    opacity: 1;
+    padding: 4px 8px;
+    background: rgba(0,0,0,0.72);
+    border-radius: 8px;
+    transform: translate(-50%, -50%) translateY(0px);
+    white-space: nowrap;
+    color: #ffffff;
+    position: absolute;
+    transition: none;
     z-index: 2147483647;
+    pointer-events: none;
 }
 /* #endregion */
 
@@ -72,7 +86,7 @@ img{
 #log .opener{
     width: 30px;
     height: 100%;
-    background: #000000ef;
+    background-color: #000000ef;
     text-align: center;
     cursor: pointer;
     z-index: inherit;
@@ -82,7 +96,7 @@ img{
     height: 100%;
     max-height: 100%;
     overflow-x: hidden; overflow-y: scroll;
-    background: #000000de;
+    background-color: #000000de;
     text-align: left;
     font-size: 14px;
     transition: right 0.3s;
@@ -114,28 +128,22 @@ img{
         opacity: 1;
     }
 }
-.color-red{
-    color: #ff1919;
-}
-.color-pink{
-    color: #ff56e9;
-}
-.color-blue{
-    color: #1919ff;
-}
 /* #endregion */
 
 /* #region description */
-#movableDescription{
+#mobileDesc{
     display: none;
     position: fixed;
     pointer-events: none;
-    background: #363636e2;
+    background-color: #363636e2;
     color: #f0f8ff;
     text-align: left;
     padding: 5px 10px;
     border-radius: 5px;
     z-index: 256;
+}
+#mobileDesc.show{
+    display: block;
 }
 /* #endregion */
 
@@ -145,6 +153,94 @@ img{
 }
 .tk.mostop{
     z-index: 2147483647;
+}
+.tk.cenXY{
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+}
+.tk.cenX{
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+}
+.tk.cenY{
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+}
+/* #endregion */
+
+/* #region alertD */
+.alertD{
+    display: block;
+    width: 320px;
+    height: 70px;
+    border-radius: 15px;
+    box-shadow: #000000 5px 5px 20px;
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: bottom 0.1s linear;
+    will-change: bottom;
+    overflow: hidden;
+    box-sizing: border-box;
+    z-index: 2147483647;
+}
+.alertD.show{
+    bottom: 20px;
+}
+.alertD .row{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+.alertD .row .icon{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    font-size: 20px;
+}
+.alertD .row .text{
+    font-size: 18px;
+}
+.alertD .x{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 20px;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    background: #00000000;
+    position: absolute;
+    right: 5px;
+    top: 0;
+    font-size: 20px;
+    cursor: pointer;
+}
+.alertD .bar{
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 5px;
+    border-radius: 0 0 15px 15px;
+    overflow: hidden;
+}
+.alertD .bar .inner{
+    width: 0px;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    bottom: 0;
 }
 /* #endregion */
 
@@ -166,7 +262,7 @@ img{
     height: 100px;
     /* aspect-ratio: 1/1; */
     padding: 5px;
-    background: #f0f8ff;
+    background-color: #f0f8ff;
     border: 1px solid #000000;
     color: #000000;
     font-size: 12px;
@@ -174,10 +270,12 @@ img{
     top: 0;
     left: 0;
     animation: fadeIn 0.5s ease forwards;
-    z-index: 23;
+    z-index: 999;
     margin-right: 5px;
     margin-bottom: 5px;
 }
+/* #endregion */
+
 
 /* #region hakaisatsu */
 #hakaisatsu{
@@ -257,13 +355,12 @@ img{
 /* #region upper 10 */
 #upper{
     display: block;
-    width: 100vw;
+    width: calc(100vw - 40px);
     height: 80px;
-    background: #bdd0df;
     opacity: 0.1;
     position: fixed;
     top: 0;
-    left: 0;
+    right: 0;
     transition: top 0.5s ease, opacity 0.3s cubic-bezier(0.25, 0.1, 0.30, 1.0);
     box-sizing: border-box;
     z-index: 10;
@@ -311,25 +408,27 @@ img{
     display: block;
     width: 100%;
     height: 100%;
+    background: #bdd0df;
     box-sizing: border-box;
 }
-#upper .home .rank .label{
+#upper .home .rank{
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100%;
+    height: 80px;
     aspect-ratio: 1/1;
     font-size: 24px;
     color: #000000;
     font-family: cube12;
     position: absolute;
     top: 0;
-    left: 0;
+    left: -40px;
     z-index: 2;
 }
-#upper .home .rank .label::after{
-    content: '';
-    display: block;
+#upper .home .rank .label{
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 100%;
     height: 100%;
     background: #c8e4ff;
@@ -337,19 +436,37 @@ img{
     position: absolute;
     top: 0;
     left: 0;
-    z-index: -1;
-
 }
-#upper .home .rank .label::before{
-    content: '';
+#upper .home .rank .bar{
     display: block;
-    width: 50%;
-    height: calc(100% + 1px);
-    background: var(--area-back);
+    width: calc(100vw - 40px);
+    height: 10px;
+    background: #b0c9dd;
     position: absolute;
-    top: 0;
-    left: 0;
+    left: 40px;
+    bottom: 0;
     z-index: -1;
+}
+#upper .home .rank .bar .inner{
+    display: block;
+    width: 0;
+    height: 100%;
+    background: #74c3ff;
+    transition: width 0.1s ease;
+}
+#upper .home .rank .bar .val{
+    opacity: 1;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    top: 50%;
+    left: calc(50% - 20px);
+    font-size: 12px;
+    color: #000000;
+    font-family: cube12;
+    z-index: 1;
+}
+#upper:hover .home .rank .bar .val{
+    opacity: 0.1;
 }
 /* #endregion */
 

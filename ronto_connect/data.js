@@ -245,7 +245,7 @@ let Charas = [
 
 let Friends = [
     {
-		able:1,
+		
         ruby:'ひか れいる',
         name:'飛花レイル',
         in:'', //所属
@@ -258,7 +258,7 @@ let Friends = [
         P:0,
     },
     {
-		able:1,
+		
         ruby:'はばから れいる',
         name:'憚羅レイル',
         rare:3,
@@ -290,26 +290,26 @@ let Friends = [
 	},
 
     {
-		able:1,
+		
         ruby:'おやすみ にーく',
         name:'小安見ニーク',
         rare:3,
     },
     {
-		able:1,
+		
         ruby:'めんど がりや',
         name:'面戸ガリヤ',
         rare: 2,
     },
     {
-		able:1,
+		
         ruby:'いらつ きき',
         name:'伊辣キキ',
         rare: 2,
     },
 
     {
-		able:1,
+		
         ruby:'いきる かしか',
         name:'息留 河鹿',
         rare: 1
@@ -1062,7 +1062,7 @@ let Equips = {
             power:0,
             price:0,
             desc:'ないです。素手とか念とか自由に解釈しておk',
-            buyable:0,
+            no:1,
             ap:0,
             ce:0,
         },
@@ -1073,10 +1073,9 @@ let Equips = {
             power:2,
             price:10,
             desc:'初期装備あるあるの武器。値段に見合わず割と強い',
-            buyable:1,//購入可能かどうか
+            //購入可能かどうか
             ap:0,
             ce:0,
-            
         },
         {
             jpnm:'木刀',
@@ -1085,7 +1084,7 @@ let Equips = {
             power:4,
             price:20,
             desc:'木の棒よりも強い。言うなれば気の剣。',
-            buyable:1,
+            
             ap:0,
             ce:0,
         },
@@ -1096,7 +1095,6 @@ let Equips = {
             power:6,
             price:30,
             desc:'さあ、剣道しようぜ！！',
-            buyable:1,
             ap:0,
             ce:0,
         },
@@ -1107,7 +1105,6 @@ let Equips = {
             power:8,
             price:50,
             desc:'石です。よわよわ',
-            buyable:1,
             ap:0,
             ce:0,
         },
@@ -1118,7 +1115,6 @@ let Equips = {
             power:10,
             price:80,
             desc:'岩です。つよつよ',
-            buyable:1,
             ap:0,
             ce:0,
         },
@@ -1129,7 +1125,6 @@ let Equips = {
             power:12,
             price:100,
             desc:'岩にセメントつけたら強くなるのって意味わからなくね？',
-            buyable:1,
             ap:0,
             ce:0,
         },
@@ -1139,8 +1134,7 @@ let Equips = {
             num:0,
             power:20,
             price:5,
-            desc:'薄い紙です。すって相手に切り付けて｢いたっ..｣ってさせる用です',
-            buyable:1,
+            desc:'薄い紙です。\nすって相手に切り付けて｢いたっ..｣ってさせる用です',
             ap:0,
             ce:1,
             bFunc:{ //攻撃前の効果
@@ -1154,7 +1148,6 @@ let Equips = {
             power:'Math.floor(Math.random()*13)+1',
             price:7,
             desc:'ちょっとした運要素。攻撃方法は切り付けなので弱い',
-            buyable:1,
             ap:0,
             ce:0,
         },
@@ -1164,8 +1157,7 @@ let Equips = {
             num:0,
             power:25,
             price:200,
-            desc:'持って｢近づいたら*すよ..?｣っていう用。実際*せない',
-            buyable:1,
+            desc:'石には負けるけど紙には勝てます\n金属製',
             ap:0,
             ce:1,
             bFunc:{
@@ -1179,7 +1171,6 @@ let Equips = {
             power:40,
             price:300,
             desc:'つよつよ武器。\n花や骨に向かって振り回しましょう',
-            buyable:1,
             ap:0,
             ce:1,
             bFunc:{
@@ -1194,12 +1185,9 @@ let Equips = {
             power:0,
             price:150,
             desc:'紅き鮮血に染まりし剣..\n攻撃時相手の体力を吸い回復する\n変換効率は80%..水力発電とだいたい同じ',
-            buyable:1,
             ap:1,
-            aFunc:async function(cam,me,are,rate,kind,prop,dmg){
-                x = (dmg * 0.80).toFixed(0);
-                humans[cam][me].hp += x;
-                if(humans[cam][me].hp > humans[cam][me].maxhp){humans[cam][me].hp = humans[cam][me].maxhp;}
+            aFunc:async function(who,are){
+                if(await damage(who, are, ))
                 addtext('血を吸った！');
                 tekiou();
                 addtext(`体力が${x}回復した!`);
@@ -1214,7 +1202,7 @@ let Equips = {
             power:10,
             price:150,
             desc:'ナギサ様の手好き',
-            buyable:1,
+            
             ap:1,
             aFunc:async function(cam,me,are,rate,kind,prop,dmg){
                 addtext(arraySelect(['トリニティの砲撃術は優秀ですから。','お口に合うと良いのですが..']));
@@ -1232,7 +1220,7 @@ let Equips = {
             power:0,
             price:150,
             desc:'大勝負..ってやつ？まじで賭け。がんばえ',
-            buyable:1,
+            
             ap:0,
             ce:1,
             bFunc:{
@@ -1246,7 +1234,7 @@ let Equips = {
             power:80,
             price:150,
             desc:'名前変更予定。',
-            buyable:0,
+            no:1,
             ap:0,
             ce:1,
             bFunc:{
@@ -1262,7 +1250,7 @@ let Equips = {
             shell:0,
             price:0,
             desc:'ないです。\n筋肉とでもフォースとでもなんとでも解釈しておk',
-            buyable:0,
+            no:1,
             sp:0
         },
         {
@@ -1273,7 +1261,7 @@ let Equips = {
             price:1,
             // desc:'大事ですね。\n防御力は関係ありませんが病気にはならない',
             desc:'防御力はないです..が、\n精神的な防御力は激高です',
-            buyable:1,
+            
             sp:0
         },
         {
@@ -1283,7 +1271,7 @@ let Equips = {
             shell:1,
             price:5,
             desc:'***なのは駄目！！\n死刑！！！！',//コハルなのでセーフ
-            buyable:1,
+            
             sp:0
         },
         {
@@ -1293,7 +1281,7 @@ let Equips = {
             shell:5,
             price:20,
             desc:'これを使って最初はつるはしを作りましょう',
-            buyable:1,
+            
             sp:0
         },
         {
@@ -1303,7 +1291,7 @@ let Equips = {
             shell:10,
             price:30,
             desc:'突進してくるあいつ。こいつに手間取ると他のが来てすぐ*ぬので注意',
-            buyable:1,
+            
             sp:0
         },
         {
@@ -1313,7 +1301,7 @@ let Equips = {
             shell:15,
             price:50,
             desc:'初期装備あるあるⅡですね。多分コスパ最強',
-            buyable:1,
+            
             sp:0
         },
         {
@@ -1323,7 +1311,7 @@ let Equips = {
             shell:20,
             price:80,
             desc:'辞書とかなのかな。いや六法全書かも',
-            buyable:1,
+            
             sp:0
         },
         {
@@ -1333,7 +1321,7 @@ let Equips = {
             shell:25,
             price:100,
             desc:'え？木の板と一緒だって？-\n君は知らないのかい...?\n木の板を6つ並べるとドアが3つできるってことを',
-            buyable:1,
+            
             sp:0
         },
         {
@@ -1343,7 +1331,7 @@ let Equips = {
             shell:30,
             price:200,
             desc:'涼めるのに便利。\nまた武器にもなり、ついでに敵から身を守れる万能装備',
-            buyable:1,
+            
             sp:0
         },
         {
@@ -1353,7 +1341,7 @@ let Equips = {
             shell:50,
             price:400,
             desc:'ペロロ様の出番です！！\nhifumi daisuki',
-            buyable:1,
+            
             sp:0
         }
     ],
@@ -1366,7 +1354,7 @@ let Equips = {
             shell:0,
             price:0,
             desc:'なし',
-            buyable:0,
+            no:1,
             sp:0
         }
     ],
@@ -1379,7 +1367,7 @@ let Equips = {
             shell:0,
             price:0,
             desc:'なし',
-            buyable:0,
+            no:1,
             sp:0
         }
     ],
@@ -1392,7 +1380,7 @@ let Equips = {
             shell:0,
             price:0,
             desc:'なし',
-            buyable:0,
+            no:1,
             sp:0
         }
     ]
@@ -1633,7 +1621,7 @@ let Skills = [
             jpnm:'null',
             desc:'何もないです。\nまあこれが店頭に並ぶこともないでしょうけどね。\nはい論破',
             price:0,
-            buyable:0,
+            no:1,
         },
         {//変更予定
             type:'ex',
@@ -1641,7 +1629,7 @@ let Skills = [
             jpnm:'',
             desc:``,
             price:50,
-            buyable:1,
+            
             exclusive:'color_slime',
             func:async function(cam,me){
                 return 0;
@@ -1653,7 +1641,7 @@ let Skills = [
             jpnm:'雷ちゃん、召喚',
             desc:'タレットを1つ配置する',
             price:95,
-            buyable:1,
+            
             func:async function(cam,me){
                 turretPlace(cam);
                 return 0;
@@ -1665,7 +1653,7 @@ let Skills = [
             jpnm:'トリッキーな変数',
             desc:'爆弾を投げる。効果はランダム',
             price:95,
-            buyable:1,
+            
             func:async function(cam,me){
                 let [target, tcam] = await LetsTargetSelect();
                 await addtext(`${humans[cam][me].jpnm}は爆弾を投げた...`);
@@ -1709,7 +1697,7 @@ let Skills = [
             jpnm:'私がかけた魔法だよ',
             desc:'敵に攻撃力の150%のダメージを与え、たまに凍らせる',
             price:80,
-            buyable:1,
+            
             func:async function(cam,me){
                 let [target, tcam] = await LetsTargetSelect();
                 await addtext(
@@ -1733,7 +1721,7 @@ let Skills = [
             jpnm:'ライニングストーム',
             desc:'敵全体に攻撃力の120%のダメージを与え、帯電にする\n帯電:自身の行動時自傷ダメージが入る',
             price:60,
-            buyable:1,
+            
             func:async function(cam,me){
                 let [target, tcam] = await LetsTargetSelect(3);
                 let result = await damage(cam,me,are,1.5,'sh',4);
@@ -1748,7 +1736,7 @@ let Skills = [
             jpnm:'Kylie Eleison',
             desc:'敵に攻撃力の200%のダメージ。もし敵の体力が70%以上ならば400%',
             price:110,
-            buyable:1,
+            
             func:async function(cam,me){
                 phase = 0; disappear();
                 let target = await LetsTargetSelect();
@@ -1765,7 +1753,7 @@ let Skills = [
             jpnm:'自走式閃光ドローン',
             desc:'敵に攻撃力の75%のダメージを与え、スタンさせる',
             price:60,
-            buyable:1,
+            
             func:async function(cam,me){
                 phase = 0; disappear();
                 let target = await LetsTargetSelect();
@@ -1781,7 +1769,7 @@ let Skills = [
             jpnm:'挑戦状を受け取ってください!!',
             desc:'敵の防御力を下げ、自身の攻撃力を上げる',
             price:90,
-            buyable:1,
+            
             func:async function(who){
                 phase = 0; disappear();
                 let [tcam, tme] = await LetsTargetSelect();
@@ -1798,7 +1786,7 @@ let Skills = [
             jpnm:'小心者の観測',
             desc:'敵を弱点把握状態を付与する',
             price:50,
-            buyable:1,
+            
             func:async function(cam,me){
                 phase = 0; disappear();
                 let [tcam, tme] = await LetsTargetSelect();
@@ -1816,7 +1804,7 @@ let Skills = [
             jpnm:'null',
             desc:'(まじでnullです。効果無し。外れ。乙)',
             price:0,
-            buyable:0,
+            no:1,
             cool:0
         },
         {
@@ -1825,7 +1813,7 @@ let Skills = [
             jpnm:'Attach!Slime!!',
             desc:'敵にスライムをくっつける',
             price:70,
-            buyable:1,
+            
             cool:3,
             func:async function(cam,me){
                 let are = ShallTargetSelect(cam,me,'er',0);
@@ -1840,7 +1828,7 @@ let Skills = [
             jpnm:'匙を投げる？これはレンチだよ',
             desc:'レンチを投げる準備をし、次の攻撃が二倍になる',
             price:70,
-            buyable:1,
+            
             cool:4,
             func:async function(who){
                 await buffadd(who, who,'letsthrow', 'turn' ,2,1);
@@ -1854,7 +1842,7 @@ let Skills = [
             jpnm:'かけ上手',
             desc:'次の攻撃時に0,2,4倍の倍率がかかる',
             price:70,
-            buyable:1,
+            
             cool:3,
             func:async function(who){
                 await buffadd(who, who,'gambling', 'turn' ,1,1);
@@ -1868,7 +1856,7 @@ let Skills = [
             jpnm:'改善が必要だよ',
             desc:'攻撃力を1.4倍に上昇させる',//変更予定,
             price:30, //"負荷"みたいにして、stackのbuffをつけて、攻撃力を上げさせる〜とかどう？
-            buyable:1,
+            
             cool:5,
             func:async function(who){
                 await buffadd(who, who,'improve', 'turn' ,4,1);
@@ -1882,7 +1870,7 @@ let Skills = [
             jpnm:'エレクトリックバリア',
             desc:'体力が最も低い味方に帯電バリアを付与する。\n帯電バリア:被攻撃時相手に帯電を付与する\n帯電:自身の行動時自傷ダメージが入る',
             price:70,
-            buyable:1,
+            
             cool:3,
             func:async function(who){
                 let are = ShallTargetSelect(who, 'phpl',0);
@@ -1899,7 +1887,7 @@ let Skills = [
             jpnm:'null',
             desc:'(まじでnullです。効果無し。外れ。乙)',
             price:0,
-            buyable:0,
+            no:1,
         },
         {
             type:'ps',
@@ -1907,7 +1895,7 @@ let Skills = [
             jpnm:'DoYourBest!!',
             desc:'slash時、たまに3回攻撃する',
             price:90,
-            buyable:1,
+            
         },
         {
             type:'ps',
@@ -1915,7 +1903,7 @@ let Skills = [
             jpnm:'雷ちゃん、もうちょっと',
             desc:'slash of light命中時、タレットを1つ配置する',
             price:90,
-            buyable:1,
+            
         },
         {
             type:'ps',
@@ -1923,7 +1911,7 @@ let Skills = [
             jpnm:'生粋の勝負師',
             desc:'slash of lightの命中率が下がるが、命中時3倍のダメージ',
             price:90,
-            buyable:1,
+            
         },
         {
             type:'ps',
@@ -1931,7 +1919,7 @@ let Skills = [
             jpnm:'一度限りの取引',
             desc:'攻撃によって敵の体力を50%以下だった場合、攻撃力の70%で追撃する',
             price:70,
-            buyable:1,
+            
         },
         {
             type:'ps',
@@ -1939,7 +1927,7 @@ let Skills = [
             jpnm:'エレクトリック衝撃',
             desc:'会心時、相手に帯電を付与する。\n帯電:自身の行動時自傷ダメージが入る',
             price:90,
-            buyable:1,
+            
         }
 ]
 
@@ -1947,13 +1935,13 @@ let Stages = [
     {
         name:'草原',
         jpnm:'創生黎明の原野',
-        able:1,
+        
         tiles: ['a','b'],
     },
     {
         name:'砂漠',
         jpnm:'ガチェンレイゲスドゥールラート',
-        able:0,
+        no:1,
         tiles: ['b','c','d'],
     }
 ];
@@ -1963,7 +1951,7 @@ let Objects = [
     {
         name:'none',
         jpnm:'none',
-        able:1,
+        
         on:1,
         in:'すべて',
         func:async function(){}
@@ -1971,37 +1959,37 @@ let Objects = [
     {
         name:'stair',
         jpnm:'階段',
-        able:1,
+        
         on:1,
         in:'すべて',
         func:async function(){
-            GoNextFloor();
+            nextFloor();
         }
     },
     {
         name:'door',
         jpnm:'ドア',
-        able:1,
+        
         on:1,
         in:'すべて',
         func:async function(){
-            NextStage();
+            nextStage();
         }
     },
     {
         name:'enemy',
         jpnm:'敵',
-        able:1,
+        
         on:0,
         in:'すべて',
         func:async function(){
-            EnemyAppear();
+            encount();
         },
     },
     {
         name:'boss',
         jpnm:'上司',
-        able:1,
+        
         on:0,
         in:'すべて',
         func:async function(){
@@ -2011,7 +1999,7 @@ let Objects = [
     {
         name:'fire_on',
         jpnm:'焚き火',
-        able:1,
+        
         on:1,
         in:'すべて',
         func:async function(){
@@ -2035,7 +2023,7 @@ let Objects = [
     {
         name:'fire_off',
         jpnm:'焚き火跡',
-        able:1,
+        
         on:1,
         in:'すべて',
         func:async function(){
@@ -2048,7 +2036,7 @@ let Objects = [
     {
         name:'shop_skill',
         jpnm:'スキルショップ',
-        able:1,
+        
         on:1,
         in:'すべて',
         func:async function(){
@@ -2058,7 +2046,7 @@ let Objects = [
     {
         name:'chest_n',
         jpnm:'宝箱',
-        able:1,
+        
         on:1,
         in:'すべて',
         func:async function(){
@@ -2068,7 +2056,7 @@ let Objects = [
     {
         name:'chest_r',
         jpnm:'レア宝箱',
-        able:1,
+        
         on:1,
         in:'すべて',
         func:async function(){
@@ -2078,7 +2066,7 @@ let Objects = [
     {
         name:'hopebutton',
         jpnm:'救いのボタン',
-        able:0,
+        no:1,
         on:1,
         in:'草原',
         func:async function(){
@@ -2088,7 +2076,7 @@ let Objects = [
     {
         name:'candytray',
         jpnm:'あめ置き場',
-        able:1,
+        
         on:1,
         in:'草原',
         func:async function(){
@@ -2098,7 +2086,7 @@ let Objects = [
     {
         name:'cookietray',
         jpnm:'クッキー置き場',
-        able:1,
+        
         on:1,
         in:'草原',
         func:async function(){
@@ -2108,7 +2096,7 @@ let Objects = [
     {
         name:'scorpion',
         jpnm:'さそりさん',
-        able:1,
+        
         on:1,
         in:'砂漠',
         func:async function(){
@@ -2118,7 +2106,7 @@ let Objects = [
     {
         name:'scorpion2',
         jpnm:'さそりさん2世',
-        able:1,
+        
         on:1,
         in:'砂漠',
         func:async function(){
@@ -2128,7 +2116,7 @@ let Objects = [
     {
         name:'cutras',
         jpnm:'さぼてんさん',
-        able:1,
+        
         on:0,
         in:'砂漠',
         sei:['接触'],
@@ -2139,7 +2127,7 @@ let Objects = [
     {
         name:'oasis',
         jpnm:'おあしす',
-        able:1,
+        
         on:1,
         in:'砂漠',
         func:async function(){
@@ -2149,7 +2137,7 @@ let Objects = [
     {
         name:'sandstorm',
         jpnm:'砂嵐',
-        able:0,
+        no:1,
         on:1,
         in:'砂漠',
         func:async function(){}
@@ -2158,7 +2146,7 @@ let Objects = [
 
 let Enemies = [
     {
-        able:0,
+        no:1,
         name:'蒼白の粘液',
         in:'草原',
         maxhp:'+15',
@@ -2199,7 +2187,7 @@ let Enemies = [
         ]
     },
     {
-        able:0,
+        no:1,
         name:'翠嵐の風刃',
         in:'草原',
         maxhp:'-20',
@@ -2240,7 +2228,7 @@ let Enemies = [
         ]
     },
     {
-        able:0,
+        no:1,
         name:'黄昏の穿影',
         in:'草原',
         maxhp:'-10',
@@ -2297,7 +2285,7 @@ let Enemies = [
         ]
     },
     {
-        able:0,
+        no:1,
         name:'燐光の妖花',
         in:'草原',
         maxhp:'+0',
@@ -2350,7 +2338,7 @@ let Enemies = [
         ]
     },
     {
-        able:0,
+        no:1,
         name:'茎槍の狩人',
         in:'草原',
         maxhp:'+0',

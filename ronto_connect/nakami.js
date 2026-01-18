@@ -3,8 +3,7 @@ function delay(ms){
     return new Promise(resolve=>setTimeout(resolve,ms));
 };
 async function nicoText(mes){
-    console.log(`[nico] ${mes}`);
-    const newDiv = document.createElement('div');
+    let newDiv = document.createElement('div');
     newDiv.textContent = mes;
     newDiv.className = 'nicotext';
     newDiv.style.top = `calc(${random(0, 100)}vh - 20px)`;
@@ -18,19 +17,73 @@ async function nicoText(mes){
     await delay(2000); 
     newDiv.remove();
 };
+function tobiText(youso, mes) {
+    let el = youso;
+    if(typeof el == 'string') el = document.querySelector(youso);
+    if(!el) return console.error('せんぱ〜い？この要素壊れてますよ〜〜？');
+
+    let rect = el.getBoundingClientRect();
+    let left = rect.left + window.scrollX + rect.width / 2;
+    let top = rect.top + window.scrollY + rect.height / 2;
+
+    let node = document.createElement('div');
+    node.className = 'tobitext';
+    node.textContent = mes;
+    node.style.top = `${top}px`;
+    node.style.left = `${left}px`;
+
+    document.body.appendChild(node);
+
+    let duration = 1200;
+    let distance = -48;
+    let jitter = (Math.random() - 0.5) * 10;
+
+    let start = performance.now();
+
+    function easeOutCubic(t){return 1 - Math.pow(1 - t, 3);}
+
+    function frame(now){
+        let t = Math.min(1, (now - start) / duration);
+        let e = easeOutCubic(t);
+        let tsY = distance * e;
+        let tsX = jitter * (1 - e);
+        node.style.transform = `translate(-50%, -50%) translateY(${tsY}px) translateX(${tsX}px)`;
+        node.style.opacity = String(1 - t);
+        if(t < 1) requestAnimationFrame(frame);
+        else node.remove();
+    }
+
+    requestAnimationFrame(frame);
+}
 function kaijou(num){
     if(num == 0) return 0;
     if(num == 1) return 1;
     return num * kaijou(num - 1);
 }
+function kaikyu(sta, end, row, val){
+    if(typeof sta != 'number' || typeof end != 'number' || typeof row != 'number' || typeof val != 'number') return console.error('えっと、できれば..引数は全て数字にして欲しい...です......');
+    if(row <= 0) return console.error(`row${row}でしたけど...大丈夫ですか？`);
+    if(sta > end) return console.error('え、えっと...多分、逆です......')
+    if(val < sta || val > end) return console.error('こ、この値..枠から外れてます....');
+
+    let kari = Math.floor((val-sta) / row);
+    let sta2 = sta + kari*row;
+    let end2 = sta + row-1;
+    if(end2 > end) end2 = end;
+
+    let arr = [];
+    for(let i = sta2; i <= end2; i++) arr.push(i);
+
+    return arr;
+}
 function arraySelect(array){
     let select = Math.floor(Math.random()*array.length);
     return array[select];
 };
-function arrayShuffle(array){
-    for(let i = array.length - 1; i > 0; i--){
-    const i2 = Math.floor(Math.random() * (i + 1));
-    [array[i], array[i2]] = [array[i2], array[i]];
+function arrayShuffle(array) {
+    for(let i = array.length - 1; i > 0; i--) {
+        let i2 = Math.floor(Math.random() * (i + 1));
+        [array[i], array[i2]] = [array[i2], array[i]];
     }
     return array;
 };
@@ -39,22 +92,22 @@ function arraySize(array){
     return res;
 };
 function arrayCount(array){
-    const counts = {};
-    for (let value of array){
-    counts[value] = (counts[value] || 0) + 1;
+    let counts = {};
+    for(let value of array){
+        counts[value] = (counts[value] || 0) + 1;
     }
     return counts;
 }
 function arrayMult(array){
     return array.reduce((a, v) => a * v, 1);
 }
-function arrayGacha(array,probability){
-    if(array.length != probability.length) throw new Error("長さがあってないっす！先輩、ちゃんとチェックした方がいいっすよ〜？");
-    const total = probability.reduce((sum, p) => sum + p, 0);
+function arrayGacha(array, prob){
+    if(array.length != prob.length) throw new Error("長さがあってないっす！先輩、ちゃんとチェックした方がいいっすよ〜？");
+    let total = prob.reduce((sum, p) => sum + p, 0);
     let random = Math.random() * total;
-    for (let i = 0; i < array.length; i++){
-        if(random < probability[i]) return array[i];
-        random -= probability[i];
+    for (let i = 0; i < array.length; i++) {
+        if(random < prob[i]) return array[i];
+        random -= prob[i];
     }
 };
 function hask(obj, key){
@@ -62,19 +115,19 @@ function hask(obj, key){
     res = res ? 1 : 0;
     return res;
 }
-function copy(moto){
+function copy(moto) {
     if(Array.isArray(moto)){
         let arr = [];
-        for (let i = 0; i < moto.length; i++){
+        for(let i = 0; i < moto.length; i++){
             arr.push(copy(moto[i]));
         }
         return arr;
     }
     else if(moto != null && typeof moto == 'object'){
         let obj = {};
-        for (let key in moto){
+        for(let key in moto){
             if(moto.hasOwnProperty(key)){
-            obj[key] = copy(moto[key]);
+                obj[key] = copy(moto[key]);
             }
         }
         return obj;
@@ -87,12 +140,12 @@ function probability(num){
     return Math.random()*100 <= num;
     //例:num == 20 → randomが20以内ならtrue,elseならfalseを返す
 };
-function random(min, max){
+function random(min, max) {
     let num = Math.floor(Math.random() * (max - min + 1)) + min;
     return Math.floor(num);
 };
-function fl(num){
-    let res = num ? 1 : 0;
+function fl(val, arr = [0, 1]){
+    let res = val == arr[0] ? arr[1] : arr[0];
     return res;
 }
 function anagramSaySay(text, loop = 10, bet = '<br>'){
@@ -112,7 +165,7 @@ function anagramSaySay(text, loop = 10, bet = '<br>'){
     let cal = (kaijou(len) / optmat) - 1;
 
     let loopen = loop;
-    console.log(`総数:${cal} 回数:${loopen}`);
+    // console.log(`総数:${cal} 回数:${loopen}`);
     if(cal < loopen) menjo = 1;
     
     let reses = [];
@@ -131,95 +184,81 @@ function anagramSaySay(text, loop = 10, bet = '<br>'){
     
     return reses.join(bet);
 }
-function setLocalStorage(name, value){
+function anagramCan(mae, ato){
+    if(mae.length != ato.length) return 0;
+
+    let count = {};
+    for(let ch of mae){
+        count[ch] = (count[ch] || 0) + 1;
+    }
+
+    for(let ch of ato){
+        if(!count[ch]) return 0;
+        count[ch] -= 1;
+    }
+
+    return 1;
+}
+function setLocalStorage(name, value) {
     localStorage.setItem(name, value || "");
 }
-function getLocalStorage(name){
+function getLocalStorage(name) {
     return localStorage.getItem(name);
 }
-let r = {
-    and: function(lef, rig){
-        if(lef && rig) return 1
-        return 0
-    },
-    or: function(lef, rig){
-        if(lef || rig) return 1
-        return 0
-    },
-    xor: function(lef, rig){
-        console.log('排他的論理和発動！！')
-        let l = lef ? 1 : 0
-        let r = rig ? 1 : 0
-        if(l != r) return 1
-        return 0
-    },
-    not: function(lef){
-        if(lef) return 0
-        return 1
-    },
-    nand: function(lef, rig){
-        if(lef && rig) return 0
-        return 1
-    },
-    nor: function(lef, rig){
-        if(lef || rig) return 0
-        return 1
-    },
-    xnor: function(lef, rig){
-        console.log('逆排他的論理和発動！！')
-        let l = lef ? 1 : 0
-        let r = rig ? 1 : 0
-        if(l != r) return 0
-        return 1
-    }
-}
 async function error(text = 'errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr'){
-    addtext(text);
+    addtext(text)
     await delay(2000);
-    window.open('about:blank', '_self').close();
+    // window.open('about:blank', '_self').close();
 }
-function hoshoku(color){
-    color = color.replace(/^#/, ''); // #付きなら取る
+function hoshoku(color) {
+    color = color.replace(/^#/, '');
 
-    if(color.length != 6) return console.log('カラーコードは6桁、ですよ〜？楽しないでくださいね〜♪')
+    if(color.length != 6) return console.log('カラーコードは6桁、ですよ〜？楽しないでくださいね♪')
 
-    // RGB分解
-    const r = parseInt(color.slice(0, 2), 16);
-    const g = parseInt(color.slice(2, 4), 16);
-    const b = parseInt(color.slice(4, 6), 16);
+    let r = parseInt(color.slice(0, 2), 16);
+    let g = parseInt(color.slice(2, 4), 16);
+    let b = parseInt(color.slice(4, 6), 16);
 
-    // 補色：255から引く
-    const compR = (255 - r).toString(16).padStart(2, '0');
-    const compG = (255 - g).toString(16).padStart(2, '0');
-    const compB = (255 - b).toString(16).padStart(2, '0');
+    let compR = (255 - r).toString(16).padStart(2, '0');
+    let compG = (255 - g).toString(16).padStart(2, '0');
+    let compB = (255 - b).toString(16).padStart(2, '0');
 
-    return `#${compR}${compG}${compB}`;
+    let ato = `#${compR}${compG}${compB}`
+
+    return ato;
 }
-function mixshoku(c1, c2, ratio = 0.5){
-    const toRGB = c => {
+function mixshoku(c1, c2, ratio = 0.5) {
+    let toRGB = c => {
         c = c.replace('#', '');
-        if(c.length === 3) c = c.split('').map(x => x + x).join('');
-        const n = parseInt(c, 16);
+        if (c.length === 3) c = c.split('').map(x => x + x).join('');
+        let n = parseInt(c, 16);
         return [n >> 16, (n >> 8) & 255, n & 255];
     };
 
-    const [r1, g1, b1] = toRGB(c1);
-    const [r2, g2, b2] = toRGB(c2);
+    let [r1, g1, b1] = toRGB(c1);
+    let [r2, g2, b2] = toRGB(c2);
 
-    const r = Math.round(r1 + (r2 - r1) * ratio);
-    const g = Math.round(g1 + (g2 - g1) * ratio);
-    const b = Math.round(b1 + (b2 - b1) * ratio);
+    let r = Math.round(r1 + (r2 - r1) * ratio);
+    let g = Math.round(g1 + (g2 - g1) * ratio);
+    let b = Math.round(b1 + (b2 - b1) * ratio);
 
     let ato = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
 
     return ato;
 }
+function ranshoku(){
+    let r = random(0, 255);
+    let g = random(0, 255);
+    let b = random(0, 255);
+    let ato = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+    return ato
+}
 //#endregion
 //#region log&text
 let textDiv = document.querySelector('#text');
 let autoDelay = 1;
-let skipText = 0; // スキップフラグ
-let clearText = 0; // テキスト消去フラグ
+let skipText = false;
+let clearText = false;
 let textShowing = 0;
 
 function colorcheck(rawtext) {
@@ -298,40 +337,44 @@ async function addtext(raw){
     textDiv.innerHTML = ""; // 中身をリセット
     textDiv.style.display = "block"; // 表示
     let index = 0;
-    clearText = 0; // 消去フラグをリセット
+    clearText = false; // 消去フラグをリセット
 
     return new Promise((resolve) => {
-        async function type(){
-            if(index < text.length){
-                if(skipText){
+        async function type() {
+                if (index < text.length) {
+                if (skipText) {
                     // スキップ処理
-                    while(index < text.length){
-                        const span = document.createElement("span");
-                        span.textContent = text[index].char;
-                        if(text[index].color) span.style.color = text[index].color;
-                        textDiv.appendChild(span);
-                        index++;
+                    while (index < text.length) {
+                            let span = document.createElement("span");
+                            span.textContent = text[index].char;
+                            if (text[index].color) {
+                            span.classList.add(`color-${text[index].color}`);
+                            }
+                            textDiv.appendChild(span);
+                            index++;
                     }
-                    index = text.length;
-                    skipText = 0;
+                    index = text.length; // 全ての文字を表示済みにする
+                    skipText = false;
                     setTimeout(type, 10);
-                }else{
+                } else {
                     // 通常の文字表示
-                    const span = document.createElement("span");
+                    let span = document.createElement("span");
                     span.textContent = text[index].char;
-                    if(text[index].color) span.style.color = text[index].color;
+                    if (text[index].color) {
+                            span.classList.add(`color-${text[index].color}`);
+                    }
                     textDiv.appendChild(span);
 
                     index++;
                     setTimeout(type, 80); // 次の文字を表示する間隔
                 }
-                }else{
+                } else {
                 addlog(textDiv.innerHTML);
-                const waitTime = autoDelay * 1000;
-                const timeout = new Promise(resolve => setTimeout(resolve, waitTime));
-                const userAction = new Promise(resolve => {
-                    function waitToClear(event){
-                            if(event.type === 'click' || event.key === 'z' || event.key === 'Enter'){
+                let waitTime = autoDelay * 1000;
+                let timeout = new Promise(resolve => setTimeout(resolve, waitTime));
+                let userAction = new Promise(resolve => {
+                    function waitToClear(event) {
+                            if (event.type === 'click' || event.key === 'z' || event.key === 'Enter') {
                             document.removeEventListener('click', waitToClear);
                             document.removeEventListener('keydown', waitToClear);
                             resolve();
@@ -344,8 +387,8 @@ async function addtext(raw){
                 Promise.race([timeout, userAction]).then(() => {
                     textDiv.textContent = "";
                     textDiv.style.display = "none";
-                    clearText = 1;
-                    skipText = 0
+                    clearText = true;
+                    skipText = false
                     textShowing = 0;
                     resolve('end'); // Promiseを解決
                 });
@@ -356,19 +399,19 @@ async function addtext(raw){
 }
 document.addEventListener('keydown', (e) => {
     if(e.key === 'z' || e.key === 'Enter'){
-        skipText = 1;
+        skipText = true;
     }
 });
 
 document.addEventListener('keyup', (e) => {
     if(e.key === 'z' || e.key === 'Enter'){
-        skipText = 0;
+        skipText = false;
     }
 });
 
 document.addEventListener('click', () => {
-    skipText = 1;
-    setTimeout(() => skipText = 0, 50); // 一時的にスキップを有効化
+    skipText = true;
+    setTimeout(() => skipText = false, 50); // 一時的にスキップを有効化
 });
 
 let logOOmoto = document.querySelector('#log');
@@ -392,42 +435,42 @@ function addlog(text){
 }
 //#endregion
 //#region description
-let movableDescription = document.getElementById('movableDescription');
+let mobileDesc = document.getElementById('mobileDesc');
 document.addEventListener('mousemove', (e) => {
-    movableDescription.style.left = `${e.clientX + 10}px`;
-    movableDescription.style.top = `${e.clientY + 10}px`;
+    mobileDesc.style.left = `${e.clientX + 10}px`;
+    mobileDesc.style.top = `${e.clientY + 10}px`;
 });
 document.addEventListener('mouseover', (e) => {
-    const descTarget = e.target.closest('[data-description]');
+    let descTarget = e.target.closest('[data-description]');
     if(descTarget){
-        const desc = descTarget.dataset.description;
-        movableDescription.innerText = desc;
-        movableDescription.style.display = 'block';
+        let desc = descTarget.dataset.description;
+        mobileDesc.innerText = desc;
+        mobileDesc.classList.add('show');
     }
 });
 document.addEventListener('mouseout', (e) => {
-    const descTarget = e.target.closest('[data-description]');
+    let descTarget = e.target.closest('[data-description]');
     if(descTarget){
-        movableDescription.innerText = '';
-        movableDescription.style.display = 'none';
+        mobileDesc.innerText = '';
+        mobileDesc.classList.remove('show');
     }
 });
 //#endregion
 //#region draggable
 document.addEventListener('mousedown', e => {
-    // const descTarget = e.target.closest('[data-description]');
+    // let descTarget = e.target.closest('[data-description]');
     let div = e.target;
     
     if(!div.classList.contains('draggable')) return;
     offsetX = e.clientX - div.getBoundingClientRect().left;
     offsetY = e.clientY - div.getBoundingClientRect().top;
     
-    function onMouseMove(e){
+    function onMouseMove(e) {
         div.style.left = `${e.clientX - offsetX}px`;
         div.style.top = `${e.clientY - offsetY}px`;
     }
 
-    function onMouseUp(){
+    function onMouseUp() {
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
     }
@@ -438,7 +481,7 @@ document.addEventListener('mousedown', e => {
 //#endregion 
 //#region tk
 class tk{
-    constructor(type, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
+    letructor(type, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
         let youso = document.createElement(type);
         youso.className = `tk ${type}`;
 
@@ -537,28 +580,120 @@ function tkTest(){
 }
 
 //#endregion
+//#region alertD
+class alertD{
+    constructor(text, elses = {}){
+        this.text = text;
+        for(let key in elses) this[key] = elses[key];
+        /*
+            back: 背景色
+            barc: barの色
+        */
+    }
+    x(aru){
+        this.x = aru;
+    }
+    appear(){
+        let back = this.back || '#ffffff'
+        let barc = this.barc || '#80ff80'
+
+        let div = document.createElement('div');
+        div.classList.add('alertD');
+        div.style.background = back;
+        div.style.boxShadow = `${hoshoku(back)} 5px 5px 20px`;
+
+        let row = document.createElement('div');
+        row.classList.add('row');
+         let icon = document.createElement('div');
+         icon.classList.add('icon');
+         icon.style.background = barc;
+         icon.style.color = back;
+         icon.textContent = '！';
+         row.appendChild(icon);
+
+         let text = document.createElement('div');
+         text.innerText = this.text;
+         text.style.color = hoshoku(back);
+         row.appendChild(text);
+        div.appendChild(row);
+
+        let x = document.createElement('div');
+        x.className = 'x';
+        x.innerText = '×';
+        x.style.color = hoshoku(back);
+        x.addEventListener('click', () => {
+            div.remove();
+        });
+        div.appendChild(x);
+        
+        let bar = document.createElement('div');
+        bar.classList.add('bar');
+         let inner = document.createElement('div');
+         inner.classList.add('inner');
+         inner.style.background = barc;
+         bar.appendChild(inner);
+        div.appendChild(bar);
+
+        document.body.appendChild(div);
+        this.div = div;
+
+        setTimeout(() => {
+            div.classList.add('show');
+        }, 100);
+
+        // pointerが乗ってる間はthis.loopを0にする
+        div.addEventListener('pointerenter', () => this.loop = 0);
+        div.addEventListener('pointerleave', () => this.loop = 1);
+
+        let time = 0;
+        let limit = 500;
+         if(this.time) limit = this.time*100;
+        this.loop = 1;
+        this.interval = setInterval(() => {
+            if(this.loop) time++;
+            inner.style.width = `${time/limit*100}%`;
+            
+            if(time == limit) this.delete();
+        }, 10);
+    }
+    delete(){
+        clearInterval(this.interval);
+        let div = this.div;
+        div.classList.remove('show');
+        setTimeout(() => {
+            div.remove();
+        }, 1000);
+    }
+}
+//#endregion
 //#region observer
 let keys = {}
 document.addEventListener('keydown', e => {
     let key = e.key.toLowerCase();
     if(e.key == ' ') key = 'space';
-    keys[key] = 1;
+    keys[key] = true;
 });
 document.addEventListener('keyup', e => {
     let key = e.key.toLowerCase();
     if(e.key == ' ') key = 'space';
-    keys[key] = 0;
+    keys[key] = false;
 });
 
-let clicking = 0;
-document.addEventListener('mousedown', () => clicking = 1);
-document.addEventListener('mouseup', () => clicking = 0);
-
-let ricking = 0;
-document.addEventListener('contextmenu', (e) => ricking = 1);
-document.addEventListener('mouseup', (e) => {
-    if(e.button == 2) ricking = 0;
-})
+let clicking = false;
+let cricking = false;
+document.addEventListener('pointerdown', (e) => {
+    if(e.buttons == 0) clicking = true;
+    if(e.buttons == 2) cricking = true;
+});
+document.addEventListener('pointerup', (e) => {
+    if(e.buttons == 0) clicking = false;
+    if(e.buttons == 2) cricking = false;
+});
+document.addEventListener('pointercancel', (e) => {
+    if(e.buttons == 0) clicking = false;
+    if(e.buttons == 2) cricking = false;
+});
+window.addEventListener('blur', () => {clicking = cricking = false});
 
 let mouseX = 0;
 let mouseY = 0;
@@ -566,8 +701,41 @@ document.addEventListener('mousemove', (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
 });
-
 //#endregion
+//#region fonts
+const Fonts = [
+    {src:'comicsans', type:'ttf'},
+    {src:'hangyaku', type:'ttf'},
+    {src:'kurobara', type:'ttf'},
+    {src:'misaki', type:'ttf'},
+    {src:'cube12', type:'ttf'},
+];
+function fontsLoad(){
+    let id = "font_load_css";
+    let existing = document.getElementById(id);
+    if(existing) existing.remove();
+
+    let css = Fonts.map(f => {
+        let src = `url('assets/fonts/${f.src}.${f.type}')`;
+        let weight = f.weight ?? 'normal';
+        return `@font-face{
+            font-family:'${f.src}';
+            src: ${src};
+            font-weight: ${weight};
+            font-style: normal;
+            font-display: swap;
+        }`;
+    }).join('\n');
+
+    let el = document.createElement('style');
+    el.id = id;
+    el.type = 'text/css';
+    el.appendChild(document.createTextNode(css));
+    document.head.appendChild(el);
+}
+fontsLoad();
+//#endregion
+
 //#region セクラテス
 let secrates = [
     {
@@ -732,7 +900,7 @@ loginC.sendD.addEventListener('click', async function(e){
     usersRef.once('value').then(async function(snapshot){
         if(snapshot.exists()){
             nicoText('オカエリナサイ マセ');
-            userDataGen = snapshot.val();
+            userData = snapshot.val();
             if(userData.password == password){
                 console.log('success')
                 login();
@@ -980,6 +1148,7 @@ uppC.ueD.addEventListener('click', uppF.ue);
 
 uppF.update = () => {
     // 名前とかレベルのあれを
+
 }
 
 uppF.tekiou = () => {

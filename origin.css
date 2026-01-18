@@ -170,17 +170,6 @@ img{
 /* #endregion */
 
 /* #region alertD */
-
-/*
-<div class="alertD" style="background-color:${back}">
-    <div class="row">
-        <div class="icon" style="background-color:${barc}">！</div>
-        <div class="text">${this.text}</div>
-    </div>
-    <div class="x">×</div>
-    <div class="bar"><div style="background-color:${barc}"></div></div>
-</div>
-*/
 .alertD{
     display: block;
     width: 320px;
