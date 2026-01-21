@@ -4,10 +4,324 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="origin/mitame.css">
+    <style>
+        /* c1ddff 4473ad */
+        #main{
+            width: 100vw;
+            height: 100vh;
+            background: #dfedff;
+            padding: 50px 20px;
+        }
+
+        .area{
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        #download .lets{
+            height: 20px;
+            aspect-ratio: 7/1;
+            background: #eff6ff;
+            padding: 5px 10px;
+            border: 2px solid #4473ad;
+            border-radius: 20px;
+            line-height: 20px;
+        }
+        #download .lets:active{
+            background: #d2ffd2;
+            scale: 0.9;
+        }
+
+        #shiyu .inp{
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        #shiyu .inp .row{
+            justify-content: flex-start;
+            align-items: center;
+            gap: 5px;
+            height: 25px;
+        }
+        #shiyu .inp .row span{
+            width: 100px;
+        }
+        #shiyu .inp .row input{
+            height: 100%;
+            font-size: 16px;
+            padding: 3px 6px;
+            border: 1px dotted #4473ad;
+            box-sizing: border-box;
+        }
+        #shiyu .inp .row .bt{
+            height: 100%;
+            aspect-ratio: 1/1;
+            background: #b5dcff;
+            border: 2px dotted #a3c3e1;
+            box-sizing: border-box;
+        }
+        #shiyu .kmgm{
+            margin-top: 15px;
+        }
+        #shiyu .kmgm .title{
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        #shiyu .kmgm .row.yok{
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: flex-start;
+            flex-wrap: nowrap;
+            gap: 10px;
+            width: fit-content;
+            padding: 0 40px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            mask-image: linear-gradient(
+                to right,
+                transparent 0%,
+                #000000 10%,
+                #000000 90%,
+                transparent 100%
+            );
+        }
+        #shiyu .kmgm .row.yok .youso{
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 5px;
+            /* width: 150px; */
+            width: 600px;
+            height: fit-content;
+            background: #fafcff;
+            padding: 20px 10px;
+            border: none;
+            border-radius: 15px;
+            box-sizing: border-box;
+        }
+        #shiyu .kmgm .row.yok .youso *:not(.row, .column){
+            width: 80%;
+            scale: 1.0;
+            padding: 0 5px;
+            background: #e8e8e8;
+            border: 1px solid #2b2b2b;
+            line-height: 20px;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+        #shiyu .kmgm .row.yok .youso *:active:not(.row, .column){
+            scale: 0.9;
+        }
+        #shiyu .kmgm .row.yok .youso *:focus:not(.row, .column){
+            border-color: #3c35ff;
+        }
+        #shiyu .kmgm .row.yok .youso.random .row{
+            width: 80%;
+            gap: 2px;
+        }
+        #shiyu .kmgm .row.yok .youso.random .kaiji{
+            text-align: center;
+            font-size: 14px;
+        }
+    </style>
     <title>Origin ースターターパックー</title>
 </head>
 <body>
-    <!-- originフォルダをzipにしてダウンロードさせる -->
-    
+    <div id="mobileDesc"></div>
+    <div id="log">
+        <div class="opener"><</div>
+        <div class="log"></div>
+    </div>
+    <div id="text"></div>
+
+    <div id="main">
+
+        <div id="download" class="area">
+            <h2>スターターパック ダウンロード会場</h2>
+            <div class="lets">Download the Starter-Pack</div>
+        </div>
+
+        <hr noshade/>
+
+        <div id="shiyu" class="area">
+            <h3>スターターパック 試遊場</h3>
+
+            <div class="inp"></div>
+
+            <div class="kmgm">
+                <div class="title">その他の機能たち</div>
+                <div class="row yok">
+                    <div class="youso random">
+                        <div class="row">
+                            <input class="min" value="0" type="number" placeholder="min"/>
+                            <input class="max" value="100" type="number" placeholder="max"/>
+                        </div>
+                        <button class="bt" tabindex="0">go</button>
+                        <div class="kaiji">開示だな</div>
+                    </div>
+                    <div class="youso kaijou">
+                        <input type="text" placeholder="階乗 -kaijou-"/>
+                        <button class="bt">go</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="origin/data.js"></script>
+    <script src="origin/nakami.js"></script>
+    <script defer>
+        let mainD = document.getElementById('main');
+
+        let dowD = document.getElementById('download');
+        let dowC = {
+            lets: dowD.querySelector('.lets'),
+        }
+        dowC.lets.addEventListener('click', () => {
+            let a = document.createElement('a');
+            a.href = 'starter-pack.zip';
+            a.download = 'starter-pack.zip';
+            a.click();
+        });
+
+
+        let shyD = document.getElementById('shiyu');
+        let shyC = {
+            inpD: shyD.querySelector('.inp'),
+        };
+        let shyF = {};
+        shyC.inpL = [
+            {
+                name:'nicoText',
+                func: (text) => {
+                    nicoText(text);
+                }
+            },
+            {
+                name:'alertD',
+                func: (text) => {
+                    let al = new alertD(text);
+                    al.appear();
+                }
+            },
+            {
+                name:'addtext',
+                func: (text) => {
+                    addtext(text);
+                }
+            },
+            {
+                name:'mobileDesc',
+                func: (text) => {
+                    let al = new alertD("hover me!", {
+                        "data-description": text
+                    });
+                    al.appear();
+                }
+            }
+        ];
+        shyF.load = () => {
+            for(let inp of shyC.inpL){
+                let div = document.createElement('div');
+                div.className = `row`;
+
+                let span = document.createElement('span');
+                span.innerText = inp.name;
+                div.appendChild(span);
+                
+                let input = document.createElement('input');
+                input.type = "text";
+                input.placeholder = inp.name;
+                div.appendChild(input);
+
+                let bt = document.createElement('div');
+                bt.className = 'bt';
+                div.appendChild(bt);
+
+                let act = () => {
+                    let text = input.value.trim(' ');
+                    inp.func(text);
+                }
+                bt.addEventListener('click', act);
+                input.addEventListener('keydown', (e) => {
+                    if(e.key == 'Enter') act();
+                });
+
+                shyC.inpD.appendChild(div);
+            }
+        };
+
+        let kmgmD = shyD.querySelector('.kmgm');
+        let kmgmC = {
+            rowD: kmgmD.querySelector('.row.yok'),
+            kaijI: kmgmD.querySelector('.youso.kaijou input'),
+             kaijB: kmgmD.querySelector('.youso.kaijou .bt'),
+            randIL: kmgmD.querySelector('.youso.random .min'),
+             randIH: kmgmD.querySelector('.youso.random .max'),
+             randB: kmgmD.querySelector('.youso.random .bt'),
+             randL: [],
+             randRen: '0_100',
+             randK: kmgmD.querySelector('.youso.random .kaiji'),
+
+        };
+        let kmgmF = {};
+        kmgmF.random = () => {
+            let min = +kmgmC.randIL.value;
+            let max = +kmgmC.randIH.value;
+            if(min < 0 || max < 0 || isNaN(min) || isNaN(max)){
+                let art = new alertD("正の整数、自然数でお願いねっ♡", {time:max<min?min-max:max-min});
+                art.appear();
+                return;
+            }
+            // if(max < min) [min, max] = [max, min];
+            
+            //この子、逆だったら勝手に直してくれるんですけど..他の処理の都合でmin→maxにしてます
+            let res = random(min, max);
+            tobiText(kmgmC.randB, res);
+
+            if(kmgmC.randRen != `${min}_${max}` && kmgmC.randRen != `${max}_${min}`){
+                kmgmC.randL = [];
+                kmgmC.randRen = `${min}_${max}`;
+            }
+            
+            kmgmC.randL.push(res);
+        }
+        kmgmC.randB.addEventListener('click', kmgmF.random);
+        kmgmC.randIL.addEventListener('keydown', (e) => {if(e.key == 'Enter') kmgmF.random()});
+        kmgmC.randIH.addEventListener('keydown', (e) => {if(e.key == 'Enter') kmgmF.random()});
+        kmgmC.randK.addEventListener('click', async() => {
+            let len = kmgmC.randL.length;
+            tobiText(kmgmC.randK, `${len}個`);
+            for(let val of kmgmC.randL){
+                nicoText(val);
+                await delay(100);
+            }
+        });
+
+        kmgmF.kaijou = () => {
+            let val = +kmgmC.kaijI.value;
+            if(isNaN(val) || val < 0){
+                let art = new alertD("正の整数を入れてください");
+                art.appear();
+                return;
+            }
+            let res = kaijou(val);
+            tobiText(kmgmC.kaijB, `!${val} = ${res}`);
+        };
+        kmgmC.kaijB.addEventListener('click', kmgmF.kaijou);
+        kmgmC.kaijI.addEventListener('keydown', (e) => {
+            if(e.key == 'Enter') kmgmF.kaijou();
+        });
+
+        function start(){
+            shyF.load();
+        }
+        document.addEventListener('DOMContentLoaded', start);
+    </script>
 </body>
 </html>

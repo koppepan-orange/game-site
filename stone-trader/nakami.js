@@ -10,9 +10,7 @@ async function nicoText(mes){
     newDiv.style.right = '0px';
     document.querySelector('body').appendChild(newDiv);
 
-    requestAnimationFrame(() => {
-    newDiv.style.right = `${window.innerWidth + newDiv.offsetWidth}px`; //なんか電車の問題解いてるみたいだね
-    });
+    requestAnimationFrame(() => newDiv.style.right = `${window.innerWidth + newDiv.offsetWidth}px`);
     
     await delay(2000); 
     newDiv.remove();
@@ -618,7 +616,7 @@ class alertD{
         x.className = 'x';
         x.innerText = '×';
         x.style.color = hoshoku(back);
-        x.addEventListener('click', () => div.remove());
+        x.addEventListener('click', () => this.delete());
         div.appendChild(x);
         
         let bar = document.createElement('div');
@@ -728,205 +726,168 @@ function fontsLoad(){
 }
 fontsLoad();
 //#endregion
-
-//#region 画像とかをロードする機構
-let imagesLoaded = 0;
+//#region images & sounds
 let images = {};
-let imageNames = {
-    'stones':['none','coal','iron','ruby','gold','larimar','stone_stone','stone_coal','stone_iron','stone_ruby','stone_gold','stone_larimar'],
+let sounds = {};
+let loaC = {
+    imgT: 0, imgD: 0,
+    souT: 0, souD: 0,
+    erd: 0
 }
-let totalImages = Object.keys(imageNames).map(a => imageNames[a].length).reduce((a, b) => a + b);
-Object.keys(imageNames).forEach(belong => {
-    imageNames[belong].forEach(num => {
-        let img = new Image();
-        img.src = `assets/${belong}/${num}.png`;
-        img.onload = () => {
-            imagesLoaded++;
-            if(imagesLoaded === totalImages){
-                gameloop()
-            }
-        };
-        img.onerror = () => {
-            console.error(`Image ${num} failed to load.`);
-        };
-        if(!images[belong]){
-            images[belong] = {}
-        }
-        images[belong][num] = img;
-    });
-});
-//#endregion
-//#region zentai-toshite-noyatsu
-let gameZone = document.getElementById('gameZone');
-let debugData = document.querySelector('#debug .data');
-let debugMenu = document.querySelector('#debug .menu');
-document.querySelectorAll('.draggable').forEach(a => {
-    a.addEventListener('mousedown', e => {
-        offsetX = e.clientX - a.getBoundingClientRect().left;
-        offsetY = e.clientY - a.getBoundingClientRect().top;
-        
-        function onMouseMove(e){
-            a.style.left = `${e.clientX - offsetX}px`;
-            a.style.top = `${e.clientY - offsetY}px`;
-        }
-    
-        function onMouseUp() {
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('mouseup', onMouseUp);
-        }
-    
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
-    }); 
-});
+let loaF = {};
+loaC.imgL = {
+    systems:['error'],
+}
+loaC.imgT = Object.values(loaC.imgL).length;
 
-let ores =  {
-    coal:{
-        id:'coal',
-        name:'石炭',
-        num:0,
-        price:10,
-        domain:[10,30],
-        value:[1,3]
-    },
-    iron:{
-        id:'iron',
-        name:'鉄',
-        num:0,
-        price:20,
-        domain:[20,60],
-        value:[1,5]
-    },
-    ruby:{
-        id:'ruby',
-        name:'ルビー',
-        num:0,
-        price:80,
-        domain:[80,240],
-        value:[1,25]
-    },
-    gold:{
-        id:'gold',
-        name:'金',
-        num:0,
-        price:180,
-        domain:[180,600],
-        value:[2,10]
-    },
-    larimar:{
-        id:'larimar',
-        name:'ラリマー',
-        num:0,
-        price:300,
-        domain:[300,1000],
-        value:[5,15]
+loaC.souL = {
+    se:['error'],
+    bgm:[],
+}
+loaC.souT = Object.values(loaC.souL).length;
+
+loaF.load = async() => {
+    if(await loaF.loadI()) return 'error';
+    else return '終わり';
+}
+loaF.loadI = async() => {
+    let kasan = () => {
+        loaC.imgD++;
+        if(loaC.imgD == loaC.imgT) loaF.loadS();
+    }
+
+    for(let belong in loaC.imgL){
+        images[belong] = {};
+
+        for(let name of loaC.imgL[belong]){
+            let img = new Image();
+            img.src = `assets/images/${belong}/${name}.png`;
+            img.onload = kasan();
+            img.onerror = () => {
+                console.error(`Image assets/images/${belong}/${name}.png failed to load.`);
+                loaC.erd += 1;
+                 if(loaC.erd > 20) return console.error('さすがにやりすぎbonus'), 1;
+                img.src = `assets/images/systems/error.png`;
+                kasan();
+            };
+            
+            images[belong][name] = img;
+            if(loaC.imgD >= loaC.imgT) loaF.loadS();
+        }   
     }
 }
 
-function tekiou(){
-    debugData.innerHTML = `
-    <span class="ore"><img src="${images.stones['coal'].src}"/>:${ores.coal.price}</span>
-    <span class="ore"><img src="${images.stones['iron'].src}"/>:${ores.iron.price}</span>
-    <span class="ore"><img src="${images.stones['ruby'].src}"/>:${ores.ruby.price}</span>
-    <span class="ore"><img src="${images.stones['gold'].src}"/>:${ores.gold.price}</span>
-    <span class="ore"><img src="${images.stones['larimar'].src}"/>:${ores.larimar.price}</span>
-    `;
-}
-function change(){
-    Object.values(ores).forEach(a => {
-        let min = a.domain[0];
-        let max = a.domain[1];
-
-        let val = random(...a.value);
-        if(probability(50)) val *= -1;
-
-        a.price += val;
-        if(a.price < min) a.price = min;
-        if(a.price > max) a.price = max;
-    })
-    tekiou();
-}
-function gameloop(){
-    change();
-    setTimeout(gameloop, 4000)
-}
-
-//#endregion
-
-//#region select
-let selectArea = document.getElementById('select');
-let nowplace = 'select';
-document.querySelectorAll('.selection').forEach(a => 
-    a.addEventListener('click', () => {
-        let goto = a.classList[1];
-        cd(goto);
-    }),
-);
-document.querySelectorAll('.back').forEach(a =>
-    a.addEventListener('click', () => {
-        let goto = 'select';
-        cd(goto);
-    }),
-)
-function cd(goto){
-    console.log(`フォリア「${goto}に行きますよ〜〜！！」`);
+loaF.loadS = async() => {
+    let kasan = () => {
+        loaC.souD += 1;
+        if(loaC.souD == loaC.souT) loaF.end();
+    }
     
-    document.getElementById(nowplace).style.display = 'none';
-    document.getElementById(goto).style.display = Selections[goto].display;
+    for(let belong in loaC.souL){
+        sounds[belong] = {};
 
-    nowplace = goto;
+        for(let name of loaC.souL[belong]){
+            let sound = new Audio();
+            sound.preload = 'auto';
+            sound.src = `assets/sounds/${belong}/${name}.mp3`;
+            if(belong == 'bgm'){
+                sound.loop = true;
+                sound.dataset.type = 'bgm';
+                sound.volume = souC.bgm;
+            }
+            if(belong == 'se'){
+                sound.dataset.type = 'se';
+                sound.volume = souC.se;
+            }
+            sound.addEventListener('canplaythrough', () => {
+                kasan();
+            }, {once: 1});
+            sound.onerror = () => {
+                console.error(`Sound assets/sounds/${belong}/${name} failed to load.`);
+                loaC.erd += 1;
+                 if(loaC.erd > 20) return console.error('さすがにやりすぎbonus'), 1;
+                sound.src = `assets/sounds/se/error.mp3`;
+                kasan();
+            };
 
-    Selections[goto].process();
+            sounds[belong][name] = sound;
+        }
+    };
+}
+loaF.end = () => {
+    console.log('images & sounds loaded!');
+    console.log(`error件数: ${loaC.erd}`);
+    start();
 }
 
-//#endregion
+let souC = {
+    se: 0.5,
+    bgm: 0.5,
+    nowBgm: null
+}
+function soundPlay(name){
+    if(!sounds[name]) return soundPlay('error');
+    let proto = sounds[name];
 
-//#region buyer
-let buyerArea = document.getElementById('buyer');
-let buyerOwnertextD = buyerArea.querySelector('.owner .text');
-let buyerOwnertext = 'いらっしゃ〜い'
-buyerArea.querySelectorAll('.item').forEach(a => {
-    a.addEventListener('mouseover', e => {
-        const targetUM = e.target.closest('[data-text]');
-        if (targetUM){
-            const text = targetText.dataset.description;
-            buyerOwnertext.innerHTML = text;
+    if(proto.dataset.type == 'bgm'){
+        if(souC.nowBgm == name && !proto.paused) return;
+        if(souC.nowBgm && sounds[souC.nowBgm] && !sounds[souC.nowBgm].paused){
+            sounds[souC.nowBgm].pause();
+            sounds[souC.nowBgm].currentTime = 0;
         }
+        proto.volume = souC.bgm;
+        proto.play().catch(e => console.warn('BGM 再生エラー', e));
+        souC.nowBgm = name;
+    }else{
+        let clone = proto.cloneNode(true);
+        clone.volume = souC.se;
+        clone.dataset.type = 'se';
+        clone.addEventListener('ended', ()=> {
+            try{clone.src = '';}catch(e){}
+        });
+        clone.play().catch(e => console.warn('SE 再生エラー', e));
+    }
+}
+function soundStop(){
+    Object.keys(sounds).forEach(k => {
+        try{
+            sounds[k].pause();
+            sounds[k].currentTime = 0;
+        }catch(e){}
     });
-    a.addEventListener('mouseout', (e) => {
-        const targetText = e.target.closest('[data-text]');
-        if(targetText){
-            buyerOwnertext.innerHTML = buyerOwnertext;
-        }
-    });
-})
+    souC.nowBgm = null;
+    document.querySelectorAll('audio,video').forEach(el => { el.pause(); el.currentTime = 0; });
+}
+function soundVolume(code, val){
+    if(typeof code == 'number' && typeof val == 'undefined') val = code, code = 'both';
+    if(typeof val !== 'number') return console.error('val は数値にして');
+    let v = val;
+    if(v > 1) v = Math.max(0, Math.min(1, v/100)); // 0-100 指定を 0-1 に
+    v = Math.max(0, Math.min(1, v));
+
+    if(code == 'se' || code == 'both'){
+        souC.se = v;
+        for(k in sounds) if(sounds[k].dataset.type == 'se') sounds[k].volume = souC.se;
+    }
+    if(code == 'bgm' || code == 'both'){
+        souC.bgm = v;
+        for(k in sounds) if(sounds[k].dataset.type == 'bgm') sounds[k].volume = souC.bgm;
+        if(souC.nowBgm && sounds[souC.nowBgm]) sounds[souC.nowBgm].volume = souC.bgm;
+    }
+
+    console.log(`[soundVolume] se:${souC.se} bgm:${souC.bgm}`);
+}
+soundVolume(50);
+
+document.addEventListener('DOMContentLoaded', async() => await loaF.load());
 //#endregion
 
-//#region mine
-let mineArea = document.getElementById('mine');
-let kakuritsu = [['coal','iron','ruby','gold','larimar'],[30,25,23,17,5]];
-mineArea.querySelectorAll('.vein .stone').forEach(a => {
-    a.addEventListener('click', () => {
-        let now = a.dataset.ore ?? 'stone';
+let mainD = document.getElementById('main');
 
-        if(now != 'stone'){
-            ores[now].num += 1;
-        }
 
-        let next = arrayGacha(...kakuritsu);
-        a.dataset.ore = next;
-        a.innerHTML = images['stones'][`stone_${next}`].outerHTML;
 
-        tekiou();
-    })
-})
+//#region start
+function start(){
+    Style.tekiou();
+}
 //#endregion
-
-//#region shop
-let shopArea = document.getElementById('shop');
-//#endregion
-
-//#region still
-let stillArea = document.getElementById('still');
-//#endregion
-

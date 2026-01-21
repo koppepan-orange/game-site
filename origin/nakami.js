@@ -136,7 +136,8 @@ function probability(num){
     return Math.random()*100 <= num;
     //例:num == 20 → randomが20以内ならtrue,elseならfalseを返す
 };
-function random(min, max) {
+function random(min, max){
+    if(max < min) [min, max] = [max, min];
     let num = Math.floor(Math.random() * (max - min + 1)) + min;
     return Math.floor(num);
 };
@@ -431,6 +432,10 @@ function addlog(text){
 };
 //#endregion
 //#region description
+/*
+要素に、data-descriptionをつけると、その要素にホバーした時に指定した文字列を表示させられます。
+ステータスとかバフの詳しい説明用とかに良き
+*/
 let mobileDesc = document.getElementById('mobileDesc');
 document.addEventListener('mousemove', (e) => {
     mobileDesc.style.left = `${e.clientX + 10}px`;
@@ -583,7 +588,15 @@ class alertD{
             back: 背景色
             barc: barの色
             time: 消えるまでの時間[s]
+            data-...: data-...をそのままsetAttribute
         */
+
+        this.datas = [];
+        //data-を
+        for(let key in elses){
+            if(!key.startsWith('data-')) continue;
+            this.datas.push({key: key, val: elses[key]});
+        }
     };
     x(aru){
         this.x = aru;
@@ -626,6 +639,11 @@ class alertD{
          inner.style.background = barc;
          bar.appendChild(inner);
         div.appendChild(bar);
+
+        //data
+        for(let data of this.datas){
+            div.setAttribute(data.key, data.val);
+        }
 
         document.body.appendChild(div);
         this.div = div;
@@ -732,19 +750,20 @@ let loaC = {
 }
 let loaF = {};
 loaC.imgL = {
-    systems:['error'],
+    // systems:['error'],
 }
 loaC.imgT = Object.values(loaC.imgL).length;
 
 loaC.souL = {
-    se:['error'],
-    bgm:[],
+    // se:['error'],
+    // bgm:[],
 }
 loaC.souT = Object.values(loaC.souL).length;
 
 loaF.load = async() => {
-    if(await loaF.loadI()) return 'error';
-    else '終わり'
+    if(await loaF.loadI()) return 1;
+
+    return 0;
 }
 loaF.loadI = async() => {
     let kasan = () => {
@@ -760,7 +779,7 @@ loaF.loadI = async() => {
             img.src = `assets/images/${belong}/${name}.png`;
             img.onload = kasan();
             img.onerror = () => {
-                console.error(`Image ${src}${mono}.png failed to load.`);
+                console.error(`Image assets/images/${belong}/${name}.png failed to load.`);
                 loaC.erd += 1;
                  if(loaC.erd > 20) return console.error('さすがにやりすぎbonus'), 1;
                 img.src = `assets/images/systems/error.png`;
@@ -776,7 +795,7 @@ loaF.loadI = async() => {
 loaF.loadS = async() => {
     let kasan = () => {
         loaC.souD += 1;
-        if(loaC.souD == loaC.souT) start();
+        if(loaC.souD == loaC.souT) loaF.end();
     }
     
     for(let belong in loaC.souL){
@@ -785,12 +804,13 @@ loaF.loadS = async() => {
         for(let name of loaC.souL[belong]){
             let sound = new Audio();
             sound.preload = 'auto';
-            sound.src = `assets/sounds/${name}.mp3`;
+            sound.src = `assets/sounds/${belong}/${name}.mp3`;
             if(belong == 'bgm'){
                 sound.loop = true;
                 sound.dataset.type = 'bgm';
                 sound.volume = souC.bgm;
-            }else{
+            }
+            if(belong == 'se'){
                 sound.dataset.type = 'se';
                 sound.volume = souC.se;
             }
@@ -801,13 +821,18 @@ loaF.loadS = async() => {
                 console.error(`Sound assets/sounds/${belong}/${name} failed to load.`);
                 loaC.erd += 1;
                  if(loaC.erd > 20) return console.error('さすがにやりすぎbonus'), 1;
-                sound.src = `assets/sounds/error.mp3`;
+                sound.src = `assets/sounds/se/error.mp3`;
                 kasan();
             };
 
             sounds[belong][name] = sound;
         }
     };
+}
+loaF.end = () => {
+    console.log('images & sounds loaded!');
+    console.log(`error件数: ${loaC.erd}`);
+    start();
 }
 
 let souC = {
@@ -870,4 +895,12 @@ function soundVolume(code, val){
 soundVolume(50);
 
 document.addEventListener('DOMContentLoaded', async() => await loaF.load());
+//#endregion
+
+
+
+//#region start
+function start(){
+    Style.tekiou();
+}
 //#endregion

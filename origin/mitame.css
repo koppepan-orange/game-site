@@ -45,6 +45,7 @@ img{
     transition: right 2.0s linear;
     white-space: nowrap;
     pointer-events: none;
+    z-index: 2147483647;
 }
 /* #endregion */
 
@@ -140,7 +141,7 @@ img{
     text-align: left;
     padding: 5px 10px;
     border-radius: 5px;
-    z-index: 256;
+    z-index: 2147483647;
 }
 #mobileDesc.show{
     display: block;
@@ -184,7 +185,7 @@ img{
     will-change: bottom;
     overflow: hidden;
     box-sizing: border-box;
-    z-index: 2147483647;
+    z-index: 2147483646;
 }
 .alertD.show{
     bottom: 20px;
