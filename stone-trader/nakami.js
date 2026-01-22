@@ -890,7 +890,7 @@ let mainD = document.getElementById('main');
 function hendou(){
     for(let ore of Ores){
         // console.log(ore.priceR);
-        let price = random(ore.priceR);
+        let price = random(...ore.priceR);
         ore.price = price;
     }
 
@@ -901,7 +901,8 @@ function hendou(){
 // #region loby
 let lobD = document.getElementById("loby");
 let lobC = {
-    griD: lobD.querySelector(".grid")   
+    griD: lobD.querySelector(".grid"),
+    divs: {},
 }
 let lobF = {};
 lobF.load = () => {
@@ -910,15 +911,62 @@ lobF.load = () => {
          if(name == 'loby') continue;
 
         let div = document.createElement('div');
-        console.log(name);
         div.className = `icon ${name}`;
 
         let img = images.systems[name];
         div.appendChild(img);
 
+        div.addEventListener('click', () => lobF.move(name));
+
         lobC.griD.appendChild(div);
     }
+
+    lobC.divs['loby'] = lobD;
+    lobC.divs['mine'] = minD;
+    lobC.divs['shichi'] = sciD;
+    lobC.divs['shop'] = shoD;
+    lobC.divs['still'] = stiD;
 }
+lobF.move = (name) => {
+    let area = Areas.find(a => a.name == name);
+    if(!area) return console.error('そんなエリアないっすよ先輩');
+
+    for(let a of Areas) lobC.divs[a.name].classList.remove('show');
+    lobC.divs[name].classList.add('show');
+}
+
+// #endregion
+
+// #region mine
+let minD = document.getElementById('mine');
+let minC = {
+
+}
+let minF = {};
+// #endregion
+
+// #region shichi
+let sciD = document.getElementById('shichi');
+let sciC = {
+
+}
+let sciF = {};
+// #endregion
+
+// #region shop
+let shoD = document.getElementById('shop');
+let shoC = {
+
+}
+let shoF = {};
+// #endregion
+
+// #region still
+let stiD = document.getElementById('still');
+let stiC = {
+
+}
+let stiF = {};
 // #endregion
 
 // #region debug
@@ -968,18 +1016,16 @@ let loop = 0;
 let looped = 0;
 let loopI = null;
 function gameloop(){
-    if(!loop) clearInterval(loopI);
+    if(!loop) return clearInterval(loopI);
     looped += 1;
 
-    // 10の倍数なら
-    if(looped % 100 == 0) hendou();
-
-    requestAnimationFrame(gameloop);
+    if(looped % 100 == 0) hendou(), console.log('hendou!');
 }
 function re_gameloop(){
     looped = 0;
     loop = 1;
-    loopI = window.setInterval(gameloop, 10);
+    hendou();
+    loopI = setInterval(gameloop, 100, 0);
 }
 //#endregion
 
