@@ -14,45 +14,29 @@
             <div class="log"></div>
         </div>
 
-        <div id="select">
-            <div class="row">
-                <div class="selection buyer"><img src="assets/images/systems/buyer.png"></div>
-                <div class="selection mine"><img src="assets/images/systems/mine.png"></div>
-            </div>
-            <div class="row">
-                <div class="selection shop"><img src="assets/images/systems/shop.png"></div>
-                <div class="selection still"><img src="assets/images/systems/still.png"></div> <!-- わるいね、ここは"まだ"営業してないのさ ..まあでも（お金を半分盗まれた）"スティール"はするがね！はっはっは〜  ...ってやつ、やりたい-->
-            </div>
+        <div id="upper">
+            
         </div>
 
-        <div id="buyer">
+        <div id="loby" class="area show">
+            <div class="grid"></div>
+        </div>
+
+        <div id="shichi" class="area">
             <div class="back"></div>
             <div class="owner">
-                <div class="chara"><img src="assets/images/portraits/buyer_normal.png"></div>
+                <div class="chara"><img src="assets/images/npcs/buyer.png"></div>
                 <div class="text"></div>
             </div>
-            <div class="place">
-                <div class="row">
-                    <div class="item coal"><img src="assets/images/stones/coal.png"></div>
-                    <div class="item iron"><img src="assets/images/stones/iron.png"></div>
-                </div>
-                <div class="row">
-                    <div class="item ruby"><img src="assets/images/stones/ruby.png"></div>
-                    <div class="item gold"><img src="assets/images/stones/gold.png"></div>
-                </div>
-                <div class="row">
-                    <div class="item larimar"><img src="assets/images/stones/larimar.png"></div>
-                    <div class="item none"><img src="assets/images/stones/none.png"></div>
-                </div>
-            </div>
+            <div class="place"></div>
         </div>
 
-        <div id="mine">
+        <div id="mine" class="area">
             <div class="back"></div>
             <div class="vein"></div>
         </div>
 
-        <div id="shop">
+        <div id="shop" class="area">
             <div class="back"></div>
             <div class="text">
                 ここは店だぜ<br>
@@ -62,7 +46,7 @@
             </div>
         </div>
 
-        <div id="still">
+        <div id="still" class="area">
             <div class="back"></div>
             <div class="text">
                 ここはまだ何もできてないとこだよ<br>
@@ -72,9 +56,9 @@
 
     </div>
 
-    <div id="debug">
-        <div class="data draggable"></div>
-        <div class="menu draggable"></div>
+    <div id="debug" class="draggable">
+        <div class="data"></div>
+        <div class="menu"></div>
     </div>
 
     <!-- <p align="center" class="buystone">Stone Trader Game Desu<br><br>

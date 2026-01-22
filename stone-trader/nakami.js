@@ -736,7 +736,8 @@ let loaC = {
 }
 let loaF = {};
 loaC.imgL = {
-    systems:['error'],
+    systems:['error', 'mine', 'shichi', 'shop', 'still'],
+    items:['coal', 'iron', 'ruby', 'gold', 'larimar']
 }
 loaC.imgT = Object.values(loaC.imgL).length;
 
@@ -882,12 +883,112 @@ soundVolume(50);
 document.addEventListener('DOMContentLoaded', async() => await loaF.load());
 //#endregion
 
+
 let mainD = document.getElementById('main');
 
+// #region hendou
+function hendou(){
+    for(let ore of Ores){
+        // console.log(ore.priceR);
+        let price = random(ore.priceR);
+        ore.price = price;
+    }
 
+    debugF.tekiou();
+}
+// #endregion
+
+// #region loby
+let lobD = document.getElementById("loby");
+let lobC = {
+    griD: lobD.querySelector(".grid")   
+}
+let lobF = {};
+lobF.load = () => {
+    for(let area of Areas){
+        let name = area.name;
+         if(name == 'loby') continue;
+
+        let div = document.createElement('div');
+        console.log(name);
+        div.className = `icon ${name}`;
+
+        let img = images.systems[name];
+        div.appendChild(img);
+
+        lobC.griD.appendChild(div);
+    }
+}
+// #endregion
+
+// #region debug
+let debugD = document.getElementById('debug');
+let debugC = {
+    dataD: debugD.querySelector('.data'),
+    menuD: debugD.querySelector('.menu'),
+}
+let debugF = {};
+debugF.tog = () => debugD.classList.toggle('show');
+debugF.istog = () => debugD.classList.contains('show');
+debugF.load = () => {
+    for(let o of Ores){
+        let div = document.createElement('div');
+        div.className = `item ${o.name}`;
+
+        let img = images.items[o.name];
+        div.appendChild(img);
+
+        let co = document.createElement('div');
+        co.className = 'num co-su';
+        co.innerText = 0;
+        div.appendChild(co);
+
+        let ne = document.createElement('div');
+        ne.className = 'num ne-dn';
+        ne.dataset.description = `#${o.priceR[0]} ~ #${o.priceR[1]}`;
+        ne.innerText = NaN;
+        div.appendChild(ne);
+
+        debugC.dataD.appendChild(div);
+    }
+}
+debugF.tekiou = () => {
+    for(let o of Ores){
+        let div = debugC.dataD.querySelector(`.item.${o.name}`);
+        let co = div.querySelector('.co-su');
+         co.innerText = `${o.x}x`;
+        let ne = div.querySelector('.ne-dn');
+         ne.innerText = `#${o.price}`;
+    }
+}
+// #endregion
+
+//#region loop
+let loop = 0;
+let looped = 0;
+let loopI = null;
+function gameloop(){
+    if(!loop) clearInterval(loopI);
+    looped += 1;
+
+    // 10の倍数なら
+    if(looped % 100 == 0) hendou();
+
+    requestAnimationFrame(gameloop);
+}
+function re_gameloop(){
+    looped = 0;
+    loop = 1;
+    loopI = window.setInterval(gameloop, 10);
+}
+//#endregion
 
 //#region start
 function start(){
     Style.tekiou();
+    lobF.load();
+    debugF.load();
+
+    re_gameloop();
 }
 //#endregion

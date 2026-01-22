@@ -277,13 +277,12 @@ img{
 /* #endregion */
 
 
-
 body{
     background: #000000;
 }
 #main{
     display: block;
-    width: 768px;
+    width: var(--iPhone-width);
     height: 100vh;
     background: #6b5542;
     margin: 0 auto;
@@ -292,60 +291,92 @@ body{
 }
 
 /*#region debugのやつ*/
-#debug .data{
-    display: block;
-    width: auto;
-    height: auto;
+#debug{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 5px;
     padding: 10px;
-    background-color: #cfe9ff;
+    padding-right: 40px;
+    background: #cfe9ff;
     position: fixed;
     top: 0px;
     left: 0px;
     font-size: 20px;
     text-align: left;
 }
-#debug .data .ore{
-    display: flex;
-    justify-content: left;
-    align-items: center;
+#debug::after{
+    content: "";
+    width: 30px;
+    height: 100%;
+    background: #4473ad;
+    position: absolute;
+    top: 0px;
+    right: 0px;
 }
-#debug .data .ore img{
-    width: 20px;
+#debug .data{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #b2b2b2;
+    box-sizing: border-box;
+}
+#debug .data .item{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 5px;
+    width: fit-content;
+    height: 24px;
+    box-sizing: border-box;
+}
+#debug .data .item .num{
+    flex: 1;
+    line-height: 20px;
+}
+#debug .data .item img{
+    height: 100%;
     aspect-ratio: 1;
 }
 /*#endregion*/
 
 
-#still{
+.area{
     display: none;
-    width: 100%;
-    height: 100%;
-    background: #dedede;
-    position: relative;
-}
-
-#select{
-    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 45px;
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
     padding-top: 25%;
 }
-#select .row{
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 45px;
+.area.show{
+    display: flex;
 }
-#select .selection{
-    width: 150px;
-    height: 150px;
-    background-color: #8d8d8d;
+#loby .grid{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    width: fit-content;
+    aspect-ratio: 1/1;
 }
-#select .selection img{
+#loby .grid .icon{
+    width: 80px;
+    aspect-ratio: 1/1;
+}
+#loby .grid .icon img{
     width: 100%;
-    aspect-ratio: 1;
-    /* object-fit: contain; */ /*これはなんかimgの比率を全体から調節してくれるらしい*/ 
+    height: 100%;
+    object-fit: cover;
 }
 .back{
     width: 100%;
@@ -355,3 +386,8 @@ body{
 
     /*感情の表現が顕著で、あーこれはｽﾊﾞﾗｼｲﾃﾞｽﾈ~~ ぜ〜ひとも私に売っていただきたいですね〜〜 ....いやこれはだめだな、なんか....宝の質屋だな*/
     /*...セイムマートを少年にして、こっちはシーナ風、つまり おや？こんな時間に客とは珍しいねぇ.. やあお兄さん、私に何を売ってくれるんだい？ ....いいね*/
+
+#shichi .chara img{
+    width: 40px;
+    height: auto;
+}

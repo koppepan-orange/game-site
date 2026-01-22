@@ -13,41 +13,78 @@ let Style = {
     }
 }
 
-let Selections = {
-    select:{
-        id:'select',
-        name:'全体',
-        func:function(){}
+let Areas = [
+    {
+        name:"loby",
+        jpnm:"ろびー",
+        desc:"ろびんふっと",
     },
-    buyer:{
-        id:'buyer',
-        name:'売り屋',
-        serifs:{
-            normal:[
-                'おや、お客さんとは珍しいね<br>まあゆっくりしていきなよ',
-                'ん？あーいらっしゃ〜い<br>え？キャラが違うって？<br>..このキャラを維持するのは難しくてね....'
-            ],
-        },
-        func:function(){
-            buyerOwnertext = arraySelect(Selections.buyer.serifs.normal);
-            buyerOwnertextD.innerHTML = buyerOwnertext;
-        }
+    {
+        name:"mine",
+        jpnm:"鉱山だよ",
+        desc:"石が掘れます。",
     },
-    mine:{
-        id:'mine',
-        name:'鉱山',
-        func:function(){}
+    {
+        name:"shichi",
+        jpnm:"質屋だよ",
+        desc:"なんか売れます。うれしいね。",
     },
-    shop:{
-        no:1,
-        id:'shop',
-        name:'セイムマート',
-        func:function(){}
+    {
+        name:"shop",
+        jpnm:"店だよ",
+        desc:"なぜかどこにでもあるコンビニ「セイムマート」",
     },
-    still:{
-        no:1,
-        id:'still',
-        name:'まだ',
-        func:function(){}
+    {
+        name:"still",
+        jpnm:"まだだよ",
+        desc:"[[リンクは削除されました]]",
     },
-}
+]
+
+let Ores = [
+    {
+        name:'coal',
+        jpnm:"石炭",
+        desc:"",
+        p:39,
+        priceR:[10, 30],
+        price:30,
+        x:0
+    },
+    {
+        name:'iron',
+        jpnm:"鉄",
+        desc:"",
+        p:32,
+        priceR:[30, 100],
+        price:100,
+        x:0
+    },
+    {
+        name:'ruby',
+        jpnm:"ルビー",
+        desc:"",
+        p:27,
+        priceR:[60, 200],
+        price:200,
+        x:0
+    },
+    {
+        name:'gold',
+        jpnm:"金",
+        desc:"",
+        p:21,
+        priceR:[100, 400],
+        price:400,
+        x:0
+    },
+    {
+        name:'larimar',
+        jpnm:"ラリマール",
+        desc:"",
+        p:12,
+        priceR:[300, 700],
+        price:700,
+        x:0
+    }
+]
