@@ -2,6 +2,9 @@ let Style = {
     iPhone:{ //16
         "width": "393px",
     },
+    mine:{
+        "row": "4",
+    },
     tekiou: function() {
         for (let section in this) {
             if (section == 'apply') continue;

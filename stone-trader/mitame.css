@@ -292,7 +292,7 @@ body{
 
 /*#region debugのやつ*/
 #debug{
-    display: flex;
+    display: none;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
@@ -314,6 +314,21 @@ body{
     position: absolute;
     top: 0px;
     right: 0px;
+}
+#debug.show{
+    display: flex;
+}
+#debug .stat{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+    height: fit-content;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #b2b2b2;
+    box-sizing: border-box;
 }
 #debug .data{
     display: flex;
@@ -363,6 +378,14 @@ body{
 .area.show{
     display: flex;
 }
+.area .back{
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 25px;
+    background-color: #ddefff;
+}
+
 #loby .grid{
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -380,11 +403,45 @@ body{
     object-fit: cover;
     pointer-events: none;
 }
-.back{
-    width: 100%;
-    height: 25px;
-    background-color: #ddefff;
+
+/* #region mine */
+#mine{
+    content: 'mine';
 }
+#mine .vein{
+    display: grid;
+    width: fit-content;
+    grid-template-columns: repeat(var(--mine-row), 1fr);
+    gap: 10px;
+    width: fit-content;
+    aspect-ratio: 1 / 1;
+}
+#mine .vein .ore{
+    display: block;
+    width: 75px;
+    aspect-ratio: 1 / 1;
+    position: relative;
+    background: #cecece;
+}
+#mine .vein .ore img{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: clip-path 0s ease;
+    object-fit: cover;
+    pointer-events: none
+}
+#mine .vein .ore img.dest{
+    opacity: 0;
+    image-rendering: pixelated;
+    z-index: 2;
+}
+#mine .vein .ore img.dest.show{
+    opacity: 1;
+}
+/* #endregion */
 
     /*感情の表現が顕著で、あーこれはｽﾊﾞﾗｼｲﾃﾞｽﾈ~~ ぜ〜ひとも私に売っていただきたいですね〜〜 ....いやこれはだめだな、なんか....宝の質屋だな*/
     /*...セイムマートを少年にして、こっちはシーナ風、つまり おや？こんな時間に客とは珍しいねぇ.. やあお兄さん、私に何を売ってくれるんだい？ ....いいね*/

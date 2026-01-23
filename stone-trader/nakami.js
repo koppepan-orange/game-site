@@ -736,7 +736,7 @@ let loaC = {
 }
 let loaF = {};
 loaC.imgL = {
-    systems:['error', 'mine', 'shichi', 'shop', 'still'],
+    systems:['error', 'mine', 'shichi', 'shop', 'still', 'destroy'],
     items:['coal', 'iron', 'ruby', 'gold', 'larimar']
 }
 loaC.imgT = Object.values(loaC.imgL).length;
@@ -885,6 +885,8 @@ document.addEventListener('DOMContentLoaded', async() => await loaF.load());
 
 
 let mainD = document.getElementById('main');
+let backDS = mainD.querySelectorAll('.back');
+let rimi = 1000;
 
 // #region hendou
 function hendou(){
@@ -913,13 +915,15 @@ lobF.load = () => {
         let div = document.createElement('div');
         div.className = `icon ${name}`;
 
-        let img = images.systems[name];
+        let img = images.systems[name].cloneNode(true);
         div.appendChild(img);
 
         div.addEventListener('click', () => lobF.move(name));
 
         lobC.griD.appendChild(div);
     }
+
+    for(let D of backDS) D.addEventListener('click', () => lobF.move('loby'));
 
     lobC.divs['loby'] = lobD;
     lobC.divs['mine'] = minD;
@@ -940,9 +944,117 @@ lobF.move = (name) => {
 // #region mine
 let minD = document.getElementById('mine');
 let minC = {
-
+    veinD: minD.querySelector('.vein'),
+    vein: [],
+    row: 4,
 }
 let minF = {};
+minF.load = () => {
+    minC.vein = [];
+    minC.veinD.innerHTML = '';
+
+    for(let i=0; i<16; i++){
+        let arr = [];
+        for(let i2=0; i2<4; i2++) arr.push(arraySelect(["5px", "10px", "15px"]));
+        let div = document.createElement('div');
+        div.className = `ore o${i}`;
+        div.style.borderRadius = arr.join(' ');
+        
+        let dest = images.systems['destroy'].cloneNode(true);
+        dest.className = 'dest';
+        dest.style.borderRadius = arr.join(' ');
+        div.appendChild(dest);
+
+
+        let time = 500
+        let ms = 10;
+        let timer = null;
+        let holding = false;
+        let scale = 50;
+        let kaijo = () => {
+            holding = false;
+            clearTimeout(timer);
+            dest.classList.remove('show');
+        };
+        div.addEventListener('pointerdown', () => {
+            holding = true;
+            dest.style.clipPath = `inset(100%)`;
+            scale = 50;
+            dest.classList.add('show');
+
+            (function loop(){
+                if(!holding) return;
+                // time/ms回で、100を0にする
+                scale -= 50/time*ms;
+                dest.style.clipPath = `inset(${scale}%)`;
+                setTimeout(loop, ms);
+            })();
+
+            timer = setTimeout(() => {
+                minF.hakai(i);
+                kaijo();
+            }, time);
+        });
+        div.addEventListener('pointerup', kaijo);
+        div.addEventListener('pointerleave', kaijo);
+
+        minC.veinD.appendChild(div);
+
+        let v = {
+            name:'stone',
+            lack:0,
+        }
+        minC.vein.push(v);
+
+        minF.hakai(i);
+    }
+}
+
+minF.hakai = (i) => {
+    // nicoText(`${i}を破壊しました`);
+    let div = minC.veinD.querySelector(`.ore.o${i}`);
+    let name = minC.vein[i].name;
+    let lack = minC.vein[i].lack;
+
+    let arr = [];
+    for(let i2=0; i2<4; i2++) arr.push(arraySelect(["5px", "10px", "15px"]));
+
+    jump:{
+        if(name == 'stone') break jump;
+
+        let oreD0 = div.querySelector('.mono');
+        if(oreD0) oreD0.remove();
+
+        let ore = Ores.find(o => o.name == name);
+        if(!ore) console.error(`先輩、そんなアイテムないっすよ～？ (${name})`);
+        let price = ore.price;
+         if(rimi < price) return addtext('金が足りません。金を買いますか');
+        
+        rimi -= price;
+        ore.x += 1;
+        debugF.tekiou();
+        tobiText(div, `- #${price}`);
+    }
+
+    let ars = {
+        ore: Ores.map(o => o.name),
+        pro: Ores.map(o => o.p),
+    }
+    ars.ore.push('stone');
+    ars.pro.push(17);
+    let ore = arrayGacha(ars.ore, ars.pro);
+
+    jump:{
+        if(ore == 'stone') break jump;
+        
+        let oreD = images.items[ore].cloneNode(true);
+        oreD.className = 'mono';
+        oreD.style.borderRadius = arr.join(' ');
+        div.appendChild(oreD);
+    }
+    minC.vein[i].name = ore;
+    minC.vein[i].lack = probability(3) ? 1 : 0;
+}
 // #endregion
 
 // #region shichi
@@ -972,12 +1084,14 @@ let stiF = {};
 // #region debug
 let debugD = document.getElementById('debug');
 let debugC = {
+    statD: debugD.querySelector('.stat'),
     dataD: debugD.querySelector('.data'),
     menuD: debugD.querySelector('.menu'),
 }
 let debugF = {};
 debugF.tog = () => debugD.classList.toggle('show');
 debugF.istog = () => debugD.classList.contains('show');
+document.addEventListener('keydown', e => {if(e.key == 'g') debugF.tog()});
 debugF.load = () => {
     for(let o of Ores){
         let div = document.createElement('div');
@@ -1001,9 +1115,12 @@ debugF.load = () => {
     }
 }
 debugF.tekiou = () => {
+    debugC.statD.querySelector('.rimi').innerText = `r: #${rimi}`;
+
     for(let o of Ores){
         let div = debugC.dataD.querySelector(`.item.${o.name}`);
         let co = div.querySelector('.co-su');
+         co.dataset.description = `=> #${o.price * o.x}`;
          co.innerText = `${o.x}x`;
         let ne = div.querySelector('.ne-dn');
          ne.innerText = `#${o.price}`;
@@ -1033,6 +1150,7 @@ function re_gameloop(){
 function start(){
     Style.tekiou();
     lobF.load();
+    minF.load();
     debugF.load();
 
     re_gameloop();
