@@ -1,7 +1,3 @@
-@font-face{src:url('assets/fonts/comicsans.ttf');font-family: comicsans;}
-@font-face{src:url("assets/fonts/hangyaku.ttf");font-family: hangyaku;}
-@font-face{src:url('assets/fonts/kurobara.ttf');font-family: kurobara;}
-@font-face{src: url("assets/fonts/misaki.ttf");font-family: misaki;}
 html{
     margin: -8px;
     overflow: hidden;

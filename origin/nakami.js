@@ -432,10 +432,6 @@ function addlog(text){
 };
 //#endregion
 //#region description
-/*
-要素に、data-descriptionをつけると、その要素にホバーした時に指定した文字列を表示させられます。
-ステータスとかバフの詳しい説明用とかに良き
-*/
 let mobileDesc = document.getElementById('mobileDesc');
 document.addEventListener('mousemove', (e) => {
     mobileDesc.style.left = `${e.clientX + 10}px`;
@@ -762,7 +758,6 @@ loaC.souT = Object.values(loaC.souL).length;
 
 loaF.load = async() => {
     if(await loaF.loadI()) return 1;
-
     return 0;
 }
 loaF.loadI = async() => {
@@ -771,6 +766,7 @@ loaF.loadI = async() => {
         if(loaC.imgD == loaC.imgT) loaF.loadS();
     }
 
+    if(loaC.imgT == 0) return loaF.loadS();
     for(let belong in loaC.imgL){
         images[belong] = {};
 
@@ -787,7 +783,6 @@ loaF.loadI = async() => {
             };
             
             images[belong][name] = img;
-            if(loaC.imgD >= loaC.imgT) loaF.loadS();
         }   
     }
 }
@@ -798,6 +793,7 @@ loaF.loadS = async() => {
         if(loaC.souD == loaC.souT) loaF.end();
     }
     
+    if(loaC.souT == 0) return loaF.end();
     for(let belong in loaC.souL){
         sounds[belong] = {};
 
