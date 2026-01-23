@@ -747,7 +747,7 @@ loaC.imgT = Object.values(loaC.imgL).length;
 
 loaC.souL = {
     se:['error'],
-    bgm:[],
+    // bgm:[],
 }
 loaC.souT = Object.values(loaC.souL).length;
 
@@ -756,6 +756,7 @@ loaF.load = async() => {
     else return '終わり';
 }
 loaF.loadI = async() => {
+    console.log('loadi')
     let kasan = () => {
         loaC.imgD++;
         if(loaC.imgD == loaC.imgT) loaF.loadS();
@@ -783,16 +784,21 @@ loaF.loadI = async() => {
 }
 
 loaF.loadS = async() => {
+    console.log('loads')
     let kasan = () => {
         loaC.souD += 1;
+        console.log('kasan', loaC.souD, loaC.souT)
         if(loaC.souD == loaC.souT) loaF.end();
     }
 
     if(loaC.souT == 0) return loaF.end();
+    console.log('kezo')
     for(let belong in loaC.souL){
+        console.log(2)
         sounds[belong] = {};
 
         for(let name of loaC.souL[belong]){
+            console.log(belong, name)
             let sound = new Audio();
             sound.preload = 'auto';
             sound.src = `assets/sounds/${belong}/${name}.mp3`;
