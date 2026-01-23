@@ -1060,9 +1060,39 @@ minF.hakai = (i) => {
 // #region shichi
 let sciD = document.getElementById('shichi');
 let sciC = {
-
+    ownerSD: sciD.querySelector('.owner .chara'),
+    owberTD: sciD.querySelector('.owner .text'),
+    ternerD: sciD.querySelector('.terner'),
 }
 let sciF = {};
+sciF.load = () => {
+    for(let ore of Ores.filter(o => o.name != 'stone')){
+        let name = ore.name;
+
+        let div = document.createElement('div');
+        div.className = `item ${name}`;
+        
+        let img = images.items[name].cloneNode(true);
+        div.appendChild(img);
+
+        let lavel = document.createElement('div');
+        lavel.className = 'lavel';
+        lavel.innerText = ore.jpnm;
+        div.appendChild(lavel);
+
+        div.addEventListener('click', () => {
+            if(ore.x == 0) return;
+            
+            let price = ore.price;
+            rimi += price*ore.x;
+            ore.x = 0;
+            debugF.tekiou();
+            tobiText(div, `+ #${price}`);
+        })
+
+        sciC.ternerD.appendChild(div);
+    }
+} 
 // #endregion
 
 // #region shop
@@ -1120,7 +1150,7 @@ debugF.tekiou = () => {
     for(let o of Ores){
         let div = debugC.dataD.querySelector(`.item.${o.name}`);
         let co = div.querySelector('.co-su');
-         co.dataset.description = `=> #${o.price * o.x}`;
+         co.dataset.description = `=>  #${o.price * o.x}`;
          co.innerText = `${o.x}x`;
         let ne = div.querySelector('.ne-dn');
          ne.innerText = `#${o.price}`;
@@ -1151,6 +1181,7 @@ function start(){
     Style.tekiou();
     lobF.load();
     minF.load();
+    sciF.load();
     debugF.load();
 
     re_gameloop();

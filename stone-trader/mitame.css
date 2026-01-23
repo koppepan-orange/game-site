@@ -443,6 +443,21 @@ body{
 }
 /* #endregion */
 
+/* #region shichi */
+#shichi{
+    content: 'shichi';
+}
+#shichi .terner{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 10px;
+}
+#shichi .terner .item img{
+    width: 80px;
+    aspect-ratio: 1/1;
+}
+/* #endregion */
+
     /*感情の表現が顕著で、あーこれはｽﾊﾞﾗｼｲﾃﾞｽﾈ~~ ぜ〜ひとも私に売っていただきたいですね〜〜 ....いやこれはだめだな、なんか....宝の質屋だな*/
     /*...セイムマートを少年にして、こっちはシーナ風、つまり おや？こんな時間に客とは珍しいねぇ.. やあお兄さん、私に何を売ってくれるんだい？ ....いいね*/
 
