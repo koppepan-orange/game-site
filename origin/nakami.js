@@ -826,8 +826,7 @@ loaF.loadS = async() => {
     };
 }
 loaF.end = () => {
-    console.log('images & sounds loaded!');
-    console.log(`error件数: ${loaC.erd}`);
+    console.log(`images & sounds loaded! (error: ${loaC.erd})`);
     start();
 }
 

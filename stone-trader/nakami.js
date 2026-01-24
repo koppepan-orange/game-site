@@ -756,7 +756,6 @@ loaF.load = async() => {
     else return '終わり';
 }
 loaF.loadI = async() => {
-    console.log('loadi')
     let kasan = () => {
         loaC.imgD++;
         if(loaC.imgD == loaC.imgT) loaF.loadS();
@@ -784,17 +783,13 @@ loaF.loadI = async() => {
 }
 
 loaF.loadS = async() => {
-    console.log('loads')
     let kasan = () => {
         loaC.souD += 1;
-        console.log('kasan', loaC.souD, loaC.souT)
         if(loaC.souD == loaC.souT) loaF.end();
     }
 
     if(loaC.souT == 0) return loaF.end();
-    console.log('kezo')
     for(let belong in loaC.souL){
-        console.log(2)
         sounds[belong] = {};
 
         for(let name of loaC.souL[belong]){
@@ -827,8 +822,7 @@ loaF.loadS = async() => {
     };
 }
 loaF.end = () => {
-    console.log('images & sounds loaded!');
-    console.log(`error件数: ${loaC.erd}`);
+    console.log(`images & sounds loaded! (error: ${loaC.erd})`);
     start();
 }
 
@@ -896,7 +890,6 @@ document.addEventListener('DOMContentLoaded', async() => await loaF.load());
 
 
 let mainD = document.getElementById('main');
-let backDS = mainD.querySelectorAll('.back');
 let rimi = 1000;
 
 // #region hendou
@@ -907,8 +900,30 @@ function hendou(){
         ore.price = price;
     }
 
-    debugF.tekiou();
+    tekiou();
 }
+// #endregion
+
+// #region tekiou
+function tekiou(){
+    debugF.tekiou();
+    uppF.tekiou();
+}
+// #endregion
+
+// #region upper
+let uppD = document.getElementById('upper');
+let uppC = {
+    rimiD: uppD.querySelector('.rimi .num'),
+    bacD: uppD.querySelector('.back'),
+}
+let uppF = {};
+uppF.tekiou = () => {
+    uppC.rimiD.textContent = `#${rimi}`;
+};
+uppF.backA = () => uppC.bacD.classList.add('show');
+uppF.backD = () => uppC.bacD.classList.remove('show');
+uppC.bacD.addEventListener('click', () => lobF.move('loby'));
 // #endregion
 
 // #region loby
@@ -934,8 +949,6 @@ lobF.load = () => {
         lobC.griD.appendChild(div);
     }
 
-    for(let D of backDS) D.addEventListener('click', () => lobF.move('loby'));
-
     lobC.divs['loby'] = lobD;
     lobC.divs['mine'] = minD;
     lobC.divs['shichi'] = sciD;
@@ -948,6 +961,9 @@ lobF.move = (name) => {
 
     for(let a of Areas) lobC.divs[a.name].classList.remove('show');
     lobC.divs[name].classList.add('show');
+
+    if(name == 'loby') uppF.backD();
+    else uppF.backA();
 }
 
 // #endregion
@@ -1043,7 +1059,7 @@ minF.hakai = (i) => {
         
         rimi -= price;
         ore.x += 1;
-        debugF.tekiou();
+        tekiou();
         tobiText(div, `- #${price}`);
     }
 
@@ -1097,7 +1113,7 @@ sciF.load = () => {
             let price = ore.price;
             rimi += price*ore.x;
             ore.x = 0;
-            debugF.tekiou();
+            tekiou();
             tobiText(div, `+ #${price}`);
         })
 

@@ -5,6 +5,9 @@ let Style = {
     mine:{
         "row": "4",
     },
+    back:{
+        "col": "#a3c9ff"
+    },
     tekiou: function() {
         for (let section in this) {
             if (section == 'apply') continue;
