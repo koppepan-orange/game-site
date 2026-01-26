@@ -1056,7 +1056,7 @@ AreF.move = (to) => {
         else div.classList.remove('appe');
     }
 }
-AreF.fieF.move('home');
+AreF.move('home');
 
 
 let movlis = document.getElementById('movlis');
@@ -1066,7 +1066,7 @@ for(let n of AreC.list){
     li.textContent = n.name;
     li.className = 'item';
 
-    li.addEventListener('click', () => AreF.fieF.move(n.name));
+    li.addEventListener('click', () => AreF.move(n.name));
 
     movlis.querySelector('.list').appendChild(li);
 }
@@ -1101,13 +1101,13 @@ homF.owarune = () => {
 homC.endD.addEventListener('click', homF.owarune);
 
 homF.goLoby = async() => {
-    AreF.fieF.move('title');
+    AreF.move('title');
     await delay(1500);
-    AreF.fieF.move('loby');
+    AreF.move('loby');
 }
 homC.goLobyD.addEventListener('click', homF.goLoby);
 
-homC.goFarmD.addEventListener('click', () => AreF.fieF.move('farm'));
+homC.goFarmD.addEventListener('click', () => AreF.move('farm'));
 
 //#endregion
 
@@ -1285,8 +1285,8 @@ let movable = 0;
 async function pUpdate(){
     let p = fieF.get();
     if(!movable) return;
-    let moved = 0;
     
+    let moved = 0;
     let mv = 1;
     if(!p.moving){
         if((keys.w || keys.arrowup) && !p.moving){
@@ -1688,14 +1688,16 @@ let invD = document.querySelector('#inventory');
 let invC = {}
 let invF = {}
 document.addEventListener('keydown', (event) => {
-    if(event.key == 'e' && fieD.style.display == 'block'){
-        if(movable){
-            movable = 0;
-            // window.setTimeout(inventoryOpen,200)
-        }else{
-            movable = 1;
-            // window.setTimeout(inventoryClose,200)
-        }
+    if(event.key != 'e') return;
+    if(fieD.style.display != 'block') return;
+    
+    if(movable){
+        movable = 0;
+        // window.setTimeout(inventoryOpen,200)
+    }else{
+        movable = 1;
+        // window.setTimeout(inventoryClose,200)
+    }
     }
     if(event.key == 'g' && fieD.style.display == 'block') testEnemyAppear();
 });
