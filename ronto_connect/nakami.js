@@ -1256,6 +1256,488 @@ FriF.numold = (num) => {
 }
 //#endregion
 
+//#region field
+let fieD = document.getElementById('fieldArea');
+let fieC = {
+    can: fieD.querySelector('.canvas'),
+    ctx: fieD.querySelector('.canvas').getContext('2d'),
+    row:8, //1列にある数
+    mas:null, //1マスの大きさ(asp:1/1)
+    // mases:[],
+    backM:[],
+    objM:[],
+}
+let fieF = {};
+fieF.load = () => {
+    let backM = fieC.backM;
+    for(let i=0; i<fieC.row; i++){
+        backM[i] = [];
+        for(let i2=0; i2<fieC.row; i2++){
+            backM[i][j] = 0;
+        }
+    }
+
+    let objM = fieC.objM;
+    for(let i=0; i<fieC.row; i++){
+        objM[i] = [];
+        for(let i2=0; i2<fieC.row; i2++){
+            objM[i][j] = 0;
+        }
+    }
+}
+
+let stage = 1;
+let floor = 0;
+
+fieF.resize = () => { 
+    fieC.can.width = window.innerHeight * 0.8;
+    fieC.can.height = window.innerHeight * 0.8;
+    mas = window.innerHeight * 0.8 / fieC.row;
+}
+document.addEventListener('resize', fieF.resize);
+
+
+let IMGselect = 0;
+IMGselect = new Image();
+IMGselect.src = 'assets/images/systems/select.png';
+
+let movable = 0;
+
+let SELECTx = 0; // x座標
+let SELECTy = 0; // y座標
+let MAPx,MAPy;
+
+async function pUpdate(){
+    let p = get();
+    if(!movable) return;
+    let moved = 0;
+    
+    let mv = 1;
+    if(!p.moving){
+        if((keys.w || keys.arrowup) && !p.moving){
+            if(p.dir == 0) await move(p, 'add', 0, -mv);
+            else p.dir = 0;
+        }
+        if((keys.s || keys.arrowdown) && !p.moving){
+            if(p.dir == 180) await move(p, 'add', 0, mv);
+            else p.dir = 180;
+        };
+        if((keys.a || keys.arrowleft) && !p.moving){
+            if(p.dir == 270) await move(p, 'add', -mv, 0);
+            else p.dir = 270;
+        };
+        if((keys.d || keys.arrowright) && !p.moving){
+            if(p.dir == 90) await move(p, 'add', mv, 0);
+            else p.dir = 90;
+        };
+    }
+
+    if((keys.z || keys.enter) && textShowing == 0 && !p.moving){
+        // 今乗ってる（on == true かつ 座標が同じ） => obon認定
+
+        let obon = fieC.objs.filter(a => a.x == p.x && a.y == p.y && a.on);
+        if(obon.length > 1) return console.log(obon,'←onのやつらが重なってるみたいっす！');
+        if(obon.length == 1){
+            obon = obon[0];
+            let data = Objectdatas.find(a => a.id == obon.id)
+            if(!data) return console.error(obon,'←これのidの処理、書いてないっすよ〜？(ニヤっ)');
+
+            let res = data.process();
+            draw();
+
+            if(res) return 1;
+        }
+
+        // 目の前にあるやつ（on == false かつ 向いてる方向）
+        let karix = 0, kariy = 0;
+        switch (p.dir) {
+            case 0: kariy -= 1; break;
+            case 90: karix += 1; break;
+            case 180: kariy += 1; break;
+            case 270: karix -= 1; break;
+        }
+        
+        //onしてない => nobon認定
+        let nobon = fieC.objs.filter(a => a.x == p.x + karix && a.y == p.y + kariy && !a.on)
+        if(nobon.length > 1) return console.log(nobon,'←not onのやつらが重なってるみたいっす！');
+        if(nobon.length == 1){
+            nobon = nobon[0];
+            let data = Objectdatas.find(a => a.id == nobon.id);
+            console.log(nobon, data)
+            if(!data) return console.error(nobon,'←これのidの処理、書いてないっすよ〜？(ニヤっ)');
+
+            let res = data.process();
+            draw();
+
+            if(res) return 1;
+        }
+    }
+
+    if(p.x < 0 || fieC.row < p.x || p.y < 0 || fieC.row < p.y) error();
+    
+};
+
+
+function draw() {
+    // if(SELECTx < 0) SELECTx=0;
+    // if(SELECTy < 0) SELECTy=0;
+    // if(SELECTx > fieC.row*fieC.mas) SELECTx = fieC.row*fieC.mas;
+    // if(SELECTy > fieC.row*fieC.mas) SELECTy = fieC.row*fieC.mas;
+    // MAPx = Math.floor(SELECTx / fieC.mas);
+    // MAPy = Math.floor(SELECTy / fieC.mas);
+
+    fieC.ctx.clearRect(0, 0, fieC.can.offsetWidth, fieD.offsetHeight); // 画面をクリア
+    
+    // fieC.ctx.drawImage(IMGselect, SELECTx, SELECTy, fieC.mas, fieC.mas);
+
+    //background、そのまま背景
+    for(let yy = 0; yy < fieC.row; yy++){
+      for(let xx = 0; xx < fieC.row; xx++){
+        let img = images['maps'][fieC.backM[yy][xx]];
+        if(img){
+          fieC.ctx.drawImage(img, xx * fieC.mas, yy * fieC.mas, fieC.mas, fieC.mas);
+        }else{
+          console.error(`assets/maps/${fieC.backM[yy][xx]}.png is not found.`);
+        }
+      }
+    }
+
+    /*
+        for(let y = 0; y < fieC.objM.length; y++) {
+        for(let x = 0; x < fieC.objM[y].length; x++) {
+        let obs = fieC.objM[y][x];
+        if(obs.id == 0) continue;
+
+        let belong = stage;
+        let src = obs.id;
+        if(obs.id == 'enemy') belong = 'enemies', src = obs.data.name;
+        if('used' in obs.data) src += obs.data.used ? '_off' : '_on';
+
+        let img = images[belong][src];
+        if(!img) console.log(`assets/${belong}/${src}.png not found.`), img = images['systems']['error'];
+
+        if(img) fieC.ctx.drawImage(img, x * fieC.mas, y * fieC.mas, fieC.mas, fieC.mas);
+      }
+    }
+    */
+
+    //object、仕掛けとか
+    for(let obs of fieC.objs){
+        if(obs.id == 0) continue;
+        
+        let belong = obs.stage;
+        let src = obs.src;
+        if(obs.id == 'player') belong = 'charas', src = obs.data.img;
+        if(obs.id == 'enemy') belong = 'enemies', src = obs.data.name;
+        if('type' in obs.data) src += `_${obs.data.type}`;
+        if('used' in obs.data) src += obs.data.used ? '_off' : '_on';
+
+        let img = images[belong][src];
+        if(!img) console.log(`assets/${belong}/${src}.png is not found.`), img = images['systems']['error'];
+        if(img) fieC.ctx.drawImage(img, obs.ox, obs.oy, obs.w, obs.h);
+    }
+}
+
+
+fieF.get = (me = '指定なし') => {
+    if(me == '指定なし') me = 0; //特別扱い, player
+    
+    let who = fieC.objs[me];
+
+    return who;
+}
+function able(who, type){
+    return who.ables.some(a => a == type);
+}
+function prop(who, type){
+    return who.prop && who.prop.some(a => a == type);
+}
+async function move(who, code, mx, my, force = 0){
+    // let who = get(cam, me);
+
+    // console.log(`想定: x|${who.x.toString().padStart(2, '0')}, y|${who.y.toString().padStart(2, '0')} => x|${(who.x + mx).toString().padStart(2, '0')}, y|${(who.y + my).toString().padStart(2, '0')}`)
+
+    if(who.x + mx < 0 || 11 < who.x + mx) mx = 0;
+    if(who.y + my < 0 || 11 < who.y + my) my = 0;
+    
+    if(mx == 0 && my == 0) return //console.log(`${who.name}「移動量が0ですわ〜〜！！」`);
+
+    if(!able(who, 'move') && !force) return //console.log(`${who.name}「動けないっっ...!!」`);
+
+    let addx, addy;
+    let ssx = who.sx, ssy = who.sy; //save sxの略
+    if(code == 'add'){
+        who.sx += mx*fieC.mas;
+        who.sy += my*fieC.mas;
+        addx = mx*fieC.mas/who.spd;
+        addy = my*fieC.mas/who.spd;
+    }
+    if(code == 'set'){
+        who.sx = mx*fieC.mas;
+        who.sy = my*fieC.mas;
+        addx = Math.abs(who.x - mx) / who.spd;
+        addy = Math.abs(who.y - my) / who.spd;
+    }
+    if(code == 'drive'){
+        let rad = (who.dir - 90) * Math.PI / 180;
+        
+        my = 0; //これ無視した方がいいかも。使い所isない
+        let noise = random(-my, my);
+
+        let dx = mx * fieC.mas * Math.cos(rad) - noise * Math.sin(rad);
+        let dy = mx * fieC.mas * Math.sin(rad) + noise * Math.cos(rad);
+
+        who.sx += dx;
+        who.sy += dy;
+
+        addx = dx / who.spd;
+        addy = dy / who.spd;
+    }
+
+    let list = Object.values(fieC.objs).flat();
+    // console.log(`(${looped})${who.name}「${able(who, 'pass')}, ${list.some(t => over(who, t))}, ${list.some(t => able(t, 'bepass'))}」`);
+    if(list.some(t => over(who, t))){
+        list.forEach(t => {
+            if(over(who, t) && !able(t, 'bepass')){
+                // console.log(`(${looped})${who.name}[${who.x},${who.y}]「${t.name}[${t.x},${t.y}]とぶつかる〜〜〜〜！！」`)
+                // console.log(`(${looped})自分: ${who.name} x:${who.x} y:${who.y} sx:${who.sx} sy:${who.sy} w:${who.w} h:${who.h} dir:${who.dir} spd:${who.spd}`);
+                // console.log(`(${looped})相手: ${t.name}) x:${t.x} y:${t.y} sx:${t.sx} sy:${t.sy} w:${t.w} h:${t.h} dir:${t.dir} spd:${t.spd}`);
+            };
+        })
+    }
+    if(!able(who, 'pass') && list.some(t => over(who, t) && !able(t, 'bepass'))) return who.sx = ssx, who.sy = ssy, draw()//, console.log(`(${looped})${who.name}「この先に何かあるっぽい？」`);
+
+    // console.log(`(${looped})想定: x|${who.x.toString().padStart(2, '0')}, y|${who.y.toString().padStart(2, '0')} => x|${(who.x + mx).toString().padStart(2, '0')}, y|${(who.y + my).toString().padStart(2, '0')} || 実行: x|${addx.toString().padStart(5, ' ')}, y|${addy.toString().padStart(5, ' ')} 計${who.spd}回反復`)
+
+    who.moving = 1;
+    for(let i = 0; i < who.spd; i++){
+        who.ox += addx;
+        who.oy += addy;
+        await delay(10);
+        draw();
+    }
+
+    who.x = Math.round(who.ox / fieC.mas);
+    who.y = Math.round(who.oy / fieC.mas);
+    who.ox = who.sx
+    who.oy = who.sy;
+
+    draw();
+
+    who.moving = 0;
+}
+const EPSILON = 0.01;
+function over(a, b) {
+    if (a.cam == b.cam && a.me == b.me) return false;
+
+    let sx1 = a.sx, sy1 = a.sy, ex1 = a.sx + a.w, ey1 = a.sy + a.h;
+    let sx2 = b.sx, sy2 = b.sy, ex2 = b.sx + b.w, ey2 = b.sy + b.h;
+
+    let overlapX = (sx1 < ex2 - EPSILON) && (ex1 > sx2 + EPSILON);
+    let overlapY = (sy1 < ey2 - EPSILON) && (ey1 > sy2 + EPSILON);
+
+    return overlapX && overlapY;
+}
+
+function nextFloor(){
+    floor += 1;
+
+    mapMake();
+    draw()
+}
+
+function mapMake(code){
+    //stage
+    for(let i = 0; i < fieC.row; i++){
+        fieC.backM[i] = [];
+
+        for(let j = 0; j < fieC.row; j++){
+            let basescore = 10, bonus = 40; //2種の場合
+            let scores = {};
+
+            // 各タイルの初期スコアをセット
+            let dataS = Stages.find(a => a.name == stage);
+            dataS.tiles.forEach(type => scores[type] = basescore);
+
+            // 左と上のマスに同じタイルがあったらスコア加算
+            if (j > 0) scores[fieC.backM[i][j-1]] += bonus;
+            if (i > 0) scores[fieC.backM[i-1][j]] += bonus;
+
+            function weightedRandom(weightMap){
+                // 重み付きランダム選択
+                let total = Object.values(weightMap).reduce((a, b) => a + b, 0);
+                let r = Math.random() * total;
+                for (let key in weightMap) {
+                    r -= weightMap[key];
+                    if (r < 0) return key;
+                }
+            }
+
+            let chosen = weightedRandom(scores);
+            fieC.backM[i][j] = chosen;
+            //fieC.ctx.drawImage(images.maps[chosen], j * fieC.mas, i * fieC.mas, fieC.mas, fieC.mas);
+        }
+    }
+
+    fieC.objM = [];
+    for(let i = 0; i < fieC.row; i++){
+        fieC.objM[i] = [];
+        for(let j = 0; j < fieC.row; j++){
+            fieC.objM[i][j] = {id:0};
+        }
+    }
+    let max = random(3, 7);
+    // let obsList = JSON.parse(JSON.stringify(obsAll[stage])); //copy
+    let obsList = copy(Objects.find(a => (a.in == stage || a.in == 'すべて') && !a.no));
+    for(let i=0; i<max; i++){
+        let obs = arrayGacha(obsList, obsList.map(a => a.p));
+        if(!obs) console.log(obsList, obs);
+        let obsInd = obsList.indexOf(obs);
+
+        let obdata = Objectdatas.find(b => b.id == obs.id??0);
+        if(!obdata) obdata = Objectdatas.find(b => b.id == 'none');
+        if(obdata.k??1 == 0) obsList.splice(obsInd, 1); // 重複できない子なら消し去る
+
+        let obx = 0, oby = 0;
+        let douBasyo = fieC.objs.filter(a => a.x == obx && a.y == oby && a.id != 0);
+        while(douBasyo.length || !(douBasyo.filter(a => a.on) && !obdata.on)){
+            // console.log(`あるか:${douBasyo.length}, 乗れるか:${!obs.on}`)
+            // console.log(`(${obx}, ${oby})はすでに何かがあるっぽい？`);
+            obx = random(0, fieC.row - 1);
+            oby = random(0, fieC.row - 1);
+            douBasyo = fieC.objs.filter(a => a.x == obx && a.y == oby && a.id != 0);
+        };
+
+        // console.log(obs)
+        // console.log(obs.id, obs.data.name)
+        addob(obs.id, obx, oby, obdata.w, obdata.h, obdata.spd, 90, obdata.ables, obs.data);
+
+        /*
+            obsAllのobs = {
+                id:'enemy',
+                on:0,
+                p:35,
+                data:{
+                    name:'蒼白の粘液',
+                }
+            }
+
+            objectDatasのob = {
+                id: 'enemy',
+                w: 1, //1 == 1fieC.masの意
+                h: 1,
+                spd: 20,
+                pass: 0,
+            }
+        */
+    }
+
+    // MAPx = fieC.objMnum[stage-1].split('.');
+    // MAPy = +MAPx[1]+1
+    // MAPx = +MAPx[0]
+    // fieC.objM = fieC.objMs[Math.floor(Math.random() *    MAPy)+MAPx];
+    // fieC.objM = JSON.parse(JSON.stringify(fieC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
+
+    // if(stage == 1){
+    //     if(fun == 23 && probability(10)){
+    //         fieC.backM = fieC.backMs[4];
+    //         fieC.objM = fieC.objMs[6];
+    //     }else if(fun <= 50 && probability(10)){
+    //         fieC.backM = fieC.backMs[5];
+    //         fieC.objM = fieC.objMs[7];
+    //     };
+    // }else if(stage == 2){
+    //     if(fun == 68 && probability(10)){
+    //         fieC.backM = fieC.backMs[11];
+    //         fieC.objM = fieC.objMs[14];
+    //         fieC.objM = JSON.parse(JSON.stringify(fieC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
+    //     }else if(fun <= 50 && probability(10)){
+    //         fieC.backM = fieC.backMs[19];
+    //         fieC.objM = fieC.objMs[23];
+    //         fieC.objM = JSON.parse(JSON.stringify(fieC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
+    //     };
+    // }else if(stage == 3){
+    //     if(fun == 68 && probability(10)){
+    //         fieC.backM = fieC.backMs[18];
+    //         fieC.objM = fieC.objMs[22];
+    //         fieC.objM = JSON.parse(JSON.stringify(fieC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
+    //     }else if(fun <= 50 && probability(10)){
+    //         fieC.backM = fieC.backMs[19];
+    //         fieC.objM = fieC.objMs[23];
+    //         fieC.objM = JSON.parse(JSON.stringify(fieC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
+    //     };
+    // }
+    // if(stage == 1 && floor >= 10){SELECTx = 150;SELECTy = 525;fieC.backM = fieC.backMs[6];fieC.objM = fieC.objMs[8]}; //創生黎明の原野
+    // if(stage == 2 && floor >= 7 ){SELECTx = 150;SELECTy = 525;fieC.backM = fieC.backMs[13];fieC.objM = fieC.objMs[16]}; //ガチェンレイゲスドゥールラート(昼)
+    // if(stage == 3 && floor >= 3 ){SELECTx = 150;SELECTy = 525;fieC.backM = fieC.backMs[20];fieC.objM = fieC.objMs[24]}; //ガチェンレイゲスドゥールラート(夜)
+}
+
+function addob(id, mx, my, w, h, spd, dir, ables, data){
+    //idは0なら何もしない
+    if(id == 0) return;
+
+    let src = id;
+
+    let ob = {
+        id: id,
+        //cam: cam,
+        me: fieC.objs.length,
+        stage: stage,
+        src: src,
+        x: mx,
+        y: my,
+        sx: mx*fieC.mas,
+        sy: my*fieC.mas,
+        ox: mx*fieC.mas,
+        oy: my*fieC.mas,
+        w: w*fieC.mas,
+        h: h*fieC.mas,
+        moving: 0,
+        spd: spd || 5,
+        dir: dir || 90,
+        ables: ables || [],
+        data: data || {},
+    }
+
+    fieC.objs.push(ob);
+}
+
+function nextStage(){
+    let mts = stage; //moto stage
+
+    let arr = Stages.map(a => a.name);
+    while(mts == stage){
+        // 1~3の間でランダムにステージを決定
+        let arr = Stages.map(a => a.name);
+        stage = arraySelect(arr);
+    }
+    console.log(`れっつら ${stage}`);
+
+    floor = 0;
+    nextFloor();
+}
+//#endregion
+
+//#region inventory
+let invD = document.querySelector('#inventory');
+let invC = {}
+let invF = {}
+document.addEventListener('keydown', (event) => {
+    if(event.key == 'e' && fieD.style.display == 'block'){
+        if(movable){
+            movable = 0;
+            // window.setTimeout(inventoryOpen,200)
+        }else{
+            movable = 1;
+            // window.setTimeout(inventoryClose,200)
+        }
+    }
+    if(event.key == 'g' && fieD.style.display == 'block') testEnemyAppear();
+});
+
+//#endregion
+
+
 //#region battle-DOM
 let batD = document.getElementById('btArea');
 let batC = {
