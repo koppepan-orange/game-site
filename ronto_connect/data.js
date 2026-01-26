@@ -1056,8 +1056,8 @@ let Magics = [
 let Equips = {
     'weapon':[
         {
-            jpnm:'なし',
             name:'none',
+            jpnm:'なし',
             num:0, //このnumはいらんとおもう、hasEquip( [] )で管理するし
             power:0,
             price:0,
@@ -1067,8 +1067,8 @@ let Equips = {
             ce:0,
         },
         {
-            jpnm:'木の棒',
             name:'woodstick',
+            jpnm:'木の棒',
             num:0,
             power:2,
             price:10,
@@ -1078,8 +1078,8 @@ let Equips = {
             ce:0,
         },
         {
-            jpnm:'木刀',
             name:'woodsword',
+            jpnm:'木刀',
             num:0,
             power:4,
             price:20,
@@ -1089,8 +1089,8 @@ let Equips = {
             ce:0,
         },
         {
-            jpnm:'竹刀',
             name:'bamboo_sword',
+            jpnm:'竹刀',
             num:0,
             power:6,
             price:30,
@@ -1099,8 +1099,8 @@ let Equips = {
             ce:0,
         },
         {
-            jpnm:'石ころ',
             name:'stone',
+            jpnm:'石ころ',
             num:0,
             power:8,
             price:50,
@@ -1109,8 +1109,8 @@ let Equips = {
             ce:0,
         },
         {
-            jpnm:'大きな石',
             name:'bigrock',
+            jpnm:'大きな石',
             num:0,
             power:10,
             price:80,
@@ -1119,8 +1119,8 @@ let Equips = {
             ce:0,
         },
         {
-            jpnm:'レンガ',
             name:'brick',
+            jpnm:'レンガ',
             num:0,
             power:12,
             price:100,
@@ -1129,8 +1129,8 @@ let Equips = {
             ce:0,
         },
         {
-            jpnm:'薄めの紙',
             name:'thinpaper',
+            jpnm:'薄めの紙',
             num:0,
             power:20,
             price:5,
@@ -1142,8 +1142,8 @@ let Equips = {
             }
         },
         {
-            jpnm:'カード',
             name:'card',
+            jpnm:'カード',
             num:0,
             power:'Math.floor(Math.random()*13)+1',
             price:7,
@@ -1152,8 +1152,8 @@ let Equips = {
             ce:0,
         },
         {
-            jpnm:'はさみ',
             name:'scissors',
+            jpnm:'はさみ',
             num:0,
             power:25,
             price:200,
@@ -1165,8 +1165,8 @@ let Equips = {
             }
         },
         {
-            jpnm:'ほんもののナイフ',
             name:'knife',
+            jpnm:'ほんもののナイフ',
             num:0,
             power:40,
             price:300,
@@ -1179,8 +1179,8 @@ let Equips = {
         },
 
         {
-            jpnm:'ジェン・ソルテ',
             name:'blooddagger',
+            jpnm:'ジェン・ソルテ',
             num:0,
             power:0,
             price:150,
@@ -1196,13 +1196,12 @@ let Equips = {
             ce:0,
         },
         {
-            jpnm:'time on target',
             name:'timeontarget',
+            jpnm:'time on target',
             num:0,
             power:10,
             price:150,
             desc:'ナギサ様の手好き',
-            
             ap:1,
             aFunc:async function(cam,me,are,rate,kind,prop,dmg){
                 addtext(arraySelect(['トリニティの砲撃術は優秀ですから。','お口に合うと良いのですが..']));
@@ -1214,13 +1213,12 @@ let Equips = {
             ce:0,
         },
         {
-            jpnm:'大博打',
             name:'biggamble',
+            jpnm:'大博打',
             num:0,
             power:0,
             price:150,
             desc:'大勝負..ってやつ？まじで賭け。がんばえ',
-            
             ap:0,
             ce:1,
             bFunc:{
@@ -1228,13 +1226,13 @@ let Equips = {
             }
         },
         {
-            jpnm:'天邪鬼',
+            no:1,
             name:'contrarian',
+            jpnm:'天邪鬼',
             num:0,
             power:80,
             price:150,
             desc:'名前変更予定。',
-            no:1,
             ap:0,
             ce:1,
             bFunc:{
@@ -1244,49 +1242,46 @@ let Equips = {
     ],
     'shield':[
         {
-            jpnm:'なし',
+            no:1,
             name:'none',
+            jpnm:'なし',
             num:0,
             shell:0,
             price:0,
             desc:'ないです。\n筋肉とでも解釈してくれればおk',
-            no:1,
             sp:0
         },
         {
-            jpnm:'マスク',
             name:'mask',
+            jpnm:'マスク',
             num:0,
             shell:0,
             price:1,
             // desc:'大事ですね。\n防御力は関係ありませんが病気にはならない',
             desc:'防御力はないです..が、\n精神的な防御力は激高です',
-            
             sp:0
         },
         {
-            jpnm:'薄い本',
             name:'thinbook',
+            jpnm:'薄い本',
             num:0,
             shell:1,
             price:5,
-            desc:'***なのは駄目！！\n死刑！！！！',//コハルなのでセーフ
-            
+            desc:'**なのは駄目！！\n死刑！！！！',//コハルなのでセーフ
             sp:0
         },
         {
-            jpnm:'木の板',
             name:'woodenplank',
+            jpnm:'木の板',
             num:0,
             shell:5,
             price:20,
             desc:'これを使って最初はつるはしを作りましょう',
-            
             sp:0
         },
         {
-            jpnm:'テッパン',
             name:'ironplate',
+            jpnm:'テッパン',
             num:0,
             shell:10,
             price:30,
@@ -1294,48 +1289,44 @@ let Equips = {
             sp:0
         },
         {
-            jpnm:'鍋の蓋',
             name:'potlid',
+            jpnm:'鍋の蓋',
             num:0,
             shell:15,
             price:50,
             desc:'初期装備あるあるⅡですね。\n多分コスパ最強',
-            
             sp:0
         },
         {
-            jpnm:'厚めの本',
             name:'thickbook',
+            jpnm:'厚めの本',
             num:0,
             shell:20,
             price:80,
             desc:'辞書とかなのかな。いや六法全書かも',
-            
             sp:0
         },
         {
-            jpnm:'ドア',
             name:'door',
+            jpnm:'ドア',
             num:0,
             shell:25,
             price:100,
             desc:'え？木の板と一緒だって？\n君は知らないのかい...?\n木の板を6つ並べるとドアが3つできるってことを',
-            
             sp:0
         },
         {
-            jpnm:'扇風機',
             name:'electricfan',
+            jpnm:'扇風機',
             num:0,
             shell:30,
             price:200,
             desc:'涼めるのに便利。\nまた武器にもなり、ついでに敵から身を守れる万能装備',
-            
             sp:0
         },
         {
-            jpnm:'ペロロ様人形',
             name:'perorodoll',
+            jpnm:'ペロロ様人形',
             num:0,
             shell:50,
             price:400,
@@ -1346,40 +1337,40 @@ let Equips = {
     ],
     'ear':[
         {
-            jpnm:'なし',
+            no:1,
             name:'none',
-            num:0, //そのうちhasEqでやって管理するようにしよーね
+            jpnm:'なし',
+            num:0, //だからそのうちhasEqでやって管理するようにしよーね
             power:0,
             shell:0,
             price:0,
             desc:'なし',
-            no:1,
             sp:0
         }
     ],
     'ring':[
         {
-            jpnm:'なし',
+            no:1,
             name:'none',
+            jpnm:'なし',
             num:0,
             power:0,
             shell:0,
             price:0,
             desc:'なし',
-            no:1,
             sp:0
         }
     ],
     'neck':[
         {
-            jpnm:'なし',
+            no:1,
             name:'none',
+            jpnm:'なし',
             num:0,
             power:0,
             shell:0,
             price:0,
             desc:'なし',
-            no:1,
             sp:0
         }
     ]

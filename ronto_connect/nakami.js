@@ -1056,7 +1056,7 @@ AreF.move = (to) => {
         else div.classList.remove('appe');
     }
 }
-AreF.move('home');
+AreF.fieF.move('home');
 
 
 let movlis = document.getElementById('movlis');
@@ -1066,7 +1066,7 @@ for(let n of AreC.list){
     li.textContent = n.name;
     li.className = 'item';
 
-    li.addEventListener('click', () => AreF.move(n.name));
+    li.addEventListener('click', () => AreF.fieF.move(n.name));
 
     movlis.querySelector('.list').appendChild(li);
 }
@@ -1101,13 +1101,13 @@ homF.owarune = () => {
 homC.endD.addEventListener('click', homF.owarune);
 
 homF.goLoby = async() => {
-    AreF.move('title');
+    AreF.fieF.move('title');
     await delay(1500);
-    AreF.move('loby');
+    AreF.fieF.move('loby');
 }
 homC.goLobyD.addEventListener('click', homF.goLoby);
 
-homC.goFarmD.addEventListener('click', () => AreF.move('farm'));
+homC.goFarmD.addEventListener('click', () => AreF.fieF.move('farm'));
 
 //#endregion
 
@@ -1210,8 +1210,6 @@ document.addEventListener('pointerup', (e) => {
 //#endregion
 
 //#region Friendについて
-
-
 let FriC = {
     
 }
@@ -1259,8 +1257,8 @@ FriF.numold = (num) => {
 //#region field
 let fieD = document.getElementById('fieldArea');
 let fieC = {
-    can: fieD.querySelector('.canvas'),
-    ctx: fieD.querySelector('.canvas').getContext('2d'),
+    can: fieD.querySelector('.field'),
+    ctx: fieD.querySelector('.field').getContext('2d'),
     row:8, //1列にある数
     mas:null, //1マスの大きさ(asp:1/1)
     // mases:[],
@@ -1269,21 +1267,7 @@ let fieC = {
 }
 let fieF = {};
 fieF.load = () => {
-    let backM = fieC.backM;
-    for(let i=0; i<fieC.row; i++){
-        backM[i] = [];
-        for(let i2=0; i2<fieC.row; i2++){
-            backM[i][j] = 0;
-        }
-    }
-
-    let objM = fieC.objM;
-    for(let i=0; i<fieC.row; i++){
-        objM[i] = [];
-        for(let i2=0; i2<fieC.row; i2++){
-            objM[i][j] = 0;
-        }
-    }
+    fieF.resize();
 }
 
 let stage = 1;
@@ -1296,38 +1280,29 @@ fieF.resize = () => {
 }
 document.addEventListener('resize', fieF.resize);
 
-
-let IMGselect = 0;
-IMGselect = new Image();
-IMGselect.src = 'assets/images/systems/select.png';
-
 let movable = 0;
 
-let SELECTx = 0; // x座標
-let SELECTy = 0; // y座標
-let MAPx,MAPy;
-
 async function pUpdate(){
-    let p = get();
+    let p = fieF.get();
     if(!movable) return;
     let moved = 0;
     
     let mv = 1;
     if(!p.moving){
         if((keys.w || keys.arrowup) && !p.moving){
-            if(p.dir == 0) await move(p, 'add', 0, -mv);
+            if(p.dir == 0) await fieF.move(p, 'add', 0, -mv);
             else p.dir = 0;
         }
         if((keys.s || keys.arrowdown) && !p.moving){
-            if(p.dir == 180) await move(p, 'add', 0, mv);
+            if(p.dir == 180) await fieF.move(p, 'add', 0, mv);
             else p.dir = 180;
         };
         if((keys.a || keys.arrowleft) && !p.moving){
-            if(p.dir == 270) await move(p, 'add', -mv, 0);
+            if(p.dir == 270) await fieF.move(p, 'add', -mv, 0);
             else p.dir = 270;
         };
         if((keys.d || keys.arrowright) && !p.moving){
-            if(p.dir == 90) await move(p, 'add', mv, 0);
+            if(p.dir == 90) await fieF.move(p, 'add', mv, 0);
             else p.dir = 90;
         };
     }
@@ -1343,7 +1318,7 @@ async function pUpdate(){
             if(!data) return console.error(obon,'←これのidの処理、書いてないっすよ〜？(ニヤっ)');
 
             let res = data.process();
-            draw();
+            fieF.draw();
 
             if(res) return 1;
         }
@@ -1367,7 +1342,7 @@ async function pUpdate(){
             if(!data) return console.error(nobon,'←これのidの処理、書いてないっすよ〜？(ニヤっ)');
 
             let res = data.process();
-            draw();
+            fieF.draw();
 
             if(res) return 1;
         }
@@ -1377,18 +1352,8 @@ async function pUpdate(){
     
 };
 
-
-function draw() {
-    // if(SELECTx < 0) SELECTx=0;
-    // if(SELECTy < 0) SELECTy=0;
-    // if(SELECTx > fieC.row*fieC.mas) SELECTx = fieC.row*fieC.mas;
-    // if(SELECTy > fieC.row*fieC.mas) SELECTy = fieC.row*fieC.mas;
-    // MAPx = Math.floor(SELECTx / fieC.mas);
-    // MAPy = Math.floor(SELECTy / fieC.mas);
-
+fieF.draw = () => {
     fieC.ctx.clearRect(0, 0, fieC.can.offsetWidth, fieD.offsetHeight); // 画面をクリア
-    
-    // fieC.ctx.drawImage(IMGselect, SELECTx, SELECTy, fieC.mas, fieC.mas);
 
     //background、そのまま背景
     for(let yy = 0; yy < fieC.row; yy++){
@@ -1418,7 +1383,7 @@ function draw() {
 
         if(img) fieC.ctx.drawImage(img, x * fieC.mas, y * fieC.mas, fieC.mas, fieC.mas);
       }
-    }
+     }
     */
 
     //object、仕掛けとか
@@ -1438,7 +1403,6 @@ function draw() {
     }
 }
 
-
 fieF.get = (me = '指定なし') => {
     if(me == '指定なし') me = 0; //特別扱い, player
     
@@ -1446,14 +1410,15 @@ fieF.get = (me = '指定なし') => {
 
     return who;
 }
-function able(who, type){
+fieF.able = (who, type) => {
     return who.ables.some(a => a == type);
 }
-function prop(who, type){
+fieF.prop = (who, type) => {
     return who.prop && who.prop.some(a => a == type);
 }
-async function move(who, code, mx, my, force = 0){
-    // let who = get(cam, me);
+
+fieF.move = async(who, code, mx, my, force = 0) => {
+    // let who = fieF.get(cam, me);
 
     // console.log(`想定: x|${who.x.toString().padStart(2, '0')}, y|${who.y.toString().padStart(2, '0')} => x|${(who.x + mx).toString().padStart(2, '0')}, y|${(who.y + my).toString().padStart(2, '0')}`)
 
@@ -1462,7 +1427,7 @@ async function move(who, code, mx, my, force = 0){
     
     if(mx == 0 && my == 0) return //console.log(`${who.name}「移動量が0ですわ〜〜！！」`);
 
-    if(!able(who, 'move') && !force) return //console.log(`${who.name}「動けないっっ...!!」`);
+    if(!fieF.able(who, 'move') && !force) return //console.log(`${who.name}「動けないっっ...!!」`);
 
     let addx, addy;
     let ssx = who.sx, ssy = who.sy; //save sxの略
@@ -1495,17 +1460,17 @@ async function move(who, code, mx, my, force = 0){
     }
 
     let list = Object.values(fieC.objs).flat();
-    // console.log(`(${looped})${who.name}「${able(who, 'pass')}, ${list.some(t => over(who, t))}, ${list.some(t => able(t, 'bepass'))}」`);
-    if(list.some(t => over(who, t))){
+    // console.log(`(${looped})${who.name}「${fieF.able(who, 'pass')}, ${list.some(t => fieF.over(who, t))}, ${list.some(t => fieF.able(t, 'bepass'))}」`);
+    if(list.some(t => fieF.over(who, t))){
         list.forEach(t => {
-            if(over(who, t) && !able(t, 'bepass')){
+            if(fieF.over(who, t) && !fieF.able(t, 'bepass')){
                 // console.log(`(${looped})${who.name}[${who.x},${who.y}]「${t.name}[${t.x},${t.y}]とぶつかる〜〜〜〜！！」`)
                 // console.log(`(${looped})自分: ${who.name} x:${who.x} y:${who.y} sx:${who.sx} sy:${who.sy} w:${who.w} h:${who.h} dir:${who.dir} spd:${who.spd}`);
                 // console.log(`(${looped})相手: ${t.name}) x:${t.x} y:${t.y} sx:${t.sx} sy:${t.sy} w:${t.w} h:${t.h} dir:${t.dir} spd:${t.spd}`);
             };
         })
     }
-    if(!able(who, 'pass') && list.some(t => over(who, t) && !able(t, 'bepass'))) return who.sx = ssx, who.sy = ssy, draw()//, console.log(`(${looped})${who.name}「この先に何かあるっぽい？」`);
+    if(!fieF.able(who, 'pass') && list.some(t => fieF.over(who, t) && !fieF.able(t, 'bepass'))) return who.sx = ssx, who.sy = ssy, fieF.draw()//, console.log(`(${looped})${who.name}「この先に何かあるっぽい？」`);
 
     // console.log(`(${looped})想定: x|${who.x.toString().padStart(2, '0')}, y|${who.y.toString().padStart(2, '0')} => x|${(who.x + mx).toString().padStart(2, '0')}, y|${(who.y + my).toString().padStart(2, '0')} || 実行: x|${addx.toString().padStart(5, ' ')}, y|${addy.toString().padStart(5, ' ')} 計${who.spd}回反復`)
 
@@ -1514,7 +1479,7 @@ async function move(who, code, mx, my, force = 0){
         who.ox += addx;
         who.oy += addy;
         await delay(10);
-        draw();
+        fieF.draw();
     }
 
     who.x = Math.round(who.ox / fieC.mas);
@@ -1522,17 +1487,17 @@ async function move(who, code, mx, my, force = 0){
     who.ox = who.sx
     who.oy = who.sy;
 
-    draw();
+    fieF.draw();
 
     who.moving = 0;
 }
-const EPSILON = 0.01;
-function over(a, b) {
+fieF.over = (a, b) => {
     if (a.cam == b.cam && a.me == b.me) return false;
 
     let sx1 = a.sx, sy1 = a.sy, ex1 = a.sx + a.w, ey1 = a.sy + a.h;
     let sx2 = b.sx, sy2 = b.sy, ex2 = b.sx + b.w, ey2 = b.sy + b.h;
 
+    const EPSILON = 0.01; //許容値？
     let overlapX = (sx1 < ex2 - EPSILON) && (ex1 > sx2 + EPSILON);
     let overlapY = (sy1 < ey2 - EPSILON) && (ey1 > sy2 + EPSILON);
 
@@ -1543,7 +1508,7 @@ function nextFloor(){
     floor += 1;
 
     mapMake();
-    draw()
+    fieF.draw()
 }
 
 function mapMake(code){
@@ -1753,13 +1718,13 @@ let batC = {
 let batF = {} //tyotto yokunai kamo
 
 batF.open = () => {
-    let p = canC.get();
+    let p = fieF.get();
     p.moving = 1;
     
     batD.classList.add('appe')
 };
 batF.clos = () => {
-    let p = canC.get();
+    let p = fieF.get();
     p.moving = 0;
     
     batD.classList.remove('appe')
@@ -2366,7 +2331,7 @@ async function dassyutsu(){
     disappear();
     batD.classList.remove('appe');
     
-    draw()
+    fieF.draw()
     movable = 1;
     await addtext('うまく逃げ切れた！');
 }
