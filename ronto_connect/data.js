@@ -1915,13 +1915,12 @@ let Stages = [
     {
         name:'草原',
         jpnm:'創生黎明の原野',
-        
         tiles: ['a','b'],
     },
     {
+        no:1,
         name:'砂漠',
         jpnm:'ガチェンレイゲスドゥールラート',
-        no:1,
         tiles: ['b','c','d'],
     }
 ];
@@ -1929,17 +1928,28 @@ let Stages = [
 let Objects = [
     //0|1 able:登場不可|登場可 on:乗れない|乗れる 
     {
+        no:1,
         name:'none',
         jpnm:'none',
-        on:1,
         in:'すべて',
+        on:1, //プレイヤーはこの上に乗れるか
+        p:20, //出現確率 (基本:20)
+        n:0, //最大出現数 (0なら逆に無制限)
+        s:0, //歩行速度 (0に近づくほど速い)(0なら逆に動けない)
+        ables:[], //可能なこと これは基本動くやつ向け
+        sei:[], //性質 触れるだけで系とか。ここに何かがあれば関数も書くこと
         func:async function(){}
     },
     {
         name:'stair',
         jpnm:'階段',
-        on:1,
         in:'すべて',
+        on:1,
+        p:20,
+        n:1,
+        s:0,
+        ables:[],
+        sei:[],
         func:async function(){
             nextFloor();
         }
@@ -1947,8 +1957,13 @@ let Objects = [
     {
         name:'door',
         jpnm:'ドア',
-        on:1,
         in:'すべて',
+        on:1,
+        p:20,
+        n:1,
+        s:0,
+        ables:[],
+        sei:[],
         func:async function(){
             nextStage();
         }
@@ -1956,8 +1971,13 @@ let Objects = [
     {
         name:'enemy',
         jpnm:'敵',
-        on:0,
         in:'すべて',
+        on:0,
+        p:20,
+        n:0,
+        s:0,
+        ables:[],
+        sei:[],
         func:async function(){
             encount();
         },
@@ -1965,8 +1985,13 @@ let Objects = [
     {
         name:'boss',
         jpnm:'上司',
-        on:0,
         in:'すべて',
+        on:0,
+        p:20,
+        n:1,
+        s:0,
+        ables:[],
+        sei:[],
         func:async function(){
             BossEnemyAppear();
         }
@@ -1974,8 +1999,13 @@ let Objects = [
     {
         name:'fire_on',
         jpnm:'焚き火',
-        on:1,
         in:'すべて',
+        on:1,
+        p:20,
+        n:3, //気分
+        s:0,
+        ables:[],
+        sei:[],
         func:async function(){
             movable = 1;
             document.querySelector('#overfieldArea').style.display = 'none';
@@ -1997,8 +2027,13 @@ let Objects = [
     {
         name:'fire_off',
         jpnm:'焚き火跡',
-        on:1,
         in:'すべて',
+        on:1,
+        p:20,
+        n:3,
+        s:0,
+        ables:[],
+        sei:[],
         func:async function(){
             await addtext(arrayGacha( //この重複感好き
                 ['この焚き火はもう木炭になっている','まだ温かい..この辺りに誰かいるようだ'],
@@ -2009,8 +2044,13 @@ let Objects = [
     {
         name:'shop_skill',
         jpnm:'スキルショップ',
-        on:1,
         in:'すべて',
+        on:1,
+        p:20,
+        n:1,
+        s:0,
+        ables:[],
+        sei:[],
         func:async function(){
             SkillShopOpen();
         }
@@ -2018,8 +2058,13 @@ let Objects = [
     {
         name:'chest_n',
         jpnm:'宝箱',
-        on:1,
         in:'すべて',
+        on:0,
+        p:20,
+        n:0,
+        s:0,
+        ables:[],
+        sei:[],
         func:async function(){
             OpenChest(1);
         }
@@ -2027,18 +2072,28 @@ let Objects = [
     {
         name:'chest_r',
         jpnm:'レア宝箱',
-        on:1,
         in:'すべて',
+        on:0,
+        p:20,
+        n:2,
+        s:0,
+        ables:[],
+        sei:[],
         func:async function(){
             OpenChest(2);
         }
     },
     {
+        no:1,
         name:'hopebutton',
         jpnm:'救いのボタン',
-        no:1,
-        on:1,
         in:'草原',
+        on:0,
+        p:20,
+        n:3,
+        s:0,
+        ables:[],
+        sei:[],
         func:async function(){
             HopeButtonact();
         }
@@ -2046,9 +2101,13 @@ let Objects = [
     {
         name:'candytray',
         jpnm:'あめ置き場',
-        
-        on:1,
         in:'草原',
+        on:1,
+        p:30,
+        n:1,
+        s:0,
+        ables:[],
+        sei:[],
         func:async function(){
             Candytake();
         }
@@ -2056,8 +2115,13 @@ let Objects = [
     {
         name:'cookietray',
         jpnm:'クッキー置き場',
-        on:1,
         in:'草原',
+        on:1,
+        p:15,
+        n:4,
+        s:0,
+        ables:[],
+        sei:[],
         func:async function(){
             Cookietake();
         }
@@ -2065,8 +2129,13 @@ let Objects = [
     {
         name:'scorpion',
         jpnm:'さそりさん',
-        on:1,
         in:'砂漠',
+        on:1,
+        p:20,
+        n:1,
+        s:0,
+        ables:[],
+        sei:[],
         func:async function(){
             ScorpionAct(1);
         }
@@ -2074,38 +2143,62 @@ let Objects = [
     {
         name:'scorpion2',
         jpnm:'さそりさん2世',
-        on:1,
         in:'砂漠',
+        on:1,
+        p:10,
+        n:1,
+        s:0,
+        ables:[],
+        sei:['乗る'],
         func:async function(){
+            ScorpionAct(2);
+        },
+        乗る: async() => {
             ScorpionAct(2);
         }
     },
     {
-        no:0,
         name:'cutras',
         jpnm:'さぼてんさん',
-        on:0,
         in:'砂漠',
+        on:0,
+        p:20,
+        n:1,
+        s:0,
+        ables:[],
         sei:['接触'],
         func:async function(){
+            CatusAct();
+        },
+        接触: async() => {
             CatusAct();
         }
     },
     {
         name:'oasis',
         jpnm:'おあしす',
-        on:1,
         in:'砂漠',
+        on:1,
+        p:18,
+        n:2,
+        s:0,
+        ables:[],
+        sei:[],
         func:async function(){
             OasisAct();
         }
     },
     {
+        no:1,
         name:'sandstorm',
         jpnm:'砂嵐',
-        no:1,
-        on:1,
         in:'砂漠',
+        on:1,
+        p:20,
+        k:0,
+        s:0,
+        ables:[],
+        sei:[],
         func:async function(){}
     },
 ]
@@ -2114,7 +2207,7 @@ let Enemies = [
     {
         no:1,
         name:'蒼白の粘液',
-        in:'草原',
+        ins:['草原'],
         maxhp:'+15',
         atk:'+0',
         def:'-5',
@@ -2155,7 +2248,7 @@ let Enemies = [
     {
         no:1,
         name:'翠嵐の風刃',
-        in:'草原',
+        ins:['草原'],
         maxhp:'-20',
         atk:'+10',
         def:'-20',
@@ -2196,7 +2289,7 @@ let Enemies = [
     {
         no:1,
         name:'黄昏の穿影',
-        in:'草原',
+        ins:['草原'],
         maxhp:'-10',
         atk:'+15',
         def:'+0',
@@ -2253,7 +2346,7 @@ let Enemies = [
     {
         no:1,
         name:'燐光の妖花',
-        in:'草原',
+        ins:['草原'],
         maxhp:'+0',
         atk:'-10',
         def:'+0',
@@ -2306,7 +2399,7 @@ let Enemies = [
     {
         no:1,
         name:'茎槍の狩人',
-        in:'草原',
+        ins:['草原'],
         maxhp:'+0',
         atk:'+10',
         def:'+2',

@@ -1263,32 +1263,30 @@ let fieC = {
     mas:null, //1マスの大きさ(asp:1/1)
     // mases:[],
     backM:[],
-    objM:[],
+    objs:[],
 }
 let fieF = {};
 fieF.load = () => {
     fieF.resize();
 }
 
-let stage = 1;
+let stage = "草原";
 let floor = 0;
 
 fieF.resize = () => { 
     fieC.can.width = window.innerHeight * 0.8;
     fieC.can.height = window.innerHeight * 0.8;
-    mas = window.innerHeight * 0.8 / fieC.row;
+    fieC.mas = window.innerHeight * 0.8 / fieC.row;
 }
 document.addEventListener('resize', fieF.resize);
 
-let movable = 0;
-
 async function pUpdate(){
     let p = fieF.get();
-    if(!movable) return;
+    if(p.moving) return;
     
     let moved = 0;
     let mv = 1;
-    if(!p.moving){
+    {
         if((keys.w || keys.arrowup) && !p.moving){
             if(p.dir == 0) await fieF.move(p, 'add', 0, -mv);
             else p.dir = 0;
@@ -1352,19 +1350,16 @@ async function pUpdate(){
     
 };
 
-fieF.draw = () => {
-    fieC.ctx.clearRect(0, 0, fieC.can.offsetWidth, fieD.offsetHeight); // 画面をクリア
+fieF.draw = async() => {
+    fieC.ctx.clearRect(0, 0, fieC.can.width, fieC.can.height); // 画面をクリア
 
     //background、そのまま背景
-    for(let yy = 0; yy < fieC.row; yy++){
-      for(let xx = 0; xx < fieC.row; xx++){
-        let img = images['maps'][fieC.backM[yy][xx]];
-        if(img){
-          fieC.ctx.drawImage(img, xx * fieC.mas, yy * fieC.mas, fieC.mas, fieC.mas);
-        }else{
-          console.error(`assets/maps/${fieC.backM[yy][xx]}.png is not found.`);
+    for(let y=0; y<fieC.row; y++){
+        for(let x=0; x<fieC.row; x++){
+            let img = images['maps'][stage][fieC.backM[y][x]];
+            // console.log  (img)
+            fieC.ctx.drawImage(img, x*fieC.mas, y * fieC.mas, fieC.mas, fieC.mas);
         }
-      }
     }
 
     /*
@@ -1389,17 +1384,25 @@ fieF.draw = () => {
     //object、仕掛けとか
     for(let obs of fieC.objs){
         if(obs.id == 0) continue;
+        console.log(`id:: ${obs.id}, stage:: ${obs.stage}`)
         
-        let belong = obs.stage;
-        let src = obs.src;
-        if(obs.id == 'player') belong = 'charas', src = obs.data.img;
-        if(obs.id == 'enemy') belong = 'enemies', src = obs.data.name;
+        
+        let sta = obs.stage;
+        let src = obs.id;
+        let bel = "maps";
+        
+        if(obs.id == 'player') bel = 'charas', src = obs.data.img;
+        if(obs.id == 'enemy') bel = 'enemies', src = obs.data.name, console.log(obs.data.name);
         if('type' in obs.data) src += `_${obs.data.type}`;
         if('used' in obs.data) src += obs.data.used ? '_off' : '_on';
 
-        let img = images[belong][src];
-        if(!img) console.log(`assets/${belong}/${src}.png is not found.`), img = images['systems']['error'];
+        let img;
+        if(bel == 'maps' || bel == 'enemies') img = images[bel][sta][src].cloneNode();
+        else img = images[bel][src].cloneNode();
+         if(!img) console.log(`assets/${sta}/${src}.png is not found.`), img = images['systems']['error'];
         if(img) fieC.ctx.drawImage(img, obs.ox, obs.oy, obs.w, obs.h);
+
+        await delay(10)
     }
 }
 
@@ -1544,57 +1547,49 @@ function mapMake(code){
         }
     }
 
-    fieC.objM = [];
-    for(let i = 0; i < fieC.row; i++){
-        fieC.objM[i] = [];
-        for(let j = 0; j < fieC.row; j++){
-            fieC.objM[i][j] = {id:0};
-        }
-    }
+    fieC.objs = [];
+
+    let mas = fieC.mas;
     let max = random(3, 7);
     // let obsList = JSON.parse(JSON.stringify(obsAll[stage])); //copy
-    let obsList = copy(Objects.find(a => (a.in == stage || a.in == 'すべて') && !a.no));
+    let obsList = copy(Objects.filter(a => (a.in == stage || a.in == 'すべて') && !a.no));
+    console.log(obsList);
     for(let i=0; i<max; i++){
+        let data = {};
+        
         let obs = arrayGacha(obsList, obsList.map(a => a.p));
         if(!obs) console.log(obsList, obs);
         let obsInd = obsList.indexOf(obs);
 
-        let obdata = Objectdatas.find(b => b.id == obs.id??0);
-        if(!obdata) obdata = Objectdatas.find(b => b.id == 'none');
-        if(obdata.k??1 == 0) obsList.splice(obsInd, 1); // 重複できない子なら消し去る
+        console.log(obs);
+        let sude = fieC.objs.filter(a => a.id == obs.name);
+         console.log(sude.length, obs.n)
+        if(obs.n != 0 &&sude.length >= obs.n) obsList.splice(obsInd, 1); // 重複できない子なら消し去る
+
+        if(obs.name == 'enemy'){
+            let arr = Enemies.filter(a => a.ins.includes(stage) || a.ins == 'すべて');
+            // let data0 = arrayGacha(arr, arr.map(a => a.p))
+            let data0 = arraySelect(arr);
+            //  console.log(data0)
+             if(!data0) console.error(arr, data0);
+            data.name = data0.name;
+        }
 
         let obx = 0, oby = 0;
-        let douBasyo = fieC.objs.filter(a => a.x == obx && a.y == oby && a.id != 0);
-        while(douBasyo.length || !(douBasyo.filter(a => a.on) && !obdata.on)){
+        let ran = () => {return fieC.objs.filter(a => a.x == obx && a.y == oby && a.id != 0)};
+        let douBasyo = ran();
+        console.log()
+        while(douBasyo.length > 0){
             // console.log(`あるか:${douBasyo.length}, 乗れるか:${!obs.on}`)
             // console.log(`(${obx}, ${oby})はすでに何かがあるっぽい？`);
-            obx = random(0, fieC.row - 1);
-            oby = random(0, fieC.row - 1);
-            douBasyo = fieC.objs.filter(a => a.x == obx && a.y == oby && a.id != 0);
+            obx = random(0, fieC.row-1);
+            oby = random(0, fieC.row-1);
+            douBasyo = ran();
         };
 
         // console.log(obs)
         // console.log(obs.id, obs.data.name)
-        addob(obs.id, obx, oby, obdata.w, obdata.h, obdata.spd, 90, obdata.ables, obs.data);
-
-        /*
-            obsAllのobs = {
-                id:'enemy',
-                on:0,
-                p:35,
-                data:{
-                    name:'蒼白の粘液',
-                }
-            }
-
-            objectDatasのob = {
-                id: 'enemy',
-                w: 1, //1 == 1fieC.masの意
-                h: 1,
-                spd: 20,
-                pass: 0,
-            }
-        */
+        addob(obs.name, obx, oby, mas, mas, obs.s, 90, obs.ables, data);
     }
 
     // MAPx = fieC.objMnum[stage-1].split('.');
@@ -1641,22 +1636,21 @@ function addob(id, mx, my, w, h, spd, dir, ables, data){
     //idは0なら何もしない
     if(id == 0) return;
 
-    let src = id;
+    
 
     let ob = {
         id: id,
         //cam: cam,
         me: fieC.objs.length,
         stage: stage,
-        src: src,
         x: mx,
         y: my,
         sx: mx*fieC.mas,
         sy: my*fieC.mas,
         ox: mx*fieC.mas,
         oy: my*fieC.mas,
-        w: w*fieC.mas,
-        h: h*fieC.mas,
+        w: fieC.mas,
+        h: fieC.mas,
         moving: 0,
         spd: spd || 5,
         dir: dir || 90,
@@ -1688,18 +1682,26 @@ let invD = document.querySelector('#inventory');
 let invC = {}
 let invF = {}
 document.addEventListener('keydown', (event) => {
-    if(event.key != 'e') return;
     if(fieD.style.display != 'block') return;
     
-    if(movable){
-        movable = 0;
-        // window.setTimeout(inventoryOpen,200)
-    }else{
-        movable = 1;
-        // window.setTimeout(inventoryClose,200)
+    let key = event.key.toLowerCase();
+
+    if(key == 'e'){
+        let p = fieF.get();
+        switch(p.moving){
+            case 0:
+            p.moving = 1;
+            //window.setTimeout(inventoryOpen,200)
+            break;
+            
+            case 1:
+            p.moving = 0
+            break;
+            // window.setTimeout(inventoryClose,200)
+        }
     }
-    }
-    if(event.key == 'g' && fieD.style.display == 'block') testEnemyAppear();
+    
+    if(event.key == 'g') testEnemyAppear();
 });
 
 //#endregion
@@ -2334,7 +2336,8 @@ async function dassyutsu(){
     batD.classList.remove('appe');
     
     fieF.draw()
-    movable = 1;
+    
+    fieF.get().moving = 0;
     await addtext('うまく逃げ切れた！');
 }
 
@@ -3064,7 +3067,7 @@ function buffclear(who, code){
             who.buffs = who.buffs.filter(e => e.type == 'uniques');
             break;
         default:
-            console.console('codeが違ったからとりあえず同名消したけど、よかった？');
+            console.log('codeが違ったからとりあえず同名消したけど、よかった？');
             who.buffs = who.buffs.filter(e => e.name == code);
     }
     tekiou();
@@ -3153,7 +3156,7 @@ async function dead(who, are){
     let dom2 = dom.querySelector(`.${tcam}${are.me}`);
     dom2.classList.add('dead');
 
-    //あれ？みんな死んじゃった？
+    //あれ？みんな死んじゃった？笑
     let res = tcams.every(a => a.stt == 0);
     if(!res) return 0;
 
@@ -3186,9 +3189,9 @@ async function finale(cam){
 
 
 async function start(){
-    console.log("=====Ronto Connect connecten=====")
-    // resizeCanvas();
-    // window.addEventListener('resize', resizeCanvas);
+    //console.log("=====Ronto Connect connecten=====")
+    soundVolume(50);
+    fieF.load();
 
     //autoLogin
     username = getLocalStorage("username");
@@ -3243,16 +3246,25 @@ loaF.loadI = async() => {
             else for(let sta2 of stas0) loaC.imgL.maps[sta2].push(name);
         });
 
-        
-        if(!loaC.imgL.enemies[sta]) loaC.imgL.enemies[sta] = [];
-        // console.log(Enemies.filter(a => a.in == sta).map(a => a.name))
-        Enemies.filter(a => a.in == sta).map(a => a.name).forEach(name => {
+        if(sta == 'すべて') continue;
+
+        Stages.find(a => a.name == sta).tiles.forEach(name => {
             loaC.imgT += 1;
-            if(sta != 'すべて') loaC.imgL.enemies[sta].push(name);
+            loaC.imgL.maps[sta].push(name);
+        })
+
+        if(!loaC.imgL.enemies[sta]) loaC.imgL.enemies[sta] = [];
+        Enemies.filter(a => a.ins.includes(sta) || a.ins == 'すべて').map(a => a.name).forEach(name => {
+            loaC.imgT += 1;
+            // loaC.imgL.enemies.push(name);
             
+            if(sta != 'すべて') loaC.imgL.enemies[sta].push(name);
             else for(let sta2 of stas0) loaC.imgL.enemies[sta2].push(name);
-        });
+    });
+
     }
+    // loaC.imgL.enemies = [];
+    
     // console.log('LETS GOOOOOOOOOOO!!')
     let T1 = (Tk) => {
         let Tv = loaC.imgL[Tk];
@@ -3296,7 +3308,7 @@ loaF.loadI = async() => {
             img.onerror = () => {
                 console.error(`Image ${src}${mono}.png failed to load.`);
                 loaC.erd += 1;
-                if(loaC.erd > 20) return console.error('さすがにやりすぎbonus'), 1;
+                 if(loaC.erd > 20) return console.error('さすがにやりすぎbonus'), 1;
                 img.src = `assets/images/systems/error.png`;
                 loaC.imgD++;
                 if(loaC.imgD == loaC.imgT) loaF.loadS();
@@ -3399,10 +3411,6 @@ function soundVolume(val){
         el.volume = v
     });
 }
-soundVolume(50);
-
 //#endregion
 
-document.addEventListener('DOMContentLoaded', async() => {
-    await loaF.load();
-})
+document.addEventListener('DOMContentLoaded', async() => await loaF.load())
