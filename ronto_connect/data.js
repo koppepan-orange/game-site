@@ -2025,6 +2025,7 @@ let Objects = [
         }
     },
     {
+        no:1,
         name:'fire_off',
         jpnm:'焚き火跡',
         in:'すべて',

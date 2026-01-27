@@ -1274,9 +1274,10 @@ let stage = "草原";
 let floor = 0;
 
 fieF.resize = () => { 
-    fieC.can.width = window.innerHeight * 0.8;
-    fieC.can.height = window.innerHeight * 0.8;
-    fieC.mas = window.innerHeight * 0.8 / fieC.row;
+    let wid = window.innerWidth * 0.8;
+    fieC.can.width = wid;
+    fieC.can.height = wid;
+    fieC.mas = wid / fieC.row;
 }
 document.addEventListener('resize', fieF.resize);
 
@@ -1384,7 +1385,7 @@ fieF.draw = async() => {
     //object、仕掛けとか
     for(let obs of fieC.objs){
         if(obs.id == 0) continue;
-        console.log(`id:: ${obs.id}, stage:: ${obs.stage}`)
+        // console.log(`id:: ${obs.id}, stage:: ${obs.stage}`)
         
         
         let sta = obs.stage;
@@ -1550,10 +1551,10 @@ function mapMake(code){
     fieC.objs = [];
 
     let mas = fieC.mas;
-    let max = random(3, 7);
+    let max = random(fieC.row*2, fieC.row**2-fieC.row); //この数字だけどうにかしよう。
     // let obsList = JSON.parse(JSON.stringify(obsAll[stage])); //copy
     let obsList = copy(Objects.filter(a => (a.in == stage || a.in == 'すべて') && !a.no));
-    console.log(obsList);
+    // console.log(obsList);
     for(let i=0; i<max; i++){
         let data = {};
         
@@ -1561,10 +1562,11 @@ function mapMake(code){
         if(!obs) console.log(obsList, obs);
         let obsInd = obsList.indexOf(obs);
 
-        console.log(obs);
+        // console.log(obs);
+        console.log(obs.name, obs.n)
         let sude = fieC.objs.filter(a => a.id == obs.name);
          console.log(sude.length, obs.n)
-        if(obs.n != 0 &&sude.length >= obs.n) obsList.splice(obsInd, 1); // 重複できない子なら消し去る
+        if(obs.n != 0 && sude.length+1 >= obs.n) obsList.splice(obsInd, 1); // 重複できない子なら消し去る
 
         if(obs.name == 'enemy'){
             let arr = Enemies.filter(a => a.ins.includes(stage) || a.ins == 'すべて');
@@ -1576,15 +1578,16 @@ function mapMake(code){
         }
 
         let obx = 0, oby = 0;
-        let ran = () => {return fieC.objs.filter(a => a.x == obx && a.y == oby && a.id != 0)};
-        let douBasyo = ran();
-        console.log()
+        let ok = () => {return fieC.objs.filter(a => a.x == obx && a.y == oby && a.id != 0)};
+        let ran = () => {obx = random(0, fieC.row-1), oby = random(0, fieC.row-1)};
+
+        ran();
+        let douBasyo = ok();
         while(douBasyo.length > 0){
             // console.log(`あるか:${douBasyo.length}, 乗れるか:${!obs.on}`)
             // console.log(`(${obx}, ${oby})はすでに何かがあるっぽい？`);
-            obx = random(0, fieC.row-1);
-            oby = random(0, fieC.row-1);
-            douBasyo = ran();
+            ran();
+            douBasyo = ok();
         };
 
         // console.log(obs)
