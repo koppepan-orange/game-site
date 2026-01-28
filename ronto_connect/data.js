@@ -1,4 +1,7 @@
 let Style = {
+    iPhone:{ //16
+        "width": "393px",
+    },
     area:{
         back: '#e3e7eb',
         rank: 2,
@@ -337,6 +340,25 @@ let Friends = [
     }
 	
 	//memo.htmlのcharaから頼むわ
+]
+
+let Facilities = [
+    {
+        name:"dungeon",
+        desc:`ダンジョンに行きます\n流石に東大`
+    },
+    {
+        no:1,
+        name:"still"
+    },
+    {
+        no:1,
+        name:"still"
+    },
+    {
+        no:1,
+        name:"still"
+    },
 ]
 
 let Buffs = [

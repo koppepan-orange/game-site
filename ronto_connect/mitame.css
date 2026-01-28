@@ -317,7 +317,7 @@ img{
     color: #e3e3e3;
     text-align: center;
     box-sizing: border-box;
-    z-index: 20;
+    z-index: 2100;
 }
 #movlis.tog{
     display: flex;

@@ -1239,9 +1239,6 @@ homC.goFarmD.addEventListener('click', () => AreF.move('farm'));
 
 //#endregion
 
-//#region ロント・コネクト
-//#endregion
-
 //#region 農業しようぜ！
 let farmD = document.getElementById('farmArea');
 let farmC = {
@@ -1259,6 +1256,29 @@ farmF.resize = () => {
 farmF.resize();
 window.addEventListener('resize', farmF.resize);
 
+//#endregion
+
+//#region ロント・コネクト(loby)
+let lobD = document.getElementById('lobyArea');
+let lobC = {
+    main:lobD.querySelector('.main'),
+}
+let lobF = {};
+lobF.load = () => {
+    for(let fac of Facilities){
+        if(fac.no) continue;
+
+        let div = document.createElement('div');
+        div.className = `icon ${fac.name}`;
+        div.dataset.description = fac.desc;
+        div.addEventListener('click', () => fac.func());
+
+        let img = images.systems[fac.name].cloneNode();
+        div.appendChild(img);
+
+        lobC.main.appendChild(div);
+    }
+}
 //#endregion
 
 //#region field
@@ -3202,6 +3222,7 @@ async function start(){
     //console.log("=====Ronto Connect connecten=====")
     soundVolume(50);
     fieF.load();
+    lobF.load();
 
     //autoLogin
     username = getLocalStorage("username");
@@ -3230,7 +3251,7 @@ let loaC = {
 }
 let loaF = {};
 loaC.imgL = {
-    systems:['select','phone','star1','star1_pre','star2','star2_pre','star3','star3_pre'],
+    systems:['select','phone','star1','star1_pre','star2','star2_pre','star3','star3_pre','dungeon'],
     // 草原:['蒼白の粘液','翡翠の風刃','顎剛なる草獣','茎槍の狩人','の茎針','攣縮する茎針','共鳴する茎赤黄','黄昏の穿影','燦爛する緑夢','紫苑の花姫','新緑なる剣士']
 }
 
@@ -3294,6 +3315,12 @@ loaF.loadI = async() => {
         for(let r of route) src += `${r}/`;
         // console.log(src)
 
+        let yomi = (mono, img) => {
+            loaC.imgD += 1;
+            if(loaC.imgD == loaC.imgT) loaF.loadS();
+            tar[mono] = img;
+        }
+
         let tar = images;
         for(let r of route){
             // console.log(r, tar)
@@ -3308,24 +3335,31 @@ loaF.loadI = async() => {
 
         // return console.log('強制終了'), '強制終了'
 
+        let numm = 0;
+        let all = arr.length;
+        console.error(`--- ${route.join('/')}:${all} ---`)
         for(let mono of arr){
+            // console.log(mono);
+            numm += 1;
+            console.log(numm, all);
             let img = new Image();
             img.src = `${src}${mono}.png`;
-            img.onload = () => {
-                loaC.imgD++;
-                if(loaC.imgD == loaC.imgT) loaF.loadS();
-            };
+            img.onload = () => yomi(mono, img);
+
+            let erd = 0;
+
             img.onerror = () => {
                 console.error(`Image ${src}${mono}.png failed to load.`);
-                loaC.erd += 1;
-                 if(loaC.erd > 20) return console.error('さすがにやりすぎbonus'), 1;
+                loaC.erd += 1; //なぜかエラー時、1増えるが何度も何度も無限再帰式に行われて一気に21に行くバグが発生中。onceとか付けられないかな？
+                 if(loaC.erd > 20) return console.error('さすがにやりすぎbonus'), loaC.kokokomai = 32,  1;
                 img.src = `assets/images/systems/error.png`;
-                loaC.imgD++;
-                if(loaC.imgD == loaC.imgT) loaF.loadS();
+                yomi(mono, img);
+                
+                erd = 1
             };
+            if(erd) continue;
+            if(loaC.kokokomai == 32) console.log("おーい！まだ続いとるぞーー！") 
             
-            tar[mono] = img;
-            if(loaC.imgD >= loaC.imgT) loaF.loadS();
         }
 
         // console.log('読み込み完了 これよりユグドラシルに帰還する')
@@ -3358,6 +3392,7 @@ loaF.loadI = async() => {
             // console.log("↑Arrayかな? 結果 => "+Array.isArray(val));
             if(Array.isArray(val)){
                 if(await loaloa(val, route)) return console.error('南ノ南');
+                if(loaC.kokokomai == 32) console.log("おーい！まだ続いとるぞーー！")
                 route.pop()
                 // console.log(`帰還成功、${route.pop()}を排除`)
             }//arrayなら => ロードへ
