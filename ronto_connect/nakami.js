@@ -997,6 +997,133 @@ async function load(){
 
 //#endregion
 
+
+//#region アッパーエンジン
+let uppD = document.getElementById('upper');
+let uppC = {
+    homeD: uppD.querySelector('.home'),
+     HnameD: uppD.querySelector('.home .name'),
+     HRankD: uppD.querySelector('.home .rank'),
+      HRbarD: uppD.querySelector('.home .rank .bar'),
+      HRD: uppD.querySelector('.home .rank .val'),
+     HRimiD: uppD.querySelector('.home .rimi'),
+
+    ueD: uppD.querySelector('.ue'),
+    ue: 0,
+}
+let uppF = {};
+
+uppF.ue = () => uppD.classList.toggle('agari');
+uppC.ueD.addEventListener('click', uppF.ue);
+
+uppF.update = () => {
+    // 名前とかレベルのあれを
+
+}
+
+uppF.tekiou = () => {
+    // ダンジョン中はこっち。
+}
+//#endregion
+
+//#region アンダーニンジャ(没ed)
+
+//没ed。別で使えるかも？
+/*
+
+let undD = document.getElementById('under');
+let undC = {
+    dragging: 0,
+    kirock: 0,
+    shote: 0,
+    pointerId: null,
+    openD: undD.querySelector('.opener'),
+};
+let undF = {};
+undF.getBottom = (el) => parseFloat(getComputedStyle(el).bottom) || 0;
+undF.clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+undC.openD.addEventListener('pointerdown', (e) => {
+    if(e.button && e.pointerType === 'mouse') return;
+    e.preventDefault();
+    undD.setPointerCapture(e.pointerId);
+    undC.drag = 1;
+    undC.pointerId = e.pointerId;
+    undC.kirock = e.clientY;
+    undC.shote = undF.getBottom(undD);
+});
+
+document.addEventListener('pointermove', (e) => {
+    if(!undC.drag || e.pointerId !== undC.pointerId) return;
+    const dy = e.clientY - undC.kirock;
+    // shote - dy で「上に引っ張ると open（bottom -> 0）」になる
+    let newBottom = undC.shote - dy;
+    let all = undD.offsetHeight;
+    const min = -all; // 完全に隠れた状態
+    const max = -all*0.2; // 完全に表示されている状態
+    newBottom = undF.clamp(newBottom, min, max);
+    undD.style.bottom = `${newBottom}px`;
+});
+
+document.addEventListener('pointerup', (e) => {
+    if(!undC.drag || e.pointerId !== undC.pointerId) return;
+    undC.drag = 0;
+    try{undD.releasePointerCapture(e.pointerId);}catch{}
+    undD.classList.remove('no-transition');
+
+    undC.pointerId = null;
+});
+
+*/
+
+//#endregion
+
+//#region Friendについて
+let FriC = {
+    
+}
+let FriF = {};
+FriF.narabe = () => {
+    const collator = new Intl.Collator('ja', { usage: 'sort', sensitivity: 'variant' });
+
+    const sorted = [...Friends].sort((a, b) => {
+        const ra = (a.ruby || '').normalize('NFKC').replace(/[\u3000\s]+/g, '');
+        const rb = (b.ruby || '').normalize('NFKC').replace(/[\u3000\s]+/g, '');
+        return collator.compare(ra, rb);
+    });
+
+    return sorted;
+}
+FriF.find = (name) => {
+    let fri = Friends.find(a => a.name == name);
+
+    //なかったぽよ...あ、rubyだったのかな？
+    if(!fri) fri = Friends.find(a => a.ruby == name);
+
+    //なかったぽよ...
+    if(!fri) return null;
+
+    return fri;
+}
+
+FriF.num = (name) => {
+    let fri = FriF.find(name);
+    if(!fri) return -1;
+
+    let narabe = FriF.narabe();
+    let num = narabe.findIndex(a => a.name == fri.name);
+
+    return num;
+}
+
+FriF.numold = (num) => {
+    let keta = 2;
+    // toStringでketaに合うようにする 例:01 13
+    let str = num.toString().padStart(keta, '0');
+}
+//#endregion
+
+
 //#region areaについて
 let AreC = {
     now:null,
@@ -1085,6 +1212,7 @@ document.addEventListener('keyup',e => {
 
 //#endregion
 
+
 //#region ホーム
 let homD = document.getElementById('homeArea');
 let homC = {
@@ -1131,127 +1259,6 @@ farmF.resize = () => {
 farmF.resize();
 window.addEventListener('resize', farmF.resize);
 
-//#endregion
-
-//#region アッパーエンジン
-let uppD = document.getElementById('upper');
-let uppC = {
-    homeD: uppD.querySelector('.home'),
-     HnameD: uppD.querySelector('.home .name'),
-     HRankD: uppD.querySelector('.home .rank'),
-      HRbarD: uppD.querySelector('.home .rank .bar'),
-      HRD: uppD.querySelector('.home .rank .val'),
-     HRimiD: uppD.querySelector('.home .rimi'),
-
-    ueD: uppD.querySelector('.ue'),
-    ue: 0,
-}
-let uppF = {};
-
-uppF.ue = () => uppD.classList.toggle('agari');
-uppC.ueD.addEventListener('click', uppF.ue);
-
-uppF.update = () => {
-    // 名前とかレベルのあれを
-
-}
-
-uppF.tekiou = () => {
-    // ダンジョン中はこっち。
-}
-//#endregion
-
-//#region アンダーニンジャ
-let undD = document.getElementById('under');
-let undC = {
-    dragging: 0,
-    kirock: 0,
-    shote: 0,
-    pointerId: null,
-    openD: undD.querySelector('.opener'),
-};
-let undF = {};
-undF.getBottom = (el) => parseFloat(getComputedStyle(el).bottom) || 0;
-undF.clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-
-undC.openD.addEventListener('pointerdown', (e) => {
-    if(e.button && e.pointerType === 'mouse') return;
-    e.preventDefault();
-    undD.setPointerCapture(e.pointerId);
-    undC.drag = 1;
-    undC.pointerId = e.pointerId;
-    undC.kirock = e.clientY;
-    undC.shote = undF.getBottom(undD);
-});
-
-document.addEventListener('pointermove', (e) => {
-    if(!undC.drag || e.pointerId !== undC.pointerId) return;
-    const dy = e.clientY - undC.kirock;
-    // shote - dy で「上に引っ張ると open（bottom -> 0）」になる
-    let newBottom = undC.shote - dy;
-    let all = undD.offsetHeight;
-    const min = -all; // 完全に隠れた状態
-    const max = -all*0.2; // 完全に表示されている状態
-    newBottom = undF.clamp(newBottom, min, max);
-    undD.style.bottom = `${newBottom}px`;
-});
-
-document.addEventListener('pointerup', (e) => {
-    if(!undC.drag || e.pointerId !== undC.pointerId) return;
-    undC.drag = 0;
-    try{undD.releasePointerCapture(e.pointerId);}catch{}
-    undD.classList.remove('no-transition');
-
-    undC.pointerId = null;
-});
-
-
-
-//#endregion
-
-//#region Friendについて
-let FriC = {
-    
-}
-let FriF = {};
-FriF.narabe = () => {
-    const collator = new Intl.Collator('ja', { usage: 'sort', sensitivity: 'variant' });
-
-    const sorted = [...Friends].sort((a, b) => {
-        const ra = (a.ruby || '').normalize('NFKC').replace(/[\u3000\s]+/g, '');
-        const rb = (b.ruby || '').normalize('NFKC').replace(/[\u3000\s]+/g, '');
-        return collator.compare(ra, rb);
-    });
-
-    return sorted;
-}
-FriF.find = (name) => {
-    let fri = Friends.find(a => a.name == name);
-
-    //なかったぽよ...あ、rubyだったのかな？
-    if(!fri) fri = Friends.find(a => a.ruby == name);
-
-    //なかったぽよ...
-    if(!fri) return null;
-
-    return fri;
-}
-
-FriF.num = (name) => {
-    let fri = FriF.find(name);
-    if(!fri) return -1;
-
-    let narabe = FriF.narabe();
-    let num = narabe.findIndex(a => a.name == fri.name);
-
-    return num;
-}
-
-FriF.numold = (num) => {
-    let keta = 2;
-    // toStringでketaに合うようにする 例:01 13
-    let str = num.toString().padStart(keta, '0');
-}
 //#endregion
 
 //#region field
@@ -1403,7 +1410,7 @@ fieF.draw = async() => {
          if(!img) console.log(`assets/${sta}/${src}.png is not found.`), img = images['systems']['error'];
         if(img) fieC.ctx.drawImage(img, obs.ox, obs.oy, obs.w, obs.h);
 
-        await delay(10)
+        // await delay(2)
     }
 }
 

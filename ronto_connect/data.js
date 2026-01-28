@@ -1037,7 +1037,7 @@ let Magics = [
             // y = Math.floor(Math.random() * x.length);
             // log.textContent = x[y]+'が出た！';await delay(1000);
             // x[y](who, are);
-            let arr = Object.values(Magics).filter(a => a.lv <= who.level && a.mp <= who.mp).map(a => a.jpnm);
+            let arr = Magics.filter(a => a.lv <= who.level && a.mp <= who.mp).map(a => a.name);
             if(arr.length >= 1){
                 let mg = arraySelect(arr);
                 await addtext(`${mg}が出た！`);
@@ -1381,10 +1381,10 @@ let Tools = [
         name:'aspirin',
         jpnm:'アスピリン',
         price:20,
-        desc:'頭痛薬らしいですね、これ。痛み止め薬とか耐えればいらんくね？とかいったら炎上するかな',
+        desc:'味方単体の体力を20%回復',
+        flav:'おや、頭が痛いって？\n痛みに効くのはアスピリン！',
         num:5,
         func:async function(who, are){
-            await addtext(`おや、頭が痛いって？痛みに効くのはアスピリン！`);
             await heal(who, are, "20%", "add");
             return 0;
         }
@@ -1393,8 +1393,8 @@ let Tools = [
         jpnm:'パブロン',
         name:'pablon',
         price:40,
-        desc:'風邪薬。大人とか向けらしいね',
-        flav:'早めのパブロン♪',
+        desc:'味方単体の体力を40%回復',
+        flav:'一種の風邪薬。大人とか向けらしいね',
         num:2,
         func:async function(cam,me,are){
             await heal(who, are, "40%", "add");
@@ -1405,8 +1405,8 @@ let Tools = [
         jpnm:'トリプシン',
         name:'trypsin',
         price:60,
-        desc:'指定した味方の体力を70%回復する。',
-        flav:'飲むタイプのトリプシン。え？これは薬じゃないって？',
+        desc:'味方単体の体力を70%回復',
+        flav:'膵液に含まれる消化酵素の一種。\n薬ではない。',
         num:0,
         func:async function(cam,me,are){
             await heal(who, are, "70%", "add");
@@ -1417,7 +1417,7 @@ let Tools = [
         jpnm:'ルル',
         name:'lulu',
         price:80,
-        desc:'指定した味方の体力を60%回復する。\n40%の確率で再度60%回復する。',
+        desc:'味方単体の体力を60%回復\n40%の確率で再度60%回復',
         flav:'sick sickな頭痛薬。\n毒が流るルルですね。',
         num:0,
         func:async function(who,are){
@@ -2557,7 +2557,4 @@ let Quests = {
         }
     ]
 };
-
-
-
 
