@@ -478,33 +478,36 @@ document.addEventListener('mousedown', e => {
 //#endregion 
 //#region tk
 class tk{
-    letructor(type, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
+    constructor(type, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
         let youso = document.createElement(type);
         youso.className = `tk ${type}`;
 
+        let contex = {x, y, w, h};
+
         let yoko = ['x', 'w'];
         for(let n of yoko){
-            if(typeof eval(n) != 'string' || typeof eval(n) == 'string' && !eval(n).endsWith('%')) continue;
-            let num = eval(n).slice(0, -1);
-            eval(n) = num * window.innerWidth / 100;
-        };
+            console.log(n), console.log(eval(n));
+            if(typeof contex[n] != 'string' || typeof contex[n] == 'string' && !contex[n].endsWith('%')) continue;
+            let num = contex[n].slice(0, -1);
+            contex[n] = num * window.innerWidth / 100;
+        }
 
         let tate = ['y', 'h'];
         for(let n of tate){
-            if(typeof eval(n) != 'string' || typeof eval(n) == 'string' && !eval(n).endsWith('%')) continue;
-            let num = eval(n).slice(0, -1);
-            eval(n) = num * window.innerHeight / 100;
-        };
+            if(typeof contex[n] != 'string' || typeof contex[n] == 'string' && !contex[n].endsWith('%')) continue;
+            let num = contex[n].slice(0, -1);
+            contex[n] = num * window.innerHeight / 100;
+        }
 
-        console.log(x, y, w, h);
+        console.log(contex);
 
-        youso.style.width = `${w}px`;
-        youso.style.height = `${h}px`;
+        youso.style.width = `${contex.x}px`;
+        youso.style.height = `${contex.h}px`;
 
-        youso.style.left = `${x}px`;
-        youso.style.top = `${y}px`;
+        youso.style.left = `${contex.x}px`;
+        youso.style.top = `${contex.y}px`;
         
-        if(x == 'half' && y == 'half') youso.classList.add('cenXY');
+        if(contex.x == 'half' && contex.y == 'half') youso.classList.add('cenXY');
          else if(x == 'half') youso.classList.add('cenX');
          else if(y == 'half') youso.classList.add('cenY');
 
@@ -521,18 +524,18 @@ class tk{
              val = val.trim();
             this.youso.setAttribute(key, val);
             return 0;
-        };
+        }
 
         if(typeof dict != 'object') return 1;
 
         for(let key in dict) this.youso.setAttribute(key, dict[key]);
 
         return 0;
-    };
+    }
 
     styleAdd(dict){
         for(let key in dict) this.youso.style[key] = dict[key];
-    };
+    }
 
     classAdd(name){this.youso.classList.add(name)};
     classRem(name){this.youso.classList.remove(name)};
@@ -540,15 +543,15 @@ class tk{
     classHas(name){
         let is = this.youso.classList.contains(name);
         return is;
-    };
+    }
 
     evAdd(type, func){
         this.youso.addEventListener(type, func);
-    };
+    }
 
     yousoAdd(youso){
         this.youso.appendChild(youso);
-    };
+    }
 
     append(){
         document.body.appendChild(this.youso);
@@ -569,11 +572,12 @@ function tkTest(){
 
     mono.yousoAdd(mono2.div);
 
-    mono.evAdd('click', () => nicoText('clicked'));
+    mono.evAdd('click', function(){
+        nicoText('clicked');
+    });
 
     mono.append();
-};
-
+}
 //#endregion
 //#region alertD
 class alertD{
@@ -3309,7 +3313,9 @@ loaF.loadI = async() => {
         }
     }
 
+    let yomikomar = 0;
     let loaloa = (arr, route) => {
+        yomikomar += 1;
         // console.log("Arrayでした lets 読み込み")
         let src = "assets/images/";
         for(let r of route) src += `${r}/`;
@@ -3362,7 +3368,7 @@ loaF.loadI = async() => {
             
         }
 
-        // console.log('読み込み完了 これよりユグドラシルに帰還する')
+        console.log('読み込み完了 これよりユグドラシルに帰還する')
         return 0;
     }
 
