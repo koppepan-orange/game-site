@@ -3397,7 +3397,9 @@ loaF.loadI = async() => {
             // console.log(val);
             // console.log("↑Arrayかな? 結果 => "+Array.isArray(val));
             if(Array.isArray(val)){
-                if(await loaloa(val, route)) return console.error('南ノ南');
+                let res = await loaloa(val, route);
+                console.log(`return; ${res}`)
+                if(res) return console.error('南ノ南');
                 if(loaC.kokokomai == 32) console.log("おーい！まだ続いとるぞーー！")
                 route.pop()
                 // console.log(`帰還成功、${route.pop()}を排除`)
