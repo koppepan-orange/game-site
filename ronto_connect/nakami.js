@@ -3314,7 +3314,7 @@ loaF.loadI = async() => {
     }
 
     let yomikomar = 0;
-    let loaloa = (arr, route) => {
+    let loaloa = async(arr, route) => {
         yomikomar += 1;
         // console.log("Arrayでした lets 読み込み")
         let src = "assets/images/";
@@ -3323,8 +3323,8 @@ loaF.loadI = async() => {
 
         let yomi = (mono, img) => {
             loaC.imgD += 1;
-            if(loaC.imgD == loaC.imgT) loaF.loadS();
             tar[mono] = img;
+            if(loaC.imgD == loaC.imgT) return loaF.loadS(), 4;
         }
 
         let tar = images;
@@ -3343,32 +3343,29 @@ loaF.loadI = async() => {
 
         let numm = 0;
         let all = arr.length;
-        console.error(`--- ${route.join('/')}:${all} ---`)
+        // console.error(`--- ${route.join('/')}:${all} ---`)
         for(let mono of arr){
             // console.log(mono);
             numm += 1;
-            console.log(numm, all);
             let img = new Image();
             img.src = `${src}${mono}.png`;
-            img.onload = () => yomi(mono, img);
+            img.onload = () => {
+                yomi(mono, img);
+            }
 
             let erd = 0;
 
             img.onerror = () => {
                 console.error(`Image ${src}${mono}.png failed to load.`);
-                loaC.erd += 1; //なぜかエラー時、1増えるが何度も何度も無限再帰式に行われて一気に21に行くバグが発生中。onceとか付けられないかな？
+                loaC.erd += 1;
                  if(loaC.erd > 20) return console.error('さすがにやりすぎbonus'), loaC.kokokomai = 32,  1;
                 img.src = `assets/images/systems/error.png`;
                 yomi(mono, img);
-                
                 erd = 1
             };
-            if(erd) continue;
-            if(loaC.kokokomai == 32) console.log("おーい！まだ続いとるぞーー！") 
-            
         }
 
-        console.log('読み込み完了 これよりユグドラシルに帰還する')
+        // console.log('読み込み完了 これよりユグドラシルに帰還する')
         return 0;
     }
 
@@ -3397,10 +3394,7 @@ loaF.loadI = async() => {
             // console.log(val);
             // console.log("↑Arrayかな? 結果 => "+Array.isArray(val));
             if(Array.isArray(val)){
-                let res = await loaloa(val, route);
-                console.log(`return; ${res}`)
-                if(res) return console.error('南ノ南');
-                if(loaC.kokokomai == 32) console.log("おーい！まだ続いとるぞーー！")
+                if(await loaloa(val, route)) return console.error('南ノ南');
                 route.pop()
                 // console.log(`帰還成功、${route.pop()}を排除`)
             }//arrayなら => ロードへ
@@ -3408,7 +3402,6 @@ loaF.loadI = async() => {
         }
 
     }
-    
 
     loaloa0(loaC.imgL);
 
