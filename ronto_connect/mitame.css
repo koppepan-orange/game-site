@@ -763,6 +763,36 @@ img{
 #lobyArea{
     content:'loby'
 }
+#lobyArea .main{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    align-content: start;
+    justify-items: center;
+    align-items: center;
+    gap: 50px;
+    width: 100%;
+    height: 100%;
+    padding: 0 50px;
+    box-sizing: border-box;
+}
+#lobyArea .main .icon{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    aspect-ratio: 1/1;
+}
+#lobyArea .main .icon img{
+    width: 60%;
+    aspect-ratio: 1/1 ;
+    object-fit: contain;
+}
+#lobyArea .main .icon .text{
+    line-height: 20px;
+    text-align: center;
+}
 /* #endregion */
 
 /* #region fieldArea 3 */

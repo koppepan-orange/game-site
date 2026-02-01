@@ -53,6 +53,9 @@ function tobiText(youso, mes) {
 
     requestAnimationFrame(frame);
 };
+function copytext(text){
+    navigator.clipboard.writeText(text);
+}
 function kaijou(num){
     if(num == 0) return 0;
     if(num == 1) return 1;

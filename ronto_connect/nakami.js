@@ -1280,6 +1280,11 @@ lobF.load = () => {
         let img = images.systems[fac.name].cloneNode();
         div.appendChild(img);
 
+        let text = document.createElement('div');
+        text.className = 'text';
+        text.textContent = fac.name;
+        div.appendChild(text);
+
         lobC.main.appendChild(div);
     }
 }
