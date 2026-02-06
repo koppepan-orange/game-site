@@ -132,7 +132,7 @@ function copy(moto) {
         return moto;
     };
 };
-function probability(num){
+function probb(num){
     return Math.random()*100 <= num;
     //例:num == 20 → randomが20以内ならtrue,elseならfalseを返す
 };
@@ -712,7 +712,7 @@ document.addEventListener('mousemove', (e) => {
 });
 //#endregion
 //#region fonts
-const Fonts = [
+let Fonts = [
     {src:'comicsans', type:'ttf'},
     {src:'hangyaku', type:'ttf'},
     {src:'kurobara', type:'ttf'},
@@ -776,7 +776,7 @@ let secrates = [
         arr:['g','i','v','e','m','e','m','o','n','e','y'],
         limit:'n',
         func: async function(){
-            // if(probability(60)) nicoText('乞食成功！'), euroF.add(100);
+            // if(probb(60)) nicoText('乞食成功！'), euroF.add(100);
             // else nicoText('乞食失敗');
         }
     },
@@ -864,7 +864,7 @@ document.addEventListener('keydown', async function(e){
 
 
 //#region ゲーム開始時ログインの動き\
-const firebaseConfig = {
+let firebaseConfig = {
     apiKey: "AIzaSyBN5V_E6PzwlJn7IwVsluKIWNIyathhxj0",
     authDomain: "koppepan-orange.firebaseapp.com",
     databaseURL: "https://koppepan-orange-default-rtdb.firebaseio.com",
@@ -875,7 +875,7 @@ const firebaseConfig = {
     measurementId: "G-MYKJWD203Z"
 };
 firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
+let database = firebase.database();
 let chatroom = 1;
 let userDataGen;
 let loginD = document.querySelector('#loginArea');
@@ -1059,12 +1059,12 @@ undC.openD.addEventListener('pointerdown', (e) => {
 
 document.addEventListener('pointermove', (e) => {
     if(!undC.drag || e.pointerId !== undC.pointerId) return;
-    const dy = e.clientY - undC.kirock;
+    let dy = e.clientY - undC.kirock;
     // shote - dy で「上に引っ張ると open（bottom -> 0）」になる
     let newBottom = undC.shote - dy;
     let all = undD.offsetHeight;
-    const min = -all; // 完全に隠れた状態
-    const max = -all*0.2; // 完全に表示されている状態
+    let min = -all; // 完全に隠れた状態
+    let max = -all*0.2; // 完全に表示されている状態
     newBottom = undF.clamp(newBottom, min, max);
     undD.style.bottom = `${newBottom}px`;
 });
@@ -1088,11 +1088,11 @@ let FriC = {
 }
 let FriF = {};
 FriF.narabe = () => {
-    const collator = new Intl.Collator('ja', { usage: 'sort', sensitivity: 'variant' });
+    let collator = new Intl.Collator('ja', { usage: 'sort', sensitivity: 'variant' });
 
-    const sorted = [...Friends].sort((a, b) => {
-        const ra = (a.ruby || '').normalize('NFKC').replace(/[\u3000\s]+/g, '');
-        const rb = (b.ruby || '').normalize('NFKC').replace(/[\u3000\s]+/g, '');
+    let sorted = [...Friends].sort((a, b) => {
+        let ra = (a.ruby || '').normalize('NFKC').replace(/[\u3000\s]+/g, '');
+        let rb = (b.ruby || '').normalize('NFKC').replace(/[\u3000\s]+/g, '');
         return collator.compare(ra, rb);
     });
 
@@ -1537,7 +1537,7 @@ fieF.over = (a, b) => {
     let sx1 = a.sx, sy1 = a.sy, ex1 = a.sx + a.w, ey1 = a.sy + a.h;
     let sx2 = b.sx, sy2 = b.sy, ex2 = b.sx + b.w, ey2 = b.sy + b.h;
 
-    const EPSILON = 0.01; //許容値？
+    let EPSILON = 0.01; //許容値？
     let overlapX = (sx1 < ex2 - EPSILON) && (ex1 > sx2 + EPSILON);
     let overlapY = (sy1 < ey2 - EPSILON) && (ey1 > sy2 + EPSILON);
 
@@ -1638,29 +1638,29 @@ function mapMake(code){
     // fieC.objM = JSON.parse(JSON.stringify(fieC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
 
     // if(stage == 1){
-    //     if(fun == 23 && probability(10)){
+    //     if(fun == 23 && probb(10)){
     //         fieC.backM = fieC.backMs[4];
     //         fieC.objM = fieC.objMs[6];
-    //     }else if(fun <= 50 && probability(10)){
+    //     }else if(fun <= 50 && probb(10)){
     //         fieC.backM = fieC.backMs[5];
     //         fieC.objM = fieC.objMs[7];
     //     };
     // }else if(stage == 2){
-    //     if(fun == 68 && probability(10)){
+    //     if(fun == 68 && probb(10)){
     //         fieC.backM = fieC.backMs[11];
     //         fieC.objM = fieC.objMs[14];
     //         fieC.objM = JSON.parse(JSON.stringify(fieC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
-    //     }else if(fun <= 50 && probability(10)){
+    //     }else if(fun <= 50 && probb(10)){
     //         fieC.backM = fieC.backMs[19];
     //         fieC.objM = fieC.objMs[23];
     //         fieC.objM = JSON.parse(JSON.stringify(fieC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
     //     };
     // }else if(stage == 3){
-    //     if(fun == 68 && probability(10)){
+    //     if(fun == 68 && probb(10)){
     //         fieC.backM = fieC.backMs[18];
     //         fieC.objM = fieC.objMs[22];
     //         fieC.objM = JSON.parse(JSON.stringify(fieC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
-    //     }else if(fun <= 50 && probability(10)){
+    //     }else if(fun <= 50 && probb(10)){
     //         fieC.backM = fieC.backMs[19];
     //         fieC.objM = fieC.objMs[23];
     //         fieC.objM = JSON.parse(JSON.stringify(fieC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
@@ -1790,7 +1790,7 @@ function cm(cam = '指定なし', me = '指定なし'){
 
     who = humans.find(a => a.cam == cam && a.me == me);
     if(Array.isArray(who)){
-        console.log('↓findなのにarrayになってるバカがこいつですwww')
+        console.log('↓findなのにarrayになってる')
         console.log(who)
     }
     
@@ -1833,6 +1833,29 @@ function tekiou(){
     }   
 }
 //#endregion
+
+//#region 今日は何ーーーー
+function whatdo(who, are, shu, name){
+    console.log(`${who.name}が${are.name}に${shu}[${name}]をします`)
+    let [cam, me] = [who.cam, who.me];
+    
+    let ares= copy(are);
+    if(typeof ares == "object") ares = [ares];
+    let ts = [];
+    for(let ar of ares){
+        let [tcam, tme] = [ar.cam, ar.me];
+        ts.push([tcam, tme]);
+    }
+    
+    let res = {
+        cam,me,
+        ts,
+        shu,
+        name
+    }
+    return res;
+}
+//#endregion どちらかと言うと youは何しに日本へ
 
 //#region どむさんのようそづくり～
 function makeHuman(cam, me){
@@ -2112,7 +2135,7 @@ async function nextTurn(who = 0){
     /*
     //強制スキルの動き
     while(skillQueue.length > 0){
-        const nanka = skillQueue.shift(); // 先頭を消してその消したやつを処理する的な機構".shift()"
+        let nanka = skillQueue.shift(); // 先頭を消してその消したやつを処理する的な機構".shift()"
         let cam = nanka.cam;
         let me = nanka.me;
         let dare = cm(cam,me);
@@ -2130,7 +2153,7 @@ async function nextTurn(who = 0){
     acted += 1;
     if(acted >= bar.me.length){
         turn += 1;
-        const combined = humans.filter(a => a.status && a.hp > 0)// オブジェクトをリストに変換して合体
+        let combined = humans.filter(a => a.status && a.hp > 0)// オブジェクトをリストに変換して合体
         .sort((a, b) => {// 降順でソート
             if(b.spd == a.spd){
                 if(a.cam == b.cam){
@@ -2380,7 +2403,7 @@ async function dassyutsu(){
     await addtext('うまく逃げ切れた！');
 }
 
-function LetsTargetSelect(code = 1){
+function selectSyudou(code = 1){
     //1:通常(1人) 2:選んだところと左右 3:選んだところと左右2人ずつ 4:選んだ陣営全員 5:全員
     return new Promise((resolve) => {
         let color = '#fff450';
@@ -2470,7 +2493,7 @@ function LetsTargetSelect(code = 1){
             }
             if(code == 5){ //全員
                 let tnums = cm(tcam).filter(a => a.status);
-                let gyaku = tcam == 'players' ? 'enemies' : 'players';
+                let gyaku = fl(tcam, ['players','enemies']);
                 let nums = cm(gyaku).filter(a => a.status);
 
                 let awase = [...tnums, ...nums];
@@ -2527,15 +2550,16 @@ async function Slash(who, num){
 
     let data = Slashs.find(a => a.id == name)
     if(who.mp >= data.mp){
-        let are = await LetsTargetSelect();
+        let are = await selectSyudou();
 
         who.mp -= data.mp;
         tekiou();
 
         await addtext(`${who.name}の${name}！`);
 
-        let result = await data.process(who, are);
-        if(result) return 1;
+        whatWantyou(who, are, "Tools", name)
+        let res = await data.process(who, are);
+        if(res) return 1;
         nextTurn(who);
     }else{
         await addtext('not enough mp...');
@@ -2556,14 +2580,16 @@ async function Magic(who, num){
     
     console.log(name, data);
     if(who.mp >= data.mp){
-        let are = await LetsTargetSelect();
+        let are = await selectSyudou();
 
         who.mp -= data.mp;
         tekiou();
 
         await addtext(`${who.name}の${name}！`);
-        let result = await data.process(who, are);
-        if(result) return 1;
+        
+        whatWantyou(who, are, "Tools", name);
+        let res = await data.process(who, are);
+        if(res) return 1;
         nextTurn(who);
     }else{
         await addtext('not enough mp...');
@@ -2577,21 +2603,23 @@ async function Tool(who, num){
     disappear();
     let name = who.tool[num]
     if(!name){
-        await addtext('you dont have tool...');
+        await addtext('you dont have sono tool...');
         return playerturn()
     }
 
-    //今はいいけど、inven(tory)に全部詰め込むことになるならdata.jsのnumじゃなくて簡単関数でinven内の数を求めて、で〜って形にした方がいいかも
+    //今はいいけど、inventory()に全部詰め込むことになるならdata.jsのnumじゃなくて簡単関数でinventory内の数を求めて、で〜って形にした方がいいかも
     let data = Tools.find(a => a.id == name)
     console.log(name, data)
     if(data.num > 0){
         data.num -= 1;
 
-        let are = await LetsTargetSelect();
+        let are = await selectSyudou();
         await addtext(`${who.name}は${name}を使用した!`);
         
-        let result = await data.process(who, are);
-        if(result) return 1;
+        whatWantyou(who, are, "Tools", name)
+        let res = await data.process(who, are);
+        if(res) return 1;
+        
         nextTurn(who);
     }else{
         await addtext('not enough tool...');
@@ -2699,8 +2727,8 @@ async function enemyturn(who){
         if(res) return 1;
     }else{
         await addtext(`${who.name}は何かで攻撃した！`)
-        are = ShallTargetSelect(who, 'phpl');
-        let res = await damage(who, are, 1, 'sh'); //areの後、1の前に"何の倍率か"を入れるべき。基本atkかもだけどfixで固定、とかできそう
+        are = selectJodou(who, 'phpl');
+        let res = await damage(who, are, 100, 'sh'); //areの後、1の前に"何の倍率か"を入れるべき。基本atkかもだけどfixで固定、とかできそう
         if(res) return 1;
     }
 
@@ -2748,15 +2776,15 @@ function enemySelectAction(who){
 
     return act;
 }
-function ShallTargetSelect(who, code, both = 0){
-    console.log(`ShallTarget::: ${code}(both:${both})`)
+function selectJodou(who, code, both = 0){
+    console.log(`selectJodou::: ${code}(both:${both})`)
     
-    const side = code[0] == 'p' ? 'players' : 'enemies';
-    const stat = code.includes('hp') ? 'hp' : code.includes('atk') ? 'atk' : 'def';
-    const mode = code.endsWith('l') ? 'low' : code.endsWith('h') ? 'high' : 'random';
+    let side = code[0]   == 'm' ? who.cam : fl(who.cam, ['players', 'enemies']);
+    let stat = code.includes('hp') ? 'hp' : code.includes('atk') ? 'atk' : 'def';
+    let mode = code.endsWith('l') ? 'low' : code.endsWith('h') ? 'high' : 'random';
     console.log(`>> ${side}, ${stat}, ${mode}]`);
 
-    const list = cm(side).filter(c => c.status).sort((a, b) => a[stat] - b[stat]);
+    let list = cm(side).filter(c => c.status).sort((a, b) => a[stat] - b[stat]);
     // console.log(list);
 
     if(list.length == 0) return `errored! ${side} is inai desuwa!!`;
@@ -2766,12 +2794,12 @@ function ShallTargetSelect(who, code, both = 0){
     else if(mode == 'high') target = list[list.length - 1];
     else target = arraySelect(list);
 
-    const ret = [];
+    let ret = [];
     if(both == 0) ret.push(target.me);
     else{
-        const ids = list.map(c => c.me);
-        const i = ids.indexOf(target.me);
-        const adj = [];
+        let ids = list.map(c => c.me);
+        let i = ids.indexOf(target.me);
+        let adj = [];
         if(i > 0) adj.push(ids[i - 1]);
         adj.push(ids[i]);
         if(i < ids.length - 1) adj.push(ids[i + 1]);
@@ -2858,13 +2886,13 @@ async function damage(who, ares, val, type0, props = []){
         
         
         // [human, keysArray, targetObj]
-        const hyous = [
+        let hyous = [
             [who, Wk, atker],
             [are, Ak, defer]
         ];
         
         for (let i = 0; i < hyous.length; i++){
-            const [human, keys, target] = hyous[i];
+            let [human, keys, target] = hyous[i];
             // console.log(human, keys, target);
             for(let buff of human.buffs){
                 let buffk = Object.keys(buff.value);
@@ -3455,7 +3483,7 @@ function soundStop(){
 }
 
 function soundVolume(val){
-    const v = Math.max(0, Math.min(1, val/100));
+    let v = Math.max(0, Math.min(1, val/100));
     console.log(`[soundVolume] ${souC.volume??null} => ${v}`);
     souC.volume = v;
     document.querySelectorAll('audio,video').forEach(el => {

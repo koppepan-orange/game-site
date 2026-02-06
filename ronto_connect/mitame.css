@@ -781,7 +781,7 @@ img{
     justify-content: center;
     align-items: center;
     gap: 10px;
-    width: 100%;
+    width: 250px;
     aspect-ratio: 1/1;
 }
 #lobyArea .main .icon img{
