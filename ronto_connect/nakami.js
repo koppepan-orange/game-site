@@ -225,7 +225,7 @@ function hoshoku(color){
 function mixshoku(c1, c2, ratio = 0.5){
     let toRGB = c => {
         c = c.replace('#', '');
-        if (c.length === 3) c = c.split('').map(x => x + x).join('');
+        if (c.length == 3) c = c.split('').map(x => x + x).join('');
         let n = parseInt(c, 16);
         return [n >> 16, (n >> 8) & 255, n & 255];
     };
@@ -364,7 +364,7 @@ async function addtext(raw){
                 let timeout = new Promise(resolve => setTimeout(resolve, waitTime));
                 let userAction = new Promise(resolve => {
                     function waitToClear(event) {
-                        if(event.type === 'click' || event.key === 'z' || event.key === 'Enter'){
+                        if(event.type == 'click' || event.key == 'z' || event.key == 'Enter'){
                             document.removeEventListener('click', waitToClear);
                             document.removeEventListener('keydown', waitToClear);
                             resolve();
@@ -388,12 +388,12 @@ async function addtext(raw){
     });
 };
 document.addEventListener('keydown', (e) => {
-    if(e.key === 'z' || e.key === 'Enter'){
+    if(e.key == 'z' || e.key == 'Enter'){
         skipText = true;
     }
 });
 document.addEventListener('keyup', (e) => {
-    if(e.key === 'z' || e.key === 'Enter'){
+    if(e.key == 'z' || e.key == 'Enter'){
         skipText = false;
     }
 });
@@ -1048,7 +1048,7 @@ undF.getBottom = (el) => parseFloat(getComputedStyle(el).bottom) || 0;
 undF.clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 undC.openD.addEventListener('pointerdown', (e) => {
-    if(e.button && e.pointerType === 'mouse') return;
+    if(e.button && e.pointerType == 'mouse') return;
     e.preventDefault();
     undD.setPointerCapture(e.pointerId);
     undC.drag = 1;
@@ -1161,7 +1161,7 @@ AreC.list = [
         back:'#87ceeb'
     },
     {
-        name:'field',
+        name:'dungeon',
         rank:3,
         back:'#8feb87'
     },
@@ -1290,54 +1290,128 @@ lobF.load = () => {
 }
 //#endregion
 
-//#region field
-let fieD = document.getElementById('fieldArea');
-let fieC = {
-    can: fieD.querySelector('.field'),
-    ctx: fieD.querySelector('.field').getContext('2d'),
+//#region dungeon
+let dunD = document.getElementById('dungeonArea');
+let dunC = {
+    can: dunD.querySelector('.field'),
+    ctx: dunD.querySelector('.field').getContext('2d'),
     row:8, //1列にある数
     mas:null, //1マスの大きさ(asp:1/1)
     // mases:[],
     backM:[],
     objs:[],
 }
-let fieF = {};
-fieF.load = () => {
-    fieF.resize();
+let dunF = {};
+dunF.load = () => {
+    dunF.resize();
 }
 
 let stage = "草原";
 let floor = 0;
 
-fieF.resize = () => { 
+dunF.resize = () => { 
     let wid = window.innerWidth * 0.8;
-    fieC.can.width = wid;
-    fieC.can.height = wid;
-    fieC.mas = wid / fieC.row;
+    dunC.can.width = wid;
+    dunC.can.height = wid;
+    dunC.mas = wid / dunC.row;
 }
-document.addEventListener('resize', fieF.resize);
+document.addEventListener('resize', dunF.resize);
+
+dunF.select = async() => {
+    let div0 = document.createElement('div');
+    div0.className = 'dun_select';
+    document.body.appendChild(div0);
+    
+    let stage0 = await new Promise(solve => {
+        function clicked(e){
+            let div = e.target;
+            let name = div.classList[1];
+            console.log(name);
+            div0.remove();
+            solve(name)
+        }
+
+        for(let ma of Stages.filter(a => !a.no)){
+            let div = document.createElement('div');
+            div.className = 'item';
+            div.textContent = ma.name;
+
+            let img = document.createElement('img');
+            img.src = `assets/images/systems/${ma.name}.png`;
+            div.appendChild(img);
+            
+            div.addEventListener('click', clicked);
+            div0.appendChild(div);
+        }
+    })
+    
+    if(!stage0) return console.log(`stageが "${stage0}" でした。なにこれ`);
+    stage = stage0;
+    
+    let chara = await new Promise(solve => {
+        let div0 = document.createElement('div');
+        div0.className = 'dun_select';
+        document.body.appendChild(div0);
+        
+        function clicked(ev){
+            let div = ev.target;
+            let name = div.classList[1];
+            console.log(name);
+            div0.remove();
+            solve(name);
+        }
+        
+        let chas = Charas.filter(a => a.able);
+        for(let data of chas){
+            let div = document.createElement('div');
+            div.className = `item ${data.name}`;
+            
+            let span = document.createElement('span');
+            span.textContent = data.jpnm;
+            div.appendChild(span);
+
+            let img = document.createElement('img');
+            img.src = `assets/images/charas/${data.img}.png`;
+            div.appendChild(img);
+            
+            div.addEventListener('click', clicked);
+            div0.appendChild(div);
+        }
+    })
+    if(isNaN(id)) return;
+    console.log(id)
+    let p = makePlayer(0, id);
+    humans.push(p);
+
+    batC.now = 1;
+
+    
+    makePlayer(0, 0);
+
+    AreF.move('dungeon');
+}
 
 async function pUpdate(){
-    let p = fieF.get();
+    let p = dunF.get();
     if(p.moving) return;
     
     let moved = 0;
     let mv = 1;
     {
         if((keys.w || keys.arrowup) && !p.moving){
-            if(p.dir == 0) await fieF.move(p, 'add', 0, -mv);
+            if(p.dir == 0) await dunF.move(p, 'add', 0, -mv);
             else p.dir = 0;
         }
         if((keys.s || keys.arrowdown) && !p.moving){
-            if(p.dir == 180) await fieF.move(p, 'add', 0, mv);
+            if(p.dir == 180) await dunF.move(p, 'add', 0, mv);
             else p.dir = 180;
         };
         if((keys.a || keys.arrowleft) && !p.moving){
-            if(p.dir == 270) await fieF.move(p, 'add', -mv, 0);
+            if(p.dir == 270) await dunF.move(p, 'add', -mv, 0);
             else p.dir = 270;
         };
         if((keys.d || keys.arrowright) && !p.moving){
-            if(p.dir == 90) await fieF.move(p, 'add', mv, 0);
+            if(p.dir == 90) await dunF.move(p, 'add', mv, 0);
             else p.dir = 90;
         };
     }
@@ -1345,7 +1419,7 @@ async function pUpdate(){
     if((keys.z || keys.enter) && textShowing == 0 && !p.moving){
         // 今乗ってる（on == true かつ 座標が同じ） => obon認定
 
-        let obon = fieC.objs.filter(a => a.x == p.x && a.y == p.y && a.on);
+        let obon = dunC.objs.filter(a => a.x == p.x && a.y == p.y && a.on);
         if(obon.length > 1) return console.log(obon,'←onのやつらが重なってるみたいっす！');
         if(obon.length == 1){
             obon = obon[0];
@@ -1353,7 +1427,7 @@ async function pUpdate(){
             if(!data) return console.error(obon,'←これのidの処理、書いてないっすよ〜？(ニヤっ)');
 
             let res = data.process();
-            fieF.draw();
+            dunF.draw();
 
             if(res) return 1;
         }
@@ -1368,7 +1442,7 @@ async function pUpdate(){
         }
         
         //onしてない => nobon認定
-        let nobon = fieC.objs.filter(a => a.x == p.x + karix && a.y == p.y + kariy && !a.on)
+        let nobon = dunC.objs.filter(a => a.x == p.x + karix && a.y == p.y + kariy && !a.on)
         if(nobon.length > 1) return console.log(nobon,'←not onのやつらが重なってるみたいっす！');
         if(nobon.length == 1){
             nobon = nobon[0];
@@ -1377,32 +1451,32 @@ async function pUpdate(){
             if(!data) return console.error(nobon,'←これのidの処理、書いてないっすよ〜？(ニヤっ)');
 
             let res = data.process();
-            fieF.draw();
+            dunF.draw();
 
             if(res) return 1;
         }
     }
 
-    if(p.x < 0 || fieC.row < p.x || p.y < 0 || fieC.row < p.y) error();
+    if(p.x < 0 || dunC.row < p.x || p.y < 0 || dunC.row < p.y) error();
     
 };
 
-fieF.draw = async() => {
-    fieC.ctx.clearRect(0, 0, fieC.can.width, fieC.can.height); // 画面をクリア
+dunF.draw = async() => {
+    dunC.ctx.clearRect(0, 0, dunC.can.width, dunC.can.height); // 画面をクリア
 
     //background、そのまま背景
-    for(let y=0; y<fieC.row; y++){
-        for(let x=0; x<fieC.row; x++){
-            let img = images['maps'][stage][fieC.backM[y][x]];
+    for(let y=0; y<dunC.row; y++){
+        for(let x=0; x<dunC.row; x++){
+            let img = images['maps'][stage][dunC.backM[y][x]];
             // console.log  (img)
-            fieC.ctx.drawImage(img, x*fieC.mas, y * fieC.mas, fieC.mas, fieC.mas);
+            dunC.ctx.drawImage(img, x*dunC.mas, y * dunC.mas, dunC.mas, dunC.mas);
         }
     }
 
     /*
-        for(let y = 0; y < fieC.objM.length; y++) {
-        for(let x = 0; x < fieC.objM[y].length; x++) {
-        let obs = fieC.objM[y][x];
+        for(let y = 0; y < dunC.objM.length; y++) {
+        for(let x = 0; x < dunC.objM[y].length; x++) {
+        let obs = dunC.objM[y][x];
         if(obs.id == 0) continue;
 
         let belong = stage;
@@ -1413,13 +1487,13 @@ fieF.draw = async() => {
         let img = images[belong][src];
         if(!img) console.log(`assets/${belong}/${src}.png not found.`), img = images['systems']['error'];
 
-        if(img) fieC.ctx.drawImage(img, x * fieC.mas, y * fieC.mas, fieC.mas, fieC.mas);
+        if(img) dunC.ctx.drawImage(img, x * dunC.mas, y * dunC.mas, dunC.mas, dunC.mas);
       }
      }
     */
 
     //object、仕掛けとか
-    for(let obs of fieC.objs){
+    for(let obs of dunC.objs){
         if(obs.id == 0) continue;
         // console.log(`id:: ${obs.id}, stage:: ${obs.stage}`)
         
@@ -1437,28 +1511,28 @@ fieF.draw = async() => {
         if(bel == 'maps' || bel == 'enemies') img = images[bel][sta][src].cloneNode();
         else img = images[bel][src].cloneNode();
          if(!img) console.log(`assets/${sta}/${src}.png is not found.`), img = images['systems']['error'];
-        if(img) fieC.ctx.drawImage(img, obs.ox, obs.oy, obs.w, obs.h);
+        if(img) dunC.ctx.drawImage(img, obs.ox, obs.oy, obs.w, obs.h);
 
         // await delay(2)
     }
 }
 
-fieF.get = (me = '指定なし') => {
+dunF.get = (me = '指定なし') => {
     if(me == '指定なし') me = 0; //特別扱い, player
     
-    let who = fieC.objs[me];
+    let who = dunC.objs[me];
 
     return who;
 }
-fieF.able = (who, type) => {
+dunF.able = (who, type) => {
     return who.ables.some(a => a == type);
 }
-fieF.prop = (who, type) => {
+dunF.prop = (who, type) => {
     return who.prop && who.prop.some(a => a == type);
 }
 
-fieF.move = async(who, code, mx, my, force = 0) => {
-    // let who = fieF.get(cam, me);
+dunF.move = async(who, code, mx, my, force = 0) => {
+    // let who = dunF.get(cam, me);
 
     // console.log(`想定: x|${who.x.toString().padStart(2, '0')}, y|${who.y.toString().padStart(2, '0')} => x|${(who.x + mx).toString().padStart(2, '0')}, y|${(who.y + my).toString().padStart(2, '0')}`)
 
@@ -1467,19 +1541,19 @@ fieF.move = async(who, code, mx, my, force = 0) => {
     
     if(mx == 0 && my == 0) return //console.log(`${who.name}「移動量が0ですわ〜〜！！」`);
 
-    if(!fieF.able(who, 'move') && !force) return //console.log(`${who.name}「動けないっっ...!!」`);
+    if(!dunF.able(who, 'move') && !force) return //console.log(`${who.name}「動けないっっ...!!」`);
 
     let addx, addy;
     let ssx = who.sx, ssy = who.sy; //save sxの略
     if(code == 'add'){
-        who.sx += mx*fieC.mas;
-        who.sy += my*fieC.mas;
-        addx = mx*fieC.mas/who.spd;
-        addy = my*fieC.mas/who.spd;
+        who.sx += mx*dunC.mas;
+        who.sy += my*dunC.mas;
+        addx = mx*dunC.mas/who.spd;
+        addy = my*dunC.mas/who.spd;
     }
     if(code == 'set'){
-        who.sx = mx*fieC.mas;
-        who.sy = my*fieC.mas;
+        who.sx = mx*dunC.mas;
+        who.sy = my*dunC.mas;
         addx = Math.abs(who.x - mx) / who.spd;
         addy = Math.abs(who.y - my) / who.spd;
     }
@@ -1489,8 +1563,8 @@ fieF.move = async(who, code, mx, my, force = 0) => {
         my = 0; //これ無視した方がいいかも。使い所isない
         let noise = random(-my, my);
 
-        let dx = mx * fieC.mas * Math.cos(rad) - noise * Math.sin(rad);
-        let dy = mx * fieC.mas * Math.sin(rad) + noise * Math.cos(rad);
+        let dx = mx * dunC.mas * Math.cos(rad) - noise * Math.sin(rad);
+        let dy = mx * dunC.mas * Math.sin(rad) + noise * Math.cos(rad);
 
         who.sx += dx;
         who.sy += dy;
@@ -1499,18 +1573,18 @@ fieF.move = async(who, code, mx, my, force = 0) => {
         addy = dy / who.spd;
     }
 
-    let list = Object.values(fieC.objs).flat();
-    // console.log(`(${looped})${who.name}「${fieF.able(who, 'pass')}, ${list.some(t => fieF.over(who, t))}, ${list.some(t => fieF.able(t, 'bepass'))}」`);
-    if(list.some(t => fieF.over(who, t))){
+    let list = Object.values(dunC.objs).flat();
+    // console.log(`(${looped})${who.name}「${dunF.able(who, 'pass')}, ${list.some(t => dunF.over(who, t))}, ${list.some(t => dunF.able(t, 'bepass'))}」`);
+    if(list.some(t => dunF.over(who, t))){
         list.forEach(t => {
-            if(fieF.over(who, t) && !fieF.able(t, 'bepass')){
+            if(dunF.over(who, t) && !dunF.able(t, 'bepass')){
                 // console.log(`(${looped})${who.name}[${who.x},${who.y}]「${t.name}[${t.x},${t.y}]とぶつかる〜〜〜〜！！」`)
                 // console.log(`(${looped})自分: ${who.name} x:${who.x} y:${who.y} sx:${who.sx} sy:${who.sy} w:${who.w} h:${who.h} dir:${who.dir} spd:${who.spd}`);
                 // console.log(`(${looped})相手: ${t.name}) x:${t.x} y:${t.y} sx:${t.sx} sy:${t.sy} w:${t.w} h:${t.h} dir:${t.dir} spd:${t.spd}`);
             };
         })
     }
-    if(!fieF.able(who, 'pass') && list.some(t => fieF.over(who, t) && !fieF.able(t, 'bepass'))) return who.sx = ssx, who.sy = ssy, fieF.draw()//, console.log(`(${looped})${who.name}「この先に何かあるっぽい？」`);
+    if(!dunF.able(who, 'pass') && list.some(t => dunF.over(who, t) && !dunF.able(t, 'bepass'))) return who.sx = ssx, who.sy = ssy, dunF.draw()//, console.log(`(${looped})${who.name}「この先に何かあるっぽい？」`);
 
     // console.log(`(${looped})想定: x|${who.x.toString().padStart(2, '0')}, y|${who.y.toString().padStart(2, '0')} => x|${(who.x + mx).toString().padStart(2, '0')}, y|${(who.y + my).toString().padStart(2, '0')} || 実行: x|${addx.toString().padStart(5, ' ')}, y|${addy.toString().padStart(5, ' ')} 計${who.spd}回反復`)
 
@@ -1519,19 +1593,19 @@ fieF.move = async(who, code, mx, my, force = 0) => {
         who.ox += addx;
         who.oy += addy;
         await delay(10);
-        fieF.draw();
+        dunF.draw();
     }
 
-    who.x = Math.round(who.ox / fieC.mas);
-    who.y = Math.round(who.oy / fieC.mas);
+    who.x = Math.round(who.ox / dunC.mas);
+    who.y = Math.round(who.oy / dunC.mas);
     who.ox = who.sx
     who.oy = who.sy;
 
-    fieF.draw();
+    dunF.draw();
 
     who.moving = 0;
 }
-fieF.over = (a, b) => {
+dunF.over = (a, b) => {
     if (a.cam == b.cam && a.me == b.me) return false;
 
     let sx1 = a.sx, sy1 = a.sy, ex1 = a.sx + a.w, ey1 = a.sy + a.h;
@@ -1548,15 +1622,15 @@ function nextFloor(){
     floor += 1;
 
     mapMake();
-    fieF.draw()
+    dunF.draw()
 }
 
 function mapMake(code){
     //stage
-    for(let i = 0; i < fieC.row; i++){
-        fieC.backM[i] = [];
+    for(let i = 0; i < dunC.row; i++){
+        dunC.backM[i] = [];
 
-        for(let j = 0; j < fieC.row; j++){
+        for(let j = 0; j < dunC.row; j++){
             let basescore = 10, bonus = 40; //2種の場合
             let scores = {};
 
@@ -1565,8 +1639,8 @@ function mapMake(code){
             dataS.tiles.forEach(type => scores[type] = basescore);
 
             // 左と上のマスに同じタイルがあったらスコア加算
-            if (j > 0) scores[fieC.backM[i][j-1]] += bonus;
-            if (i > 0) scores[fieC.backM[i-1][j]] += bonus;
+            if (j > 0) scores[dunC.backM[i][j-1]] += bonus;
+            if (i > 0) scores[dunC.backM[i-1][j]] += bonus;
 
             function weightedRandom(weightMap){
                 // 重み付きランダム選択
@@ -1579,15 +1653,15 @@ function mapMake(code){
             }
 
             let chosen = weightedRandom(scores);
-            fieC.backM[i][j] = chosen;
-            //fieC.ctx.drawImage(images.maps[chosen], j * fieC.mas, i * fieC.mas, fieC.mas, fieC.mas);
+            dunC.backM[i][j] = chosen;
+            //dunC.ctx.drawImage(images.maps[chosen], j * dunC.mas, i * dunC.mas, dunC.mas, dunC.mas);
         }
     }
 
-    fieC.objs = [];
+    dunC.objs = [];
 
-    let mas = fieC.mas;
-    let max = random(fieC.row*2, fieC.row**2-fieC.row); //この数字だけどうにかしよう。
+    let mas = dunC.mas;
+    let max = random(dunC.row*2, dunC.row**2-dunC.row); //この数字だけどうにかしよう。
     // let obsList = JSON.parse(JSON.stringify(obsAll[stage])); //copy
     let obsList = copy(Objects.filter(a => (a.in == stage || a.in == 'すべて') && !a.no));
     // console.log(obsList);
@@ -1600,7 +1674,7 @@ function mapMake(code){
 
         // console.log(obs);
         console.log(obs.name, obs.n)
-        let sude = fieC.objs.filter(a => a.id == obs.name);
+        let sude = dunC.objs.filter(a => a.id == obs.name);
          console.log(sude.length, obs.n)
         if(obs.n != 0 && sude.length+1 >= obs.n) obsList.splice(obsInd, 1); // 重複できない子なら消し去る
 
@@ -1614,8 +1688,8 @@ function mapMake(code){
         }
 
         let obx = 0, oby = 0;
-        let ok = () => {return fieC.objs.filter(a => a.x == obx && a.y == oby && a.id != 0)};
-        let ran = () => {obx = random(0, fieC.row-1), oby = random(0, fieC.row-1)};
+        let ok = () => {return dunC.objs.filter(a => a.x == obx && a.y == oby && a.id != 0)};
+        let ran = () => {obx = random(0, dunC.row-1), oby = random(0, dunC.row-1)};
 
         ran();
         let douBasyo = ok();
@@ -1631,44 +1705,44 @@ function mapMake(code){
         addob(obs.name, obx, oby, mas, mas, obs.s, 90, obs.ables, data);
     }
 
-    // MAPx = fieC.objMnum[stage-1].split('.');
+    // MAPx = dunC.objMnum[stage-1].split('.');
     // MAPy = +MAPx[1]+1
     // MAPx = +MAPx[0]
-    // fieC.objM = fieC.objMs[Math.floor(Math.random() *    MAPy)+MAPx];
-    // fieC.objM = JSON.parse(JSON.stringify(fieC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
+    // dunC.objM = dunC.objMs[Math.floor(Math.random() *    MAPy)+MAPx];
+    // dunC.objM = JSON.parse(JSON.stringify(dunC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
 
     // if(stage == 1){
     //     if(fun == 23 && probb(10)){
-    //         fieC.backM = fieC.backMs[4];
-    //         fieC.objM = fieC.objMs[6];
+    //         dunC.backM = dunC.backMs[4];
+    //         dunC.objM = dunC.objMs[6];
     //     }else if(fun <= 50 && probb(10)){
-    //         fieC.backM = fieC.backMs[5];
-    //         fieC.objM = fieC.objMs[7];
+    //         dunC.backM = dunC.backMs[5];
+    //         dunC.objM = dunC.objMs[7];
     //     };
     // }else if(stage == 2){
     //     if(fun == 68 && probb(10)){
-    //         fieC.backM = fieC.backMs[11];
-    //         fieC.objM = fieC.objMs[14];
-    //         fieC.objM = JSON.parse(JSON.stringify(fieC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
+    //         dunC.backM = dunC.backMs[11];
+    //         dunC.objM = dunC.objMs[14];
+    //         dunC.objM = JSON.parse(JSON.stringify(dunC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
     //     }else if(fun <= 50 && probb(10)){
-    //         fieC.backM = fieC.backMs[19];
-    //         fieC.objM = fieC.objMs[23];
-    //         fieC.objM = JSON.parse(JSON.stringify(fieC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
+    //         dunC.backM = dunC.backMs[19];
+    //         dunC.objM = dunC.objMs[23];
+    //         dunC.objM = JSON.parse(JSON.stringify(dunC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
     //     };
     // }else if(stage == 3){
     //     if(fun == 68 && probb(10)){
-    //         fieC.backM = fieC.backMs[18];
-    //         fieC.objM = fieC.objMs[22];
-    //         fieC.objM = JSON.parse(JSON.stringify(fieC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
+    //         dunC.backM = dunC.backMs[18];
+    //         dunC.objM = dunC.objMs[22];
+    //         dunC.objM = JSON.parse(JSON.stringify(dunC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
     //     }else if(fun <= 50 && probb(10)){
-    //         fieC.backM = fieC.backMs[19];
-    //         fieC.objM = fieC.objMs[23];
-    //         fieC.objM = JSON.parse(JSON.stringify(fieC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
+    //         dunC.backM = dunC.backMs[19];
+    //         dunC.objM = dunC.objMs[23];
+    //         dunC.objM = JSON.parse(JSON.stringify(dunC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
     //     };
     // }
-    // if(stage == 1 && floor >= 10){SELECTx = 150;SELECTy = 525;fieC.backM = fieC.backMs[6];fieC.objM = fieC.objMs[8]}; //創生黎明の原野
-    // if(stage == 2 && floor >= 7 ){SELECTx = 150;SELECTy = 525;fieC.backM = fieC.backMs[13];fieC.objM = fieC.objMs[16]}; //ガチェンレイゲスドゥールラート(昼)
-    // if(stage == 3 && floor >= 3 ){SELECTx = 150;SELECTy = 525;fieC.backM = fieC.backMs[20];fieC.objM = fieC.objMs[24]}; //ガチェンレイゲスドゥールラート(夜)
+    // if(stage == 1 && floor >= 10){SELECTx = 150;SELECTy = 525;dunC.backM = dunC.backMs[6];dunC.objM = dunC.objMs[8]}; //創生黎明の原野
+    // if(stage == 2 && floor >= 7 ){SELECTx = 150;SELECTy = 525;dunC.backM = dunC.backMs[13];dunC.objM = dunC.objMs[16]}; //ガチェンレイゲスドゥールラート(昼)
+    // if(stage == 3 && floor >= 3 ){SELECTx = 150;SELECTy = 525;dunC.backM = dunC.backMs[20];dunC.objM = dunC.objMs[24]}; //ガチェンレイゲスドゥールラート(夜)
 }
 
 function addob(id, mx, my, w, h, spd, dir, ables, data){
@@ -1680,16 +1754,16 @@ function addob(id, mx, my, w, h, spd, dir, ables, data){
     let ob = {
         id: id,
         //cam: cam,
-        me: fieC.objs.length,
+        me: dunC.objs.length,
         stage: stage,
         x: mx,
         y: my,
-        sx: mx*fieC.mas,
-        sy: my*fieC.mas,
-        ox: mx*fieC.mas,
-        oy: my*fieC.mas,
-        w: fieC.mas,
-        h: fieC.mas,
+        sx: mx*dunC.mas,
+        sy: my*dunC.mas,
+        ox: mx*dunC.mas,
+        oy: my*dunC.mas,
+        w: dunC.mas,
+        h: dunC.mas,
         moving: 0,
         spd: spd || 5,
         dir: dir || 90,
@@ -1697,7 +1771,7 @@ function addob(id, mx, my, w, h, spd, dir, ables, data){
         data: data || {},
     }
 
-    fieC.objs.push(ob);
+    dunC.objs.push(ob);
 }
 
 function nextStage(){
@@ -1721,12 +1795,12 @@ let invD = document.querySelector('#inventory');
 let invC = {}
 let invF = {}
 document.addEventListener('keydown', (event) => {
-    if(fieD.style.display != 'block') return;
+    if(dunD.style.display != 'block') return;
     
     let key = event.key.toLowerCase();
 
     if(key == 'e'){
-        let p = fieF.get();
+        let p = dunF.get();
         switch(p.moving){
             case 0:
             p.moving = 1;
@@ -1761,13 +1835,13 @@ let batC = {
 let batF = {} //tyotto yokunai kamo
 
 batF.open = () => {
-    let p = fieF.get();
+    let p = dunF.get();
     p.moving = 1;
     
     batD.classList.add('appe')
 };
 batF.clos = () => {
-    let p = fieF.get();
+    let p = dunF.get();
     p.moving = 0;
     
     batD.classList.remove('appe')
@@ -1858,223 +1932,123 @@ function whatdo(who, are, shu, name){
 //#endregion どちらかと言うと youは何しに日本へ
 
 //#region どむさんのようそづくり～
-function makeHuman(cam, me){
-    let hD = document.createElement('div');
-    hD.className = `human ${cam}${me}`;
-
-    let img = document.createElement('img');
-    img.className = 'img';
-    img.src = `assets/images/systems/error.png`;
-    hD.appendChild(img);
-
-    let skill = document.createElement('div');
-    skill.className = 'skill';
-     let back = document.createElement('img');
-     back.className = 'back';
-     back.src = `assets/images/systems/error.png`;
-     skill.appendChild(back);
-     let liquid = document.createElement('div');
-     liquid.className = 'liquid';
-     skill.appendChild(liquid);
-    hD.appendChild(skill);
-
-    let waku = document.createElement('div');
-    waku.className = 'waku';
-
-    let plate = document.createElement('div');
-    plate.className = 'plate';
-
-    let name = document.createElement('div');
-    name.className = 'name';
-    plate.appendChild(name);
-    let lv = document.createElement('div');
-    lv.className = 'lv';
-    plate.appendChild(lv);
-
-    waku.appendChild(plate);
-
-    let hpZ = document.createElement('div');
-    hpZ.className = 'hp status';
-    
-    let hpt = document.createElement('div');
-    hpt.className = 'text';
-    hpZ.appendChild(hpt);
-    let hpb = document.createElement('div');
-    hpb.className = 'bar';
-     let hpbi = document.createElement('div');
-     hpbi.className = 'inner';
-     hpb.appendChild(hpbi);
-    hpZ.appendChild(hpb);
-    
-    waku.appendChild(hpZ);
-    
-    let mpZ = document.createElement('div');
-    mpZ.className = 'mp status';
-    
-    let mpt = document.createElement('div');
-    mpt.className = 'text';
-    mpZ.appendChild(mpt);
-    let mpb = document.createElement('div');
-    mpb.className = 'bar';
-     let mpbi = document.createElement('div');
-     mpbi.className = 'inner';
-     mpb.appendChild(mpbi);
-    mpZ.appendChild(mpb);
-
-    waku.appendChild(mpZ);
-
-    hD.appendChild(waku);
-
-    return hD;
-}
-//#endregion
-
-//#region きゃらのせんたく〜
-async function sele(){
-    let id = 'errored!!'
-    id = await new Promise((mis) => {
-        function clicked(ev){
-            let div = ev.target;
-            // console.log(div)
-            
-            let name = div.classList[1];
-            console.log(name);
-            
-            batC.seleD.replaceChildren();
-
-            mis(name)
-        }
-        
-        let chas = Charas.filter(a => a.able);
-        // console.log(chas)
-        for(let data of chas){
-            // console.log(data)
-            let div0 = document.createElement('div');
-            div0.className = `slsl ${data.id}`;
-            
-            let span = document.createElement('span');
-            span.textContent = data.name;
-            div0.appendChild(span);
-
-            let img = document.createElement('img');
-            img.src = `assets/images/charas/${data.img}.png`;
-            div0.appendChild(img);
-            
-            div0.addEventListener('click', clicked);
-            batC.seleD.appendChild(div0);
-        }
-    })
-    
-    let p = makePlayer(0, id);
-    humans.push(p);
-
-    batC.now = 1;
-}
-//#endregion
-
-//#region ピのせーぞー
-function makePlayer(code, id){
-    //code 0 == Charas, 1 == Friends
-    let pd = 0;
-    if(!code) pd = Charas.find(a => a.id == id);
-    else pd = Friends.find(a => a.name == id);
-
-    if(!pd) return logadd(`codeが[${code}]の${id}はいないらしい`);
-
-    let p = {};
-    let statuses = Object.keys(eneBas);
-    statuses.forEach(statu => p[statu] = pd[statu]); //変更点だけ、らしい。
-    p.hp = p.maxhp;
-    p.mp = p.maxmp;
-    p.ep = 0;
-
-    p.status = 1;
-    p.cam = 'players';
-    p.me = humans.filter(a => a.cam == 'players').length;
-    p.id  = id;
-    p.name = pd.name;
-    p.lv = 1;
-    p.exp = 0;
-    p.sp = 0;
-
-    p.slash = p.slash??['slash','double slash', 'slash of light'];
-    p.magic = p.magic??['heal', 'power', 'shell'];
-    p.tool = p.tool??['aspirin','throw knife','redcard'];
-
-    p.buffs = [];
-    p.attr = [];
-    
-    p.weapon = 'none';
-    p.shield = 'none';
-
-    if(!code){
-        p.ex = pd.ex;
-        p.ns = pd.ns;
-        p.ps = pd.ps;
-        p.ts = pd.ts;
-        
-        Style.button.solid = pd.buttonsolid;
-        Style.button.back = pd.buttonback;
-        Style.button.aima = mixshoku(pd.buttonsolid, pd.buttonback);
-        Style.tekiou();
-    }
-    else{
-        p.e = pd.e;
-        p.s = pd.s;
-        p.n = pd.p;
-        p.p = pd.p;
-        p.t = pd.t;
-    }
-
-
-    let div = makeHuman('players', p.me);
-    batC.pD.appendChild(div);
-    
-    return p;
-}
-
-function makeEnemy(){
-    let e = {} //うつわ
-    let statuses = Object.keys(eneBas);
-    statuses.forEach(statu => e[statu] = eneBas[statu]);
-
-    let ed = arraySelect(Enemies);
-    // console.log(ed)
-    statuses.forEach(statu => {
-        if(ed[statu].startsWith('+') || ed[statu].startsWith('-')){
-            let num = +(ed[statu].slice(1));
-            if(ed[statu].startsWith('-')) num *= -1;
-            e[statu] += num;
-        }
-        if(ed[statu].startsWith('=')){
-            let num = +(ed[statu].slice(1));
-            e[statu] = num;
-        }
-    })
-
-    e.hp = e.maxhp;
-    e.mp = e.maxmp;
-    e.ep = 0;
-
-    e.status = 1;
-    e.name = ed.name;
-    e.cam = 'enemies';
-    e.me = humans.filter(a => a.cam == 'enemies').length;
-    e.status = 1; // 1:生存 0:死亡
-    e.lv = random(1,3); //一旦
-    
-    e.attr = ed.attr??[];
-    e.buffs = [];
-    e.lasts = [];
-
-    e.weapon = ed.shield ?? 'none';
-    e.shield = ed.shield ?? 'none';
-
-    let div = makeHuman('enemies', e.me);
-    batC.eD.appendChild(div);
-
+function El(tag, cls, children = []) {
+    let e = document.createElement(tag);
+    if (cls) e.className = cls;
+    children.forEach(c => e.appendChild(c));
     return e;
 }
+
+function makeHuman(cam, me) {
+    let img = El('img', 'img');
+    img.src = 'assets/images/systems/error.png';
+
+    let back = El('img', 'back');
+    back.src = 'assets/images/systems/error.png';
+
+    const baa = (type) => El('div', `${type} status`, [
+        El('div', 'text'),
+        El('div', 'bar', [El('div', 'inner')])
+    ]);
+
+    return El('div', `human ${cam}${me}`, [
+        img,
+        El('div', 'skill', [back, El('div', 'liquid')]),
+        El('div', 'waku', [
+            El('div', 'plate', [El('div', 'name'), El('div', 'lv')]),
+            baa('hp'),
+            baa('mp'),
+        ]),
+    ]);
+}
+//#endregion
+//#region せーぞーマシーン（統合版）
+function makeUnit(type, code, name) {
+    let data, unit = {};
+    const stats = Object.keys(eneBas);
+
+    // ── データ取得 ──
+    if(type == 'player'){
+        data = (!code ? Charas : Friends).find(a => a.name == name);
+        if (!data) return logadd(`codeが[${code}]の${name}はいないらしい`);
+    }else{
+        data = arraySelect(Enemies);
+    }
+
+    // ── ステータス計算 ──
+    if(type == 'player'){
+        // プレイヤー: データそのままコピー
+        stats.forEach(s => unit[s] = data[s]);
+    }else{
+        // 敵: ベース値 → 補正値で加工
+        stats.forEach(s => unit[s] = eneBas[s]);
+        stats.forEach(s => {
+            let v = data[s];
+            if (v.startsWith('+') || v.startsWith('-')) {
+                let num = +v.slice(1);
+                if (v.startsWith('-')) num *= -1;
+                unit[s] += num;
+            }
+            if (v.startsWith('=')) {
+                unit[s] = +v.slice(1);
+            }
+        });
+    }
+
+    // ── 共通の初期化 ──
+    unit.hp = unit.maxhp;
+    unit.mp = unit.maxmp;
+    unit.ep = 0;
+    unit.status = 1;
+    unit.buffs = [];
+    unit.cam = (type == 'player') ? 'players' : 'enemies';
+    unit.me = humans.filter(a => a.cam == unit.cam).length;
+
+    // ── タイプ別の初期化 ──
+    if(type == 'player'){
+        unit.name   = name;
+        unit.lv     = 1;
+        unit.exp    = 0;
+        unit.sp     = 0;
+        unit.attr   = [];
+        unit.weapon = 'none';
+        unit.shield = 'none';
+
+        unit.slash = unit.slash ?? ['slash', 'double slash', 'slash of light'];
+        unit.magic = unit.magic ?? ['heal', 'power', 'shell'];
+        unit.tool  = unit.tool  ?? ['aspirin', 'throw knife', 'redcard'];
+
+        if (!code) {
+            unit.ex = data.ex;  unit.ns = data.ns;
+            unit.ps = data.ps;  unit.ts = data.ts;
+
+            Style.button.solid = data.buttonsolid;
+            Style.button.back  = data.buttonback;
+            Style.button.aima  = mixshoku(data.buttonsolid, data.buttonback);
+            Style.tekiou();
+        } else {
+            unit.e = data.e;  unit.s = data.s;
+            unit.n = data.p;  unit.p = data.p;  unit.t = data.t;
+        }
+    } else {
+        unit.name   = data.name;
+        unit.lv     = random(1, 3);
+        unit.attr   = data.attr ?? [];
+        unit.lasts  = [];
+        unit.weapon = data.shield ?? 'none';
+        unit.shield = data.shield ?? 'none';
+    }
+
+    // ── DOM生成・配置 ──
+    let container = (type == 'player') ? batC.pD : batC.eD;
+    container.appendChild(makeHuman(unit.cam, unit.me));
+
+    return unit;
+}
+
+// いままで通り呼べるやつ
+const makePlayer = (code, name) => makeUnit('player', code, name);
+const makeEnemy  = () => makeUnit('enemy');
 //#endregion
 
 //#region みちとのそーぐー
@@ -2298,7 +2272,7 @@ batC.s1B.addEventListener('click', async function(){
             batC.s4B.textContent = 'back';
             break;
         case 2:
-            Slash(who, 0)
+            Attack(who, 0)
             break;
         case 3:
             Magic(who, 0)
@@ -2322,7 +2296,7 @@ batC.s2B.addEventListener('click', async function(){
             batC.s4B.textContent = 'back';
             break;
         case 2:
-            Slash(who, 1);
+            Attack(who, 1);
             break;
         case 3:
             Magic(who, 1);
@@ -2346,7 +2320,7 @@ batC.s3B.addEventListener('click', async function(){
             batC.s4B.textContent = 'back';
             break;
         case 2:
-            Slash(who, 2);
+            Attack(who, 2);
             break;
         case 3:
             Magic(who, 2);
@@ -2397,9 +2371,9 @@ async function dassyutsu(){
     disappear();
     batD.classList.remove('appe');
     
-    fieF.draw()
+    dunF.draw()
     
-    fieF.get().moving = 0;
+    dunF.get().moving = 0;
     await addtext('うまく逃げ切れた！');
 }
 
@@ -2540,7 +2514,7 @@ function selectSyudou(code = 1){
 
 //#endregion
 //#region ピのざんげき
-async function Slash(who, num){
+async function Attack(who, num){
     disappear();
     let name = who.slash[num]
     if(!name){
@@ -2548,7 +2522,7 @@ async function Slash(who, num){
         return playerturn()
     }
 
-    let data = Slashs.find(a => a.id == name)
+    let data = Attacks.find(a => a.id == name)
     if(who.mp >= data.mp){
         let are = await selectSyudou();
 
@@ -3140,7 +3114,7 @@ function buffclear(who, code){
     tekiou();
 }
 function buffhas(who, buff){
-    if(who.buffs.find(b => b.name === buff)) return 1;
+    if(who.buffs.find(b => b.name == buff)) return 1;
 
     return 0;
 }
@@ -3256,9 +3230,9 @@ async function finale(cam){
 
 
 async function start(){
-    //console.log("=====Ronto Connect connecten=====")
+    //console.log("====Ronto Connect connecten====")
     soundVolume(50);
-    fieF.load();
+    dunF.load();
     lobF.load();
 
     //autoLogin

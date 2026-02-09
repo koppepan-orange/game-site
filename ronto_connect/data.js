@@ -339,6 +339,28 @@ let Friends = [
 	//memo.htmlのcharaから頼むわ
 ]
 
+let Facilities = [
+    {
+        name:"dungeon",
+        desc:`ダンジョンに行きます\n流石に東大`,
+        func:() => {
+            dunF.select();
+        }
+    },
+    {
+        no:1,
+        name:"still"
+    },
+    {
+        no:1,
+        name:"still"
+    },
+    {
+        no:1,
+        name:"still"
+    },
+]
+
 let Buffs = [
     { //if value < 0, それはデバフ扱い
         name:'power', //keyと同じものを
@@ -754,7 +776,7 @@ let Buffs = [
     }
 ]
 
-let Slashs = [
+let Attacks = [
     {
         name:'slash',
         jpnm:'シンプル斬り',
@@ -763,13 +785,13 @@ let Slashs = [
         lv:1,
         tcam:'players',
         func:async function(who, are){
-            if(await damage(who, are, 100, 'sh')) return 1;
+            if(await damage(who, are, 100, 'ph')) return 1;
 
             //elseesに移行よろ
             if(who.ps == 'sthree' && probb(25)){
                 await addtext(`${who.name}は頑張った!`);
-                if(await damage(who, are, 100, 'sh')) return 1;
-                if(await damage(who, are, 100, 'sh')) return 1;
+                if(await damage(who, are, 100, 'ph')) return 1;
+                if(await damage(who, are, 100, 'ph')) return 1;
             }
             
             return 0;
@@ -782,8 +804,8 @@ let Slashs = [
         mp:0,
         lv:1,
         func:async function(who, are){
-            if(await damage(who, are, 100, 'sh')) return 1;
-            if(await damage(who, are, 100, 'sh')) return 1;
+            if(await damage(who, are, 100, 'ph')) return 1;
+            if(await damage(who, are, 100, 'ph')) return 1;
 
             return 0;
         }
@@ -800,7 +822,7 @@ let Slashs = [
 
             let result = 0;
             if(probb(pro)){
-                result = await damage(who, are,300,'sh');
+                result = await damage(who, are,300,'ph');
                 if(result) return dead;
             }else{
                 //let result = letsHappen(tcam, target, cam, me, 'missed', 'sl', 'slashoflight');
@@ -1407,7 +1429,7 @@ let Tools = [
         desc:'指定した人単体の現在体力の10%分のダメージを与える',
         flav:'十六夜さんが投げるあれ\n「では、ナイフの錆にしてあげましょう」',
         func:async function(who,are){
-            if(await damage(who,are,"10%",'sh',["%!maxhp",'追撃なし','固定'])) return 1;
+            if(await damage(who,are,"10%",'cn',["%!maxhp",'追撃なし','固定'])) return 1;
             return 0;
         }
     },
@@ -1415,7 +1437,7 @@ let Tools = [
         jpnm:'トリッキーな変数',
         name:'trickyvariables',
         price:40,
-        desc:'敵全体に攻撃力のn%分のダメージを与える\nnは10%, 25%, 40%からランダム',
+        desc:'敵全体に攻撃力のn%分の関節ダメージを与える\nnは10%, 25%, 40%からランダム',
         flav:'黒崎コユキ、きちゃいました！！\nなんか面白いことないですか？',
         contex:{
             bai:[10, 25, 40],
@@ -1433,7 +1455,7 @@ let Tools = [
         jpnm:'ボトルグレネード',
         name:'bottlegrenade',
         price:60,
-        desc:'敵単体に攻撃力の20%分のダメージを与えたのち、\n敵全体に火傷(3t,2lv)を付与する',
+        desc:'敵単体に攻撃力の20%分の間接ダメージを与えたのち、\n敵全体に火傷(3t,2lv)を付与する',
         num:0,
         func:async function(who,are){
             await addtext('これはちょっと、スパイシーなやつだよ');
@@ -1461,13 +1483,15 @@ let Tools = [
         jpnm:'爆弾',
         name:'bomb',
         price:100,
-        desc:'エクスプローージョン！！！\n敵を確殺します。嬉しいね',
+        desc:'指定した人単体に、その最大体力の100%の固定貫通間接ダメージを与える。',
+        flav:'エクスプローージョン！！！\n敵を確殺します。嬉しいね',
         num:1,
+
         func:async function(who,are){
-            let x = humans[tcam][target].hp;
-            let result = await damage(who,are,x,'mg',['unpursuit',"fixed","penetrate"]);
             await addtext('爆発オチなんてサイテー！！');
-            return 1;
+            if(await damage(who, are, "100%", 'cn', ['%!maxhp','追撃無し',"固定","貫通"])) return 1;
+            
+            return 0; //生きることもあります たぶん
         }
     },
     {
@@ -1607,7 +1631,7 @@ let Skills = [
                         break;
                     };
                 }
-                let result = await damage(who,are,x,'sh',4);
+                let result = await damage(who,are,x,'ph',4);
                 if(result == 'end'){return 1;}
                 return 0;
             }
@@ -1630,7 +1654,7 @@ let Skills = [
                         ]
                     )
                 );
-                let result = await damage(who,are,1.5,'sh',4);
+                let result = await damage(who,are,1.5,'ph',4);
                 if(result == 'end'){return 1;}
                 if(Math.floor(Math.random()*2)) await buffadd(who, are,'freeze', 'turn' ,4,1)
                 return 0;
@@ -1645,7 +1669,7 @@ let Skills = [
             
             func:async function(who){
                 let [target, tcam] = await selectSyudou(3);
-                let result = await damage(who,are,1.5,'sh',4);
+                let result = await damage(who,are,1.5,'ph',4);
                 if(result == 'end'){return 1;}
                 await buffadd(who, are,'elec', 'turn' ,2,1);
                 return 0;
@@ -1663,7 +1687,7 @@ let Skills = [
                 let target = await selectSyudou();
                 x = 2;
                 if(humans[target[1]][target].hp > humans[target[1]][target].maxhp * 0.7) x = 4;
-                let result = await damage(who,target[1],target,x,'sh',4);
+                let result = await damage(who,target[1],target,x,'ph',4);
                 if(result == 'end'){return 1;}
                 return 0;
             }
@@ -1678,7 +1702,7 @@ let Skills = [
             func:async function(who){
                 phase = 0; disappear();
                 let target = await selectSyudou();
-                let result = await damage(who,target[1],target,0.75,'sh',4);
+                let result = await damage(who,target[1],target,0.75,'ph',4);
                 if(result == 'end'){return 1;}
                 await buffadd(target[1],target,'stun', 'turn' ,1,1);
                 return 0;
@@ -1694,7 +1718,7 @@ let Skills = [
             func:async function(who){
                 phase = 0; disappear();
                 let [tcam, tme] = await selectSyudou();
-                let result = await damage(who,are,0.2,'sh',4);
+                let result = await damage(who,are,0.2,'ph',4);
                 if(result == 'end'){return 1;}
                 await buffadd(who, are,'shell',3,1);
                 await buffadd(who, are,'power', 'turn' ,3,2);
@@ -1859,10 +1883,15 @@ let Stages = [
         tiles: ['a','b'],
     },
     {
-        no:1,
+        // no:1,
         name:'砂漠',
         jpnm:'ガチェンレイゲスドゥールラート',
         tiles: ['b','c','d'],
+    },
+    {
+        name:'遊園地',
+        jpnm:'油淋鶏',
+        tiles: ['c','d'],   
     }
 ];
 
@@ -2168,7 +2197,7 @@ let Enemies = [
                 func:async function(who){
                     await addtext(`${who.name}は粘液を飛ばしてきた！`);
                     let are = selectJodou(who, 'phph',0);
-                    let res = await damage(who, are, 100, 'sh');
+                    let res = await damage(who, are, 100, 'ph');
                     if(res) return 1;
                     
                     return 0;
@@ -2209,7 +2238,7 @@ let Enemies = [
                 func:async function(who){
                     await addtext(`${who.name}は体当たりを仕掛けてきた！`);
                     let are = selectJodou(who, 'phpl', 0);
-                    let result = await damage(who, are, 100, 'sh');
+                    let result = await damage(who, are, 100, 'ph');
                     if(result) return 1;
                     return 0;
                 }
@@ -2221,7 +2250,7 @@ let Enemies = [
                 func:async function(who){
                     await addtext(`${who.name}は回転しながら突進してきた！`);
                     let are = selectJodou(who,'phpl',0);
-                    let result = await damage(who,are,150,'sh');
+                    let result = await damage(who,are,150,'ph');
                     if(result) return 1;
                     return 0;
                 }
@@ -2266,7 +2295,7 @@ let Enemies = [
                     let x = buffhas(who, 'disappear') ? (buffclear(who, 'disappear'), 200) : 100;
                     await addtext(`${who.name}は突進してきた！`);
                     let are = selectJodou(who, 'pr',0);
-                    let result = await damage(who, are, x, 'sh');
+                    let result = await damage(who, are, x, 'ph');
                     return result;
                 }
             },
@@ -2278,7 +2307,7 @@ let Enemies = [
                 func:async function(who){
                     await addtext(`${who.name}はローキックしてきた！`)
                     let are = selectJodou(who,'phpl',0);
-                    let result = await damage(who, are, 70, 'sh');
+                    let result = await damage(who, are, 70, 'ph');
                     await buffadd(who, are, 'speeddown', 'turn', 2, 1);
                     return result;
                 }

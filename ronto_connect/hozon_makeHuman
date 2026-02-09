@@ -1,0 +1,175 @@
+//#region どむさんのようそづくり～
+function makeHuman(cam, me){
+    let hD = document.createElement('div');
+    hD.className = `human ${cam}${me}`;
+
+    let img = document.createElement('img');
+    img.className = 'img';
+    img.src = `assets/images/systems/error.png`;
+    hD.appendChild(img);
+
+    let skill = document.createElement('div');
+    skill.className = 'skill';
+     let back = document.createElement('img');
+     back.className = 'back';
+     back.src = `assets/images/systems/error.png`;
+     skill.appendChild(back);
+     let liquid = document.createElement('div');
+     liquid.className = 'liquid';
+     skill.appendChild(liquid);
+    hD.appendChild(skill);
+
+    let waku = document.createElement('div');
+    waku.className = 'waku';
+
+    let plate = document.createElement('div');
+    plate.className = 'plate';
+
+    let name = document.createElement('div');
+    name.className = 'name';
+    plate.appendChild(name);
+    let lv = document.createElement('div');
+    lv.className = 'lv';
+    plate.appendChild(lv);
+
+    waku.appendChild(plate);
+
+    let hpZ = document.createElement('div');
+    hpZ.className = 'hp status';
+    
+    let hpt = document.createElement('div');
+    hpt.className = 'text';
+    hpZ.appendChild(hpt);
+    let hpb = document.createElement('div');
+    hpb.className = 'bar';
+     let hpbi = document.createElement('div');
+     hpbi.className = 'inner';
+     hpb.appendChild(hpbi);
+    hpZ.appendChild(hpb);
+    
+    waku.appendChild(hpZ);
+    
+    let mpZ = document.createElement('div');
+    mpZ.className = 'mp status';
+    
+    let mpt = document.createElement('div');
+    mpt.className = 'text';
+    mpZ.appendChild(mpt);
+    let mpb = document.createElement('div');
+    mpb.className = 'bar';
+     let mpbi = document.createElement('div');
+     mpbi.className = 'inner';
+     mpb.appendChild(mpbi);
+    mpZ.appendChild(mpb);
+
+    waku.appendChild(mpZ);
+
+    hD.appendChild(waku);
+
+    return hD;
+}
+//#endregion
+
+//#region ピのせーぞー
+function makePlayer(code, name){
+    //code 0 == Charas, 1 == Friends
+    let pd = 0;
+    if(!code) pd = Charas.find(a => a.name == name);
+    else pd = Friends.find(a => a.name == name);
+
+    if(!pd) return logadd(`codeが[${code}]の${name}はいないらしい`);
+
+    let p = {};
+    let statuses = Object.keys(eneBas);
+    statuses.forEach(statu => p[statu] = pd[statu]); //変更点だけ、らしい。
+    p.hp = p.maxhp;
+    p.mp = p.maxmp;
+    p.ep = 0;
+
+    p.status = 1;
+    p.cam = 'players';
+    p.me = humans.filter(a => a.cam == 'players').length;
+    p.name = name;
+    p.lv = 1;
+    p.exp = 0;
+    p.sp = 0;
+
+    p.slash = p.slash??['slash','double slash', 'slash of light'];
+    p.magic = p.magic??['heal', 'power', 'shell'];
+    p.tool = p.tool??['aspirin','throw knife','redcard'];
+
+    p.buffs = [];
+    p.attr = [];
+    
+    p.weapon = 'none';
+    p.shield = 'none';
+
+    if(!code){
+        p.ex = pd.ex;
+        p.ns = pd.ns;
+        p.ps = pd.ps;
+        p.ts = pd.ts;
+        
+        Style.button.solid = pd.buttonsolid;
+        Style.button.back = pd.buttonback;
+        Style.button.aima = mixshoku(pd.buttonsolid, pd.buttonback);
+        Style.tekiou();
+    }
+    else{
+        p.e = pd.e;
+        p.s = pd.s;
+        p.n = pd.p;
+        p.p = pd.p;
+        p.t = pd.t;
+    }
+
+
+    let div = makeHuman('players', p.me);
+    batC.pD.appendChild(div);
+    
+    return p;
+}
+
+function makeEnemy(){
+    let e = {} //うつわ
+    let statuses = Object.keys(eneBas);
+    statuses.forEach(statu => e[statu] = eneBas[statu]);
+
+    let ed = arraySelect(Enemies);
+    // console.log(ed)
+    statuses.forEach(statu => {
+        if(ed[statu].startsWith('+') || ed[statu].startsWith('-')){
+            let num = +(ed[statu].slice(1));
+            if(ed[statu].startsWith('-')) num *= -1;
+            e[statu] += num;
+        }
+        if(ed[statu].startsWith('=')){
+            let num = +(ed[statu].slice(1));
+            e[statu] = num;
+        }
+    })
+
+    e.hp = e.maxhp;
+    e.mp = e.maxmp;
+    e.ep = 0;
+
+    e.status = 1;
+    e.name = ed.name;
+    e.cam = 'enemies';
+    e.me = humans.filter(a => a.cam == 'enemies').length;
+    e.status = 1; // 1:生存 0:死亡
+    e.lv = random(1,3); //一旦
+    
+    e.attr = ed.attr??[];
+    e.buffs = [];
+    e.lasts = [];
+
+    e.weapon = ed.shield ?? 'none';
+    e.shield = ed.shield ?? 'none';
+
+    let div = makeHuman('enemies', e.me);
+    batC.eD.appendChild(div);
+
+    return e;
+}
+//#endregion
