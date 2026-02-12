@@ -1369,75 +1369,76 @@ let Tools = [
         desc:'味方単体の体力を20%回復',
         flav:'おや、頭が痛いって？\n痛みに効くのはアスピリン！',
         func:async function(who, are){
-            await heal(who, are, "20%", "add");
+            if(await heal(who, are, "20%", "add")) return 1;
             return 0;
         }
     },
     {
-        jpnm:'パブロン',
         name:'pablon',
+        jpnm:'パブロン',
         price:40,
         desc:'味方単体の体力を40%回復',
         flav:'一種の風邪薬。大人とか向けらしいね',
         func:async function(who,are){
-            await heal(who, are, "40%", "add");
+            if(await heal(who, are, "40%", "add")) return 1;
             return 0;
         }
     },
     {
+        name:'trypsin',
         jpnm:'トリプシン',
         name:'trypsin',
         price:60,
         desc:'味方単体の体力を70%回復',
         flav:'膵液に含まれる消化酵素の一種。\n薬ではない。',
         func:async function(who,are){
-            await heal(who, are, "70%", "add");
+            if(await heal(who, are, "70%", "add")) return 1;
             return 0;
         }
     },
     {
-        jpnm:'ルル',
         name:'lulu',
+        jpnm:'ルル',
         price:80,
-        desc:'味方単体の体力を60%回復\n40%の確率で再度60%回復。',
+        desc:'味方単体の体力を60%回復。40%の確率で再度60%回復。',
         flav:'sick sickな頭痛薬。\n毒が流るルルですね。',
         func:async function(who,are){
-            await addtext(`求愛性 孤独 ドク 流るルル`)
-            await heal(who, are, '60%', 'add')
-            if(probably(40)) return 0;
+            //await addtext(`求愛性 孤独 ドク 流るルル`)
+            if(await heal(who, are, '60%', 'add')) return 1;
+            if(probb(40)) return 0;
             await addtext('愛をもっと')
-            await heal(who, are, '60%', 'add')
+            if(await heal(who, are, '60%', 'add')) return 1;
             return 0;
         }
     },
     {
-        jpnm:'魔法薬',
         name:'potion',
+        jpnm:'魔法薬',
         price:120,
-        desc:'味方単体の体力を全回復',
+        desc:'味方単体の体力を100%回復',
         flav:'投げつけたい。敵に（？）\n内部処理的にはHPを100%にセットしてます',
         func:async function(who,are){
             await addtext("パワー...全開だ！！")
-            await heal(who, are, '100%', 'set')
+            if(await heal(who, are, '100%', 'set')) return 1;
             return 0;
         }
     },
     {
-        jpnm:'投げナイフ',
         name:'throwknife',
+        jpnm:'投げナイフ',
         price:20,
         desc:'指定した人単体の現在体力の10%分のダメージを与える',
         flav:'十六夜さんが投げるあれ\n「では、ナイフの錆にしてあげましょう」',
         func:async function(who,are){
-            if(await damage(who,are,"10%",'cn',["%!maxhp",'追撃なし','固定'])) return 1;
+            if(await damage(who,are,"10%",'cn',["%!maxhp",'固定'])) return 1;
             return 0;
         }
     },
     {
-        jpnm:'トリッキーな変数',
         name:'trickyvariables',
+        jpnm:'トリッキーな変数',
         price:40,
-        desc:'敵全体に攻撃力のn%分の関節ダメージを与える\nnは10%, 25%, 40%からランダム',
+        desc:'敵全体に攻撃力のn%分の間接ダメージを与える。nは10%, 25%, 40%からランダムに選ばれる。',
         flav:'黒崎コユキ、きちゃいました！！\nなんか面白いことないですか？',
         contex:{
             bai:[10, 25, 40],
@@ -1447,19 +1448,20 @@ let Tools = [
         func:async function(who,are){
             let bai = arrayGacha(this.contex.bai, this.contex.p);
             bai /= 100;
-            if(await damage(who, are, x, 'cn',['追撃なし',])) return 1
+            if(await damage(who, are, x, 'cn',[])) return 1
             return 0;
         }
     },
     {
-        jpnm:'ボトルグレネード',
         name:'bottlegrenade',
+        jpnm:'ボトルグレネード',
         price:60,
-        desc:'敵単体に攻撃力の20%分の間接ダメージを与えたのち、\n敵全体に火傷(3t,2lv)を付与する',
+        desc:'敵単体に攻撃力の20%分の間接ダメージを与えたのち、敵全体に火傷(3t,2lv)を付与する。',
+        flav:'なんだかんだ初期からずっと好きな人/nレッドウィンターの問題児にしては上出来すぎる',
         num:0,
         func:async function(who,are){
             await addtext('これはちょっと、スパイシーなやつだよ');
-            if(await damage(who, are, 20, 'cn', ['追撃なし'])) return 1;
+            if(await damage(who, are, 20, 'cn', [])) return 1;
             
             let are2 = selectJodou(who, 'tz'); //敵 全体
             await buffadd(who, are2, 'burn', 3, 2);
@@ -1467,26 +1469,25 @@ let Tools = [
         }
     },
     {
-        jpnm:'援護射撃',
         name:'coveringfire',
+        jpnm:'援護射撃',
         price:80,
-        desc:'指定した敵に、その現在の体力の75%分のダメージを与える/nさすがは凄腕のスナイパー',
+        desc:'指定した敵に、その現在の体力の75%分のダメージを与える。',
         flav:'ゴミ箱に隠れてる人。\nかわいいね',
         num:0,
         func:async function(who,are){
             // await addtext('え、援護します...');
-            if(await damage(who, are, "75%", 'cn', ['%!hp','追撃なし'])) return 1;
+            if(await damage(who, are, "75%", 'cn', ['%!hp'])) return 1;
             return 0;
         }
     },
     {
-        jpnm:'爆弾',
         name:'bomb',
+        jpnm:'爆弾',
         price:100,
         desc:'指定した人単体に、その最大体力の100%の固定貫通間接ダメージを与える。',
         flav:'エクスプローージョン！！！\n敵を確殺します。嬉しいね',
         num:1,
-
         func:async function(who,are){
             await addtext('爆発オチなんてサイテー！！');
             if(await damage(who, are, "100%", 'cn', ['%!maxhp','追撃無し',"固定","貫通"])) return 1;
@@ -1495,385 +1496,378 @@ let Tools = [
         }
     },
     {
-        jpnm:'レッドカード',
         name:'redcard',
+        jpnm:'レッドカード',
         price:35,
-        desc:'退場です。帰れ(スキップ)',
+        desc:'この次の人のターンを強制的にスキップさせます。',
+        flav:'特にファールとかをしていなくても、これを見せるだけで合法的に人を減らすことができます。うれしいね',
         num:3,
         func:async function(who,are){
             await buffadd(who, are,'skip','turn' ,1,1);
-            await addtext('カードを仕込みました!')
+            await addtext('ピピッ、レッドカードが出ました');
             return 0;
         }
     },
     {
-        jpnm:'ブルーカード',
         name:'bluecard',
+        jpnm:'ブルーカード',
         price:35,
-        desc:'リバースを召喚！このカードは相手と自分の体力を交換する！！割合だ！！！！',
+        desc:'トランプのJでも代用可。\nなぜか知らないけど青色のイメージが強い',
         num:0,
         func:async function(who, are){
-            x = who.hp/who.maxhp*are.hp;//割合交換(そのうちゲージにする時用)
-            y = are.hp/are.hp*who.maxhp;
-            are.hp = x;
-            if(are.hp < are.hp){are.hp = are.hp;}
-            who.hp = y;
-            if(who.maxhp < who.hp){who.hp = humans.players[me].maxhp;}
-            tekiou();
             await addtext('これはリバースのモニュメントか？');
+            aH = who.hp/who.maxhp * are.maxhp;//割合交換(そのうちゲージにする時用)
+            wH = are.hp/are.maxhp * who.maxhp;
+            if(await heal(who, are, aH, ["set"])) return 1;
+            if(await heal(who, who, wH, ["set"])) return 1;
+
             return 0;
         }
     },
     {
-        jpnm:'グリーンカード',
         name:'greencard',
+        jpnm:'グリーンカード',
         price:35,
         desc:'バフを2個ランダムでつける。つよい',
         num:0,
         func:async function(who,are){
-            let rbuffs = ['power','shellup','luck'];
-            rbuffs = arrayShuffle(rbuffs);
-            let buff1 = rbuffs[0];
-            let buff2 = rbuffs[1];
-            await buffadd(who, are, x, 'turn' , 3, random(1,3));
-            await buffadd(who, are, y, 'turn' , 3, random(1,3));
-            await addtext(`${humans[tcam][target].name}にバフを二個つけました！！`);
+            let buffs = arrayShuffle(['power','shellup','luck']);
+            for(let i=0; i<2; i++) await buffadd(who, are, buffs[i], 3, random(1, 3));
+            await addtext(`${are.name}に良い効果を2個つけました！！`);
             return 0;
         }
     },
     {
-        jpnm:'ブラックカード',
         name:'blackcard',
+        jpnm:'ブラックカード',
         price:35,
         desc:'デバフを2個つける。割とつよい',
         num:0,
+
         func:async function(who,are){
-            let rbuffs = ['powerdown','shelldown','poison','burn','freeze'];
-            rbuffs = arrayShuffle(rbuffs);
-            for(i = 0;i < 2;i++){
-                await buffadd(who, are,rbuffs[i], 'turn' ,3, Math.floor(Math.random()*2)+1);
-            }
-            log.textContent = humans[tcam][target].name+'にバフをニ個つけました！！';await delay(1000);
+            buffs = arrayShuffle(['powerdown','shelldown','poison','burn','freeze']);
+            for(let i=0; i<2; i++) await buffadd(who, are, buffs[i], 3, random(1, 3));
+            await addtext(`${are.name}にわるわる効果を2個つけました！！`);
             return 0;
         }
     },
 ]
 
 let Skills = [
-        {
-            type:'ex',
-            name:'null',
-            jpnm:'null',
-            desc:'何もないです。\nまあこれが店頭に並ぶこともないでしょうけどね。\nはい論破',
-            price:0,
-            no:1,
-        },
-        {//変更予定
-            type:'ex',
-            name:'',
-            jpnm:'',
-            desc:``,
-            price:50,
-            
-            exclusive:'color_slime',
-            func:async function(who){
-                return 0;
-            }
-        },
-        {
-            type:'ex',
-            name:'placeturret',
-            jpnm:'雷ちゃん、召喚',
-            desc:'タレットを1つ配置する',
-            price:95,
-            
-            func:async function(who){
-                turretPlace(cam);
-                return 0;
-            }
-        },
-        {
-            type:'ex',
-            name:'trickyvariables',
-            jpnm:'トリッキーな変数',
-            desc:'爆弾を投げる。効果はランダム',
-            price:95,
-            
-            func:async function(who){
-                let [target, tcam] = await selectSyudou();
-                await addtext(`${humans[cam][me].jpnm}は爆弾を投げた...`);
-                x = random(0,5)
-                switch(x){
-                    case 0:{
-                        await addtext('しかし不発弾だった!!');
-                        break;//これによる効果とかもあっていいかも
-                    };
-                    case 5:{
-                        await addtext('Lucky! 爆弾は焼夷弾だった!!!');
-                        break;
-                    };
-                    case 4:{
-                        await addtext('爆弾は花火だった!');
-                        break;
-                    };
-                    case 3:{
-                        await addtext('爆弾は毒ガス入りだった!!');
-                        await buffadd(who, are,'poison', 'turn' ,3,1);
-                        break; //毒ガス入りだった場合
-                    };
-                    case 2:{
-                        await addtext('爆弾はスライム入りだった!!');
-                        await buffadd(who, are,'onslime', 'turn' ,2,1);
-                        break;//スライム入りだった場合
-                    };
-                    case 1:{
-                        await addtext('爆発した..だがただの特殊な薬品だった!!');
-                        break;
-                    };
-                }
-                let result = await damage(who,are,x,'ph',4);
-                if(result == 'end'){return 1;}
-                return 0;
-            }
-        },
-        {
-            type:'ex',
-            name:'bigdiamond',
-            jpnm:'私がかけた魔法だよ',
-            desc:'敵に攻撃力の150%のダメージを与え、たまに凍らせる',
-            price:80,
-            
-            func:async function(who){
-                let [target, tcam] = await selectSyudou();
-                await addtext(
-                    arraySelect(
-                        ['こんな大きなダイアモンド見たことないでしょ？あげるね～',
-                         'あなた…それじゃあダメだよ',
-                         'ちょっとは静かになさい！',
-                         '私が誰だか知ってるの？'
-                        ]
-                    )
-                );
-                let result = await damage(who,are,1.5,'ph',4);
-                if(result == 'end'){return 1;}
-                if(Math.floor(Math.random()*2)) await buffadd(who, are,'freeze', 'turn' ,4,1)
-                return 0;
-            }
-        },
-        {
-            type:'ex',
-            name:'lightningstorm',
-            jpnm:'ライニングストーム',
-            desc:'敵全体に攻撃力の120%のダメージを与え、帯電にする\n帯電:自身の行動時自傷ダメージが入る',
-            price:60,
-            
-            func:async function(who){
-                let [target, tcam] = await selectSyudou(3);
-                let result = await damage(who,are,1.5,'ph',4);
-                if(result == 'end'){return 1;}
-                await buffadd(who, are,'elec', 'turn' ,2,1);
-                return 0;
-            }
-        },
-        {
-            type:'ex',
-            name:'kylieelison',
-            jpnm:'Kylie Eleison',
-            desc:'敵に攻撃力の200%のダメージ。もし敵の体力が70%以上ならば400%',
-            price:110,
-            
-            func:async function(who){
-                phase = 0; disappear();
-                let target = await selectSyudou();
-                x = 2;
-                if(humans[target[1]][target].hp > humans[target[1]][target].maxhp * 0.7) x = 4;
-                let result = await damage(who,target[1],target,x,'ph',4);
-                if(result == 'end'){return 1;}
-                return 0;
-            }
-        },
-        {
-            type:'ex',
-            name:'standrone',
-            jpnm:'自走式閃光ドローン',
-            desc:'敵に攻撃力の75%のダメージを与え、スタンさせる',
-            price:60,
-            
-            func:async function(who){
-                phase = 0; disappear();
-                let target = await selectSyudou();
-                let result = await damage(who,target[1],target,0.75,'ph',4);
-                if(result == 'end'){return 1;}
-                await buffadd(target[1],target,'stun', 'turn' ,1,1);
-                return 0;
-            }
-        },
-        {//仲間にした方がいいかも
-            type:'ex',
-            name:'recievechallenge',
-            jpnm:'挑戦状を受け取ってください!!',
-            desc:'敵の防御力を下げ、自身の攻撃力を上げる',
-            price:90,
-            
-            func:async function(who){
-                phase = 0; disappear();
-                let [tcam, tme] = await selectSyudou();
-                let result = await damage(who,are,0.2,'ph',4);
-                if(result == 'end'){return 1;}
-                await buffadd(who, are,'shell',3,1);
-                await buffadd(who, are,'power', 'turn' ,3,2);
-                return 0;
-            }
-        },
-        {//上に同じく
-            type:'ex',
-            name:'timedpursuit',
-            jpnm:'小心者の観測',
-            desc:'敵を弱点把握状態を付与する',
-            price:50,
-            
-            func:async function(who){
-                phase = 0; disappear();
-                let [tcam, tme] = await selectSyudou();
-                await addtext(arraySelect(['わたしはその辺の小石...','わたしのことなんて、気にしないでください...','すみません、一人にさせてください......']));
-                await buffadd(who, are,'weaknessgrasp', 'turn' ,1,1);//弱点把握状態
-                return 0;
-            },
-        },
-        //bombeはしんだよ
+    {
+        type:'ex',
+        name:'null',
+        jpnm:'null',
+        desc:'何もないです。\nまあこれが店頭に並ぶこともないでしょうけどね。\nはい論破',
+        price:0,
+        no:1,
+    },
+    {//変更予定
+        type:'ex',
+        name:'',
+        jpnm:'',
+        desc:``,
+        price:50,
         
-        // ns
-        {
-            type:'ns',
-            name:'null',
-            jpnm:'null',
-            desc:'(まじでnullです。効果無し。外れ。乙)',
-            price:0,
-            no:1,
-            cool:0
-        },
-        {
-            type:'ns',
-            name:'throwslime',
-            jpnm:'Attach!Slime!!',
-            desc:'敵にスライムをくっつける',
-            price:70,
-            
-            cool:3,
-            func:async function(who){
-                let are = selectJodou(who,'er',0);
-                await buffadd(who, are,'onslime', 'turn' ,1,1);
-                await addtext(`${are.name}にスライムが覆い被さった!`);
-                return 0;
-            }
-        },
-        {
-            type:'ns',
-            name:'throwwrench',
-            jpnm:'匙を投げる？これはレンチだよ',
-            desc:'レンチを投げる準備をし、次の攻撃が二倍になる',
-            price:70,
-            
-            cool:4,
-            func:async function(who){
-                await buffadd(who, who,'letsthrow', 'turn' ,2,1);
-                await addtext('wrenchを投げる準備ができた!');
-                return 0;
-            }
-        },
-        {
-            type:'ns',
-            name:'gambler',
-            jpnm:'かけ上手',
-            desc:'次の攻撃時に0,2,4倍の倍率がかかる',
-            price:70,
-            
-            cool:3,
-            func:async function(who){
-                await buffadd(who, who,'gambling', 'turn' ,1,1);
-                addtext('さあ、ギャンブルの時間だ!!');
-                return 0;
-            }
-        },
-        {
-            type:'ns',
-            name:'improve',
-            jpnm:'改善が必要だよ',
-            desc:'攻撃力を1.4倍に上昇させる',//変更予定,
-            price:30, //"負荷"みたいにして、stackのbuffをつけて、攻撃力を上げさせる〜とかどう？
-            
-            cool:5,
-            func:async function(who){
-                await buffadd(who, who,'improve', 'turn' ,4,1);
-                await addtext('パーツアップグレード。');
-                return 0;
-            }
-        },
-        {
-            type:'ns',
-            name:'elecbarrier',
-            jpnm:'エレクトリックバリア',
-            desc:'体力が最も低い味方に帯電バリアを付与する。\n帯電バリア:被攻撃時相手に帯電を付与する\n帯電:自身の行動時自傷ダメージが入る',
-            price:70,
-            
-            cool:3,
-            func:async function(who){
-                let are = selectJodou(who, 'phpl',0);
-                await buffadd(who, are,'elecshield', 'turn' ,2,1);
-                await addtext('帯電バリアを付与しました！');
-                return 0;
-            }
-        },
-
-        // ps
-        {
-            type:'ps',
-            name:'null',
-            jpnm:'null',
-            desc:'(まじでnullです。効果無し。外れ。乙)',
-            price:0,
-            no:1,
-        },
-        {
-            type:'ps',
-            name:'sthree',
-            jpnm:'DoYourBest!!',
-            desc:'slash時、たまに3回攻撃する',
-            price:90,
-            
-        },
-        {
-            type:'ps',
-            name:'solplaceturret',
-            jpnm:'雷ちゃん、もうちょっと',
-            desc:'slash of light命中時、タレットを1つ配置する',
-            price:90,
-            
-        },
-        {
-            type:'ps',
-            name:'highsol',
-            jpnm:'生粋の勝負師',
-            desc:'slash of lightの命中率が下がるが、命中時3倍のダメージ',
-            price:90,
-            
-        },
-        {
-            type:'ps',
-            name:'enemy50%pursuit',
-            jpnm:'一度限りの取引',
-            desc:'攻撃によって敵の体力を50%以下だった場合、攻撃力の70%で追撃する',
-            price:70,
-            
-        },
-        {
-            type:'ps',
-            name:'elecshock',
-            jpnm:'エレクトリック衝撃',
-            desc:'会心時、相手に帯電を付与する。\n帯電:自身の行動時自傷ダメージが入る',
-            price:90,
-            
+        exclusive:'color_slime',
+        func:async function(who){
+            return 0;
         }
+    },
+    {
+        type:'ex',
+        name:'placeturret',
+        jpnm:'雷ちゃん、召喚',
+        desc:'タレットを1つ配置する',
+        price:95,
+        
+        func:async function(who){
+            turretPlace(cam);
+            return 0;
+        }
+    },
+    {
+        type:'ex',
+        name:'trickyvariables',
+        jpnm:'トリッキーな変数',
+        desc:'爆弾を投げる。効果はランダム',
+        price:95,
+        
+        func:async function(who){
+            let [target, tcam] = await selectSyudou();
+            await addtext(`${humans[cam][me].jpnm}は爆弾を投げた...`);
+            x = random(0,5)
+            switch(x){
+                case 0:{
+                    await addtext('しかし不発弾だった!!');
+                    break;//これによる効果とかもあっていいかも
+                };
+                case 5:{
+                    await addtext('Lucky! 爆弾は焼夷弾だった!!!');
+                    break;
+                };
+                case 4:{
+                    await addtext('爆弾は花火だった!');
+                    break;
+                };
+                case 3:{
+                    await addtext('爆弾は毒ガス入りだった!!');
+                    await buffadd(who, are,'poison', 'turn' ,3,1);
+                    break; //毒ガス入りだった場合
+                };
+                case 2:{
+                    await addtext('爆弾はスライム入りだった!!');
+                    await buffadd(who, are,'onslime', 'turn' ,2,1);
+                    break;//スライム入りだった場合
+                };
+                case 1:{
+                    await addtext('爆発した..だがただの特殊な薬品だった!!');
+                    break;
+                };
+            }
+            let result = await damage(who,are,x,'ph',4);
+            if(result == 'end'){return 1;}
+            return 0;
+        }
+    },
+    {
+        type:'ex',
+        name:'bigdiamond',
+        jpnm:'私がかけた魔法だよ',
+        desc:'敵に攻撃力の150%のダメージを与え、たまに凍らせる',
+        price:80,
+        
+        func:async function(who){
+            let [target, tcam] = await selectSyudou();
+            await addtext(
+                arraySelect(
+                    ['こんな大きなダイアモンド見たことないでしょ？あげるね～',
+                        'あなた…それじゃあダメだよ',
+                        'ちょっとは静かになさい！',
+                        '私が誰だか知ってるの？'
+                    ]
+                )
+            );
+            let result = await damage(who,are,1.5,'ph',4);
+            if(result == 'end'){return 1;}
+            if(Math.floor(Math.random()*2)) await buffadd(who, are,'freeze', 'turn' ,4,1)
+            return 0;
+        }
+    },
+    {
+        type:'ex',
+        name:'lightningstorm',
+        jpnm:'ライニングストーム',
+        desc:'敵全体に攻撃力の120%のダメージを与え、帯電にする\n帯電:自身の行動時自傷ダメージが入る',
+        price:60,
+        
+        func:async function(who){
+            let [target, tcam] = await selectSyudou(3);
+            let result = await damage(who,are,1.5,'ph',4);
+            if(result == 'end'){return 1;}
+            await buffadd(who, are,'elec', 'turn' ,2,1);
+            return 0;
+        }
+    },
+    {
+        type:'ex',
+        name:'kylieelison',
+        jpnm:'Kylie Eleison',
+        desc:'敵に攻撃力の200%のダメージ。もし敵の体力が70%以上ならば400%',
+        price:110,
+        
+        func:async function(who){
+            phase = 0; disappear();
+            let target = await selectSyudou();
+            x = 2;
+            if(humans[target[1]][target].hp > humans[target[1]][target].maxhp * 0.7) x = 4;
+            let result = await damage(who,target[1],target,x,'ph',4);
+            if(result == 'end'){return 1;}
+            return 0;
+        }
+    },
+    {
+        type:'ex',
+        name:'standrone',
+        jpnm:'自走式閃光ドローン',
+        desc:'敵に攻撃力の75%のダメージを与え、スタンさせる',
+        price:60,
+        
+        func:async function(who){
+            phase = 0; disappear();
+            let target = await selectSyudou();
+            let result = await damage(who,target[1],target,0.75,'ph',4);
+            if(result == 'end'){return 1;}
+            await buffadd(target[1],target,'stun', 'turn' ,1,1);
+            return 0;
+        }
+    },
+    {//仲間にした方がいいかも
+        type:'ex',
+        name:'recievechallenge',
+        jpnm:'挑戦状を受け取ってください!!',
+        desc:'敵の防御力を下げ、自身の攻撃力を上げる',
+        price:90,
+        
+        func:async function(who){
+            phase = 0; disappear();
+            let [tcam, tme] = await selectSyudou();
+            let result = await damage(who,are,0.2,'ph',4);
+            if(result == 'end'){return 1;}
+            await buffadd(who, are,'shell',3,1);
+            await buffadd(who, are,'power', 'turn' ,3,2);
+            return 0;
+        }
+    },
+    {//上に同じく
+        type:'ex',
+        name:'timedpursuit',
+        jpnm:'小心者の観測',
+        desc:'敵を弱点把握状態を付与する',
+        price:50,
+        
+        func:async function(who){
+            phase = 0; disappear();
+            let [tcam, tme] = await selectSyudou();
+            await addtext(arraySelect(['わたしはその辺の小石...','わたしのことなんて、気にしないでください...','すみません、一人にさせてください......']));
+            await buffadd(who, are,'weaknessgrasp', 'turn' ,1,1);//弱点把握状態
+            return 0;
+        },
+    },
+    //bombeはしんだよ
+    
+    // ns
+    {
+        type:'ns',
+        name:'null',
+        jpnm:'null',
+        desc:'(まじでnullです。効果無し。外れ。乙)',
+        price:0,
+        no:1,
+        cool:0
+    },
+    {
+        type:'ns',
+        name:'throwslime',
+        jpnm:'Attach!Slime!!',
+        desc:'敵にスライムをくっつける',
+        price:70,
+        
+        cool:3,
+        func:async function(who){
+            let are = selectJodou(who,'er',0);
+            await buffadd(who, are,'onslime', 'turn' ,1,1);
+            await addtext(`${are.name}にスライムが覆い被さった!`);
+            return 0;
+        }
+    },
+    {
+        type:'ns',
+        name:'throwwrench',
+        jpnm:'匙を投げる？これはレンチだよ',
+        desc:'レンチを投げる準備をし、次の攻撃が二倍になる',
+        price:70,
+        
+        cool:4,
+        func:async function(who){
+            await buffadd(who, who,'letsthrow', 'turn' ,2,1);
+            await addtext('wrenchを投げる準備ができた!');
+            return 0;
+        }
+    },
+    {
+        type:'ns',
+        name:'gambler',
+        jpnm:'かけ上手',
+        desc:'次の攻撃時に0,2,4倍の倍率がかかる',
+        price:70,
+        
+        cool:3,
+        func:async function(who){
+            await buffadd(who, who,'gambling', 'turn' ,1,1);
+            addtext('さあ、ギャンブルの時間だ!!');
+            return 0;
+        }
+    },
+    {
+        type:'ns',
+        name:'improve',
+        jpnm:'改善が必要だよ',
+        desc:'攻撃力を1.4倍に上昇させる',//変更予定,
+        price:30, //"負荷"みたいにして、stackのbuffをつけて、攻撃力を上げさせる〜とかどう？
+        
+        cool:5,
+        func:async function(who){
+            await buffadd(who, who,'improve', 'turn' ,4,1);
+            await addtext('パーツアップグレード。');
+            return 0;
+        }
+    },
+    {
+        type:'ns',
+        name:'elecbarrier',
+        jpnm:'エレクトリックバリア',
+        desc:'体力が最も低い味方に帯電バリアを付与する。\n帯電バリア:被攻撃時相手に帯電を付与する\n帯電:自身の行動時自傷ダメージが入る',
+        price:70,
+        
+        cool:3,
+        func:async function(who){
+            let are = selectJodou(who, 'phpl',0);
+            await buffadd(who, are,'elecshield', 'turn' ,2,1);
+            await addtext('帯電バリアを付与しました！');
+            return 0;
+        }
+    },
+
+    // ps
+    {
+        type:'ps',
+        name:'null',
+        jpnm:'null',
+        desc:'(まじでnullです。効果無し。外れ。乙)',
+        price:0,
+        no:1,
+    },
+    {
+        type:'ps',
+        name:'sthree',
+        jpnm:'DoYourBest!!',
+        desc:'slash時、たまに3回攻撃する',
+        price:90,
+        
+    },
+    {
+        type:'ps',
+        name:'solplaceturret',
+        jpnm:'雷ちゃん、もうちょっと',
+        desc:'slash of light命中時、タレットを1つ配置する',
+        price:90,
+        
+    },
+    {
+        type:'ps',
+        name:'highsol',
+        jpnm:'生粋の勝負師',
+        desc:'slash of lightの命中率が下がるが、命中時3倍のダメージ',
+        price:90,
+        
+    },
+    {
+        type:'ps',
+        name:'enemy50%pursuit',
+        jpnm:'一度限りの取引',
+        desc:'攻撃によって敵の体力を50%以下だった場合、攻撃力の70%で追撃する',
+        price:70,
+        
+    },
+    {
+        type:'ps',
+        name:'elecshock',
+        jpnm:'エレクトリック衝撃',
+        desc:'会心時、相手に帯電を付与する。\n帯電:自身の行動時自傷ダメージが入る',
+        price:90,
+        
+    }
 ]
 
 let Stages = [
