@@ -862,8 +862,9 @@ document.addEventListener('keydown', async function(e){
 })
 //#endregion
 
+const context = {};
 
-//#region ゲーム開始時ログインの動き\
+//#region ゲーム開始時ログインの動き
 let firebaseConfig = {
     apiKey: "AIzaSyBN5V_E6PzwlJn7IwVsluKIWNIyathhxj0",
     authDomain: "koppepan-orange.firebaseapp.com",
@@ -1088,7 +1089,7 @@ let FriC = {
 }
 let FriF = {};
 FriF.narabe = () => {
-    let collator = new Intl.Collator('ja', { usage: 'sort', sensitivity: 'variant' });
+    let collator = new Intl.Collator('ja', {usage:'sort', sensitivity:'variant'});
 
     let sorted = [...Friends].sort((a, b) => {
         let ra = (a.ruby || '').normalize('NFKC').replace(/[\u3000\s]+/g, '');
@@ -1300,14 +1301,14 @@ let dunC = {
     // mases:[],
     backM:[],
     objs:[],
+    loop:0,
+    stage: "草原",
+    floor:0
 }
 let dunF = {};
 dunF.load = () => {
     dunF.resize();
 }
-
-let stage = "草原";
-let floor = 0;
 
 dunF.resize = () => { 
     let wid = window.innerWidth * 0.8;
@@ -1319,21 +1320,20 @@ document.addEventListener('resize', dunF.resize);
 
 dunF.select = async() => {
     let div0 = document.createElement('div');
-    div0.className = 'dun_select';
+    div0.className = 'dun_select stage';
     document.body.appendChild(div0);
     
     let stage0 = await new Promise(solve => {
         function clicked(e){
             let div = e.target;
             let name = div.classList[1];
-            console.log(name);
             div0.remove();
             solve(name)
         }
 
         for(let ma of Stages.filter(a => !a.no)){
             let div = document.createElement('div');
-            div.className = 'item';
+            div.className = `item ${ma.name}`;
             div.textContent = ma.name;
 
             let img = document.createElement('img');
@@ -1346,11 +1346,11 @@ dunF.select = async() => {
     })
     
     if(!stage0) return console.log(`stageが "${stage0}" でした。なにこれ`);
-    stage = stage0;
+    dunC.stage = stage0;
     
     let chara = await new Promise(solve => {
         let div0 = document.createElement('div');
-        div0.className = 'dun_select';
+        div0.className = 'dun_select chara';
         document.body.appendChild(div0);
         
         function clicked(ev){
@@ -1361,7 +1361,7 @@ dunF.select = async() => {
             solve(name);
         }
         
-        let chas = Charas.filter(a => a.able);
+        let chas = Charas.filter(a => !a.no);
         for(let data of chas){
             let div = document.createElement('div');
             div.className = `item ${data.name}`;
@@ -1378,20 +1378,24 @@ dunF.select = async() => {
             div0.appendChild(div);
         }
     })
-    if(isNaN(id)) return;
-    console.log(id)
-    let p = makePlayer(0, id);
+    if(!chara) return console.log(`charaが "${chara}" でした。なんですか？これ`);
+    let p = makePlayer(0, chara);
     humans.push(p);
 
     batC.now = 1;
 
-    
-    makePlayer(0, 0);
-
     AreF.move('dungeon');
+
+    //はじまりはじまり～
+    let cd = Charas.find(a => a.name == chara);
+    addob("player", 0, 0, 1, 1, 1, 90, [], {img:cd.img});
+    dunC.loop = 1;
+
+    await nextStage(dunC.stage);
+    dunF.gameloop();
 }
 
-async function pUpdate(){
+dunF.update = async() => {
     let p = dunF.get();
     if(p.moving) return;
     
@@ -1467,7 +1471,7 @@ dunF.draw = async() => {
     //background、そのまま背景
     for(let y=0; y<dunC.row; y++){
         for(let x=0; x<dunC.row; x++){
-            let img = images['maps'][stage][dunC.backM[y][x]];
+            let img = images['maps'][dunC.stage][dunC.backM[y][x]];
             // console.log  (img)
             dunC.ctx.drawImage(img, x*dunC.mas, y * dunC.mas, dunC.mas, dunC.mas);
         }
@@ -1479,7 +1483,7 @@ dunF.draw = async() => {
         let obs = dunC.objM[y][x];
         if(obs.id == 0) continue;
 
-        let belong = stage;
+        let belong = dunC.stage;
         let src = obs.id;
         if(obs.id == 'enemy') belong = 'enemies', src = obs.data.name;
         if('used' in obs.data) src += obs.data.used ? '_off' : '_on';
@@ -1497,7 +1501,6 @@ dunF.draw = async() => {
         if(obs.id == 0) continue;
         // console.log(`id:: ${obs.id}, stage:: ${obs.stage}`)
         
-        
         let sta = obs.stage;
         let src = obs.id;
         let bel = "maps";
@@ -1507,10 +1510,11 @@ dunF.draw = async() => {
         if('type' in obs.data) src += `_${obs.data.type}`;
         if('used' in obs.data) src += obs.data.used ? '_off' : '_on';
 
+        // console.log(`assets/${bel}/${src}.png`);
         let img;
         if(bel == 'maps' || bel == 'enemies') img = images[bel][sta][src].cloneNode();
         else img = images[bel][src].cloneNode();
-         if(!img) console.log(`assets/${sta}/${src}.png is not found.`), img = images['systems']['error'];
+         if(!img) console.log(`assets/${bel}/(${sta}/)${src}.png is not found.`), img = images['systems']['error'];
         if(img) dunC.ctx.drawImage(img, obs.ox, obs.oy, obs.w, obs.h);
 
         // await delay(2)
@@ -1618,8 +1622,14 @@ dunF.over = (a, b) => {
     return overlapX && overlapY;
 }
 
+dunF.gameloop = async() => {
+    dunF.update();
+    dunF.draw();
+    if(dunC.loop) requestAnimationFrame(dunF.gameloop);
+}
+
 function nextFloor(){
-    floor += 1;
+    dunC.floor += 1;
 
     mapMake();
     dunF.draw()
@@ -1635,7 +1645,7 @@ function mapMake(code){
             let scores = {};
 
             // 各タイルの初期スコアをセット
-            let dataS = Stages.find(a => a.name == stage);
+            let dataS = Stages.find(a => a.name == dunC.stage);
             dataS.tiles.forEach(type => scores[type] = basescore);
 
             // 左と上のマスに同じタイルがあったらスコア加算
@@ -1658,12 +1668,14 @@ function mapMake(code){
         }
     }
 
-    dunC.objs = [];
+    // dunC.objs = [];
+    dunC.objs.length = 1; //playerだけのこす
 
     let mas = dunC.mas;
-    let max = random(dunC.row*2, dunC.row**2-dunC.row); //この数字だけどうにかしよう。
+    let max = random(5, 10)
+    // let max = random(dunC.row*2, dunC.row**2-dunC.row); //この数字だけどうにかしよう。
     // let obsList = JSON.parse(JSON.stringify(obsAll[stage])); //copy
-    let obsList = copy(Objects.filter(a => (a.in == stage || a.in == 'すべて') && !a.no));
+    let obsList = copy(Objects.filter(a => (a.in == dunC.stage || a.in == 'すべて') && !a.no));
     // console.log(obsList);
     for(let i=0; i<max; i++){
         let data = {};
@@ -1679,7 +1691,7 @@ function mapMake(code){
         if(obs.n != 0 && sude.length+1 >= obs.n) obsList.splice(obsInd, 1); // 重複できない子なら消し去る
 
         if(obs.name == 'enemy'){
-            let arr = Enemies.filter(a => a.ins.includes(stage) || a.ins == 'すべて');
+            let arr = Enemies.filter(a => a.ins.includes(dunC.stage) || a.ins == 'すべて');
             // let data0 = arrayGacha(arr, arr.map(a => a.p))
             let data0 = arraySelect(arr);
             //  console.log(data0)
@@ -1705,13 +1717,13 @@ function mapMake(code){
         addob(obs.name, obx, oby, mas, mas, obs.s, 90, obs.ables, data);
     }
 
-    // MAPx = dunC.objMnum[stage-1].split('.');
+    // MAPx = dunC.objMnum[dunC.stage-1].split('.');
     // MAPy = +MAPx[1]+1
     // MAPx = +MAPx[0]
     // dunC.objM = dunC.objMs[Math.floor(Math.random() *    MAPy)+MAPx];
     // dunC.objM = JSON.parse(JSON.stringify(dunC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
 
-    // if(stage == 1){
+    // if(dunC.stage == 1){
     //     if(fun == 23 && probb(10)){
     //         dunC.backM = dunC.backMs[4];
     //         dunC.objM = dunC.objMs[6];
@@ -1719,7 +1731,7 @@ function mapMake(code){
     //         dunC.backM = dunC.backMs[5];
     //         dunC.objM = dunC.objMs[7];
     //     };
-    // }else if(stage == 2){
+    // }else if(dunC.stage == 2){
     //     if(fun == 68 && probb(10)){
     //         dunC.backM = dunC.backMs[11];
     //         dunC.objM = dunC.objMs[14];
@@ -1729,7 +1741,7 @@ function mapMake(code){
     //         dunC.objM = dunC.objMs[23];
     //         dunC.objM = JSON.parse(JSON.stringify(dunC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
     //     };
-    // }else if(stage == 3){
+    // }else if(dunC.stage == 3){
     //     if(fun == 68 && probb(10)){
     //         dunC.backM = dunC.backMs[18];
     //         dunC.objM = dunC.objMs[22];
@@ -1740,9 +1752,9 @@ function mapMake(code){
     //         dunC.objM = JSON.parse(JSON.stringify(dunC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
     //     };
     // }
-    // if(stage == 1 && floor >= 10){SELECTx = 150;SELECTy = 525;dunC.backM = dunC.backMs[6];dunC.objM = dunC.objMs[8]}; //創生黎明の原野
-    // if(stage == 2 && floor >= 7 ){SELECTx = 150;SELECTy = 525;dunC.backM = dunC.backMs[13];dunC.objM = dunC.objMs[16]}; //ガチェンレイゲスドゥールラート(昼)
-    // if(stage == 3 && floor >= 3 ){SELECTx = 150;SELECTy = 525;dunC.backM = dunC.backMs[20];dunC.objM = dunC.objMs[24]}; //ガチェンレイゲスドゥールラート(夜)
+    // if(dunC.stage == 1 && dunC.floor >= 10){SELECTx = 150;SELECTy = 525;dunC.backM = dunC.backMs[6];dunC.objM = dunC.objMs[8]}; //創生黎明の原野
+    // if(dunC.stage == 2 && dunC.floor >= 7 ){SELECTx = 150;SELECTy = 525;dunC.backM = dunC.backMs[13];dunC.objM = dunC.objMs[16]}; //ガチェンレイゲスドゥールラート(昼)
+    // if(dunC.stage == 3 && dunC.floor >= 3 ){SELECTx = 150;SELECTy = 525;dunC.backM = dunC.backMs[20];dunC.objM = dunC.objMs[24]}; //ガチェンレイゲスドゥールラート(夜)
 }
 
 function addob(id, mx, my, w, h, spd, dir, ables, data){
@@ -1755,7 +1767,7 @@ function addob(id, mx, my, w, h, spd, dir, ables, data){
         id: id,
         //cam: cam,
         me: dunC.objs.length,
-        stage: stage,
+        stage: dunC.stage,
         x: mx,
         y: my,
         sx: mx*dunC.mas,
@@ -1774,18 +1786,18 @@ function addob(id, mx, my, w, h, spd, dir, ables, data){
     dunC.objs.push(ob);
 }
 
-function nextStage(){
-    let mts = stage; //moto stage
+function nextStage(kakutey = null){
+    let mts = dunC.stage; //moto stage
 
-    let arr = Stages.map(a => a.name);
-    while(mts == stage){
-        // 1~3の間でランダムにステージを決定
-        let arr = Stages.map(a => a.name);
-        stage = arraySelect(arr);
+    let arr = Stages.filter(a => !a.no).map(a => a.name);
+    while(mts == dunC.stage || !kakutey){
+        // ランダムにステージを決定
+        dunC.stage = arraySelect(arr);
     }
-    console.log(`れっつら ${stage}`);
+    if(kakutey) dunC.stage = kakutey;
+    console.log(`れっつら ${dunC.stage}`);
 
-    floor = 0;
+    dunC.floor = 0;
     nextFloor();
 }
 //#endregion
@@ -3258,7 +3270,8 @@ let loaC = {
     imgD: 0,
     souT: 0,
     souD: 0,
-    erd: 0
+    erd: 0,
+    deep:0
 }
 let loaF = {};
 loaC.imgL = {
@@ -3274,7 +3287,7 @@ loaF.load = async() => {
     else '終わり'
 }
 loaF.loadI = async() => {
-    let stas0 = Stages.map(a => a.name);
+    let stas0 = Stages.filter(a => !a.no).map(a => a.name);
     let stas = stas0.concat(['すべて']);
     
     loaC.imgL.maps = {};
@@ -3302,11 +3315,29 @@ loaF.loadI = async() => {
             
             if(sta != 'すべて') loaC.imgL.enemies[sta].push(name);
             else for(let sta2 of stas0) loaC.imgL.enemies[sta2].push(name);
-    });
-
+        });
     }
-    // loaC.imgL.enemies = [];
+
+    loaC.imgL.charas = [];
+    for(let ch of Charas){
+        let toku = 0;
+        if(ch.name == "color_slime") toku = 1;
+        if(toku == 0){
+            let img = `${ch.img}`;
+            loaC.imgL.charas.push(img);
+        }
+        else{
+            switch(ch.name){
+                case "color_slime":
+                    for(let c of ch.data.colors){
+                        let img = `${ch.data.colorp}${c}`;
+                        loaC.imgL.charas.push(img);
+                    }
+            }
+        }
+    }
     
+
     // console.log('LETS GOOOOOOOOOOO!!')
     let T1 = (Tk) => {
         let Tv = loaC.imgL[Tk];
@@ -3320,9 +3351,7 @@ loaF.loadI = async() => {
         }
     }
 
-    let yomikomar = 0;
     let loaloa = async(arr, route) => {
-        yomikomar += 1;
         // console.log("Arrayでした lets 読み込み")
         let src = "assets/images/";
         for(let r of route) src += `${r}/`;
@@ -3346,26 +3375,20 @@ loaF.loadI = async() => {
         // console.log(route);
         // console.log(images);
 
-        // return console.log('強制終了'), '強制終了'
-
-        let numm = 0;
         let all = arr.length;
-        // console.error(`--- ${route.join('/')}:${all} ---`)
+        console.error(`--- ${route.join('/')}:${all} ---`)
         for(let mono of arr){
             // console.log(mono);
-            numm += 1;
             let img = new Image();
             img.src = `${src}${mono}.png`;
             img.onload = () => {
                 yomi(mono, img);
             }
 
-            let erd = 0;
-
             img.onerror = () => {
                 console.error(`Image ${src}${mono}.png failed to load.`);
                 loaC.erd += 1;
-                 if(loaC.erd > 20) return console.error('さすがにやりすぎbonus'), loaC.kokokomai = 32,  1;
+                 if(loaC.erd > 50) return console.error('さすがにやりすぎbonus'), loaC.kokokomai = 32
                 img.src = `assets/images/systems/error.png`;
                 yomi(mono, img);
                 erd = 1
@@ -3379,21 +3402,22 @@ loaF.loadI = async() => {
     // let gensho = Object.keys(loaC.imgL);
     let loaloa0 = async(mono, route = []) => {
         let sink = route.length ? 1 : 0
-        // if(sink) console.log("not Arrayでした lets 再帰");
-        
-        // console.log("[loaloa0] route:[" + route + "]");
+        if(sink) console.log("not Arrayでした lets 再帰");
+        let hzd = loaC.deep;
+        console.log("[loaloa0] route:[" + route + "]");
         // console.log('次:monoです')
         // console.log(mono)
         for(let key in mono){
-            // console.log(`key:${key} (all:[${Object.keys(mono)}])`)
+            console.log(`key:${key} (all:[${Object.keys(mono)}])`)
             if(key == 'すべて'){
-                // console.error('"すべて"だったのでスキップ');
+                console.error('"すべて"だったのでスキップ');
                 route.pop()
                 continue;
             }
 
             route.push(key);
-            // console.log("[loaloa0ed] route:[" + route + "]");
+            loaC.deep += 1;
+            console.log(`[loaloa0ed] route:[${route}]`);
             
             let val = mono[key]??null;
             if(!val) return console.error('↓↓null↓↓'), console.log(tar), console.log(mono), console.log(key), console.error('↑↑null↑↑');
@@ -3402,12 +3426,16 @@ loaF.loadI = async() => {
             // console.log("↑Arrayかな? 結果 => "+Array.isArray(val));
             if(Array.isArray(val)){
                 if(await loaloa(val, route)) return console.error('南ノ南');
-                route.pop()
-                // console.log(`帰還成功、${route.pop()}を排除`)
+                let pop = route.pop()
+                console.log(`帰還成功、${pop}を排除`)
+                loaC.deep -= 1;
+                console.log("深度", loaC.deep)
             }//arrayなら => ロードへ
             else await loaloa0(val, route); //まだオブジェクトなら => もっかい
         }
-
+        route.pop();
+        loaC.deep -= 1;
+        console.log("深度2", loaC.deep)
     }
 
     loaloa0(loaC.imgL);

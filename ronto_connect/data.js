@@ -156,8 +156,13 @@ let Charas = [
 
     {
         name:'color_slime',
-        jpnm:'color_slime',
+        jpnm:'ファン・ボイ・チャウ',
         img:'color_slime_green',
+        data:{
+            colorp:"color_slime_",
+            color0:"green",
+            colors:["green", "black", "blue", "purple", "red", "white", "yellow"]
+        },
         desc:'スライム。...まだできてないから使わない方が吉',
         ex:'null',
         ns:'null',
@@ -1498,7 +1503,7 @@ let Tools = [
     {
         name:'redcard',
         jpnm:'レッドカード',
-        price:35,
+        price:60,
         desc:'この次の人のターンを強制的にスキップさせます。',
         flav:'特にファールとかをしていなくても、これを見せるだけで合法的に人を減らすことができます。うれしいね',
         num:3,
@@ -1511,7 +1516,7 @@ let Tools = [
     {
         name:'bluecard',
         jpnm:'ブルーカード',
-        price:35,
+        price:60,
         desc:'トランプのJでも代用可。\nなぜか知らないけど青色のイメージが強い',
         num:0,
         func:async function(who, are){
@@ -1527,7 +1532,7 @@ let Tools = [
     {
         name:'greencard',
         jpnm:'グリーンカード',
-        price:35,
+        price:60,
         desc:'バフを2個ランダムでつける。つよい',
         num:0,
         func:async function(who,are){
@@ -1540,7 +1545,7 @@ let Tools = [
     {
         name:'blackcard',
         jpnm:'ブラックカード',
-        price:35,
+        price:60,
         desc:'デバフを2個つける。割とつよい',
         num:0,
 
@@ -1562,7 +1567,8 @@ let Skills = [
         price:0,
         no:1,
     },
-    {//変更予定
+    {
+        //変更予定
         type:'ex',
         name:'',
         jpnm:'',
@@ -1883,6 +1889,7 @@ let Stages = [
         tiles: ['b','c','d'],
     },
     {
+        no:1,
         name:'遊園地',
         jpnm:'油淋鶏',
         tiles: ['c','d'],   

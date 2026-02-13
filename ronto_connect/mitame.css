@@ -800,7 +800,7 @@ img{
     justify-content: flex-start;
     align-items: center;
     gap: 20px;
-    width: 60%;
+    width: 75%;
     height: 70%;
     position: fixed;
     top: 50%;
@@ -808,6 +808,15 @@ img{
     transform: translate(-50%, -50%);
     box-sizing: border-box;
     z-index: 20;
+}
+.dun_select.chara{
+    display: grid;
+    align-content: start;
+    justify-content: center;
+    justify-items: center;
+    align-items: start;
+    grid-template-columns: repeat(3, 1fr);
+    width: 75%;
 }
 .dun_select .item{
     display: flex;
@@ -826,7 +835,10 @@ img{
     cursor: pointer;
     box-sizing: border-box;
 }
-.dun_select .item img{
+.dun_select.chara .item{
+    aspect-ratio: 3/2;
+}
+.dun_select.stage .item img{
     width: 100%;
     height: auto;
     object-fit: contain;
@@ -835,6 +847,22 @@ img{
     left: 0;
     box-sizing: border-box;
     z-index: -1;
+}
+.dun_select.chara .item img{
+    height: 100%;
+    aspect-ratio: 1/1;
+    object-fit: contain;
+    position: absolute;
+    top: 10%;
+    right: 0;
+    box-sizing: border-box;
+    z-index: -1;
+}
+.dun_select.chara .item span{
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    font-size: 14px;
 }
 /* #endregion */
 
