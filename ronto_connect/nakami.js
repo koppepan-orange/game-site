@@ -1506,7 +1506,7 @@ dunF.draw = async() => {
         let bel = "maps";
         
         if(obs.id == 'player') bel = 'charas', src = obs.data.img;
-        if(obs.id == 'enemy') bel = 'enemies', src = obs.data.name, console.log(obs.data.name);
+        if(obs.id == 'enemy') bel = 'enemies', src = obs.data.name;
         if('type' in obs.data) src += `_${obs.data.type}`;
         if('used' in obs.data) src += obs.data.used ? '_off' : '_on';
 
