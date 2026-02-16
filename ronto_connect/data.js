@@ -87,6 +87,7 @@ let Status = [
         desc:"キャラクターの最大魔力を示します",
         bas:50,
     },
+    
     {
         name:"crla",
         jpnm:"会心率",
@@ -111,11 +112,6 @@ let Status = [
         jpnm:"速度",
         desc:"行動速度のあれ。計算がむずい",
         bas:50
-    },
-    {
-        name:"epa",
-        jpnm:"ep増加量",
-        desc:"EXを使うための..やつの増加量の基礎。"
     },
     {
         name:"dodge",
@@ -146,9 +142,9 @@ let Charas = [
         mdef:0,
         maxhp:100,
         maxmp:50,
-        critlate:5,
-        critdmg:1.5,
-        critresist:0,
+        crla:5,
+        crdm:1.5,
+        crrs:0,
         speed:50,
         buttonsolid:'#000000',
         buttonback:'#999999',
@@ -173,9 +169,9 @@ let Charas = [
         mdef:0,
         maxhp:100,
         maxmp:50,
-        critlate:0,
-        critdmg:1.5,
-        critresist:'absolute',
+        crla:0,
+        crdm:1.5,
+        crrs:'absolute',
         speed:35,
         buttonsolid:'#000000',
         buttonback:'#999999',
@@ -195,9 +191,9 @@ let Charas = [
         mdef:20,
         maxhp:25,
         maxmp:30,
-        critlate:7,
-        critdmg:2.0,
-        critresist:0,
+        crla:7,
+        crdm:2.0,
+        crrs:0,
         speed:65,
         buttonsolid:'#ff7373',
         buttonback:'#fcffc0',
@@ -217,9 +213,9 @@ let Charas = [
         mdef:0,
         maxhp:100,
         maxmp:50,
-        critlate:9,
-        critdmg:3.0,//...ちょまってこれ大丈夫かな
-        critresist:10,
+        crla:9,
+        crdm:3.0,//...ちょまってこれ大丈夫かな
+        crrs:10,
         speed:40,
         buttonsolid:'#ffacf9',
         buttonback:'#acf8ff',
@@ -239,9 +235,9 @@ let Charas = [
         mdef:20,
         maxhp:40,
         maxmp:100,
-        critlate:5,
-        critdmg:2.0,
-        critresist:5,
+        crla:5,
+        crdm:2.0,
+        crrs:5,
         speed:60,
         buttonsolid:'#7f1184',
         buttonback:'#5f4894',
@@ -419,12 +415,12 @@ let Buffs = [
             {
                 power:'+1.0',
                 speed:'+20.0',
-                critlate:'-5.0'
+                crla:'-5.0'
             },
             {
                 power: '+1.5',
                 speed: '+25.0',
-                critlate: '+-6.5'
+                crla: '+-6.5'
             }
         ],
         max:2
@@ -1148,7 +1144,7 @@ let Equips = {
             ap:0,
             ce:1,
             bFunc:{ //攻撃前の効果
-                critlate: 70,
+                crla: 70,
             }
         },
         {
@@ -1169,7 +1165,7 @@ let Equips = {
             ap:0,
             ce:1,
             bFunc:{
-                critdmg: 4.0,
+                crdm: 4.0,
             }
         },
         {
@@ -1181,7 +1177,7 @@ let Equips = {
             ap:0,
             ce:1,
             bFunc:{
-                critlate: 10,
+                crla: 10,
             }
         },
 
@@ -1239,7 +1235,7 @@ let Equips = {
             ap:0,
             ce:1,
             bFunc:{
-                critlate: 60
+                crla: 60
             }
         },
     ],
@@ -2186,9 +2182,9 @@ let Enemies = [
         maxmp:'0',
         matk:'0',
         mdef:'-30',
-        critlate:'=absolute',
-        critdmg:'=0',
-        critresist:'=absolute',
+        crla:'=absolute',
+        crdm:'=0',
+        crrs:'=absolute',
         speed:'40',
         acts:[
             {
@@ -2227,9 +2223,9 @@ let Enemies = [
         maxmp:'0',
         matk:'+0',
         mdef:'+0',
-        critlate:'+30',
-        critdmg:'+0.5',
-        critresist:'+0',
+        crla:'+30',
+        crdm:'+0.5',
+        crrs:'+0',
         speed:'75',
         acts:[
             {
@@ -2268,9 +2264,9 @@ let Enemies = [
         maxmp:'=0',
         matk:'+0',
         mdef:'+0',
-        critlate:'+0',
-        critdmg:'+0',
-        critresist:'+0',
+        crla:'+0',
+        crdm:'+0',
+        crrs:'+0',
         speed:'60',
         acts:[
             {
@@ -2325,9 +2321,9 @@ let Enemies = [
         maxmp:'=0',
         matk:'+0',
         mdef:'+15',
-        critlate:'+0',
-        critdmg:'+0.5',
-        critresist:'+10',
+        crla:'+0',
+        crdm:'+0.5',
+        crrs:'+10',
         speed:'50',
         acts:[
             {
@@ -2378,9 +2374,9 @@ let Enemies = [
         maxmp:'0',
         matk:'+0',
         mdef:'+0',
-        critlate:'+0',
-        critdmg:'+0.5',
-        critresist:'+10',
+        crla:'+0',
+        crdm:'+0.5',
+        crrs:'+10',
         speed:'50',
         acts:[
             {
@@ -2428,7 +2424,7 @@ let Prefixes = [
         jpnm:'ギャンブラーな',
         rare:1,
         effects:{
-            critlate: '+4',
+            crla: '+4',
             maxhp: '=200%'
         }
     },
@@ -2437,7 +2433,7 @@ let Prefixes = [
         jpnm:'守りが固い',
         rare:2,
         effects:{
-            critresist: '+5',
+            crrs: '+5',
             maxhp: '=125%',
             atk: '=30%',
             def: '=150%',
@@ -2448,8 +2444,8 @@ let Prefixes = [
         jpnm:'心眼持ちの',
         rare:3,
         effects:{
-            critlate: '=100',
-            critdmg: '=120',
+            crla: '=100',
+            crdm: '=120',
             atk: '=30%',
         }
     },

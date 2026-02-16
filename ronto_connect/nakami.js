@@ -15,7 +15,7 @@ async function nicoText(mes){
     await delay(2000); 
     newDiv.remove();
 };
-function tobiText(youso, mes) {
+function tobiText(youso, mes){
     let el = youso;
     if(typeof el == 'string') el = document.querySelector(youso);
     if(!el) return console.error('せんぱ〜い？この要素壊れてますよ〜〜？');
@@ -78,8 +78,8 @@ function arraySelect(array){
     let select = Math.floor(Math.random()*array.length);
     return array[select];
 };
-function arrayShuffle(array) {
-    for(let i = array.length - 1; i > 0; i--) {
+function arrayShuffle(array){
+    for(let i = array.length - 1; i > 0; i--){
         let i2 = Math.floor(Math.random() * (i + 1));
         [array[i], array[i2]] = [array[i2], array[i]];
     };
@@ -113,7 +113,7 @@ function hask(obj, key){
     res = res ? 1 : 0;
     return res;
 };
-function copy(moto) {
+function copy(moto){
     if(Array.isArray(moto)){
         let arr = [];
         for(let i = 0; i < moto.length; i++){
@@ -225,7 +225,7 @@ function hoshoku(color){
 function mixshoku(c1, c2, ratio = 0.5){
     let toRGB = c => {
         c = c.replace('#', '');
-        if (c.length == 3) c = c.split('').map(x => x + x).join('');
+        if(c.length == 3) c = c.split('').map(x => x + x).join('');
         let n = parseInt(c, 16);
         return [n >> 16, (n >> 8) & 255, n & 255];
     };
@@ -256,7 +256,7 @@ let skipText = false;
 let clearText = false;
 let textShowing = 0;
 
-function colorcheck(rawtext) {
+function colorcheck(rawtext){
     let text = [];
     let color = null;
     let colors = [
@@ -338,7 +338,7 @@ async function addtext(raw){
         async function type(){
             if(index < text.length){
                 if(skipText){
-                    while (index < text.length) {
+                    while (index < text.length){
                         let span = document.createElement("span");
                         span.textContent = text[index].char;
                         if(text[index].color) span.classList.add(`color-${text[index].color}`);
@@ -363,7 +363,7 @@ async function addtext(raw){
                 let waitTime = autoDelay * 1000;
                 let timeout = new Promise(resolve => setTimeout(resolve, waitTime));
                 let userAction = new Promise(resolve => {
-                    function waitToClear(event) {
+                    function waitToClear(event){
                         if(event.type == 'click' || event.key == 'z' || event.key == 'Enter'){
                             document.removeEventListener('click', waitToClear);
                             document.removeEventListener('keydown', waitToClear);
@@ -1388,7 +1388,7 @@ dunF.select = async() => {
 
     //はじまりはじまり～
     let cd = Charas.find(a => a.name == chara);
-    addob("player", 0, 0, 1, 1, 1, 90, [], {img:cd.img});
+    addob("player", 0, 0, 1, 1, 20, 90, ["move"], {img:cd.img});
     dunC.loop = 1;
 
     await nextStage(dunC.stage);
@@ -1402,35 +1402,35 @@ dunF.update = async() => {
     let moved = 0;
     let mv = 1;
     {
-        if((keys.w || keys.arrowup) && !p.moving){
+        if((keys.w || keys.arrowup)){
             if(p.dir == 0) await dunF.move(p, 'add', 0, -mv);
             else p.dir = 0;
         }
-        if((keys.s || keys.arrowdown) && !p.moving){
+        if((keys.s || keys.arrowdown)){
             if(p.dir == 180) await dunF.move(p, 'add', 0, mv);
             else p.dir = 180;
         };
-        if((keys.a || keys.arrowleft) && !p.moving){
+        if((keys.a || keys.arrowleft)){
             if(p.dir == 270) await dunF.move(p, 'add', -mv, 0);
             else p.dir = 270;
         };
-        if((keys.d || keys.arrowright) && !p.moving){
+        if((keys.d || keys.arrowright)){
             if(p.dir == 90) await dunF.move(p, 'add', mv, 0);
             else p.dir = 90;
         };
     }
 
-    if((keys.z || keys.enter) && textShowing == 0 && !p.moving){
+    if((keys.z || keys.enter) && textShowing == 0){
         // 今乗ってる（on == true かつ 座標が同じ） => obon認定
-
         let obon = dunC.objs.filter(a => a.x == p.x && a.y == p.y && a.on);
         if(obon.length > 1) return console.log(obon,'←onのやつらが重なってるみたいっす！');
         if(obon.length == 1){
+            console.log("banana")
             obon = obon[0];
-            let data = Objectdatas.find(a => a.id == obon.id)
+            let data = Objects.find(a => a.name == obon.id)
             if(!data) return console.error(obon,'←これのidの処理、書いてないっすよ〜？(ニヤっ)');
 
-            let res = data.process();
+            let res = await data.func();
             dunF.draw();
 
             if(res) return 1;
@@ -1438,7 +1438,7 @@ dunF.update = async() => {
 
         // 目の前にあるやつ（on == false かつ 向いてる方向）
         let karix = 0, kariy = 0;
-        switch (p.dir) {
+        switch (p.dir){
             case 0: kariy -= 1; break;
             case 90: karix += 1; break;
             case 180: kariy += 1; break;
@@ -1449,12 +1449,14 @@ dunF.update = async() => {
         let nobon = dunC.objs.filter(a => a.x == p.x + karix && a.y == p.y + kariy && !a.on)
         if(nobon.length > 1) return console.log(nobon,'←not onのやつらが重なってるみたいっす！');
         if(nobon.length == 1){
+            console.log("tomatoes")
             nobon = nobon[0];
-            let data = Objectdatas.find(a => a.id == nobon.id);
-            console.log(nobon, data)
+            let data = Objects.find(a => a.name == nobon.id);
+            console.log(nobon)
             if(!data) return console.error(nobon,'←これのidの処理、書いてないっすよ〜？(ニヤっ)');
+            console.log(data)
 
-            let res = data.process();
+            let res = await data.func();
             dunF.draw();
 
             if(res) return 1;
@@ -1478,8 +1480,8 @@ dunF.draw = async() => {
     }
 
     /*
-        for(let y = 0; y < dunC.objM.length; y++) {
-        for(let x = 0; x < dunC.objM[y].length; x++) {
+        for(let y = 0; y < dunC.objM.length; y++){
+        for(let x = 0; x < dunC.objM[y].length; x++){
         let obs = dunC.objM[y][x];
         if(obs.id == 0) continue;
 
@@ -1540,10 +1542,11 @@ dunF.move = async(who, code, mx, my, force = 0) => {
 
     // console.log(`想定: x|${who.x.toString().padStart(2, '0')}, y|${who.y.toString().padStart(2, '0')} => x|${(who.x + mx).toString().padStart(2, '0')}, y|${(who.y + my).toString().padStart(2, '0')}`)
 
-    if(who.x + mx < 0 || 11 < who.x + mx) mx = 0;
-    if(who.y + my < 0 || 11 < who.y + my) my = 0;
+
+    if(who.x + mx < 0 || dunC.row < who.x + mx) mx = 0;
+    if(who.y + my < 0 || dunC.row < who.y + my) my = 0;
     
-    if(mx == 0 && my == 0) return //console.log(`${who.name}「移動量が0ですわ〜〜！！」`);
+    if(mx == 0 && my == 0) return console.log(`${who.id}「移動量が0ですわ〜〜！！」`);
 
     if(!dunF.able(who, 'move') && !force) return //console.log(`${who.name}「動けないっっ...!!」`);
 
@@ -1610,7 +1613,7 @@ dunF.move = async(who, code, mx, my, force = 0) => {
     who.moving = 0;
 }
 dunF.over = (a, b) => {
-    if (a.cam == b.cam && a.me == b.me) return false;
+    if(a.cam == b.cam && a.me == b.me) return false;
 
     let sx1 = a.sx, sy1 = a.sy, ex1 = a.sx + a.w, ey1 = a.sy + a.h;
     let sx2 = b.sx, sy2 = b.sy, ex2 = b.sx + b.w, ey2 = b.sy + b.h;
@@ -1649,16 +1652,16 @@ function mapMake(code){
             dataS.tiles.forEach(type => scores[type] = basescore);
 
             // 左と上のマスに同じタイルがあったらスコア加算
-            if (j > 0) scores[dunC.backM[i][j-1]] += bonus;
-            if (i > 0) scores[dunC.backM[i-1][j]] += bonus;
+            if(j > 0) scores[dunC.backM[i][j-1]] += bonus;
+            if(i > 0) scores[dunC.backM[i-1][j]] += bonus;
 
             function weightedRandom(weightMap){
                 // 重み付きランダム選択
                 let total = Object.values(weightMap).reduce((a, b) => a + b, 0);
                 let r = Math.random() * total;
-                for (let key in weightMap) {
+                for (let key in weightMap){
                     r -= weightMap[key];
-                    if (r < 0) return key;
+                    if(r < 0) return key;
                 }
             }
 
@@ -1685,9 +1688,9 @@ function mapMake(code){
         let obsInd = obsList.indexOf(obs);
 
         // console.log(obs);
-        console.log(obs.name, obs.n)
+        // console.log(obs.name, obs.n)
         let sude = dunC.objs.filter(a => a.id == obs.name);
-         console.log(sude.length, obs.n)
+        //  console.log(sude.length, obs.n)
         if(obs.n != 0 && sude.length+1 >= obs.n) obsList.splice(obsInd, 1); // 重複できない子なら消し去る
 
         if(obs.name == 'enemy'){
@@ -1944,14 +1947,14 @@ function whatdo(who, are, shu, name){
 //#endregion どちらかと言うと youは何しに日本へ
 
 //#region どむさんのようそづくり～
-function El(tag, cls, children = []) {
+function El(tag, cls, children = []){
     let e = document.createElement(tag);
-    if (cls) e.className = cls;
+    if(cls) e.className = cls;
     children.forEach(c => e.appendChild(c));
     return e;
 }
 
-function makeHuman(cam, me) {
+function makeHuman(cam, me){
     let img = El('img', 'img');
     img.src = 'assets/images/systems/error.png';
 
@@ -1975,14 +1978,13 @@ function makeHuman(cam, me) {
 }
 //#endregion
 //#region せーぞーマシーン（統合版）
-function makeUnit(type, code, name) {
+function makeUnit(type, code, name){
     let data, unit = {};
-    const stats = Object.keys(eneBas);
 
     // ── データ取得 ──
     if(type == 'player'){
         data = (!code ? Charas : Friends).find(a => a.name == name);
-        if (!data) return logadd(`codeが[${code}]の${name}はいないらしい`);
+        if(!data) return logadd(`codeが[${code}]の${name}はいないらしい`);
     }else{
         data = arraySelect(Enemies);
     }
@@ -1990,18 +1992,20 @@ function makeUnit(type, code, name) {
     // ── ステータス計算 ──
     if(type == 'player'){
         // プレイヤー: データそのままコピー
-        stats.forEach(s => unit[s] = data[s]);
+        Status.map(a => a.name).forEach(s => unit[s] = data[s]);
     }else{
         // 敵: ベース値 → 補正値で加工
-        stats.forEach(s => unit[s] = eneBas[s]);
-        stats.forEach(s => {
+        Status.map(a => a.name).forEach(s => unit[s] = data[s]);
+        Status.map(a => a.name).forEach(s => {
             let v = data[s];
-            if (v.startsWith('+') || v.startsWith('-')) {
+            console.log(s)
+            if(typeof v != 'string') console.error(v);
+            if(v.startsWith('+') || v.startsWith('-')){
                 let num = +v.slice(1);
-                if (v.startsWith('-')) num *= -1;
+                if(v.startsWith('-')) num *= -1;
                 unit[s] += num;
             }
-            if (v.startsWith('=')) {
+            if(v.startsWith('=')){
                 unit[s] = +v.slice(1);
             }
         });
@@ -2013,7 +2017,7 @@ function makeUnit(type, code, name) {
     unit.ep = 0;
     unit.status = 1;
     unit.buffs = [];
-    unit.cam = (type == 'player') ? 'players' : 'enemies';
+    unit.cam = fl(type, ['players', 'enemies']);
     unit.me = humans.filter(a => a.cam == unit.cam).length;
 
     // ── タイプ別の初期化 ──
@@ -2030,7 +2034,7 @@ function makeUnit(type, code, name) {
         unit.magic = unit.magic ?? ['heal', 'power', 'shell'];
         unit.tool  = unit.tool  ?? ['aspirin', 'throw knife', 'redcard'];
 
-        if (!code) {
+        if(!code){
             unit.ex = data.ex;  unit.ns = data.ns;
             unit.ps = data.ps;  unit.ts = data.ts;
 
@@ -2038,11 +2042,11 @@ function makeUnit(type, code, name) {
             Style.button.back  = data.buttonback;
             Style.button.aima  = mixshoku(data.buttonsolid, data.buttonback);
             Style.tekiou();
-        } else {
+        }else{
             unit.e = data.e;  unit.s = data.s;
             unit.n = data.p;  unit.p = data.p;  unit.t = data.t;
         }
-    } else {
+    }else{
         unit.name   = data.name;
         unit.lv     = random(1, 3);
         unit.attr   = data.attr ?? [];
@@ -2051,7 +2055,6 @@ function makeUnit(type, code, name) {
         unit.shield = data.shield ?? 'none';
     }
 
-    // ── DOM生成・配置 ──
     let container = (type == 'player') ? batC.pD : batC.eD;
     container.appendChild(makeHuman(unit.cam, unit.me));
 
@@ -2081,7 +2084,6 @@ async function encount(){
 
     await nextTurn();
 }
-
 //#endregion
 
 //#region たーんのまねーじめんと～
