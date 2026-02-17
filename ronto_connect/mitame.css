@@ -847,6 +847,7 @@ img{
     left: 0;
     box-sizing: border-box;
     z-index: -1;
+    pointer-events: none;
 }
 .dun_select.chara .item img{
     height: 100%;
@@ -857,12 +858,14 @@ img{
     right: 0;
     box-sizing: border-box;
     z-index: -1;
+    pointer-events: none;
 }
 .dun_select.chara .item span{
     position: absolute;
     left: 0;
     bottom: 0;
     font-size: 14px;
+    pointer-events: none;
 }
 /* #endregion */
 
@@ -881,7 +884,130 @@ img{
 
 /* #region btArea 4 */
 #btArea{
-    content:'bt'
+    content:'bt';
+}
+#btArea .column{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 90%;
+    margin: 0 auto;
+}
+#btArea .humans{
+    width: fit-content;
+    height: auto;
+}
+#btArea .humans .human{
+    display: flex;
+    flex-direction: column;
+    width: 150px;
+    height: fit-content;
+    padding: 15px 5px;
+    background: #fdfdfd;
+    border: #b2b2b2;
+    border-radius: 15px 15px 5px 5px;
+    position: relative;
+}
+#btArea .humans .human .name{
+    display: block;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    color: #eeeeee;
+    font-size: 14px;
+    z-index: 1;
+}
+#btArea .humans .human .img{
+    /* img */
+    width: 80%;
+    aspect-ratio: 1/1;
+    opacity: 1.0;
+    mask-image: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.8) 0%,
+        rgba(0,0,0,0.6) 80%,
+        rgba(0,0,0,0.4) 100%
+    );
+    object-fit: contain;
+    z-index: 2;
+}
+#btArea .humans .human .skill{
+    display: block;
+    width: 20%;
+    aspect-ratio: 1/1;
+    border: 3px solid;
+    border-radius: 50%;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    overflow: hidden;
+    z-index: 3;
+}
+#btArea .humans .human .skill .back{
+    /* img */
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+#btArea .humans .human .skill .liquid{
+    width: 100%;
+    height: 0;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: #4473ad;
+    pointer-events: none;
+}
+#btArea .humans .human .lv{
+    display: block;
+    position: absolute;
+    top: 35%;
+    right: 10px;
+    text-align: right;
+    line-height: 20px;
+    color: #2b2b2b;
+}
+
+#btArea .humans .human .bars{
+    width: 95%;
+    margin: -20px auto 0;
+    pointer-events: none;
+}
+#btArea .humans .human .bars .status{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0;
+    height: 30px;
+}
+#btArea .humans .human .bars .status .text{
+    display: block;
+    font-size: 12px;
+}
+#btArea .humans .human .bars .status .bar{
+    width: 100%;
+    flex: 1;
+    background: #b2b2b2;
+}
+#btArea .humans .human .bars .status .bar .inner{
+    width: 0;
+    height: 100%;
+}
+#btArea .humans .human .bars .status.hp .bar .inner{
+    background: #ff8080;
+}
+#btArea .humans .human .bars .status.mp .bar .inner{
+    background: #8080ff;
+}
+
+#btArea .sele{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
 }
 /* #endregion */
 

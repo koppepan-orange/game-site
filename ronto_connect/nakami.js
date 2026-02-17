@@ -758,6 +758,15 @@ let secrates = [
     },
     {
         ind:0,
+        name:'dadas',
+        arr:['d','a','d','a','s'],
+        limit:3,
+        func: async function(){
+            mapMake();
+        }
+    },
+    {
+        ind:0,
         name:'darkness',
         arr:['d','a','r','k','n','e','s','s'],
         limit:'n',
@@ -1357,6 +1366,7 @@ dunF.select = async() => {
             let div = ev.target;
             let name = div.classList[1];
             console.log(name);
+            if(!name) console.log(div)
             div0.remove();
             solve(name);
         }
@@ -1425,7 +1435,6 @@ dunF.update = async() => {
         let obon = dunC.objs.filter(a => a.x == p.x && a.y == p.y && a.on);
         if(obon.length > 1) return console.log(obon,'←onのやつらが重なってるみたいっす！');
         if(obon.length == 1){
-            console.log("banana")
             obon = obon[0];
             let data = Objects.find(a => a.name == obon.id)
             if(!data) return console.error(obon,'←これのidの処理、書いてないっすよ〜？(ニヤっ)');
@@ -1449,12 +1458,10 @@ dunF.update = async() => {
         let nobon = dunC.objs.filter(a => a.x == p.x + karix && a.y == p.y + kariy && !a.on)
         if(nobon.length > 1) return console.log(nobon,'←not onのやつらが重なってるみたいっす！');
         if(nobon.length == 1){
-            console.log("tomatoes")
             nobon = nobon[0];
             let data = Objects.find(a => a.name == nobon.id);
-            console.log(nobon)
             if(!data) return console.error(nobon,'←これのidの処理、書いてないっすよ〜？(ニヤっ)');
-            console.log(data)
+            // console.log(data)
 
             let res = await data.func();
             dunF.draw();
@@ -1689,7 +1696,7 @@ function mapMake(code){
 
         // console.log(obs);
         // console.log(obs.name, obs.n)
-        let sude = dunC.objs.filter(a => a.id == obs.name);
+        let sude = dunC.objs.filter(a => a.name == obs.name);
         //  console.log(sude.length, obs.n)
         if(obs.n != 0 && sude.length+1 >= obs.n) obsList.splice(obsInd, 1); // 重複できない子なら消し去る
 
@@ -1703,7 +1710,7 @@ function mapMake(code){
         }
 
         let obx = 0, oby = 0;
-        let ok = () => {return dunC.objs.filter(a => a.x == obx && a.y == oby && a.id != 0)};
+        let ok = () => {return dunC.objs.filter(a => a.x == obx && a.y == oby && a.name != 0)};
         let ran = () => {obx = random(0, dunC.row-1), oby = random(0, dunC.row-1)};
 
         ran();
@@ -1879,7 +1886,7 @@ function cm(cam = '指定なし', me = '指定なし'){
 
     who = humans.find(a => a.cam == cam && a.me == me);
     if(Array.isArray(who)){
-        console.log('↓findなのにarrayになってる')
+        console.log('↓findなのにarrayになってるふぉーぜ')
         console.log(who)
     }
     
@@ -1896,11 +1903,20 @@ function tekiou(){
         let div = div0.querySelector(`.${cam}${human.me}`);
 
         let hd = 0;
-        if(cam == 'enemies') hd = Enemies.find(a => a.name == human.name);
+        let srca = null;
+        if(cam == 'enemies'){
+            hd = Enemies.find(a => a.name == human.name);
+            srca = `enemies/${dunC.stage}/${hd.img ?? hd.name}.png`;
+        }
         if(cam == 'players'){
             hd = Charas.find(a => a.name == human.name);
-            if(!hd) hd = Friends.find(a => a.name == human.name);
+            if(hd) srca = `charas/${hd.img}.png`;
+            if(!hd){
+                hd = Friends.find(a => a.name == human.name);
+                srca = `friends/${hd.img}.png`;
+            }
         }
+
 
 
         // console.log(`${cam}${human.me}`)
@@ -1909,7 +1925,7 @@ function tekiou(){
 
         div.querySelector('.name').textContent = human.name;
         div.querySelector('.lv').textContent = `Lv.${human.lv}`;
-        div.querySelector('.img').src = `assets/images/charas/${hd.img}.png`;
+        div.querySelector('.img').src = `assets/images/${srca}`;
         div.querySelector('.skill .liquid').style.height = `${human.ep/human.maxep*100}%`;
 
         let hpZ = div.querySelector('.hp');
@@ -1955,11 +1971,19 @@ function El(tag, cls, children = []){
 }
 
 function makeHuman(cam, me){
+    let sd = Stages.find(a => a.name == dunC.stage);
+
+    let name = El('div', 'name');
+    name.style.color = mixshoku('#cecece', sd.color);
+
     let img = El('img', 'img');
     img.src = 'assets/images/systems/error.png';
 
     let back = El('img', 'back');
     back.src = 'assets/images/systems/error.png';
+    
+    let skill = El('div', 'skill', [back, El('div', 'liquid')])
+    skill.style.borderColor = mixshoku('#2b2b2b', sd.color);
 
     const baa = (type) => El('div', `${type} status`, [
         El('div', 'text'),
@@ -1967,12 +1991,13 @@ function makeHuman(cam, me){
     ]);
 
     return El('div', `human ${cam}${me}`, [
+        name,
         img,
-        El('div', 'skill', [back, El('div', 'liquid')]),
-        El('div', 'waku', [
-            El('div', 'plate', [El('div', 'name'), El('div', 'lv')]),
+        skill,
+        El('div', 'lv'),
+        El('div', 'bars', [
             baa('hp'),
-            baa('mp'),
+            baa('mp')
         ]),
     ]);
 }
@@ -1986,8 +2011,10 @@ function makeUnit(type, code, name){
         data = (!code ? Charas : Friends).find(a => a.name == name);
         if(!data) return logadd(`codeが[${code}]の${name}はいないらしい`);
     }else{
-        data = arraySelect(Enemies);
+        data = arraySelect(Enemies.filter(a => !a.no));
     }
+
+    console.log(data);
 
     // ── ステータス計算 ──
     if(type == 'player'){
@@ -1995,11 +2022,12 @@ function makeUnit(type, code, name){
         Status.map(a => a.name).forEach(s => unit[s] = data[s]);
     }else{
         // 敵: ベース値 → 補正値で加工
-        Status.map(a => a.name).forEach(s => unit[s] = data[s]);
         Status.map(a => a.name).forEach(s => {
+            let vd = Status.find(a => a.name == s);
+            unit[s] = vd.bas; //vis0.top/ftp
+
             let v = data[s];
-            console.log(s)
-            if(typeof v != 'string') console.error(v);
+            if(!v || typeof v != 'string') v = "+0"
             if(v.startsWith('+') || v.startsWith('-')){
                 let num = +v.slice(1);
                 if(v.startsWith('-')) num *= -1;
@@ -2017,7 +2045,7 @@ function makeUnit(type, code, name){
     unit.ep = 0;
     unit.status = 1;
     unit.buffs = [];
-    unit.cam = fl(type, ['players', 'enemies']);
+    unit.cam = (type == 'player') ? 'players' : 'enemies';
     unit.me = humans.filter(a => a.cam == unit.cam).length;
 
     // ── タイプ別の初期化 ──
@@ -2128,7 +2156,7 @@ async function nextTurn(who = 0){
         let me = nanka.me;
         let dare = cm(cam,me);
         let skill = nanka.skill;
-        let data = Skills.find(a => a.id == skill);
+        let data = Skills.find(a => a.name == skill);
         console.log(`${dare.name}のスキル:"${skill}"を発動!`);
         await addtext(`${dare.name}は"${data.name}"を発動した！！`);
         let result = await skillAct(dare, skill);
@@ -2251,9 +2279,9 @@ async function playerturn(who = 0){
     jump:{
         if(!who) break jump;
         let nss = Skills.filter(a => a.type == 'ns');
-        let datans = nss.find(a => a.id == who.ns);
-        if(who.ns.process != undefined && (turncount % datans.cool) == 0){
-            await data.process(who);
+        let datans = nss.find(a => a.name == who.ns);
+        if(who.ns.func != undefined && (turncount % datans.cool) == 0){
+            await data.func(who);
             await delay(1000)
         };
 
@@ -2274,7 +2302,7 @@ async function playerturn(who = 0){
 //#endregion
 //#region ピのせんたく
 batC.s1B.addEventListener('click', async function(){
-    let who = humans.find(a => a.cam == 'players' && a.me == 0);
+    let who = cm();
     switch(phase){
         case 1:
             phase = 2;
@@ -2298,7 +2326,7 @@ batC.s1B.addEventListener('click', async function(){
 })
 
 batC.s2B.addEventListener('click', async function(){
-    let who = humans.find(a => a.cam == 'players' && a.me == 0);
+    let who = cm();
     switch(phase){
         case 1:
             phase = 3;
@@ -2322,7 +2350,7 @@ batC.s2B.addEventListener('click', async function(){
 })
 
 batC.s3B.addEventListener('click', async function(){
-    let who = humans.find(a => a.cam == 'players' && a.me == 0);
+    let who = cm();
     switch(phase){
         case 1:
             phase = 4;
@@ -2346,7 +2374,7 @@ batC.s3B.addEventListener('click', async function(){
 })
 
 batC.s4B.addEventListener('click', async function(){
-    let who = humans.find(a => a.cam == 'players' && a.me == 0);
+    let who = cm();
     switch(phase){
         case 1:
             dassyutsu();
@@ -2406,22 +2434,16 @@ function selectSyudou(code = 1){
         function handleClick(event){
             let div = event.target;
 
+            // ↓ 天才です   天 天 天才
+            while(!div.classList.contains('human')) div = div.parentElement;
             let lis = div.classList;
 
-            let tcam = lis[1].substring(0, 7);
-            let tme = +lis[1].substring(7);
-
-            if(div && !arrs.includes(`${tcam}${tme}`)) div = div.parentElement;
-            if(!div) return;
-
-            console.log(div)
-
-            console.log(tcam, tme)
+            let tcam = lis[1].substring(0, 7); //前半7文字(player / enemies)
+            let tme = +lis[1].substring(7); //数字。数字です。
 
             arrs.forEach(a => {
-                console.log(a)
+                // console.log(a)
                 let div0 = batC[`${a.substring(0, 1)}D`];
-                console.log(div0)
                 let div = div0.querySelector(`.${a}`);
                 
                 div.removeEventListener('click', handleClick);
@@ -2536,7 +2558,8 @@ async function Attack(who, num){
         return playerturn()
     }
 
-    let data = Attacks.find(a => a.id == name)
+    let data = Attacks.find(a => a.name == name)
+    if(!data) return console.error(`せんぱ～い？なんか${name}とか言う変なものが紛れ込んでますよ～？`)
     if(who.mp >= data.mp){
         let are = await selectSyudou();
 
@@ -2545,8 +2568,8 @@ async function Attack(who, num){
 
         await addtext(`${who.name}の${name}！`);
 
-        whatWantyou(who, are, "Tools", name)
-        let res = await data.process(who, are);
+        whatdo(who, are, "Tools", name)
+        let res = await data.func(who, are);
         if(res) return 1;
         nextTurn(who);
     }else{
@@ -2564,7 +2587,7 @@ async function Magic(who, num){
         return playerturn()
     }
 
-    let data = Magics.find(a => a.id == name)
+    let data = Magics.find(a => a.name == name)
     
     console.log(name, data);
     if(who.mp >= data.mp){
@@ -2575,8 +2598,8 @@ async function Magic(who, num){
 
         await addtext(`${who.name}の${name}！`);
         
-        whatWantyou(who, are, "Tools", name);
-        let res = await data.process(who, are);
+        whatdo(who, are, "Tools", name);
+        let res = await data.func(who, are);
         if(res) return 1;
         nextTurn(who);
     }else{
@@ -2596,7 +2619,7 @@ async function Tool(who, num){
     }
 
     //今はいいけど、inventory()に全部詰め込むことになるならdata.jsのnumじゃなくて簡単関数でinventory内の数を求めて、で〜って形にした方がいいかも
-    let data = Tools.find(a => a.id == name)
+    let data = Tools.find(a => a.name == name)
     console.log(name, data)
     if(data.num > 0){
         data.num -= 1;
@@ -2604,8 +2627,8 @@ async function Tool(who, num){
         let are = await selectSyudou();
         await addtext(`${who.name}は${name}を使用した!`);
         
-        whatWantyou(who, are, "Tools", name)
-        let res = await data.process(who, are);
+        whatdo(who, are, "Tools", name)
+        let res = await data.func(who, are);
         if(res) return 1;
         
         nextTurn(who);
@@ -2642,8 +2665,8 @@ async function skillReserve(cam,me){
     }
 }
 async function skillAct(cam,me,skill){
-    let dataex = Skills.filter(a => a.type == 'ex').find(a => a.id == skill);
-    let result = await dataex.process(cam, me);
+    let dataex = Skills.filter(a => a.type == 'ex').find(a => a.name == skill);
+    let result = await dataex.func(cam, me);
     await delay(1000);
     return result;
 }
@@ -2711,12 +2734,12 @@ async function enemyturn(who){
     let are;
     if(data){
         let act = enemySelectAction(who)
-        let res = await act.process(who);
+        let res = await act.func(who);
         if(res) return 1;
     }else{
         await addtext(`${who.name}は何かで攻撃した！`)
         are = selectJodou(who, 'phpl');
-        let res = await damage(who, are, 100, 'sh'); //areの後、1の前に"何の倍率か"を入れるべき。基本atkかもだけどfixで固定、とかできそう
+        let res = await damage(who, are, 100, 'ph'); //areの後、1の前に"何の倍率か"を入れるべき。基本atkかもだけどfixで固定、とかできそう
         if(res) return 1;
     }
 
@@ -2770,7 +2793,7 @@ function selectJodou(who, code, both = 0){
     let side = code[0]   == 'm' ? who.cam : fl(who.cam, ['players', 'enemies']);
     let stat = code.includes('hp') ? 'hp' : code.includes('atk') ? 'atk' : 'def';
     let mode = code.endsWith('l') ? 'low' : code.endsWith('h') ? 'high' : 'random';
-    console.log(`>> ${side}, ${stat}, ${mode}]`);
+    console.log(`>> ${side}, ${stat}, ${mode}`);
 
     let list = cm(side).filter(c => c.status).sort((a, b) => a[stat] - b[stat]);
     // console.log(list);
@@ -2905,16 +2928,17 @@ async function damage(who, ares, val, type0, props = []){
         }
 
         let wep = atker.weapon;
-        let weped = Equips['weapon'].find(a => a.id == wep);
+        let weped = Equips['weapon'].find(a => a.name == wep);
 
         let shi = defer.shield;
-        let shied = Equips['shield'].find(a => a.id == shi);
+        let shied = Equips['shield'].find(a => a.name == shi);
 
         //計算
         let type, type2;
-        if(type0 == 'sh') type = 'atk', type2 = 'def';
-        if(type0 == 'mg') type = 'matk', type2 = 'mdef';
-        
+        if(type0 == 'ph') type = 'atk', type2 = 'def'; //筋力、筋肉
+        if(type0 == 'mg') type = 'matk', type2 = 'mdef'; //なんかそういうやつ、それの2
+        if(type0 == 'cn') type = 'atk', type2 = 'def'; //銃の攻撃力....?武器依存では？、防御力かな
+
         console.log(`(damage) ${type0} ::`);
 
         // (攻撃力+武器攻撃力) * 攻撃倍率
@@ -3378,7 +3402,7 @@ loaF.loadI = async() => {
         // console.log(images);
 
         let all = arr.length;
-        console.error(`--- ${route.join('/')}:${all} ---`)
+        // console.error(`--- ${route.join('/')}:${all} ---`)
         for(let mono of arr){
             // console.log(mono);
             let img = new Image();
@@ -3404,22 +3428,22 @@ loaF.loadI = async() => {
     // let gensho = Object.keys(loaC.imgL);
     let loaloa0 = async(mono, route = []) => {
         let sink = route.length ? 1 : 0
-        if(sink) console.log("not Arrayでした lets 再帰");
+        // if(sink) console.log("not Arrayでした lets 再帰");
         let hzd = loaC.deep;
-        console.log("[loaloa0] route:[" + route + "]");
+        // console.log("[loaloa0] route:[" + route + "]");
         // console.log('次:monoです')
         // console.log(mono)
         for(let key in mono){
-            console.log(`key:${key} (all:[${Object.keys(mono)}])`)
+            // console.log(`key:${key} (all:[${Object.keys(mono)}])`)
             if(key == 'すべて'){
-                console.error('"すべて"だったのでスキップ');
+                // console.error('"すべて"だったのでスキップ');
                 route.pop()
                 continue;
             }
 
             route.push(key);
             loaC.deep += 1;
-            console.log(`[loaloa0ed] route:[${route}]`);
+            // console.log(`[loaloa0ed] route:[${route}]`);
             
             let val = mono[key]??null;
             if(!val) return console.error('↓↓null↓↓'), console.log(tar), console.log(mono), console.log(key), console.error('↑↑null↑↑');
@@ -3429,15 +3453,13 @@ loaF.loadI = async() => {
             if(Array.isArray(val)){
                 if(await loaloa(val, route)) return console.error('南ノ南');
                 let pop = route.pop()
-                console.log(`帰還成功、${pop}を排除`)
+                // console.log(`帰還成功、${pop}を排除`)
                 loaC.deep -= 1;
-                console.log("深度", loaC.deep)
             }//arrayなら => ロードへ
             else await loaloa0(val, route); //まだオブジェクトなら => もっかい
         }
         route.pop();
         loaC.deep -= 1;
-        console.log("深度2", loaC.deep)
     }
 
     loaloa0(loaC.imgL);
