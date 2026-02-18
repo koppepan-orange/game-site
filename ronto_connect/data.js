@@ -354,6 +354,7 @@ let Buffs = [
         name:'power', //keyと同じものを
         jpnm:'攻撃倍率',
         type:'buff', // buff/debuff/handle/unique
+        kind:'turn',
         mode:'free', // turn/stack/actは付与時に決定。kindはfixe（Lv依存で値決定）かfree（付与時の引数で値決定）を定める用に。 poison/deadpoisonはfixe、burnもfixe。cheerupはfixe。atkup等能力値上昇系はfree。
                                  // if(data.kind??'fixed')ってすべきかも。あんまないと思うけど
         agemono:'power',
@@ -364,6 +365,7 @@ let Buffs = [
         name:'shell',
         jpnm:'防御倍率',
         type:'buff',
+        kind:'turn',
         mode:'free',
         agemono:'shell',
         desc:'防御倍率が上がる。あんまり実感しづらい。',
@@ -372,6 +374,7 @@ let Buffs = [
         name:'luck',
         jpnm:'幸運',
         type:'buff',
+        kind:'turn',
         mode:'fixe',
         desc:'ターン終了時、確率でもう一回行動できる。\nLv7ならば確定。\n願うと起きやすいです',
         lvs:[
@@ -389,6 +392,7 @@ let Buffs = [
         name:'disappear',
         jpnm:'消滅',
         type:'buff',
+        kind:'turn',
         mode:'fixe',
         desc:'姿を消し、攻撃を受けなくなる。\nしかし範囲攻撃はちゃんと当たる。\nLv1ならば範囲攻撃で解除される。',
     },
@@ -396,6 +400,7 @@ let Buffs = [
         name:'cheerup',
         jpnm:'応援！',//多分「攻撃！」モチーフ
         type:'buff',
+        kind:'turn',
         mode:'fixe',
         desc:'応援されている状態。攻撃力と速度が上がり会心率が下がる。\nちょっと緊張しちゃうよね、わかる',
         lvs:[
@@ -416,6 +421,7 @@ let Buffs = [
         name:'poison',
         jpnm:'毒',
         type:'debuff',
+        kind:'turn',
         mode:'fixe',
         dot:'poison',
         desc:'ターン終了時HP割合で防御貫通ダメージ。\n毒の苦しみもお好きなんですね',
@@ -433,6 +439,7 @@ let Buffs = [
         name:'poison_deadly',
         jpnm:'猛毒',
         type:'debuff',
+        kind:'turn',
         mode:'fixe',
         dot:'poison',
         desc:'ターン終了時HP割合で防御貫通ダメージ。\nついでにランダムで他のバフ(良)の持続時間を1減少\n徐々〜に蝕まれて終わります。解消を推奨す',
@@ -449,6 +456,7 @@ let Buffs = [
         name:'blood',
         jpnm:'出血',
         type:'debuff',
+        kind:'turn',
         mode:'fixe',
         dot:'blood',
         desc:'ターン終了時固定ダメージ、非攻撃毎に1.5倍に増加。\nそのままにしとくと普通に死にます',
@@ -467,6 +475,7 @@ let Buffs = [
         name:'blood_born', //大怒られしそうな名前だなこれ
         jpnm:'血の誕生',
         type:'debuff',
+        kind:'turn',
         mode:'fixe',
         dot:'blood',
         desc:'ターン終了時固定ダメージ、ターン終了毎に2.0倍に増加。\nガチで死にかねん故早めに解除しよう',
@@ -485,6 +494,7 @@ let Buffs = [
         name:'burn',
         jpnm:'火傷',
         type:'debuff',
+        kind:'turn',
         mode:'fixe',
         dot:'burn',
         desc:'ターン終了時固定ダメージ\nマイクラだとすごいギリで耐えるか死ぬかのやつよね',
@@ -502,6 +512,7 @@ let Buffs = [
         name:'burn_out',
         jpnm:'燃え尽き症候群', //...結構ぴったりよな、俺の雑々ネーミングセンス
         type:'debuff',
+        kind:'turn',
         mode:'fixe',
         dot:'burn',
         desc:'ターン終了時固定ダメージ。\nあと...このデバフのダメージで死んだ場合、お金が半分燃えて消えます\n珍しいしょ〜〜戦闘外干渉系',
@@ -521,6 +532,7 @@ let Buffs = [
         name:'elec',
         jpnm:'帯電',
         type:'debuff',
+        kind:'turn',
         mode:'fixe',
         dot:'elec',
         desc:'ターン終了時固定ダメージ\nターン終了時、確率で他の味方に伝染する', //"風邪"とかの方が良かったか...?
@@ -539,6 +551,7 @@ let Buffs = [
         name:'elec_elec',
         jpnm:'帯電・帯電',
         type:'debuff',
+        kind:'turn',
         mode:'fixe',
         dot:'elec',
         desc:'ターン終了時固定ダメージ\nターン終了時、確率で他の味方に伝染する\nあと確率で麻痺のデバフを自身に付与します\n帯電・帯電ってなんだよ',
@@ -557,6 +570,7 @@ let Buffs = [
         name:'injury',
         jpnm:'傷口',
         type:'debuff',
+        kind:'turn',
         mode:'fixe',
         dot:'injury',
         desc:'攻撃毎に固定ダメージ。\n連続攻撃/行動ビルドに大打撃\n私はこのデバフが最も嫌いです。まぢ無理',
@@ -573,6 +587,7 @@ let Buffs = [
         name:'injury_gore',
         jpnm:'裂痕', //れっこん..ほぼ造語。中国語にはあるらしい
         type:'debuff',
+        kind:'turn',
         mode:'fixe',
         dot:'injury',
         desc:'行動時固定ダメージ。\nあと被回復量が半減します。\nさっさと解除せんと結構やばいです',
@@ -590,6 +605,7 @@ let Buffs = [
         name:'freeze',
         jpnm:'氷結', //レモンサワーじゃないです
         type:'handle',
+        kind:'turn',
         mode:'fixe',
         desc:'凍っている状態。\nターン開始時、n%の確率で解除されます\n炎属性の攻撃を受けても解除できます',
         // n/100の確率で解除
@@ -607,6 +623,7 @@ let Buffs = [
         name:'freeze_blue',
         jpnm:'凍結', //blueの真意に気づけるかな〜〜？？
         type:'handle',
+        kind:'turn',
         mode:'fixe',
         desc:'凍結されている状態。\nターン開始時、n%の確率で解除されます\n炎攻撃を受けても解除不可です',
         // n/100の確率で解除
@@ -624,6 +641,7 @@ let Buffs = [
         name:'freeze_eternal',
         jpnm:'エターナルフリーズ',
         type:'handle',
+        kind:'turn',
         mode:'fixe',
         desc:'エターナルフリーズ！！', //どうあがいても解除不可です。この先、デバフ解除が有効だ
         // n/100の確率で解除
@@ -636,6 +654,7 @@ let Buffs = [
         name:'palsy',
         jpnm:'麻痺',
         type:'handle',
+        kind:'turn',
         mode:'fixe',
         desc:'麻痺ですね。これ好き',
         // n/100の確率で行動不可
@@ -653,6 +672,7 @@ let Buffs = [
         name:'stan',
         jpnm:'スタン',
         type:'handle',
+        kind:'turn',
         mode:'fixe',
         desc:'スタンです。\n内部処理的には麻痺の延長',
         // n/100の確率で行動不可
@@ -665,6 +685,7 @@ let Buffs = [
         name:'skip',
         jpnm:'スキップ',
         type:'handle',
+        kind:'turn',
         mode:'fixe',
         desc:'はいお前スキップ〜〜笑笑\nぴえん超えてだっさぁですね\nえ？違う？',
     },
@@ -672,6 +693,7 @@ let Buffs = [
         name:'sleepiness',
         jpnm:'睡魔',
         type:'handle',
+        kind:'turn',
         mode:'fixe',
         desc:'睡魔..微熱魔じゃないです\nターン終了時にsleepyをnstack増加さかせます',
         // sleepy:sleepyをnstack増加
@@ -686,6 +708,7 @@ let Buffs = [
         name:'sleepy',
         jpnm:'眠気',
         type:'handle',
+        kind:'stack',
         mode:'fixe',
         desc:'眠くなってる状態..です....\n100stack到達でsleepingに変化します....\n変化後のsleepingのLvはsleepinessに寄りけりです\nあと、行動時にsleepyをnstack減少できます....',
         lvs:[ //-と捉へよ
@@ -697,8 +720,9 @@ let Buffs = [
     },
     {
         name:'sleeping',
-        jpnm:'眠',
+        jpnm:'睡眠',
         type:'handle',
+        kind:'stack',
         mode:'fixe',
         desc:'攻撃されると..ちょっと....起きます......\nzzz...',
         lvs:[
@@ -732,8 +756,9 @@ let Buffs = [
     {
         name:'anger',
         type:'handle',
+        kind:'stack',
         mode:'fixe',
-        desc:'すごいイラつかせてくる敵..だからメガさんとかと相性良さそう\nで避けられてさらに煽られるみたいな', //メガさん == メスガキさん
+        desc:'すごいイラつかせてくる敵..?\nいやまあ普通にパクリですけれども\nで避けられてさらに煽られるみたいな',
         // 攻撃力が上がり最大体力、防御力が下がる
     },
 
@@ -741,12 +766,25 @@ let Buffs = [
     {
         name:'onslime',
         type:'unique',
+        kind:'stack',
         mode:'fixe',
         desc:'スライムが体に粘りついている状態です。やばいね(行動不可)',
+        kaijo:"行動開始",
+        kaijov:"All",
+        kaijoF:() => {
+            if(probb(30)){
+                addtext('纏わりついたスライムが邪魔をして動けなかった！');
+                return 1;
+            }
+
+            addtext("スライムを何とか引きはがした！");
+            return 0;
+        }
     },
     {
         name:'stickyslime',
         type:'unique',
+        kind:'turn',
         mode:'fixe',
         desc:'スライムがくっついているおかげで行動するとダメージを受けます',
         flav:'連続行動ビルドに大打撃 part2',
@@ -760,12 +798,14 @@ let Buffs = [
     {
         name:'letsthrow',
         type:'unique',
+        kind:'turn',
         mode:'fixe',
         desc:'レンチを投げる準備をしている状態。次の攻撃与ダメ2倍',
     },
     {
         name:'gambling',
         type:'unique',
+        kind:'turn',
         mode:'fixe',
         desc:'次の攻撃が0,2,4倍になる。これぞ醍醐味..ってやつ？',
     }
@@ -1066,7 +1106,7 @@ let Equips = {
         {
             name:'none',
             jpnm:'なし',
-            power:0,
+            atk:0,
             price:0,
             desc:'ないです。素手とか念とか自由に解釈しておk',
             no:1,
@@ -1076,7 +1116,7 @@ let Equips = {
         {
             name:'woodstick',
             jpnm:'木の棒',
-            power:2,
+            atk:2,
             price:10,
             desc:'初期装備あるあるの武器。値段に見合わず割と強い',
             //購入可能かどうか
@@ -1086,7 +1126,7 @@ let Equips = {
         {
             name:'woodsword',
             jpnm:'木刀',
-            power:4,
+            atk:4,
             price:20,
             desc:'木の棒よりも強い。言うなれば気の剣。',
             
@@ -1096,7 +1136,7 @@ let Equips = {
         {
             name:'bamboo_sword',
             jpnm:'竹刀',
-            power:6,
+            atk:6,
             price:30,
             desc:'さあ、剣道しようぜ！！',
             ap:0,
@@ -1105,7 +1145,7 @@ let Equips = {
         {
             name:'stone',
             jpnm:'石ころ',
-            power:8,
+            atk:8,
             price:50,
             desc:'石です。よわよわ',
             ap:0,
@@ -1114,7 +1154,7 @@ let Equips = {
         {
             name:'bigrock',
             jpnm:'大きな石',
-            power:10,
+            atk:10,
             price:80,
             desc:'岩です。つよつよ',
             ap:0,
@@ -1123,7 +1163,7 @@ let Equips = {
         {
             name:'brick',
             jpnm:'レンガ',
-            power:12,
+            atk:12,
             price:100,
             desc:'岩にセメントつけたら強くなるのって意味わからなくね？',
             ap:0,
@@ -1132,7 +1172,7 @@ let Equips = {
         {
             name:'thinpaper',
             jpnm:'薄めの紙',
-            power:20,
+            atk:20,
             price:5,
             desc:'薄い紙です。\nすって相手に切り付けて｢いたっ..｣ってさせる用です',
             ap:0,
@@ -1144,7 +1184,7 @@ let Equips = {
         {
             name:'card',
             jpnm:'カード',
-            power:'Math.floor(Math.random()*13)+1',
+            atk:'Math.floor(Math.random()*13)+1',
             price:7,
             desc:'ちょっとした運要素。\n攻撃方法は切り付けなので弱い',
             ap:0,
@@ -1153,7 +1193,7 @@ let Equips = {
         {
             name:'scissors',
             jpnm:'はさみ',
-            power:25,
+            atk:25,
             price:200,
             desc:'石には負けるけど紙には勝てます\n#金属製　#特に謎解きとかは無い',
             ap:0,
@@ -1165,7 +1205,7 @@ let Equips = {
         {
             name:'knife',
             jpnm:'ほんもののナイフ',
-            power:40,
+            atk:40,
             price:300,
             desc:'つよつよ武器。\n花や骨に向かって振り回しましょう',
             ap:0,
@@ -1178,7 +1218,7 @@ let Equips = {
         {
             name:'blooddagger',
             jpnm:'ジェン・ソルテ',
-            power:0,
+            atk:0,
             price:150,
             desc:'紅き鮮血に染まりし剣..\n攻撃時相手の体力を吸い回復する\n変換効率は80%..水力発電とだいたい同じ',
             ap:1,
@@ -1194,7 +1234,7 @@ let Equips = {
         {
             name:'timeontarget',
             jpnm:'time on target',
-            power:10,
+            atk:10,
             price:150,
             desc:'ナギサ様の手好き',
             ap:1,
@@ -1210,7 +1250,7 @@ let Equips = {
         {
             name:'biggamble',
             jpnm:'大博打',
-            power:0,
+            atk:0,
             price:150,
             desc:'大勝負..ってやつ？まじで賭け。がんばえ',
             ap:0,
@@ -1223,7 +1263,7 @@ let Equips = {
             no:1,
             name:'contrarian',
             jpnm:'天邪鬼',
-            power:80,
+            atk:80,
             price:150,
             desc:'名前変更予定。',
             ap:0,
@@ -1238,7 +1278,7 @@ let Equips = {
             no:1,
             name:'none',
             jpnm:'なし',
-            shell:0,
+            def:0,
             price:0,
             desc:'ないです。\n筋肉とでも解釈してくれればおk',
             sp:0
@@ -1246,7 +1286,7 @@ let Equips = {
         {
             name:'mask',
             jpnm:'マスク',
-            shell:0,
+            def:0,
             price:1,
             // desc:'大事ですね。\n防御力は関係ありませんが病気にはならない',
             desc:'防御力はないです..が、\n精神的な防御力は激高です',
@@ -1255,7 +1295,7 @@ let Equips = {
         {
             name:'thinbook',
             jpnm:'薄い本',
-            shell:1,
+            def:1,
             price:5,
             desc:'**なのは駄目！！\n死刑！！！！',//コハルなのでセーフ
             sp:0
@@ -1263,7 +1303,7 @@ let Equips = {
         {
             name:'woodenplank',
             jpnm:'木の板',
-            shell:5,
+            def:5,
             price:20,
             desc:'これを使って最初はつるはしを作りましょう',
             sp:0
@@ -1271,7 +1311,7 @@ let Equips = {
         {
             name:'ironplate',
             jpnm:'テッパン',
-            shell:10,
+            def:10,
             price:30,
             desc:'突進してくるあいつ。\ nこいつに手間取ると他のが来てすぐしぬので注意',
             sp:0
@@ -1279,7 +1319,7 @@ let Equips = {
         {
             name:'potlid',
             jpnm:'鍋の蓋',
-            shell:15,
+            def:15,
             price:50,
             desc:'初期装備あるあるⅡですね。\n多分コスパ最強',
             sp:0
@@ -1287,7 +1327,7 @@ let Equips = {
         {
             name:'thickbook',
             jpnm:'厚めの本',
-            shell:20,
+            def:20,
             price:80,
             desc:'辞書とかなのかな。いや六法全書かも',
             sp:0
@@ -1295,7 +1335,7 @@ let Equips = {
         {
             name:'door',
             jpnm:'ドア',
-            shell:25,
+            def:25,
             price:100,
             desc:'え？木の板と一緒だって？\n君は知らないのかい...?\n木の板を6つ並べるとドアが3つできるってことを',
             sp:0
@@ -1303,7 +1343,7 @@ let Equips = {
         {
             name:'electricfan',
             jpnm:'扇風機',
-            shell:30,
+            def:30,
             price:200,
             desc:'涼めるのに便利。\nまた武器にもなり、ついでに敵から身を守れる万能装備',
             sp:0
@@ -1311,7 +1351,7 @@ let Equips = {
         {
             name:'perorodoll',
             jpnm:'ペロロ様人形',
-            shell:50,
+            def:50,
             price:400,
             desc:'ペロロ様の出番です！！\nhifumi daisuki',
             
@@ -1323,8 +1363,8 @@ let Equips = {
             no:1,
             name:'none',
             jpnm:'なし',
-            power:0,
-            shell:0,
+            atk:0,
+            def:0,
             price:0,
             desc:'なし',
             sp:0
@@ -1335,8 +1375,8 @@ let Equips = {
             no:1,
             name:'none',
             jpnm:'なし',
-            power:0,
-            shell:0,
+            atk:0,
+            def:0,
             price:0,
             desc:'なし',
             sp:0
@@ -1347,8 +1387,8 @@ let Equips = {
             no:1,
             name:'none',
             jpnm:'なし',
-            power:0,
-            shell:0,
+            atk:0,
+            def:0,
             price:0,
             desc:'なし',
             sp:0

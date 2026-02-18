@@ -2055,9 +2055,8 @@ function makeUnit(type, code, name){
         unit.exp    = 0;
         unit.sp     = 0;
         unit.attr   = [];
-        unit.weapon = 'none';
-        unit.shield = 'none';
-
+        unit.equips = {}
+        
         unit.slash = unit.slash ?? ['slash', 'double slash', 'slash of light'];
         unit.magic = unit.magic ?? ['heal', 'power', 'shell'];
         unit.tool  = unit.tool  ?? ['aspirin', 'throw knife', 'redcard'];
@@ -2079,8 +2078,7 @@ function makeUnit(type, code, name){
         unit.lv     = random(1, 3);
         unit.attr   = data.attr ?? [];
         unit.lasts  = [];
-        unit.weapon = data.shield ?? 'none';
-        unit.shield = data.shield ?? 'none';
+        unit.equips = {};
     }
 
     let container = (type == 'player') ? batC.pD : batC.eD;
@@ -2089,9 +2087,24 @@ function makeUnit(type, code, name){
     return unit;
 }
 
-// いままで通り呼べるやつ
 const makePlayer = (code, name) => makeUnit('player', code, name);
 const makeEnemy  = () => makeUnit('enemy');
+//#endregion
+
+//#region そーびひん
+function eq_find(type, name){
+    let eqs = Equips[type];
+    let eq = eqs.find(a => a.name == name);
+    if(!eq) return console.error(`あ、あの...${type}に${name}なんていう名前の装備はないです......`);
+    
+    return eq;
+}
+function eq_get(who, type){
+    let eq = who.equips[type];
+    if(!eq) eq = eq_find(type, 'none');
+
+    return eq;
+}
 //#endregion
 
 //#region みちとのそーぐー
@@ -2830,22 +2843,22 @@ function selectJodou(who, code, both = 0){
 //#endregion
 
 //#region だめーじとかぎゃくだめーじとか
-function isCrit(crl, crr = 0){
-    if(typeof crl == 'string' && isNaN(+crl)) return logadd(`isCritのcrlが →${crl}← 。さすがにおかしい。直せや〜〜`);
-    if(typeof crr == 'string' && isNaN(+crr)) return logadd(`isCritのcrrが →${crr}← 。さすがにおかしい。直せや〜〜2`);
+function isCrit(crla, crrs = 0){
+    if(typeof crla == 'string' && isNaN(+crla)) return logadd(`isCritのcrlが →${crla}← 。さすがにおかしい。直せや〜〜`);
+    if(typeof crrs == 'string' && isNaN(+crrs)) return logadd(`isCritのcrrが →${crrs}← 。さすがにおかしい。直せや〜〜2`);
 
-    crl = +crl;
-    crr = +crr;
+    crla = +crla;
+    crrs = +crrs;
 
-    //crl, crrはそれぞれ整数。
-    if(crr == 'ab') return logadd('確定抵抗！'), 0;
-    if(crl == 'ab') return logadd('確定！'), 1;
+    //crla, crrはそれぞれ整数。
+    if(crrs == 'ab') return logadd('確定抵抗！'), 0;
+    if(crla == 'ab') return logadd('確定！'), 1;
     
-    let kei = crl - crr;
+    let kei = crla - crrs;
     if(kei < 0) kei = 0;
 
     let is = Math.floor(Math.random() * 100) < kei;
-    console.log(`率は${crl}%, 抵抗率は${crr}%... 結果は${is}！`);
+    console.log(`率は${crla}%, 抵抗率は${crrs}%... 結果は${is}！`);
 
     if(is) return 1;
     
@@ -2880,8 +2893,8 @@ async function damage(who, ares, val, type0, props = []){
             atk:0,
             matk:0,
             pow:1,
-            crl:0,
-            crd:0,
+            crla:0,
+            crdm:0,
             aim:0
         };
         let Wk = Object.keys(W);
@@ -2890,7 +2903,7 @@ async function damage(who, ares, val, type0, props = []){
             mdef:0,
             she:1,
             cut:0,
-            crr:0,
+            crrs:0,
             dod:0
         };
         let Ak = Object.keys(A);
@@ -2927,11 +2940,12 @@ async function damage(who, ares, val, type0, props = []){
             if(prop == 'fixed') atker.pow = 1;
         }
 
-        let wep = atker.weapon;
-        let weped = Equips['weapon'].find(a => a.name == wep);
-
-        let shi = defer.shield;
-        let shied = Equips['shield'].find(a => a.name == shi);
+        let wep = eq_get(atker, 'weapon');
+        let wepd = eq_find('weapon', wep.name);
+        
+        let shi = eq_get(defer, 'shield');
+        let shied = eq_find('shield', shi.name);
+        console.log(`装備品: 武器:${wep.name}, 防具:${shi.name}`);
 
         //計算
         let type, type2;
@@ -2939,21 +2953,21 @@ async function damage(who, ares, val, type0, props = []){
         if(type0 == 'mg') type = 'matk', type2 = 'mdef'; //なんかそういうやつ、それの2
         if(type0 == 'cn') type = 'atk', type2 = 'def'; //銃の攻撃力....?武器依存では？、防御力かな
 
-        console.log(`(damage) ${type0} ::`);
+        console.log(`[damage] ${who.cam}${who.me} => ${are.cam}${are.me}(${type0})::`);
 
         // (攻撃力+武器攻撃力) * 攻撃倍率
-        let dmg = ((atker[type]+weped.atk) * (atker.pow));
-        console.log(`dmg:: (${atker[type]} + ${weped[type]}) * (${atker.pow}) = ${dmg}`);
+        let dmg = ((atker[type]+wepd.atk) * (atker.pow));
+        console.log(`与え:: (${atker[type]} + ${wepd[type]}) * (${atker.pow}) = ${dmg}`);
         
         // (防御力+盾防御力) * 防御倍率 + ダメージカット
         let rer = ((defer[type2]+shied.def)*(defer.she)) + defer.cut;
-        console.log(`rer:: (${defer[type2]} + ${shied[type2]}) * (${defer.she}) + (${defer.cut}) = ${rer}`);
+        console.log(`守り:: (${defer[type2]} + ${shied[type2]}) * (${defer.she}) + (${defer.cut}) = ${rer}`);
         
         //crit
-        let crit = isCrit((atker.crl + weped.crl), (defer.crr + shied.crr));
+        let crit = isCrit((atker.crla + wepd.crla), (defer.crrs + shied.crrs));
         if(crit){
-            dmg *= (atker.crd + weped.crd);
-            console.log(`(会心ed！) dmg x (${atker.crd} + ${weped.crd})`);
+            dmg *= (atker.crdm + wepd.crdm);
+            console.log(`(会心ed！) dmg x (${atker.crdm} + ${wepd.crdm})`);
         }
 
         //実装
@@ -3071,20 +3085,23 @@ function buffMold(buff, time, val){
     if(!data) console.error(`${buff} ←これ存在しないらしいっすよ〜？`);
     let kind = data.kind;
 
-    if(kind == 'fixe' && !data.lvs[val]){
+    if(data.mode == 'fixe' && !data.lvs[val]){
         console.error(`${buff} ←これ最大レベルが${data.max}なのに、今${val}指定されてますよ〜？`);
         console.error(`私が調整しておきますから... 感謝してくださいね〜？`);
         val = data.max;
     }
 
     if(data.mode == 'free') val = {[data.agemono]: val};
-    if(data.mode == 'fixe') val = data.lvs[val-1]??null;
+    if(data.mode == 'fixe'){
+        if(data.lvs) val = data.lvs[val-1]??null;
+        else val = {}; //多分、値が要らないものなのでしょう
+    }
     console.log(`[${data.mode}] ${buff} time:${time} val↓`);
     console.log(val);
 
     let newbuff = {};
 
-    switch(kind){
+    switch(data.kind){
         case 'turn':{
             newbuff = {
                 type: data.type,
