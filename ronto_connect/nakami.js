@@ -1803,6 +1803,7 @@ function nextStage(kakutey = null){
     while(mts == dunC.stage || !kakutey){
         // ランダムにステージを決定
         dunC.stage = arraySelect(arr);
+        if(arr.length == 1) break;
     }
     if(kakutey) dunC.stage = kakutey;
     console.log(`れっつら ${dunC.stage}`);
@@ -2009,7 +2010,7 @@ function makeUnit(type, code, name){
     // ── データ取得 ──
     if(type == 'player'){
         data = (!code ? Charas : Friends).find(a => a.name == name);
-        if(!data) return logadd(`codeが[${code}]の${name}はいないらしい`);
+        if(!data) return console.log(`codeが[${code}]の${name}はいないらしい`);
     }else{
         data = arraySelect(Enemies.filter(a => !a.no));
     }
@@ -2731,6 +2732,14 @@ function turretAllClear(){
 
 //#endregion
 
+//#region Q-T-E
+async function qte(who){
+    let are = await selectSyudou();
+    let res = await damage(who, are, 100, 'qte');
+    if(res) return 1;
+}
+//#endregion
+
 //#region てきさんのた～ん
 async function enemyturn(who){
     let data = Enemies.find(a => a.name == who.name);
@@ -2844,15 +2853,15 @@ function selectJodou(who, code, both = 0){
 
 //#region だめーじとかぎゃくだめーじとか
 function isCrit(crla, crrs = 0){
-    if(typeof crla == 'string' && isNaN(+crla)) return logadd(`isCritのcrlが →${crla}← 。さすがにおかしい。直せや〜〜`);
-    if(typeof crrs == 'string' && isNaN(+crrs)) return logadd(`isCritのcrrが →${crrs}← 。さすがにおかしい。直せや〜〜2`);
+    if(typeof crla == 'string' && isNaN(+crla)) return console.log(`isCritのcrlが →${crla}← 。さすがにおかしい。直せや〜〜`);
+    if(typeof crrs == 'string' && isNaN(+crrs)) return console.log(`isCritのcrrが →${crrs}← 。さすがにおかしい。直せや〜〜2`);
 
     crla = +crla;
     crrs = +crrs;
 
     //crla, crrはそれぞれ整数。
-    if(crrs == 'ab') return logadd('確定抵抗！'), 0;
-    if(crla == 'ab') return logadd('確定！'), 1;
+    if(crrs == 'ab') return console.log('確定抵抗！'), 0;
+    if(crla == 'ab') return console.log('確定！'), 1;
     
     let kei = crla - crrs;
     if(kei < 0) kei = 0;
@@ -2882,6 +2891,8 @@ async function damage(who, ares, val, type0, props = []){
     }
     
     for(let are of ares){
+        if(hasp("set") && val > are.maxhp) return await heal(who, are, val, props);
+
         let atker = {...who};
         atker.pow = 1;
 
@@ -3006,7 +3017,7 @@ async function heal(who, ares, val, props = []){
     let hasa = (whi, name) => whi.attr.includes(name);
     if(!Array.isArray(ares)) ares = [ares];
 
-    if(val.endsWith('%')){
+    if(typeof val == 'string' && val.endsWith('%')){
         let key = props.find(a => a.startsWith("%!"));
         if(key) key = key.substring(2);
         else key = "maxhp";
@@ -3017,10 +3028,13 @@ async function heal(who, ares, val, props = []){
     }
     
     for(let are of ares){
-        if(are.attr.includes('undead')){
+        if(hasp("set") && (val < are.maxhp || hasa(are, 'undead'))) return await damage(who, are, val, "mg", props);
+        
+        if(hasa(are, 'undead')){
+            
             // console.log('アンデッドなので逆回復 =>')
             console.log('undead 死んじゃいない =>')
-            let res = await damage(who, are, val, props);
+            let res = await damage(who, are, val, "mg", props);
             if(res) return 1;
             continue;
         }

@@ -886,7 +886,7 @@ let Magics = [
         mp:4,
         lv:1,
         func:async function(who, are){
-            await heal(who, are, '20%', 'add')
+            if(await heal(who, are, '20%')) return 1;
             
             return 0;
         }
@@ -957,7 +957,7 @@ let Magics = [
         mp:8,
         lv:6,
         func:async function(who, are){
-            await heal(who, are, '40%', 'add')
+            if(await heal(who, are, '40%')) return 1;
             return 0;
         }
     },
@@ -1036,7 +1036,7 @@ let Magics = [
         mp:12,
         lv:12,
         func:async function(who, are){
-            await heal(who, are, '60%', 'add')
+            if(await heal(who, are, '60%')) return 1;
             return 0
         }
     },
@@ -1404,7 +1404,7 @@ let Tools = [
         desc:'味方単体の体力を20%回復',
         flav:'おや、頭が痛いって？\n痛みに効くのはアスピリン！',
         func:async function(who, are){
-            if(await heal(who, are, "20%", "add")) return 1;
+            if(await heal(who, are, "20%")) return 1;
             return 0;
         }
     },
@@ -1415,7 +1415,7 @@ let Tools = [
         desc:'味方単体の体力を40%回復',
         flav:'一種の風邪薬。大人とか向けらしいね',
         func:async function(who,are){
-            if(await heal(who, are, "40%", "add")) return 1;
+            if(await heal(who, are, "40%")) return 1;
             return 0;
         }
     },
@@ -1427,7 +1427,7 @@ let Tools = [
         desc:'味方単体の体力を70%回復',
         flav:'膵液に含まれる消化酵素の一種。\n薬ではない。',
         func:async function(who,are){
-            if(await heal(who, are, "70%", "add")) return 1;
+            if(await heal(who, are, "70%")) return 1;
             return 0;
         }
     },
@@ -1439,10 +1439,10 @@ let Tools = [
         flav:'sick sickな頭痛薬。\n毒が流るルルですね。',
         func:async function(who,are){
             //await addtext(`求愛性 孤独 ドク 流るルル`)
-            if(await heal(who, are, '60%', 'add')) return 1;
+            if(await heal(who, are, '60%')) return 1;
             if(probb(40)) return 0;
             await addtext('愛をもっと')
-            if(await heal(who, are, '60%', 'add')) return 1;
+            if(await heal(who, are, '60%')) return 1;
             return 0;
         }
     },
@@ -1454,7 +1454,7 @@ let Tools = [
         flav:'投げつけたい。敵に（？）\n内部処理的にはHPを100%にセットしてます',
         func:async function(who,are){
             await addtext("パワー...全開だ！！")
-            if(await heal(who, are, '100%', 'set')) return 1;
+            if(await heal(who, are, '100%', ["set"])) return 1;
             return 0;
         }
     },
@@ -2413,7 +2413,7 @@ let Enemies = [
                 probable:30,
                 type:'',
                 num:3,
-                func:async function(who){
+                    func:async function(who){
                     let are = selectJodou(who,'pdefl');
                     let res = await qte(1000,['a','d']); //0が失敗, 1が成功
                     switch(res){
