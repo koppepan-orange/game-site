@@ -52,7 +52,13 @@ function tobiText(youso, mes){
     };
 
     requestAnimationFrame(frame);
-};
+};function El(tag, cls, children = []){
+    let e = document.createElement(tag);
+    if(cls) e.className = cls;
+    children.forEach(c => e.appendChild(c));
+    return e;
+}
+
 function kaijou(num){
     if(num == 0) return 0;
     if(num == 1) return 1;
@@ -1964,13 +1970,6 @@ function whatdo(who, are, shu, name){
 //#endregion どちらかと言うと youは何しに日本へ
 
 //#region どむさんのようそづくり～
-function El(tag, cls, children = []){
-    let e = document.createElement(tag);
-    if(cls) e.className = cls;
-    children.forEach(c => e.appendChild(c));
-    return e;
-}
-
 function makeHuman(cam, me){
     let sd = Stages.find(a => a.name == dunC.stage);
 

@@ -56,6 +56,12 @@ function tobiText(youso, mes) {
 function copytext(text){
     navigator.clipboard.writeText(text);
 }
+function El(tag, cls, children = []){
+    let e = document.createElement(tag);
+    if(cls) e.className = cls;
+    children.forEach(c => e.appendChild(c));
+    return e;
+}
 function kaijou(num){
     if(num == 0) return 0;
     if(num == 1) return 1;
@@ -251,9 +257,39 @@ function ranshoku(){
     let ato = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
     return ato;
 };
+function timeDifference(pastTimestamp) {
+    let now = new Date(); // 現在時刻
+    let pastDate = new Date(
+        pastTimestamp.slice(0, 4),
+        pastTimestamp.slice(4, 6) - 1,
+        pastTimestamp.slice(6, 8),
+        pastTimestamp.slice(8, 10),
+        pastTimestamp.slice(10, 12)
+    );
+
+    let diffMs = now - pastDate; // ミリ秒の差分
+    let diffMinutes = Math.floor(diffMs / (1000 * 60)); // 分に変換
+    let diffHours = Math.floor(diffMs / (1000 * 60 * 60)); // 時間に変換
+    let diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24)); // 日に変換
+    let diffMonths = (now.getFullYear() - pastDate.getFullYear()) * 12 + now.getMonth() - pastDate.getMonth(); // 月差分計算
+    let diffYears = now.getFullYear() - pastDate.getFullYear(); // 年差分計算
+
+    // 条件分岐で返す
+    if (diffMinutes < 60) {
+        return `${diffMinutes}分前`;
+    } else if (diffHours < 24) {
+        return `${diffHours}時間前`;
+    } else if (diffDays < 30) { // 30日未満なら「日」
+        return `${diffDays}日前`;
+    } else if (diffMonths < 12) { // 12ヶ月未満なら「月」
+        return `${diffMonths}ヶ月前`;
+    } else { // それ以上なら「年」
+        return `${diffYears}年前`;
+    }
+}
 //#endregion
 //#region log&text
-let textDiv = document.querySelector('#text');
+let textDiv = document.getElementById('text');
 let autoDelay = 1;
 let skipText = false;
 let clearText = false;
@@ -405,9 +441,9 @@ document.addEventListener('click', () => {
     setTimeout(() => skipText = false, 50); // 一時的にスキップを有効化
 });
 
-let logOOmoto = document.querySelector('#log');
-let log = document.querySelector('#log .log');
-let logOpener = document.querySelector('#log .opener');
+let logOOmoto = document.getElementById('log');
+let log = logOOmoto.querySelector('.log');
+let logOpener = logOOmoto.querySelector('.opener');
 let log_open = (code = NaN) => {
     jump:{
         if(!isNaN(code)) break jump;
