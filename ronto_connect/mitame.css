@@ -1,12 +1,13 @@
 /* #region スターターパック */
 html{
-    margin: -8px;
+    margin: 0px;
     overflow: hidden;
     user-select:none;
 }
 body{
     width: 100vw;
     height: 100vh;
+    margin: 0;
     white-space: nowrap;
     touch-action: none;
 }
@@ -38,7 +39,7 @@ img{
     position: fixed;
     top: 0;
     right: 0;
-    background-color: #f0f8ff80;
+    background: #f0f8ff80;
     color: #000000;
     font-size: 20px;
     transition: right 2.0s linear;
@@ -68,56 +69,58 @@ img{
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
-    width: 320px;
-    height: 24vh;
+    width: 330px;
+    height: 160px;
     border: 2px solid #ffffff;
-     border-left: none;
+     border-right: none;
     position: fixed;
-    left: -334px;
+    right: -300px;
+    bottom: 20%;
+    transition: right 1.0s ease;
     color: #fefefe;
-    overflow-y: hidden;
-    transition: left 1.0s ease;
+    overflow: hidden;
+    box-sizing: border-box;
     z-index: 10;
 }
 #log.tog{
-    left: 54px;
+    right: 0px;
 }
 #log .opener{
     width: 30px;
     height: 100%;
-    background-color: #000000ef;
+    background: #000000ef;
     text-align: center;
+    box-sizing: border-box;
     cursor: pointer;
-    z-index: inherit;
 }
-#log .log{
+#log .main{
     width: 300px;
     height: 100%;
     max-height: 100%;
-    overflow-x: hidden; overflow-y: scroll;
-    background-color: #000000de;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    background: #000000de;
     text-align: left;
-    font-size: 14px;
-    transition: right 0.3s;
-    z-index: inherit;
+    font-size: 11px;
+    box-sizing: border-box;
 }
-#text{
+#log .text{
     display: none;
-    background: rgba(0, 0, 0, 0.8);
-    color: #ffffff;
+    width: fit-content;
     padding: 10px 15px;
     border-radius: 5px;
-    font-size: 1.2em;
+    background: #000000ce;
     position: fixed;
-    bottom: 120px;
     left: 50%;
+    bottom: 120px;
     transform: translateX(-50%);
-    z-index: 10000;
-
+    color: #ffffff;
+    font-size: 1.2em;
     white-space: nowrap;
     overflow: hidden;
-    width: fit-content; /* 文字の長さに応じた幅 */
     animation: fadeIn 0.5s ease forwards;
+    box-sizing: border-box;
+    z-index: 2147483647;
 }
 @keyframes fadeIn {
     0%{
@@ -134,7 +137,7 @@ img{
     display: none;
     position: fixed;
     pointer-events: none;
-    background-color: #363636e2;
+    background: #363636e2;
     color: #f0f8ff;
     text-align: left;
     padding: 5px 10px;
@@ -261,7 +264,7 @@ img{
     height: 100px;
     /* aspect-ratio: 1/1; */
     padding: 5px;
-    background-color: #f0f8ff;
+    background: #f0f8ff;
     border: 1px solid #000000;
     color: #000000;
     font-size: 12px;
