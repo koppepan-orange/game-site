@@ -52,13 +52,62 @@ function tobiText(youso, mes){
     };
 
     requestAnimationFrame(frame);
-};function El(tag, cls, children = []){
+};
+function copytext(text){
+    navigator.clipboard.writeText(text);
+}
+async function kirameki(div0, zukey = 'star', n = 20, time = 2000, col){
+    //heart!!!!!!!!!
+    let taioued = ['star', 'heart'];
+    if(!taioued.includes(zukey)) return console.log(`図形が対応していません。現在対応しているのは[${taioued.join(', ')}だけあります。`);
+    let rect = div0.getBoundingClientRect();
+    let cenX = rect.left + rect.width / 2;
+    let cenY = rect.top + rect.height / 2;
+
+    let divs = [];
+    for(let i=0; i<n; i++){
+        let div = document.createElement('div');
+        div.className = `kirameki p_${zukey}`;
+        div.style.top = `${Math.random() * 100}%`;
+        div.style.left = `${Math.random() * 100}%`;
+        if(zukey == 'star') div.style.transform = `rotate(${Math.random() * 360}deg)`;
+        if(col) div.style.background = col;
+        document.body.appendChild(div);
+        divs.push(div);
+    }
+
+    divs.forEach(div => {
+        let angle = Math.random() * 2 * Math.PI;
+        let speed = Math.random() * 2 + 1;
+        let velocityX = Math.cos(angle) * speed;
+        let velocityY = Math.sin(angle) * speed;
+
+        let lifeTime = 0;
+        let maxLifeTime = time;
+
+        function animate(){
+            lifeTime += 16; // 約60fpsで更新
+            if(lifeTime >= maxLifeTime){
+                div.remove();
+                return;
+            }
+
+            velocityY += 0.05; // 重力
+            div.style.left = `${cenX + velocityX * (lifeTime / 16)}px`;
+            div.style.top = `${cenY + velocityY * (lifeTime / 16)}px`;
+            div.style.opacity = String(1 - lifeTime / maxLifeTime);
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+    })
+}
+function El(tag, cls, children = []){
     let e = document.createElement(tag);
     if(cls) e.className = cls;
     children.forEach(c => e.appendChild(c));
     return e;
 }
-
 function kaijou(num){
     if(num == 0) return 0;
     if(num == 1) return 1;
@@ -72,7 +121,7 @@ function kaikyu(sta, end, row, val){
 
     let kari = Math.floor((val-sta) / row);
     let sta2 = sta + kari*row;
-    let end2 = sta + row-1;
+    let end2 = sta2 + row - 1;
     if(end2 > end) end2 = end;
 
     let arr = [];
@@ -85,7 +134,7 @@ function arraySelect(array){
     return array[select];
 };
 function arrayShuffle(array){
-    for(let i = array.length - 1; i > 0; i--){
+    for(let i=(array.length-1); i>0; i--){
         let i2 = Math.floor(Math.random() * (i + 1));
         [array[i], array[i2]] = [array[i2], array[i]];
     };
@@ -200,14 +249,30 @@ function anagramCan(mae, ato){
 
     return 1;
 };
-function setLocalStorage(name, value){
+// LocalStorage(Data) => lsd
+function lsdSet(name, value){
     localStorage.setItem(name, value || "");
 };
-function getLocalStorage(name){
+function lsdGet(name){
     return localStorage.getItem(name);
 };
+function lsdRem(name){
+    localStorage.removeItem(name);
+}
+function lsdShow(){
+    let itemCount = localStorage.length;
+    console.error(`-- LocalStorageのアイテム数: ${itemCount} --`);
+    for(let i = 0; i < itemCount; i++){
+        let key = localStorage.key(i);
+        let value = localStorage.getItem(key);
+        // nicoText(`キー: ${key}, 値: ${value}`);
+        console.log(`キー: ${key}, 値: ${value}`);
+    }
+    console.error(`-- 以上 --`);
+}
+
 async function error(text = 'errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr'){
-    addtext(text);
+    await logText(text);
     await delay(2000);
     // window.open('about:blank', '_self').close();
 };
@@ -231,7 +296,7 @@ function hoshoku(color){
 function mixshoku(c1, c2, ratio = 0.5){
     let toRGB = c => {
         c = c.replace('#', '');
-        if(c.length == 3) c = c.split('').map(x => x + x).join('');
+        if (c.length === 3) c = c.split('').map(x => x + x).join('');
         let n = parseInt(c, 16);
         return [n >> 16, (n >> 8) & 255, n & 255];
     };
@@ -254,123 +319,179 @@ function ranshoku(){
     let ato = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
     return ato;
 };
+function timeDiff(kako){
+    let now = new Date();
+    let past = new Date(
+        kako.slice(0, 4),
+        kako.slice(4, 6) - 1,
+        kako.slice(6, 8),
+        kako.slice(8, 10),
+        kako.slice(10, 12)
+    );
+
+    let diff = now - past;
+    let d = {
+        minute:Math.floor(diff / (1000 * 60)),
+        hour:Math.floor(diff / (1000 * 60 * 60)),
+        day:Math.floor(diff / (1000 * 60 * 60 * 24)),
+        month:(now.getFullYear() - past.getFullYear()) * 12 + now.getMonth() - past.getMonth(),
+        year:now.getFullYear() - past.getFullYear()
+    };
+
+    if(d.minute < 60){
+        return `${d.minute}分前`;
+    }else if(d.hour < 24){
+        return `${d.hour}時間前`;
+    }else if(d.day < 30){
+        return `${d.day}日前`; //30日未満なら「日」
+    }else if(d.month < 12){
+        return `${d.month}ヶ月前`; //12ヶ月未満なら「月」
+    }else{
+        return `${d.year}年前`; //それ以上なら「年」
+    }
+}
+function timeToshow(date){ //見る用
+    if(!date) console.error('日付がありませんぜ旦那！');
+    let year = date.getFullYear();
+    let month = String(date.getMonth() + 1).padStart(2, '0');
+    let day = String(date.getDate()).padStart(2, '0');
+    let hours = String(date.getHours()).padStart(2, '0');
+    let minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}/${month}/${day} ${hours}:${minutes}`;
+}
+function timeTodata(date){ //データ保存用
+    if(!date) date = new Date(), console.warn('あなた、日付を入れ忘れてるわよ');
+    let year = date.getFullYear();
+    let month = String(date.getMonth() + 1).padStart(2, '0');
+    let day = String(date.getDate()).padStart(2, '0');
+    let hours = String(date.getHours()).padStart(2, '0');
+    let minutes = String(date.getMinutes()).padStart(2, '0');
+    let time = `${year}${month}${day}${hours}${minutes}`;
+    return +time;
+}
 //#endregion
 //#region log&text
-let textDiv = document.querySelector('#text');
-let autoDelay = 1;
-let skipText = false;
-let clearText = false;
-let textShowing = 0;
+let logD = document.getElementById('log');
+let logC = {
+    mainD: logD.querySelector('.main'),
+    togD: logD.querySelector('.opener'),
+    textD: logD.querySelector('.text'),
+    autoDelay: 1,
+    skipText: false,
+    clearText: false,
+    loopText: 0,
+    ing: 0,
+    queue: []
+}
+logC.colors = [
+    {
+        name: 'red',
+        sym: '*',
+        col: '#ff4040'
+    },
+    {
+        name: 'pink',
+        sym: '&',
+        col: '#ff80bf'
+    },
+    {
+        name: 'yell',
+        sym: '^',
+        col: '#ffff40'
+    }
+];
+let logF = {};
 
-function colorcheck(rawtext){
+logF.cc = (raw) => {
     let text = [];
     let color = null;
-    let colors = [
-        {
-            name: 'red',
-            sym: '*',
-            col: '#ff4040'
-        },
-        {
-            name: 'pink',
-            sym: '&',
-            col: '#ff80bf'
-        },
-        {
-            name: 'yell',
-            sym: '^',
-            col: '#ffff40'
-        }
-    ];
 
-    for(let i = 0; i < rawtext.length; i++){
+    for(let i = 0; i < raw.length; i++){
         let sym = false;
-        for(let c of colors){
-            if(rawtext[i] == c.sym && rawtext[i + 1] == c.sym){
-                console.log(`→${rawtext[i]}← 発見！ ${c.name}色です`);
+        for(let c of logC.colors){
+            if(raw[i] == c.sym && raw[i + 1] == c.sym){
+                console.log(`→${raw[i]}← 発見！ ${c.name}色です`);
                 color = color ? null : c.col;
                 i++;
                 sym = true;
                 break;
             }
         };
-
         if(sym) continue;
-        if(color) console.log(color);
+
         text.push({
-            char: rawtext[i],
+            char: raw[i],
             color: color
         });
     }
     return text;
 };
 
-let queueAddtext = [];
-let loopAddtext = 0;
-async function waitforAddtext(){
-    let len = queueAddtext.length;
+logF.waitfor = async() => {
+    let len = logC.queue.length;
 
-    if(len == 0) loopAddtext = 0;
-    else loopAddtext = 1;
+    if(len == 0) logC.loopText = 0;
+    else logC.loopText = 1;
 
-    if(!loopAddtext) return console.log('loopがないんでしゅーりょー');
+    if(!logC.loopText) return;
     requestAnimationFrame(waitforAddtext);
 
-    if(textShowing) return console.log('文字表示されたんでスキップ');
-    
-    let raw = queueAddtext.shift();
+    if(logC.ing) return;
+    let raw = logC.queue.shift();
     // console.log(`${raw}を送信します`);
-    // console.log(`残り: (${len - 1})[${queueAddtext}]`);
-    await addtext(raw);
+    // console.log(`残り: (${len - 1})[${logC.queue}]`);
+    await logText(raw);
 };
-async function addtext(raw){
+async function logText(raw){
     if(!raw) return console.log('「内容が？内容が〜〜？ないよ〜〜〜つってwwww直せ」');
+    if(typeof raw != 'string') raw = String(raw);
 
-    if(textShowing){
-        queueAddtext.push(raw);
+    if(logC.ing){
+        logC.queue.push(raw);
 
-        if(!loopAddtext) waitforAddtext();
+        if(!logC.loopText) logF.waitfor();
         return;
     };
     
-    textShowing = 1;
-    text = colorcheck(raw);
-    textDiv.innerHTML = "";
-    textDiv.style.display = "block";
-    let index = 0;
-    clearText = false;
+    logC.ing = 1;
+    text = logF.cc(raw);
+    logC.textD.innerHTML = "";
+    logC.textD.style.display = "block";
+    logC.clearT = false;
 
+    let index = 0;
     return new Promise((resolve) => {
         async function type(){
             if(index < text.length){
-                if(skipText){
-                    while (index < text.length){
+                if(logC.skipT){
+                    while(index < text.length){
                         let span = document.createElement("span");
                         span.textContent = text[index].char;
-                        if(text[index].color) span.classList.add(`color-${text[index].color}`);
-                        textDiv.appendChild(span);
+                        if(text[index].color) span.style.color = text[index].color;
+                        logC.textD.appendChild(span);
 
                         index++;
                     }
                     index = text.length;
-                    skipText = false;
+                    logC.skipT = false;
                     setTimeout(type, 10);
                 }else{
                     let span = document.createElement("span");
                     span.textContent = text[index].char;
-                    if(text[index].color) span.classList.add(`color-${text[index].color}`);
-                    textDiv.appendChild(span);
+                    if(text[index].color) span.style.color = text[index].color;
+                    logC.textD.appendChild(span);
 
                     index++;
                     setTimeout(type, 80); // 次の文字を表示する間隔
                 }
             }else{
-                addlog(textDiv.innerHTML);
-                let waitTime = autoDelay * 1000;
+                logText_log(logC.textD.innerHTML);
+                let waitTime = logC.autoDelay * 1000;
                 let timeout = new Promise(resolve => setTimeout(resolve, waitTime));
                 let userAction = new Promise(resolve => {
+
                     function waitToClear(event){
-                        if(event.type == 'click' || event.key == 'z' || event.key == 'Enter'){
+                        if(event.type === 'click' || event.key === 'z' || event.key === 'Enter'){
                             document.removeEventListener('click', waitToClear);
                             document.removeEventListener('keydown', waitToClear);
                             resolve();
@@ -381,11 +502,11 @@ async function addtext(raw){
                 });
 
                 Promise.race([timeout, userAction]).then(() => {
-                    textDiv.textContent = "";
-                    textDiv.style.display = "none";
-                    clearText = true;
-                    skipText = false
-                    textShowing = 0;
+                    logC.textD.textContent = "";
+                    logC.textD.style.display = "none";
+                    logC.clearT = true;
+                    logC.skipT = false
+                    logC.ing = 0;
                     resolve('end');
                 });
             }
@@ -394,47 +515,55 @@ async function addtext(raw){
     });
 };
 document.addEventListener('keydown', (e) => {
-    if(e.key == 'z' || e.key == 'Enter'){
-        skipText = true;
-    }
+    if(e.key === 'z' || e.key === 'Enter') logC.skipT = true;
 });
 document.addEventListener('keyup', (e) => {
-    if(e.key == 'z' || e.key == 'Enter'){
-        skipText = false;
-    }
+    if(e.key === 'z' || e.key === 'Enter') logC.skipT = false;
 });
 document.addEventListener('click', () => {
-    skipText = true;
-    setTimeout(() => skipText = false, 50); // 一時的にスキップを有効化
+    logC.skipT = true;
+    setTimeout(() => logC.skipT = false, 50); // 一時的にスキップを有効化
 });
 
-let logOOmoto = document.querySelector('#log');
-let log = document.querySelector('#log .log');
-let logOpener = document.querySelector('#log .opener');
-let log_open = (code = NaN) => {
-    jump:{
-        if(!isNaN(code)) break jump;
+logF.tog = (code = NaN) => {
+    if(isNaN(code)){
+        logD.classList.toggle('tog');
+        logC.togD.textContent = logD.classList.contains('tog') ? '<' : '>';
+    }
+    else{
+        if(code == 1){
+            logD.classList.add('tog');
+            logC.togD.textContent = '<';
+        };
+        if(code == 0){
+            logD.classList.remove('tog');
+            logC.togD.textContent = '>';
+        };
+    }
 
-        logOOmoto.classList.toggle('tog');
-        logOpener.textContent = logOOmoto.classList.contains('tog') ? '<' : '>';
-        return;
-    };
-
-    if(code == 1){
-        logOOmoto.classList.add('tog');
-        logOpener.textContent = '<';
-    };
-    if(code == 0){
-        logOOmoto.classList.remove('tog');
-        logOpener.textContent = '>';
-    };
-
+    let isTog = logD.classList.contains('tog');
+    let isHid = logD.classList.contains('hid');
+    if(isTog && isHid) logF.woah(0);
 };
-logOpener.addEventListener('click', log_open);
+logC.togD.addEventListener('click', logF.tog);
 
-function addlog(text){
-    log.innerHTML += text + '<br>';
-    log.scrollTop = log.scrollHeight;
+logF.woah = (code = NaN) => {
+    if(isNaN(code)){
+        logD.classList.toggle('hid');
+    }
+    else{
+        if(code == 1) logD.classList.add('hid');
+        if(code == 0) logD.classList.remove('hid');
+    }
+
+    let isTog = logD.classList.contains('tog');
+    let isHid = logD.classList.contains('hid');
+    if(isTog && isHid) logF.tog(0);
+};
+
+function logText_log(text){
+    logC.mainD.innerHTML += text + '<br>';
+    logC.mainD.scrollTop = logC.mainD.scrollHeight;
 };
 //#endregion
 //#region description
@@ -464,7 +593,11 @@ document.addEventListener('mousedown', e => {
     // let descTarget = e.target.closest('[data-description]');
     let div = e.target;
     
-    if(!div.classList.contains('draggable')) return;
+    while(div && !div.classList.contains('draggable')){
+        if(div.tagName == 'BODY') return; //戻りすぎね
+        div = div.parentElement;
+    }
+
     offsetX = e.clientX - div.getBoundingClientRect().left;
     offsetY = e.clientY - div.getBoundingClientRect().top;
     
@@ -481,7 +614,7 @@ document.addEventListener('mousedown', e => {
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
 });
-//#endregion 
+//#endregion
 //#region tk
 class tk{
     constructor(type, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
@@ -1436,7 +1569,7 @@ dunF.update = async() => {
         };
     }
 
-    if((keys.z || keys.enter) && textShowing == 0){
+    if((keys.z || keys.enter) && logC.ing == 0){
         // 今乗ってる（on == true かつ 座標が同じ） => obon認定
         let obon = dunC.objs.filter(a => a.x == p.x && a.y == p.y && a.on);
         if(obon.length > 1) return console.log(obon,'←onのやつらが重なってるみたいっす！');
@@ -2121,7 +2254,7 @@ async function encount(){
     let iran = ['うわっ！', '嗚呼、'];
     let iran2= ['きた！なんだって～？！', '来たり']
     let ran = random(0, iran.length-1);
-    await addtext(`${iran[ran]}${enemiesen}人飛び出して${iran2[ran]}`);
+    await logText(`${iran[ran]}${enemiesen}人飛び出して${iran2[ran]}`);
 
     await nextTurn();
 }
@@ -2138,7 +2271,7 @@ async function nextTurn(who = 0){
             //アンコールの動き
             if(hask(data, 'luck')){//luck
                 if(isCrit(data.luck)){
-                    addlog('当たりが出たらもう一本！');
+                    logText_log('当たりが出たらもう一本！');
                     return playerturn();
                 }
             }
@@ -2171,7 +2304,7 @@ async function nextTurn(who = 0){
         let skill = nanka.skill;
         let data = Skills.find(a => a.name == skill);
         console.log(`${dare.name}のスキル:"${skill}"を発動!`);
-        await addtext(`${dare.name}は"${data.name}"を発動した！！`);
+        await logText(`${dare.name}は"${data.name}"を発動した！！`);
         let result = await skillAct(dare, skill);
         if(result) return 1;
     }
@@ -2228,15 +2361,15 @@ async function nextTurn(who = 0){
         if(buff.name == 'onslime'){
             if(isCrit(buff.value)){
                 buffremove(are, 'onslime');
-                addlog('なんとかスライムを取り払った!!');
+                logText_log('なんとかスライムを取り払った!!');
             }else{
-                addlog('スライムが邪魔して動けない!!');
+                logText_log('スライムが邪魔して動けない!!');
                 nextTurn(are);
                 return;
             }; 
         }
         if(buffhas(are,'skip')){
-            await addtext(`>> はい${are.name}、お前スキップ〜〜`);
+            await logText(`>> はい${are.name}、お前スキップ〜〜`);
             nextTurn(are); return;
         }
         if(hask(buff.value, 'palsy')){
@@ -2246,20 +2379,20 @@ async function nextTurn(who = 0){
             if(!isCrit(val)) continue;
 
             data.name != 'stan'
-            ? addlog(`${are.cam}${are.me}は麻痺している..`)
-            : addlog(`${are.cam}${are.me}はスタンしている....`);
+            ? logText_log(`${are.cam}${are.me}は麻痺している..`)
+            : logText_log(`${are.cam}${are.me}はスタンしている....`);
             nextTurn(are);
             return 1;
         }
         if(hask(buff.value, 'freeze')){
             let val = buff.value.freeze;
             if(!isCrit(val)){
-                addlog(`${are.name}は凍っている...`);
+                logText_log(`${are.name}は凍っている...`);
                 nextTurn(are);
                 return;
             }
             
-            await addtext(`氷が溶けた！`);
+            await logText(`氷が溶けた！`);
             buffremove(are,'freeze');    
         }
     }    
@@ -2300,7 +2433,7 @@ async function playerturn(who = 0){
 
         tekiou();
     
-        addtext('あなたのターンです！');
+        logText('あなたのターンです！');
         playerturn();
 
         return;
@@ -2429,7 +2562,7 @@ async function dassyutsu(){
     dunF.draw()
     
     dunF.get().moving = 0;
-    await addtext('うまく逃げ切れた！');
+    await logText('うまく逃げ切れた！');
 }
 
 function selectSyudou(code = 1){
@@ -2567,7 +2700,7 @@ async function Attack(who, num){
     disappear();
     let name = who.slash[num]
     if(!name){
-        await addtext('you dont have slash...');
+        await logText('you dont have slash...');
         return playerturn()
     }
 
@@ -2579,14 +2712,14 @@ async function Attack(who, num){
         who.mp -= data.mp;
         tekiou();
 
-        await addtext(`${who.name}の${name}！`);
+        await logText(`${who.name}の${name}！`);
 
         whatdo(who, are, "Tools", name)
         let res = await data.func(who, are);
         if(res) return 1;
         nextTurn(who);
     }else{
-        await addtext('not enough mp...');
+        await logText('not enough mp...');
         playerturn();
     }
 }
@@ -2596,7 +2729,7 @@ async function Magic(who, num){
     disappear();
     let name = who.magic[num]
     if(!name){
-        await addtext('you dont have magic...');
+        await logText('you dont have magic...');
         return playerturn()
     }
 
@@ -2609,14 +2742,14 @@ async function Magic(who, num){
         who.mp -= data.mp;
         tekiou();
 
-        await addtext(`${who.name}の${name}！`);
+        await logText(`${who.name}の${name}！`);
         
         whatdo(who, are, "Tools", name);
         let res = await data.func(who, are);
         if(res) return 1;
         nextTurn(who);
     }else{
-        await addtext('not enough mp...');
+        await logText('not enough mp...');
         playerturn();
     }
 }
@@ -2627,7 +2760,7 @@ async function Tool(who, num){
     disappear();
     let name = who.tool[num]
     if(!name){
-        await addtext('you dont have sono tool...');
+        await logText('you dont have sono tool...');
         return playerturn()
     }
 
@@ -2638,7 +2771,7 @@ async function Tool(who, num){
         data.num -= 1;
 
         let are = await selectSyudou();
-        await addtext(`${who.name}は${name}を使用した!`);
+        await logText(`${who.name}は${name}を使用した!`);
         
         whatdo(who, are, "Tools", name)
         let res = await data.func(who, are);
@@ -2646,7 +2779,7 @@ async function Tool(who, num){
         
         nextTurn(who);
     }else{
-        await addtext('not enough tool...');
+        await logText('not enough tool...');
         playerturn();
     }
 }
@@ -2758,7 +2891,7 @@ async function enemyturn(who){
         let res = await act.func(who);
         if(res) return 1;
     }else{
-        await addtext(`${who.name}は何かで攻撃した！`)
+        await logText(`${who.name}は何かで攻撃した！`)
         are = selectJodou(who, 'phpl');
         let res = await damage(who, are, 100, 'ph'); //areの後、1の前に"何の倍率か"を入れるべき。基本atkかもだけどfixで固定、とかできそう
         if(res) return 1;
@@ -2998,7 +3131,7 @@ async function damage(who, ares, val, type0, props = []){
         are.hp -= dmg2;
         tekiou();
         let criten = crit ? '！' : '';
-        addlog(`(${turn}) [${who.cam}]${who.name} => [${are.cam}]${are.name} (${dmg2}ダメージ${criten})`);
+        logText_log(`(${turn}) [${who.cam}]${who.name} => [${are.cam}]${are.name} (${dmg2}ダメージ${criten})`);
         
         await delay(1000)
 
@@ -3040,7 +3173,7 @@ async function heal(who, ares, val, props = []){
         
         if(are.attr.includes('musha')) continue; //武者は回復を受けつけない
 
-        addlog(`(${turn}) [${who.cam}]${who.name} ==> [${are.cam}]${are.name} (${val}回復)`);
+        logText_log(`(${turn}) [${who.cam}]${who.name} ==> [${are.cam}]${are.name} (${val}回復)`);
         
         await delay(1000)
 

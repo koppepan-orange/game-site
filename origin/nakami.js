@@ -2,20 +2,21 @@
 function delay(ms){
     return new Promise(resolve=>setTimeout(resolve,ms));
 };
-async function nicoText(mes){
-    let newDiv = document.createElement('div');
-    newDiv.textContent = mes;
-    newDiv.className = 'nicotext';
-    newDiv.style.top = `calc(${random(0, 100)}vh - 20px)`;
-    newDiv.style.right = '0px';
-    document.querySelector('body').appendChild(newDiv);
 
-    requestAnimationFrame(() => newDiv.style.right = `${window.innerWidth + newDiv.offsetWidth}px`);
+async function nicoText(mes){
+    let div = document.createElement('div');
+    div.textContent = mes;
+    div.className = 'nicotext';
+    document.querySelector('body').appendChild(div);
+
+    div.style.top = `calc(${random(0, 100)}vh - 20px)`;
+    div.style.right = `-${div.offsetWidth}px`;
+
+    requestAnimationFrame(() => div.style.right = `${window.innerWidth + div.offsetWidth}px`);
     
-    await delay(2000); 
-    newDiv.remove();
-};
-function tobiText(youso, mes) {
+    await delay(5000); 
+    div.remove();};
+function tobiText(youso, mes){
     let el = youso;
     if(typeof el == 'string') el = document.querySelector(youso);
     if(!el) return console.error('せんぱ〜い？この要素壊れてますよ〜〜？');
@@ -56,6 +57,52 @@ function tobiText(youso, mes) {
 function copytext(text){
     navigator.clipboard.writeText(text);
 }
+async function kirameki(div0, zukey = 'star', n = 20, time = 2000, col){
+    //heart!!!!!!!!!
+    let taioued = ['star', 'heart'];
+    if(!taioued.includes(zukey)) return console.log(`図形が対応していません。現在対応しているのは[${taioued.join(', ')}だけあります。`);
+    let rect = div0.getBoundingClientRect();
+    let cenX = rect.left + rect.width / 2;
+    let cenY = rect.top + rect.height / 2;
+
+    let divs = [];
+    for(let i=0; i<n; i++){
+        let div = document.createElement('div');
+        div.className = `kirameki p_${zukey}`;
+        div.style.top = `${Math.random() * 100}%`;
+        div.style.left = `${Math.random() * 100}%`;
+        if(zukey == 'star') div.style.transform = `rotate(${Math.random() * 360}deg)`;
+        if(col) div.style.background = col;
+        document.body.appendChild(div);
+        divs.push(div);
+    }
+
+    divs.forEach(div => {
+        let angle = Math.random() * 2 * Math.PI;
+        let speed = Math.random() * 2 + 1;
+        let velocityX = Math.cos(angle) * speed;
+        let velocityY = Math.sin(angle) * speed;
+
+        let lifeTime = 0;
+        let maxLifeTime = time;
+
+        function animate(){
+            lifeTime += 16; // 約60fpsで更新
+            if(lifeTime >= maxLifeTime){
+                div.remove();
+                return;
+            }
+
+            velocityY += 0.05; // 重力
+            div.style.left = `${cenX + velocityX * (lifeTime / 16)}px`;
+            div.style.top = `${cenY + velocityY * (lifeTime / 16)}px`;
+            div.style.opacity = String(1 - lifeTime / maxLifeTime);
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+    })
+}
 function El(tag, cls, children = []){
     let e = document.createElement(tag);
     if(cls) e.className = cls;
@@ -75,7 +122,7 @@ function kaikyu(sta, end, row, val){
 
     let kari = Math.floor((val-sta) / row);
     let sta2 = sta + kari*row;
-    let end2 = sta + row-1;
+    let end2 = sta2 + row - 1;
     if(end2 > end) end2 = end;
 
     let arr = [];
@@ -87,8 +134,16 @@ function arraySelect(array){
     let select = Math.floor(Math.random()*array.length);
     return array[select];
 };
-function arrayShuffle(array) {
-    for(let i = array.length - 1; i > 0; i--) {
+function arrayToggle(array, name){
+    let array2 = copy(array);
+    let index = array2.indexOf(name);
+    if(index == -1) array2.push(name);
+    else array2.splice(index, 1);
+    
+    return array2;
+}
+function arrayShuffle(array){
+    for(let i=(array.length-1); i>0; i--){
         let i2 = Math.floor(Math.random() * (i + 1));
         [array[i], array[i2]] = [array[i2], array[i]];
     };
@@ -122,7 +177,7 @@ function hask(obj, key){
     res = res ? 1 : 0;
     return res;
 };
-function copy(moto) {
+function copy(moto){
     if(Array.isArray(moto)){
         let arr = [];
         for(let i = 0; i < moto.length; i++){
@@ -141,7 +196,7 @@ function copy(moto) {
         return moto;
     };
 };
-function probability(num){
+function probb(num){
     return Math.random()*100 <= num;
     //例:num == 20 → randomが20以内ならtrue,elseならfalseを返す
 };
@@ -203,14 +258,30 @@ function anagramCan(mae, ato){
 
     return 1;
 };
-function setLocalStorage(name, value){
+// LocalStorage(Data) => lsd
+function lsdSet(name, value){
     localStorage.setItem(name, value || "");
 };
-function getLocalStorage(name){
+function lsdGet(name){
     return localStorage.getItem(name);
 };
+function lsdRem(name){
+    localStorage.removeItem(name);
+}
+function lsdShow(){
+    let itemCount = localStorage.length;
+    console.error(`-- LocalStorageのアイテム数: ${itemCount} --`);
+    for(let i = 0; i < itemCount; i++){
+        let key = localStorage.key(i);
+        let value = localStorage.getItem(key);
+        // nicoText(`キー: ${key}, 値: ${value}`);
+        console.log(`キー: ${key}, 値: ${value}`);
+    }
+    console.error(`-- 以上 --`);
+}
+
 async function error(text = 'errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr'){
-    addtext(text);
+    await logText(text);
     await delay(2000);
     // window.open('about:blank', '_self').close();
 };
@@ -257,152 +328,178 @@ function ranshoku(){
     let ato = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
     return ato;
 };
-function timeDifference(pastTimestamp) {
-    let now = new Date(); // 現在時刻
-    let pastDate = new Date(
-        pastTimestamp.slice(0, 4),
-        pastTimestamp.slice(4, 6) - 1,
-        pastTimestamp.slice(6, 8),
-        pastTimestamp.slice(8, 10),
-        pastTimestamp.slice(10, 12)
+function timeDiff(kako){
+    let now = new Date();
+    let past = new Date(
+        kako.slice(0, 4),
+        kako.slice(4, 6) - 1,
+        kako.slice(6, 8),
+        kako.slice(8, 10),
+        kako.slice(10, 12)
     );
 
-    let diffMs = now - pastDate; // ミリ秒の差分
-    let diffMinutes = Math.floor(diffMs / (1000 * 60)); // 分に変換
-    let diffHours = Math.floor(diffMs / (1000 * 60 * 60)); // 時間に変換
-    let diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24)); // 日に変換
-    let diffMonths = (now.getFullYear() - pastDate.getFullYear()) * 12 + now.getMonth() - pastDate.getMonth(); // 月差分計算
-    let diffYears = now.getFullYear() - pastDate.getFullYear(); // 年差分計算
+    let diff = now - past;
+    let d = {
+        minute:Math.floor(diff / (1000 * 60)),
+        hour:Math.floor(diff / (1000 * 60 * 60)),
+        day:Math.floor(diff / (1000 * 60 * 60 * 24)),
+        month:(now.getFullYear() - past.getFullYear()) * 12 + now.getMonth() - past.getMonth(),
+        year:now.getFullYear() - past.getFullYear()
+    };
 
-    // 条件分岐で返す
-    if (diffMinutes < 60) {
-        return `${diffMinutes}分前`;
-    } else if (diffHours < 24) {
-        return `${diffHours}時間前`;
-    } else if (diffDays < 30) { // 30日未満なら「日」
-        return `${diffDays}日前`;
-    } else if (diffMonths < 12) { // 12ヶ月未満なら「月」
-        return `${diffMonths}ヶ月前`;
-    } else { // それ以上なら「年」
-        return `${diffYears}年前`;
+    if(d.minute < 60){
+        return `${d.minute}分前`;
+    }else if(d.hour < 24){
+        return `${d.hour}時間前`;
+    }else if(d.day < 30){
+        return `${d.day}日前`; //30日未満なら「日」
+    }else if(d.month < 12){
+        return `${d.month}ヶ月前`; //12ヶ月未満なら「月」
+    }else{
+        return `${d.year}年前`; //それ以上なら「年」
     }
+}
+function timeToshow(date){ //見る用
+    if(!date) console.error('日付がありませんぜ旦那！');
+    let year = date.getFullYear();
+    let month = String(date.getMonth() + 1).padStart(2, '0');
+    let day = String(date.getDate()).padStart(2, '0');
+    let hours = String(date.getHours()).padStart(2, '0');
+    let minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}/${month}/${day} ${hours}:${minutes}`;
+}
+function timeTodata(date){ //データ保存用
+    if(!date) date = new Date(), console.warn('あなた、日付を入れ忘れてるわよ');
+    let year = date.getFullYear();
+    let month = String(date.getMonth() + 1).padStart(2, '0');
+    let day = String(date.getDate()).padStart(2, '0');
+    let hours = String(date.getHours()).padStart(2, '0');
+    let minutes = String(date.getMinutes()).padStart(2, '0');
+    let time = `${year}${month}${day}${hours}${minutes}`;
+    return +time;
 }
 //#endregion
 //#region log&text
-let textDiv = document.getElementById('text');
-let autoDelay = 1;
-let skipText = false;
-let clearText = false;
-let textShowing = 0;
+let logD = document.getElementById('log');
+let logC = {
+    mainD: logD.querySelector('.main'),
+    togD: logD.querySelector('.opener'),
+    textD: logD.querySelector('.text'),
+    autoDelay: 1,
+    skipText: false,
+    clearText: false,
+    loopText: 0,
+    ing: 0,
+    queue: []
+}
+logC.colors = [
+    {
+        name: 'red',
+        sym: '*',
+        col: '#ff4040'
+    },
+    {
+        name: 'pink',
+        sym: '&',
+        col: '#ff80bf'
+    },
+    {
+        name: 'yell',
+        sym: '^',
+        col: '#ffff40'
+    }
+];
+let logF = {};
 
-function colorcheck(rawtext) {
+logF.cc = (raw) => {
     let text = [];
     let color = null;
-    let colors = [
-        {
-            name: 'red',
-            sym: '*',
-            col: '#ff4040'
-        },
-        {
-            name: 'pink',
-            sym: '&',
-            col: '#ff80bf'
-        },
-        {
-            name: 'yell',
-            sym: '^',
-            col: '#ffff40'
-        }
-    ];
 
-    for(let i = 0; i < rawtext.length; i++){
+    for(let i = 0; i < raw.length; i++){
         let sym = false;
-        for(let c of colors){
-            if(rawtext[i] == c.sym && rawtext[i + 1] == c.sym){
-                console.log(`→${rawtext[i]}← 発見！ ${c.name}色です`);
+        for(let c of logC.colors){
+            if(raw[i] == c.sym && raw[i + 1] == c.sym){
+                console.log(`→${raw[i]}← 発見！ ${c.name}色です`);
                 color = color ? null : c.col;
                 i++;
                 sym = true;
                 break;
             }
         };
-
         if(sym) continue;
-        if(color) console.log(color);
+
         text.push({
-            char: rawtext[i],
+            char: raw[i],
             color: color
         });
     }
     return text;
 };
 
-let queueAddtext = [];
-let loopAddtext = 0;
-async function waitforAddtext(){
-    let len = queueAddtext.length;
+logF.waitfor = async() => {
+    let len = logC.queue.length;
 
-    if(len == 0) loopAddtext = 0;
-    else loopAddtext = 1;
+    if(len == 0) logC.loopText = 0;
+    else logC.loopText = 1;
 
-    if(!loopAddtext) return console.log('loopがないんでしゅーりょー');
+    if(!logC.loopText) return;
     requestAnimationFrame(waitforAddtext);
 
-    if(textShowing) return console.log('文字表示されたんでスキップ');
-    
-    let raw = queueAddtext.shift();
+    if(logC.ing) return;
+    let raw = logC.queue.shift();
     // console.log(`${raw}を送信します`);
-    // console.log(`残り: (${len - 1})[${queueAddtext}]`);
-    await addtext(raw);
+    // console.log(`残り: (${len - 1})[${logC.queue}]`);
+    await logText(raw);
 };
-async function addtext(raw){
+async function logText(raw){
     if(!raw) return console.log('「内容が？内容が〜〜？ないよ〜〜〜つってwwww直せ」');
+    if(typeof raw != 'string') raw = String(raw);
 
-    if(textShowing){
-        queueAddtext.push(raw);
+    if(logC.ing){
+        logC.queue.push(raw);
 
-        if(!loopAddtext) waitforAddtext();
+        if(!logC.loopText) logF.waitfor();
         return;
     };
     
-    textShowing = 1;
-    text = colorcheck(raw);
-    textDiv.innerHTML = "";
-    textDiv.style.display = "block";
-    let index = 0;
-    clearText = false;
+    logC.ing = 1;
+    text = logF.cc(raw);
+    logC.textD.innerHTML = "";
+    logC.textD.style.display = "block";
+    logC.clearT = false;
 
+    let index = 0;
     return new Promise((resolve) => {
         async function type(){
             if(index < text.length){
-                if(skipText){
-                    while (index < text.length) {
+                if(logC.skipT){
+                    while(index < text.length){
                         let span = document.createElement("span");
                         span.textContent = text[index].char;
-                        if(text[index].color) span.classList.add(`color-${text[index].color}`);
-                        textDiv.appendChild(span);
+                        if(text[index].color) span.style.color = text[index].color;
+                        logC.textD.appendChild(span);
 
                         index++;
                     }
                     index = text.length;
-                    skipText = false;
+                    logC.skipT = false;
                     setTimeout(type, 10);
                 }else{
                     let span = document.createElement("span");
                     span.textContent = text[index].char;
-                    if(text[index].color) span.classList.add(`color-${text[index].color}`);
-                    textDiv.appendChild(span);
+                    if(text[index].color) span.style.color = text[index].color;
+                    logC.textD.appendChild(span);
 
                     index++;
                     setTimeout(type, 80); // 次の文字を表示する間隔
                 }
             }else{
-                addlog(textDiv.innerHTML);
-                let waitTime = autoDelay * 1000;
+                logText_log(logC.textD.innerHTML);
+                let waitTime = logC.autoDelay * 1000;
                 let timeout = new Promise(resolve => setTimeout(resolve, waitTime));
                 let userAction = new Promise(resolve => {
-                    function waitToClear(event) {
+
+                    function waitToClear(event){
                         if(event.type === 'click' || event.key === 'z' || event.key === 'Enter'){
                             document.removeEventListener('click', waitToClear);
                             document.removeEventListener('keydown', waitToClear);
@@ -414,11 +511,11 @@ async function addtext(raw){
                 });
 
                 Promise.race([timeout, userAction]).then(() => {
-                    textDiv.textContent = "";
-                    textDiv.style.display = "none";
-                    clearText = true;
-                    skipText = false
-                    textShowing = 0;
+                    logC.textD.textContent = "";
+                    logC.textD.style.display = "none";
+                    logC.clearT = true;
+                    logC.skipT = false
+                    logC.ing = 0;
                     resolve('end');
                 });
             }
@@ -427,47 +524,55 @@ async function addtext(raw){
     });
 };
 document.addEventListener('keydown', (e) => {
-    if(e.key === 'z' || e.key === 'Enter'){
-        skipText = true;
-    }
+    if(e.key === 'z' || e.key === 'Enter') logC.skipT = true;
 });
 document.addEventListener('keyup', (e) => {
-    if(e.key === 'z' || e.key === 'Enter'){
-        skipText = false;
-    }
+    if(e.key === 'z' || e.key === 'Enter') logC.skipT = false;
 });
 document.addEventListener('click', () => {
-    skipText = true;
-    setTimeout(() => skipText = false, 50); // 一時的にスキップを有効化
+    logC.skipT = true;
+    setTimeout(() => logC.skipT = false, 50); // 一時的にスキップを有効化
 });
 
-let logOOmoto = document.getElementById('log');
-let log = logOOmoto.querySelector('.log');
-let logOpener = logOOmoto.querySelector('.opener');
-let log_open = (code = NaN) => {
-    jump:{
-        if(!isNaN(code)) break jump;
+logF.tog = (code = NaN) => {
+    if(isNaN(code)){
+        logD.classList.toggle('tog');
+        logC.togD.textContent = logD.classList.contains('tog') ? '<' : '>';
+    }
+    else{
+        if(code == 1){
+            logD.classList.add('tog');
+            logC.togD.textContent = '<';
+        };
+        if(code == 0){
+            logD.classList.remove('tog');
+            logC.togD.textContent = '>';
+        };
+    }
 
-        logOOmoto.classList.toggle('tog');
-        logOpener.textContent = logOOmoto.classList.contains('tog') ? '<' : '>';
-        return;
-    };
-
-    if(code == 1){
-        logOOmoto.classList.add('tog');
-        logOpener.textContent = '<';
-    };
-    if(code == 0){
-        logOOmoto.classList.remove('tog');
-        logOpener.textContent = '>';
-    };
-
+    let isTog = logD.classList.contains('tog');
+    let isHid = logD.classList.contains('hid');
+    if(isTog && isHid) logF.woah(0);
 };
-logOpener.addEventListener('click', log_open);
+logC.togD.addEventListener('click', logF.tog);
 
-function addlog(text){
-    log.innerHTML += text + '<br>';
-    log.scrollTop = log.scrollHeight;
+logF.woah = (code = NaN) => {
+    if(isNaN(code)){
+        logD.classList.toggle('hid');
+    }
+    else{
+        if(code == 1) logD.classList.add('hid');
+        if(code == 0) logD.classList.remove('hid');
+    }
+
+    let isTog = logD.classList.contains('tog');
+    let isHid = logD.classList.contains('hid');
+    if(isTog && isHid) logF.tog(0);
+};
+
+function logText_log(text){
+    logC.mainD.innerHTML += text + '<br>';
+    logC.mainD.scrollTop = logC.mainD.scrollHeight;
 };
 //#endregion
 //#region description
@@ -497,7 +602,11 @@ document.addEventListener('mousedown', e => {
     // let descTarget = e.target.closest('[data-description]');
     let div = e.target;
     
-    if(!div.classList.contains('draggable')) return;
+    while(div && !div.classList.contains('draggable')){
+        if(div.tagName == 'BODY') return; //戻りすぎね
+        div = div.parentElement;
+    }
+
     offsetX = e.clientX - div.getBoundingClientRect().left;
     offsetY = e.clientY - div.getBoundingClientRect().top;
     
@@ -514,7 +623,7 @@ document.addEventListener('mousedown', e => {
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
 });
-//#endregion 
+//#endregion
 //#region tk
 class tk{
     constructor(type, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
@@ -749,6 +858,17 @@ document.addEventListener('mousemove', (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
 });
+
+document.addEventListener("paste", event => {
+    // プレーンペーストに強制的にするやつ
+    event.preventDefault();
+    let text = event.clipboardData.getData("text/plain");
+    let selection = window.getSelection();
+    if (!selection.rangeCount) return;
+    selection.deleteFromDocument();
+    selection.getRangeAt(0).insertNode(document.createTextNode(text));
+    selection.collapseToEnd();
+});
 //#endregion
 //#region fonts
 const Fonts = [
@@ -794,7 +914,7 @@ loaC.imgL = {
 loaC.imgT = Object.values(loaC.imgL).length;
 
 loaC.souL = {
-    // se:['error'],
+    se:['error'],
     // bgm:[],
 }
 loaC.souT = Object.values(loaC.souL).length;
@@ -933,6 +1053,96 @@ function soundVolume(code, val){
 soundVolume(50);
 
 document.addEventListener('DOMContentLoaded', async() => await loaF.load());
+//#endregion
+//#region 幸せになれる隠しコマンドがあるらしい
+let secrates = [
+    {
+        ind:0,
+        name:'koppepan',
+        arr:['k','o','p','p','e','p','a','n'],
+        limit:3,
+        func: async function(){
+            nicoText('なんにも起こらない＝ヨーン');
+        }
+    },
+    {
+        ind:0,
+        name:'re',
+        arr:['r','e'],
+        limit:1,
+        func: async function(){
+            let img = document.createElement('img');
+            img.id = 'hakaisatsu';
+            img.src = 'assets/images/systems/hakai_1.png'
+            img.dataset.phase = 1;
+            document.querySelector('body').appendChild(img);
+
+            setTimeout(() => {
+                img.remove();
+                this.ind = 0;
+                this.limit = 1;
+            }, 3000)
+
+            return 0;
+        }
+    },
+    {
+        ind:0,
+        name:'rere',
+        arr:['r','e','r','e'],
+        limit:1,
+        func: async function(){
+            let img = document.getElementById('hakaisatsu');
+            if(!img) return;
+
+            img.src = 'assets/images/systems/hakai_2.png'
+            img.dataset.phase = 2;
+
+            setTimeout(() => {
+                img.remove();
+                this.ind = 0;
+                this.limit = 1;
+            }, 3000)
+
+            return 0;
+        }
+    },
+    {
+        ind:0,
+        name:'rerere',
+        arr:['r','e','r','e','r','e'],
+        limit:1,
+        func: async function(){
+            let img = document.getElementById('hakaisatsu');
+            if(!img) return 1;
+            console.log(img.dataset.phase);
+            if(img.dataset.phase != '2') return 1;
+            location.reload();
+        }
+    },
+]
+document.addEventListener('keydown', async function(e){
+    let key = e.key.toLowerCase();
+    if(key == 'escape') loop = 0;
+
+    if(document.activeElement.tagName == 'INPUT') return;
+    if(document.activeElement.tagName == 'TEXTAREA') return;
+
+    for(let sec of secrates){
+        let nke = sec.arr[sec.ind];
+        // console.log(`必要は${nke}、押されたは${key}！`);
+        if(key == nke){
+            sec.ind += 1;
+            if(sec.ind == sec.arr.length && sec.limit){
+                console.log(`${sec.name}発動！！[${sec.arr.join(' ')}]`);
+                sec.ind = 0;
+                let res = await sec.func();
+                if(!res && sec.limit != 'n') sec.limit -= 1;
+            }
+        }
+        else sec.ind = 0;
+    }
+})
 //#endregion
 
 

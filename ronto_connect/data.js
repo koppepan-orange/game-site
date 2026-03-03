@@ -773,11 +773,11 @@ let Buffs = [
         kaijov:"All",
         kaijoF:() => {
             if(probb(30)){
-                addtext('纏わりついたスライムが邪魔をして動けなかった！');
+                logText('纏わりついたスライムが邪魔をして動けなかった！');
                 return 1;
             }
 
-            addtext("スライムを何とか引きはがした！");
+            logText("スライムを何とか引きはがした！");
             return 0;
         }
     },
@@ -824,7 +824,7 @@ let Attacks = [
 
             //elseesに移行よろ
             if(who.ps == 'sthree' && probb(25)){
-                await addtext(`${who.name}は頑張った!`);
+                await logText(`${who.name}は頑張った!`);
                 if(await damage(who, are, 100, 'ph')) return 1;
                 if(await damage(who, are, 100, 'ph')) return 1;
             }
@@ -1088,13 +1088,13 @@ let Magics = [
             let arr = Magics.filter(a => a.lv <= who.level && a.mp <= who.mp).map(a => a.name);
             if(arr.length >= 1){
                 let mg = arraySelect(arr);
-                await addtext(`${mg}が出た！`);
+                await logText(`${mg}が出た！`);
                 await delay(500);
                 let res = await Magics[mg].func(who, are);
                 return res
             }else{
-                await addtext(`失敗！`)
-                await addtext(`マキシマイザ・マキシマイザー！！`);
+                await logText(`失敗！`)
+                await logText(`マキシマイザ・マキシマイザー！！`);
                 return 0;
             }
         }
@@ -1224,9 +1224,9 @@ let Equips = {
             ap:1,
             aFunc:async function(who,are){
                 if(await damage(who, are, ))
-                addtext('血を吸った！');
+                logText('血を吸った！');
                 tekiou();
-                addtext(`体力が${x}回復した!`);
+                logText(`体力が${x}回復した!`);
                 return 0;
             },
             ce:0,
@@ -1239,7 +1239,7 @@ let Equips = {
             desc:'ナギサ様の手好き',
             ap:1,
             aFunc:async function(who,are,rate,kind,prop,dmg){
-                addtext(arraySelect(['トリニティの砲撃術は優秀ですから。','お口に合うと良いのですが..']));
+                logText(arraySelect(['トリニティの砲撃術は優秀ですから。','お口に合うと良いのですが..']));
                 let result = await damage(who,are,0.4,kind,['unpursuit']);
                 if(result) return 1;
                 await buffadd(who, are, 'shelldown', 3, 1);
@@ -1438,10 +1438,10 @@ let Tools = [
         desc:'味方単体の体力を60%回復。40%の確率で再度60%回復。',
         flav:'sick sickな頭痛薬。\n毒が流るルルですね。',
         func:async function(who,are){
-            //await addtext(`求愛性 孤独 ドク 流るルル`)
+            //await logText(`求愛性 孤独 ドク 流るルル`)
             if(await heal(who, are, '60%')) return 1;
             if(probb(40)) return 0;
-            await addtext('愛をもっと')
+            await logText('愛をもっと')
             if(await heal(who, are, '60%')) return 1;
             return 0;
         }
@@ -1453,7 +1453,7 @@ let Tools = [
         desc:'味方単体の体力を100%回復',
         flav:'投げつけたい。敵に（？）\n内部処理的にはHPを100%にセットしてます',
         func:async function(who,are){
-            await addtext("パワー...全開だ！！")
+            await logText("パワー...全開だ！！")
             if(await heal(who, are, '100%', ["set"])) return 1;
             return 0;
         }
@@ -1495,7 +1495,7 @@ let Tools = [
         flav:'なんだかんだ初期からずっと好きな人/nレッドウィンターの問題児にしては上出来すぎる',
         num:0,
         func:async function(who,are){
-            await addtext('これはちょっと、スパイシーなやつだよ');
+            await logText('これはちょっと、スパイシーなやつだよ');
             if(await damage(who, are, 20, 'cn', [])) return 1;
             
             let are2 = selectJodou(who, 'tz'); //敵 全体
@@ -1511,7 +1511,7 @@ let Tools = [
         flav:'ゴミ箱に隠れてる人。\nかわいいね',
         num:0,
         func:async function(who,are){
-            // await addtext('え、援護します...');
+            // await logText('え、援護します...');
             if(await damage(who, are, "75%", 'cn', ['%!hp'])) return 1;
             return 0;
         }
@@ -1524,7 +1524,7 @@ let Tools = [
         flav:'エクスプローージョン！！！\n敵を確殺します。嬉しいね',
         num:1,
         func:async function(who,are){
-            await addtext('爆発オチなんてサイテー！！');
+            await logText('爆発オチなんてサイテー！！');
             if(await damage(who, are, "100%", 'cn', ['%!maxhp','追撃無し',"固定","貫通"])) return 1;
             
             return 0; //生きることもあります たぶん
@@ -1539,7 +1539,7 @@ let Tools = [
         num:3,
         func:async function(who,are){
             await buffadd(who, are,'skip',1,1);
-            await addtext('ピピッ、レッドカードが出ました');
+            await logText('ピピッ、レッドカードが出ました');
             return 0;
         }
     },
@@ -1550,7 +1550,7 @@ let Tools = [
         desc:'トランプのJでも代用可。\nなぜか知らないけど青色のイメージが強い',
         num:0,
         func:async function(who, are){
-            await addtext('これはリバースのモニュメントか？');
+            await logText('これはリバースのモニュメントか？');
             aH = who.hp/who.maxhp * are.maxhp;//割合交換(そのうちゲージにする時用)
             wH = are.hp/are.maxhp * who.maxhp;
             if(await heal(who, are, aH, ["set"])) return 1;
@@ -1568,7 +1568,7 @@ let Tools = [
         func:async function(who,are){
             let buffs = arrayShuffle(['power','shellup','luck']);
             for(let i=0; i<2; i++) await buffadd(who, are, buffs[i], 3, random(1, 3));
-            await addtext(`${are.name}に良い効果を2個つけました！！`);
+            await logText(`${are.name}に良い効果を2個つけました！！`);
             return 0;
         }
     },
@@ -1582,7 +1582,7 @@ let Tools = [
         func:async function(who,are){
             buffs = arrayShuffle(['powerdown','shelldown','poison','burn','freeze']);
             for(let i=0; i<2; i++) await buffadd(who, are, buffs[i], 3, random(1, 3));
-            await addtext(`${are.name}にわるわる効果を2個つけました！！`);
+            await logText(`${are.name}にわるわる効果を2個つけました！！`);
             return 0;
         }
     },
@@ -1631,33 +1631,33 @@ let Skills = [
         
         func:async function(who){
             let [target, tcam] = await selectSyudou();
-            await addtext(`${humans[cam][me].jpnm}は爆弾を投げた...`);
+            await logText(`${humans[cam][me].jpnm}は爆弾を投げた...`);
             x = random(0,5)
             switch(x){
                 case 0:{
-                    await addtext('しかし不発弾だった!!');
+                    await logText('しかし不発弾だった!!');
                     break;//これによる効果とかもあっていいかも
                 };
                 case 5:{
-                    await addtext('Lucky! 爆弾は焼夷弾だった!!!');
+                    await logText('Lucky! 爆弾は焼夷弾だった!!!');
                     break;
                 };
                 case 4:{
-                    await addtext('爆弾は花火だった!');
+                    await logText('爆弾は花火だった!');
                     break;
                 };
                 case 3:{
-                    await addtext('爆弾は毒ガス入りだった!!');
+                    await logText('爆弾は毒ガス入りだった!!');
                     await buffadd(who, are,'poison', 3,1);
                     break; //毒ガス入りだった場合
                 };
                 case 2:{
-                    await addtext('爆弾はスライム入りだった!!');
+                    await logText('爆弾はスライム入りだった!!');
                     await buffadd(who, are,'onslime', 2,1);
                     break;//スライム入りだった場合
                 };
                 case 1:{
-                    await addtext('爆発した..だがただの特殊な薬品だった!!');
+                    await logText('爆発した..だがただの特殊な薬品だった!!');
                     break;
                 };
             }
@@ -1675,7 +1675,7 @@ let Skills = [
         
         func:async function(who){
             let [target, tcam] = await selectSyudou();
-            await addtext(
+            await logText(
                 arraySelect(
                     ['こんな大きなダイアモンド見たことないでしょ？あげるね～',
                         'あなた…それじゃあダメだよ',
@@ -1764,7 +1764,7 @@ let Skills = [
         func:async function(who){
             phase = 0; disappear();
             let [tcam, tme] = await selectSyudou();
-            await addtext(arraySelect(['わたしはその辺の小石...','わたしのことなんて、気にしないでください...','すみません、一人にさせてください......']));
+            await logText(arraySelect(['わたしはその辺の小石...','わたしのことなんて、気にしないでください...','すみません、一人にさせてください......']));
             await buffadd(who, are,'weaknessgrasp', 1,1);//弱点把握状態
             return 0;
         },
@@ -1792,7 +1792,7 @@ let Skills = [
         func:async function(who){
             let are = selectJodou(who,'er',0);
             await buffadd(who, are,'onslime', 1,1);
-            await addtext(`${are.name}にスライムが覆い被さった!`);
+            await logText(`${are.name}にスライムが覆い被さった!`);
             return 0;
         }
     },
@@ -1806,7 +1806,7 @@ let Skills = [
         cool:4,
         func:async function(who){
             await buffadd(who, who,'letsthrow', 2,1);
-            await addtext('wrenchを投げる準備ができた!');
+            await logText('wrenchを投げる準備ができた!');
             return 0;
         }
     },
@@ -1820,7 +1820,7 @@ let Skills = [
         cool:3,
         func:async function(who){
             await buffadd(who, who,'gambling', 1,1);
-            addtext('さあ、ギャンブルの時間だ!!');
+            logText('さあ、ギャンブルの時間だ!!');
             return 0;
         }
     },
@@ -1834,7 +1834,7 @@ let Skills = [
         cool:5,
         func:async function(who){
             await buffadd(who, who,'improve', 4,1);
-            await addtext('パーツアップグレード。');
+            await logText('パーツアップグレード。');
             return 0;
         }
     },
@@ -1849,7 +1849,7 @@ let Skills = [
         func:async function(who){
             let are = selectJodou(who, 'phpl',0);
             await buffadd(who, are,'elecshield', 2,1);
-            await addtext('帯電バリアを付与しました！');
+            await logText('帯電バリアを付与しました！');
             return 0;
         }
     },
@@ -2037,7 +2037,7 @@ let Objects = [
         ables:[],
         sei:[],
         func:async function(){
-            await addtext(arrayGacha( //この重複感好き
+            await logText(arrayGacha( //この重複感好き
                 ['この焚き火はもう木炭になっている','まだ温かい..この辺りに誰かいるようだ'],
                 [85,15]
             ));
@@ -2225,7 +2225,7 @@ let Enemies = [
                 probable:75,
                 num:1,
                 func:async function(who){
-                    await addtext(`${who.name}は粘液を飛ばしてきた！`);
+                    await logText(`${who.name}は粘液を飛ばしてきた！`);
                     let are = selectJodou(who, 'phph',0);
                     let res = await damage(who, are, 100, 'ph');
                     if(res) return 1;
@@ -2238,7 +2238,7 @@ let Enemies = [
                 probable:25,
                 num:3,
                 func:async function(who){
-                    await addtext(`${who.name}は粘液を絡ませてきた！`);
+                    await logText(`${who.name}は粘液を絡ませてきた！`);
                     let are = selectJodou(who, 'phph', 0);
                     await buffadd(who, are, 'stickyslime', 2, 1);
                     return 0;
@@ -2265,7 +2265,7 @@ let Enemies = [
                 probable:70,
                 num:1,
                 func:async function(who){
-                    await addtext(`${who.name}は体当たりを仕掛けてきた！`);
+                    await logText(`${who.name}は体当たりを仕掛けてきた！`);
                     let are = selectJodou(who, 'phpl', 0);
                     let result = await damage(who, are, 100, 'ph');
                     if(result) return 1;
@@ -2277,7 +2277,7 @@ let Enemies = [
                 probable:30,
                 num:3,
                 func:async function(who){
-                    await addtext(`${who.name}は回転しながら突進してきた！`);
+                    await logText(`${who.name}は回転しながら突進してきた！`);
                     let are = selectJodou(who,'phpl',0);
                     let result = await damage(who,are,150,'ph');
                     if(result) return 1;
@@ -2307,7 +2307,7 @@ let Enemies = [
                 prop:['reInvisi'],
                 num:1,
                 func:async function(who){
-                    await addtext(`${who.name}は姿を消..あれどこ行った？`);
+                    await logText(`${who.name}は姿を消..あれどこ行った？`);
                     let are = selectJodou(who, 'ec', 0);
                     await buffadd(who, are,'disappear', 2,1);
                     return 0;
@@ -2321,7 +2321,7 @@ let Enemies = [
                 num:2,
                 func:async function(who){
                     let x = buffhas(who, 'disappear') ? (buffclear(who, 'disappear'), 200) : 100;
-                    await addtext(`${who.name}は突進してきた！`);
+                    await logText(`${who.name}は突進してきた！`);
                     let are = selectJodou(who, 'pr',0);
                     let result = await damage(who, are, x, 'ph');
                     return result;
@@ -2333,7 +2333,7 @@ let Enemies = [
                 type:'none',
                 num:3,
                 func:async function(who){
-                    await addtext(`${who.name}はローキックしてきた！`)
+                    await logText(`${who.name}はローキックしてきた！`)
                     let are = selectJodou(who,'phpl',0);
                     let result = await damage(who, are, 70, 'ph');
                     await buffadd(who, are, 'spddown', 2, 1);
@@ -2362,7 +2362,7 @@ let Enemies = [
                 type:'none',
                 num:1,
                 func:async function(who){
-                    await addtext(`${who.name}は痺れ粉を振りかけてきた！`)
+                    await logText(`${who.name}は痺れ粉を振りかけてきた！`)
                     let are = selectJodou(who, 'patkh', 0);
                     await buffadd(who, are, 'palsy', 2, 1);
                     return 0;
@@ -2374,7 +2374,7 @@ let Enemies = [
                 type:'none',
                 num:2,
                 func:async function(who){
-                    await addtext(`${who.name}は毒の粉を振りかけてきた！`)
+                    await logText(`${who.name}は毒の粉を振りかけてきた！`)
                     let are = selectJodou(who, 'phph', 0);
                     await buffadd(who, are, 'poison', 2, 1);
                     return 0;
@@ -2386,7 +2386,7 @@ let Enemies = [
                 type:'none',
                 num:3,
                 func:async function(who){
-                    await addtext(`${who.name}は眠り粉を振りかけてきた！`)
+                    await logText(`${who.name}は眠り粉を振りかけてきた！`)
                     let are = selectJodou(who, 'patkh',0);
                     await buffadd(who, are, 'sleeping', 1, 1);
                     return 0;
