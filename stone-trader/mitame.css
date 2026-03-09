@@ -502,6 +502,9 @@ body{
     position: relative;
     background: #cecece;
 }
+#mine .vein .ore.o0{
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%)
+}
 #mine .vein .ore img{
     width: 100%;
     height: 100%;
