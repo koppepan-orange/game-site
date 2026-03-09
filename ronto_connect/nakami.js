@@ -1025,6 +1025,7 @@ let firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 let database = firebase.database();
+let noname = "no name";
 let chatroom = 1;
 let userDataGen;
 let loginD = document.querySelector('#loginArea');
@@ -1040,6 +1041,12 @@ let loginC = {
     dolP: 0,
 }
 // let loginTD = document.querySelector('#upper .login');
+
+let User = {
+    truth: noname,
+    idora: noname,
+    
+}
 
 let messagesRef = database.ref(`rontoConnect/rooms/${chatroom}/messages`);
 let usersRef = database.ref(`users/null`);
