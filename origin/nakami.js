@@ -836,7 +836,7 @@ class alertD{
     };
 };
 //#endregion
-//#region observer
+//#region OBS
 let OBS = {
     keys: {},
     cling: 0,
