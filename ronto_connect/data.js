@@ -772,7 +772,7 @@ let Buffs = [
         kaijo:"行動開始",
         kaijov:"All",
         kaijoF:() => {
-            if(probb(30)){
+            if(hit(30)){
                 logText('纏わりついたスライムが邪魔をして動けなかった！');
                 return 1;
             }
@@ -823,7 +823,7 @@ let Attacks = [
             if(await damage(who, are, 100, 'ph')) return 1;
 
             //elseesに移行よろ
-            if(who.ps == 'sthree' && probb(25)){
+            if(who.ps == 'sthree' && hit(25)){
                 await logText(`${who.name}は頑張った!`);
                 if(await damage(who, are, 100, 'ph')) return 1;
                 if(await damage(who, are, 100, 'ph')) return 1;
@@ -856,7 +856,7 @@ let Attacks = [
             if(who.ps == 'highsol') pro = 20;
 
             let result = 0;
-            if(probb(pro)){
+            if(hit(pro)){
                 result = await damage(who, are,300,'ph');
                 if(result) return dead;
             }else{
@@ -933,7 +933,7 @@ let Magics = [
         lv:4,
         func:async function(who, are){
             if(await damage(who, are, 30, 'mg')) return 1;
-            if(probb(2)) buffadd(who, are, 'hirumi' , 1)
+            if(hit(2)) buffadd(who, are, 'hirumi' , 1)
             return 0;
         }
     },
@@ -946,7 +946,7 @@ let Magics = [
         func:async function(who, are){
             let result = await damage(who, are,110,'mg',2);//火
             if(result) return 1;
-            if(probb(10)) await buffadd(who, are,'burn', 2,1);
+            if(hit(10)) await buffadd(who, are,'burn', 2,1);
             return 0;
         }
     },
@@ -980,7 +980,7 @@ let Magics = [
         lv:8,
         func:async function(who, are){
             damage(who, are,120,'mg',4);//雷
-            if(probb(5)) buffadd(who, are,'hirumi',1)
+            if(hit(5)) buffadd(who, are,'hirumi',1)
             return 0
         }
     },
@@ -1440,7 +1440,7 @@ let Tools = [
         func:async function(who,are){
             //await logText(`求愛性 孤独 ドク 流るルル`)
             if(await heal(who, are, '60%')) return 1;
-            if(probb(40)) return 0;
+            if(hit(40)) return 0;
             await logText('愛をもっと')
             if(await heal(who, are, '60%')) return 1;
             return 0;

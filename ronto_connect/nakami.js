@@ -187,7 +187,7 @@ function copy(moto){
         return moto;
     };
 };
-function probb(num){
+function hit(num){
     return Math.random()*100 <= num;
     //例:num == 20 → randomが20以内ならtrue,elseならfalseを返す
 };
@@ -924,7 +924,7 @@ let secrates = [
         arr:['g','i','v','e','m','e','m','o','n','e','y'],
         limit:'n',
         func: async function(){
-            // if(probb(60)) nicoText('乞食成功！'), euroF.add(100);
+            // if(hit(60)) nicoText('乞食成功！'), euroF.add(100);
             // else nicoText('乞食失敗');
         }
     },
@@ -1880,29 +1880,29 @@ function mapMake(code){
     // dunC.objM = JSON.parse(JSON.stringify(dunC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
 
     // if(dunC.stage == 1){
-    //     if(fun == 23 && probb(10)){
+    //     if(fun == 23 && hit(10)){
     //         dunC.backM = dunC.backMs[4];
     //         dunC.objM = dunC.objMs[6];
-    //     }else if(fun <= 50 && probb(10)){
+    //     }else if(fun <= 50 && hit(10)){
     //         dunC.backM = dunC.backMs[5];
     //         dunC.objM = dunC.objMs[7];
     //     };
     // }else if(dunC.stage == 2){
-    //     if(fun == 68 && probb(10)){
+    //     if(fun == 68 && hit(10)){
     //         dunC.backM = dunC.backMs[11];
     //         dunC.objM = dunC.objMs[14];
     //         dunC.objM = JSON.parse(JSON.stringify(dunC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
-    //     }else if(fun <= 50 && probb(10)){
+    //     }else if(fun <= 50 && hit(10)){
     //         dunC.backM = dunC.backMs[19];
     //         dunC.objM = dunC.objMs[23];
     //         dunC.objM = JSON.parse(JSON.stringify(dunC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
     //     };
     // }else if(dunC.stage == 3){
-    //     if(fun == 68 && probb(10)){
+    //     if(fun == 68 && hit(10)){
     //         dunC.backM = dunC.backMs[18];
     //         dunC.objM = dunC.objMs[22];
     //         dunC.objM = JSON.parse(JSON.stringify(dunC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
-    //     }else if(fun <= 50 && probb(10)){
+    //     }else if(fun <= 50 && hit(10)){
     //         dunC.backM = dunC.backMs[19];
     //         dunC.objM = dunC.objMs[23];
     //         dunC.objM = JSON.parse(JSON.stringify(dunC.objMs[Math.floor(Math.random() * MAPy) + MAPx]));
