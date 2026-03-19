@@ -4,6 +4,7 @@ function delay(ms){
 };
 
 async function nicoText(mes){
+    console.log(`[nico] ${mes}`);
     let div = document.createElement('div');
     div.textContent = mes;
     div.className = 'nicotext';
@@ -23,13 +24,15 @@ function tobiText(youso, mes){
     if(typeof el == 'string') el = document.querySelector(youso);
     if(!el) return console.error('せんぱ〜い？この要素壊れてますよ〜〜？');
 
+    console.log(`[tobi] ${mes}`);
+
     let rect = el.getBoundingClientRect();
     let left = rect.left + window.scrollX + rect.width / 2;
     let top = rect.top + window.scrollY + rect.height / 2;
 
     let node = document.createElement('div');
     node.className = 'tobitext';
-    node.textContent = mes;
+    node.innerText = mes;
     node.style.top = `${top}px`;
     node.style.left = `${left}px`;
 
@@ -57,6 +60,7 @@ function tobiText(youso, mes){
     requestAnimationFrame(frame);
 };
 function copytext(text){
+    console.log(`[copy] ${text}`);
     navigator.clipboard.writeText(text)
 }
 async function kirameki(div0, zukey = 'star', n = 20, time = 2000, col){
@@ -1262,6 +1266,18 @@ document.addEventListener('keydown', async function(e){
 })
 //#endregion
 
+
+let mainD = document.getElementById('main');
+let mainC = {
+    ares: []
+}
+let mainF = {};
+mainF.move = (code) => {
+	if(!code) return console.error(`せんぱ〜い？${code}ってどこですか〜？笑`);
+	
+	for(let a of mainC.ares) document.getElementById(a).classList.remove('show');
+    document.getElementById(code).classList.add('show');
+}
 
 
 //#region start
