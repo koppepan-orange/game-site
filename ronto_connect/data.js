@@ -1409,13 +1409,14 @@ let Tools = [
         }
     },
     {
-        name:'pablon',
-        jpnm:'パブロン',
-        price:40,
-        desc:'味方単体の体力を40%回復',
-        flav:'一種の風邪薬。大人とか向けらしいね',
+        name:'glucose',
+        jpnm:'ブドウ糖',
+        price:25,
+        desc:'味方単体の体力を15%回復し、攻撃倍率を少し上昇させる。',
+        flav:'これで少しは頑張れそう',
         func:async function(who,are){
-            if(await heal(who, are, "40%")) return 1;
+            if(await heal(who, are, "15%")) return 1;
+            await buffadd(who, are, 'power', 1, 1);
             return 0;
         }
     },
@@ -1424,7 +1425,7 @@ let Tools = [
         jpnm:'トリプシン',
         name:'trypsin',
         price:60,
-        desc:'味方単体の体力を70%回復',
+        desc:'味方単体の体力を50%回復するが、',
         flav:'膵液に含まれる消化酵素の一種。\n薬ではない。',
         func:async function(who,are){
             if(await heal(who, are, "70%")) return 1;
@@ -1435,14 +1436,15 @@ let Tools = [
         name:'lulu',
         jpnm:'ルル',
         price:80,
-        desc:'味方単体の体力を60%回復。40%の確率で再度60%回復。',
+        desc:'味方単体の体力を40%回復。50%の確率で再度40%回復。',
         flav:'sick sickな頭痛薬。\n毒が流るルルですね。',
         func:async function(who,are){
             //await logText(`求愛性 孤独 ドク 流るルル`)
-            if(await heal(who, are, '60%')) return 1;
-            if(hit(40)) return 0;
+            if(await heal(who, are, '40%')) return 1;
+            if(hit(50)) return 0;
+
             await logText('愛をもっと')
-            if(await heal(who, are, '60%')) return 1;
+            if(await heal(who, are, '40%')) return 1;
             return 0;
         }
     },
@@ -1498,7 +1500,7 @@ let Tools = [
             await logText('これはちょっと、スパイシーなやつだよ');
             if(await damage(who, are, 20, 'cn', [])) return 1;
             
-            let are2 = selectJodou(who, 'tz'); //敵 全体
+            let are2 = selectJodou(who, 'are', 0, 0, 0); //敵 全体
             await buffadd(who, are2, 'burn', 3, 2);
             return 0;
         }
@@ -1790,7 +1792,7 @@ let Skills = [
         
         cool:3,
         func:async function(who){
-            let are = selectJodou(who,'er',0);
+            let are = selectJodou(who, 'are', 0, 'random');
             await buffadd(who, are,'onslime', 1,1);
             await logText(`${are.name}にスライムが覆い被さった!`);
             return 0;
@@ -1847,7 +1849,7 @@ let Skills = [
         
         cool:3,
         func:async function(who){
-            let are = selectJodou(who, 'phpl',0);
+            let are = selectJodou(who, 'who', 'hp', 'low');
             await buffadd(who, are,'elecshield', 2,1);
             await logText('帯電バリアを付与しました！');
             return 0;
@@ -2008,7 +2010,9 @@ let Objects = [
         ables:[],
         sei:[],
         func:async function(){
-            movable = 1;
+            let p = dunF.get();
+            p.moving = 1;
+
             document.querySelector('#overfieldArea').style.display = 'none';
             document.querySelector('#eventArea').style.display = 'block';
             document.querySelector('#eventArea').innerHTML = '<button id="CampRest" onclick="Camprest()"></button>\n<button id="CampTrade" onclick="Camptrade()"></button>'
@@ -2053,6 +2057,7 @@ let Objects = [
         s:0,
         ables:[],
         sei:[],
+
         func:async function(){
             SkillShopOpen();
         }
@@ -2222,11 +2227,11 @@ let Enemies = [
         acts:[
             {
                 name:'粘液飛ばし',
-                probable:75,
+                p:75,
                 num:1,
                 func:async function(who){
                     await logText(`${who.name}は粘液を飛ばしてきた！`);
-                    let are = selectJodou(who, 'phph',0);
+                    let are = selectJodou(who, 'are', 'hp', 'high');
                     let res = await damage(who, are, 100, 'ph');
                     if(res) return 1;
                     
@@ -2235,11 +2240,11 @@ let Enemies = [
             },
             {
                 name:'粘液付与',
-                probable:25,
+                p:25,
                 num:3,
                 func:async function(who){
                     await logText(`${who.name}は粘液を絡ませてきた！`);
-                    let are = selectJodou(who, 'phph', 0);
+                    let are = selectJodou(who, 'are', 'hp', 'high');
                     await buffadd(who, are, 'stickyslime', 2, 1);
                     return 0;
                 }
@@ -2262,11 +2267,11 @@ let Enemies = [
         acts:[
             {
                 name:'体当たり',
-                probable:70,
+                p:70,
                 num:1,
                 func:async function(who){
                     await logText(`${who.name}は体当たりを仕掛けてきた！`);
-                    let are = selectJodou(who, 'phpl', 0);
+                    let are = selectJodou(who, 'are', 'hp', 'low');
                     let result = await damage(who, are, 100, 'ph');
                     if(result) return 1;
                     return 0;
@@ -2274,11 +2279,11 @@ let Enemies = [
             },
             {
                 name:'体当たり・改',
-                probable:30,
+                p:30,
                 num:3,
                 func:async function(who){
                     await logText(`${who.name}は回転しながら突進してきた！`);
-                    let are = selectJodou(who,'phpl',0);
+                    let are = selectJodou(who, 'are', 'hp', 'low');
                     let result = await damage(who,are,150,'ph');
                     if(result) return 1;
                     return 0;
@@ -2302,39 +2307,39 @@ let Enemies = [
         acts:[
             {
                 name:'消滅',
-                probable:60,
+                p:60,
                 type:'',
                 prop:['reInvisi'],
                 num:1,
                 func:async function(who){
                     await logText(`${who.name}は姿を消..あれどこ行った？`);
-                    let are = selectJodou(who, 'ec', 0);
+                    let are = selectJodou(who, 'who', 0, 'cen');
                     await buffadd(who, are,'disappear', 2,1);
                     return 0;
                 }
             },
             {
                 name:'衝突',
-                probable:20,
+                p:20,
                 type:'',
                 prop:['abInvisi'],
                 num:2,
                 func:async function(who){
                     let x = buffhas(who, 'disappear') ? (buffclear(who, 'disappear'), 200) : 100;
                     await logText(`${who.name}は突進してきた！`);
-                    let are = selectJodou(who, 'pr',0);
+                    let are = selectJodou(who, 'are', 0, 'random');
                     let result = await damage(who, are, x, 'ph');
                     return result;
                 }
             },
             {
                 name:'ローキック',//ロストワンの号哭の号哭使いたいけど意味が泣くことらしい
-                probable:20,
+                p:20,
                 type:'none',
                 num:3,
                 func:async function(who){
                     await logText(`${who.name}はローキックしてきた！`)
-                    let are = selectJodou(who,'phpl',0);
+                    let are = selectJodou(who, 'are', 'hp', 'low');
                     let result = await damage(who, are, 70, 'ph');
                     await buffadd(who, are, 'spddown', 2, 1);
                     return result;
@@ -2358,36 +2363,36 @@ let Enemies = [
         acts:[
             {
                 name:'しびれごな',
-                probable:30,
+                p:30,
                 type:'none',
                 num:1,
                 func:async function(who){
                     await logText(`${who.name}は痺れ粉を振りかけてきた！`)
-                    let are = selectJodou(who, 'patkh', 0);
+                    let are = selectJodou(who, 'are', 'hp', 'high');
                     await buffadd(who, are, 'palsy', 2, 1);
                     return 0;
                 }
             },
             {
                 name:'どくのこな',
-                probable:30,
+                p:30,
                 type:'none',
                 num:2,
                 func:async function(who){
                     await logText(`${who.name}は毒の粉を振りかけてきた！`)
-                    let are = selectJodou(who, 'phph', 0);
+                    let are = selectJodou(who, 'are', 'hp', 'high');
                     await buffadd(who, are, 'poison', 2, 1);
                     return 0;
                 }
             },
             {
                 name:'ねむりごな',
-                probable:30,
+                p:30,
                 type:'none',
                 num:3,
                 func:async function(who){
                     await logText(`${who.name}は眠り粉を振りかけてきた！`)
-                    let are = selectJodou(who, 'patkh',0);
+                    let are = selectJodou(who, 'are', 'hp', 'high');
                     await buffadd(who, are, 'sleeping', 1, 1);
                     return 0;
                 }
@@ -2395,6 +2400,7 @@ let Enemies = [
         ]
     },
     {
+        no:1,
         name:'茎槍の狩人',
         ins:['草原'],
         maxhp:'+0',
@@ -2410,11 +2416,11 @@ let Enemies = [
         acts:[
             {
                 name:'急襲',
-                probable:30,
+                p:30,
                 type:'',
                 num:3,
                     func:async function(who){
-                    let are = selectJodou(who,'pdefl');
+                    let are = selectJodou(who, 'are', 'def', 'low');
                     let res = await qte(1000,['a','d']); //0が失敗, 1が成功
                     switch(res){
                         case 0:

@@ -2,23 +2,29 @@
 function delay(ms){
     return new Promise(resolve=>setTimeout(resolve,ms));
 };
-async function nicoText(mes){
-    let newDiv = document.createElement('div');
-    newDiv.textContent = mes;
-    newDiv.className = 'nicotext';
-    newDiv.style.top = `calc(${random(0, 100)}vh - 20px)`;
-    newDiv.style.right = '0px';
-    document.querySelector('body').appendChild(newDiv);
 
-    requestAnimationFrame(() => newDiv.style.right = `${window.innerWidth + newDiv.offsetWidth}px`);
+async function nicoText(mes){
+    console.log(`[nico] ${mes}`);
+    let div = document.createElement('div');
+    div.textContent = mes;
+    div.className = 'nicotext';
+    document.querySelector('body').appendChild(div);
+
+    let wid = div.offsetWidth;
+    div.style.top = `calc(${random(0, 100)}vh - 20px)`;
+    div.style.right = `-${wid}px`;
+
+    requestAnimationFrame(() => div.style.right = `${window.innerWidth + wid}px`);
     
-    await delay(2000); 
-    newDiv.remove();
+    await delay(5000); 
+    div.remove();
 };
 function tobiText(youso, mes){
     let el = youso;
     if(typeof el == 'string') el = document.querySelector(youso);
     if(!el) return console.error('せんぱ〜い？この要素壊れてますよ〜〜？');
+
+    console.log(`[tobi] ${mes}`);
 
     let rect = el.getBoundingClientRect();
     let left = rect.left + window.scrollX + rect.width / 2;
@@ -26,7 +32,7 @@ function tobiText(youso, mes){
 
     let node = document.createElement('div');
     node.className = 'tobitext';
-    node.textContent = mes;
+    node.innerText = mes;
     node.style.top = `${top}px`;
     node.style.left = `${left}px`;
 
@@ -54,22 +60,23 @@ function tobiText(youso, mes){
     requestAnimationFrame(frame);
 };
 function copytext(text){
-    navigator.clipboard.writeText(text);
+    console.log(`[copy] ${text}`);
+    navigator.clipboard.writeText(text)
 }
 async function kirameki(div0, zukey = 'star', n = 20, time = 2000, col){
-    //heart!!!!!!!!!
     let taioued = ['star', 'heart'];
-    if(!taioued.includes(zukey)) return console.log(`図形が対応していません。現在対応しているのは[${taioued.join(', ')}だけあります。`);
+    if(!taioued.includes(zukey)) return console.log(`図形が対応していません。現在対応しているのは[${taioued.join(', ')}]だけであります。`);
     let rect = div0.getBoundingClientRect();
-    let cenX = rect.left + rect.width / 2;
-    let cenY = rect.top + rect.height / 2;
+    let cenX = rect.left + rect.width / 2 + window.scrollX;
+    let cenY = rect.top + rect.height / 2 + window.scrollY;
 
     let divs = [];
     for(let i=0; i<n; i++){
         let div = document.createElement('div');
         div.className = `kirameki p_${zukey}`;
-        div.style.top = `${Math.random() * 100}%`;
-        div.style.left = `${Math.random() * 100}%`;
+        // 初期は中央にpxで置く（CSS側で position:absolute を想定）
+        div.style.left = `${cenX}px`;
+        div.style.top = `${cenY}px`;
         if(zukey == 'star') div.style.transform = `rotate(${Math.random() * 360}deg)`;
         if(col) div.style.background = col;
         document.body.appendChild(div);
@@ -82,31 +89,41 @@ async function kirameki(div0, zukey = 'star', n = 20, time = 2000, col){
         let velocityX = Math.cos(angle) * speed;
         let velocityY = Math.sin(angle) * speed;
 
-        let lifeTime = 0;
-        let maxLifeTime = time;
-
-        function animate(){
-            lifeTime += 16; // 約60fpsで更新
-            if(lifeTime >= maxLifeTime){
+        let start = performance.now();
+        function animate(now){
+            let elapsed = now - start;
+            if(elapsed >= time){
                 div.remove();
                 return;
             }
-
-            velocityY += 0.05; // 重力
-            div.style.left = `${cenX + velocityX * (lifeTime / 16)}px`;
-            div.style.top = `${cenY + velocityY * (lifeTime / 16)}px`;
-            div.style.opacity = String(1 - lifeTime / maxLifeTime);
-
+            // 滑らかなイージング
+            let t = elapsed / time;
+            let e = 1 - Math.pow(1 - t, 3);
+            // 少し拡散するように速度を掛ける
+            div.style.left = `${cenX + velocityX * (elapsed / 16)}px`;
+            div.style.top = `${cenY + velocityY * (elapsed / 16)}px`;
+            div.style.opacity = String(1 - t);
             requestAnimationFrame(animate);
         }
-        animate();
-    })
+        requestAnimationFrame(animate);
+    });
 }
 function El(tag, cls, children = []){
     let e = document.createElement(tag);
     if(cls) e.className = cls;
     children.forEach(c => e.appendChild(c));
     return e;
+}
+function awase(div, max = 28, code = "innerText"){
+    if(max == 0) max = 28; //skipと仮定する
+    if(!code) return console.error(`せんぱ〜い..? ${code}なんていうよくわからないものは使わないでくださ〜い笑`);
+
+    let wid = div.clientWidth;
+    let len = div[code].length;
+     if(len == 0) return;
+    let px = wid/len;
+     if(max < px) px = max;
+    div.style.fontSize = `${px}px`;
 }
 function kaijou(num){
     if(num == 0) return 0;
@@ -133,12 +150,21 @@ function arraySelect(array){
     let select = Math.floor(Math.random()*array.length);
     return array[select];
 };
+function arrayToggle(array, name){
+    let array2 = copy(array);
+    let index = array2.indexOf(name);
+    if(index == -1) array2.push(name);
+    else array2.splice(index, 1);
+    
+    return array2;
+}
 function arrayShuffle(array){
-    for(let i=(array.length-1); i>0; i--){
+    let ato = copy(array);
+    for(let i=(ato.length-1); i>0; i--){
         let i2 = Math.floor(Math.random() * (i + 1));
-        [array[i], array[i2]] = [array[i2], array[i]];
+        [ato[i], ato[i2]] = [ato[i2], ato[i]];
     };
-    return array;
+    return ato;
 };
 function arraySize(array){
     let res = new Set(array).size;
@@ -164,9 +190,9 @@ function arrayGacha(array, prob){
     };
 };
 function hask(obj, key){
-    let res = obj.hasOwnProperty(key);
-    res = res ? 1 : 0;
-    return res;
+    let res = Object.prototype.hasOwnProperty.call(obj, key)
+    if(res) return 1;
+    return 0;
 };
 function copy(moto){
     if(Array.isArray(moto)){
@@ -188,9 +214,18 @@ function copy(moto){
     };
 };
 function hit(num){
-    return Math.random()*100 <= num;
-    //例:num == 20 → randomが20以内ならtrue,elseならfalseを返す
+    return +(Math.random()*100 <= num);
+    //例:num == 20 → randomが20以内なら1, elseなら0を返す
 };
+function roll(n, m){
+    let res = 0;
+    for(let i=0; i<n; i++) res += random(1, m);
+
+    if(3 < m && res == n*m) console.log('ファンブル！');
+    if(3 < m && res == n) console.log('クリティカル！');
+    return res;
+    //例:n = 1, m = 100 => 100面ダイスを1回振った出目の合計を返す
+}
 function random(min, max){
     if(max < min) [min, max] = [max, min];
     let num = Math.floor(Math.random() * (max - min + 1)) + min;
@@ -208,7 +243,7 @@ function anagramSaySay(text, loop = 10, bet = '<br>'){
     let optout = text.split('');
     let optcou = arrayCount(optout);
     let optvals = [];
-    for(a of Object.keys(optcou)){
+    for(let a of Object.keys(optcou)){
         let b = optcou[a];
         b = kaijou(b);
         optvals.push(b);
@@ -251,10 +286,22 @@ function anagramCan(mae, ato){
 };
 // LocalStorage(Data) => lsd
 function lsdSet(name, value){
+    if(Array.isArray(value) ||
+       typeof value == 'object') value = JSON.stringify(value);
     localStorage.setItem(name, value || "");
 };
 function lsdGet(name){
-    return localStorage.getItem(name);
+    let res = localStorage.getItem(name);
+    
+    // データが存在しない場合は null を返す
+    if(res == null) return null;
+    if(res == undefined) return null;
+
+    try{
+        return JSON.parse(res);
+    }catch(e){
+        return res;
+    }
 };
 function lsdRem(name){
     localStorage.removeItem(name);
@@ -271,12 +318,7 @@ function lsdShow(){
     console.error(`-- 以上 --`);
 }
 
-async function error(text = 'errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr'){
-    await logText(text);
-    await delay(2000);
-    // window.open('about:blank', '_self').close();
-};
-function hoshoku(color){
+function irohaHo(color){
     color = color.replace(/^#/, '');
 
     if(color.length != 6) return console.log('カラーコードは6桁、ですよ〜？楽しないでくださいね♪');
@@ -293,7 +335,7 @@ function hoshoku(color){
 
     return ato;
 };
-function mixshoku(c1, c2, ratio = 0.5){
+function irohaMix(c1, c2, ratio = 0.5){
     let toRGB = c => {
         c = c.replace('#', '');
         if (c.length === 3) c = c.split('').map(x => x + x).join('');
@@ -312,14 +354,30 @@ function mixshoku(c1, c2, ratio = 0.5){
 
     return ato;
 };
-function ranshoku(){
+function irohaRan(){
     let r = random(0, 255);
     let g = random(0, 255);
     let b = random(0, 255);
     let ato = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
     return ato;
 };
+function irohaDark(color) {
+    color = color.replace('#', '');
+    if (color.length === 3) color = color.split('').map(x => x + x).join('');
+    
+    let r = parseInt(color.slice(0, 2), 16);
+    let g = parseInt(color.slice(2, 4), 16);
+    let b = parseInt(color.slice(4, 6), 16);
+
+    // 相対輝度の近似計算
+    // 0.2126 * R + 0.7152 * G + 0.0722 * B
+    let luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    
+    return luma < 128; // 暗い色ならtrue
+}
+
 function timeDiff(kako){
+    if(typeof kako == 'number') kako = kako.toString();
     let now = new Date();
     let past = new Date(
         kako.slice(0, 4),
@@ -359,7 +417,7 @@ function timeToshow(date){ //見る用
     let minutes = String(date.getMinutes()).padStart(2, '0');
     return `${year}/${month}/${day} ${hours}:${minutes}`;
 }
-function timeTodata(date){ //データ保存用
+function timeTodata(date = new Date()){ //データ保存用
     if(!date) date = new Date(), console.warn('あなた、日付を入れ忘れてるわよ');
     let year = date.getFullYear();
     let month = String(date.getMonth() + 1).padStart(2, '0');
@@ -369,6 +427,52 @@ function timeTodata(date){ //データ保存用
     let time = `${year}${month}${day}${hours}${minutes}`;
     return +time;
 }
+
+function cursorSelect(){
+    let selected = window.getSelection();
+    let res = '';
+    if(0 >= selected.rangeCount) return '';
+
+    res = selected.toString();
+    return res;
+}
+function cursorEnd(){
+    let selected = window.getSelection();
+    if(0 >= selected.rangeCount) return 1;
+    selected.collapseToEnd();
+    return 0;
+}
+function cursorActive(){
+    let el = document.activeElement;
+    let res = 0;
+    if(el.tagName == 'INPUT') res = 1;
+    if(el.tagName == 'TEXTAREA') res = 2; //改行可
+    if(el.isContentEditable) res = 1;
+    return res;
+}
+function cursorHas(){
+    let selected = window.getSelection();
+    let text = selected.toString();
+    if(text.length <= 0) return 0;
+    return text;
+}
+function cursorRect(){
+    let selection = window.getSelection();
+    if(selection.rangeCount == 0) return 0;
+    
+    let range = selection.getRangeAt(0);
+    return range.getBoundingClientRect();
+}
+
+function scrlEnd(div){
+    div.scrollTop = div.scrollHeight;
+};
+
+async function error(text = 'errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr'){
+    await logText(text);
+    await delay(2000);
+    // window.open('about:blank', '_self').close();
+};
 //#endregion
 //#region log&text
 let logD = document.getElementById('log');
@@ -377,8 +481,8 @@ let logC = {
     togD: logD.querySelector('.opener'),
     textD: logD.querySelector('.text'),
     autoDelay: 1,
-    skipText: false,
-    clearText: false,
+    skipText: 0,
+    clearText: 0,
     loopText: 0,
     ing: 0,
     queue: []
@@ -407,13 +511,13 @@ logF.cc = (raw) => {
     let color = null;
 
     for(let i = 0; i < raw.length; i++){
-        let sym = false;
+        let sym = 0;
         for(let c of logC.colors){
             if(raw[i] == c.sym && raw[i + 1] == c.sym){
                 console.log(`→${raw[i]}← 発見！ ${c.name}色です`);
                 color = color ? null : c.col;
                 i++;
-                sym = true;
+                sym = 1;
                 break;
             }
         };
@@ -434,7 +538,7 @@ logF.waitfor = async() => {
     else logC.loopText = 1;
 
     if(!logC.loopText) return;
-    requestAnimationFrame(waitforAddtext);
+    requestAnimationFrame(logF.waitfor);
 
     if(logC.ing) return;
     let raw = logC.queue.shift();
@@ -457,7 +561,7 @@ async function logText(raw){
     text = logF.cc(raw);
     logC.textD.innerHTML = "";
     logC.textD.style.display = "block";
-    logC.clearT = false;
+    logC.clearT = 0;
 
     let index = 0;
     return new Promise((resolve) => {
@@ -473,7 +577,7 @@ async function logText(raw){
                         index++;
                     }
                     index = text.length;
-                    logC.skipT = false;
+                    logC.skipT = 0;
                     setTimeout(type, 10);
                 }else{
                     let span = document.createElement("span");
@@ -504,8 +608,8 @@ async function logText(raw){
                 Promise.race([timeout, userAction]).then(() => {
                     logC.textD.textContent = "";
                     logC.textD.style.display = "none";
-                    logC.clearT = true;
-                    logC.skipT = false
+                    logC.clearT = 1;
+                    logC.skipT = 0
                     logC.ing = 0;
                     resolve('end');
                 });
@@ -515,14 +619,14 @@ async function logText(raw){
     });
 };
 document.addEventListener('keydown', (e) => {
-    if(e.key === 'z' || e.key === 'Enter') logC.skipT = true;
+    if(e.key === 'z' || e.key === 'Enter') logC.skipT = 1;
 });
 document.addEventListener('keyup', (e) => {
-    if(e.key === 'z' || e.key === 'Enter') logC.skipT = false;
+    if(e.key === 'z' || e.key === 'Enter') logC.skipT = 0;
 });
 document.addEventListener('click', () => {
-    logC.skipT = true;
-    setTimeout(() => logC.skipT = false, 50); // 一時的にスキップを有効化
+    logC.skipT = 1;
+    setTimeout(() => logC.skipT = 0, 50); // 一時的にスキップを有効化
 });
 
 logF.tog = (code = NaN) => {
@@ -617,7 +721,7 @@ document.addEventListener('mousedown', e => {
 //#endregion
 //#region tk
 class tk{
-    constructor(type, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
+    letructor(type, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
         let youso = document.createElement(type);
         youso.className = `tk ${type}`;
 
@@ -657,7 +761,7 @@ class tk{
         if(dict == 'none') return;
         
         if(typeof dict == 'string'){
-            //attr: nanka
+            // attr: nanka
             let [key, val] = dict.split(':');
              key = key.trim();
              val = val.trim();
@@ -720,7 +824,7 @@ function tkTest(){
 //#endregion
 //#region alertD
 class alertD{
-    constructor(text, elses = {}){
+    letructor(text, elses = {}){
         this.text = text;
         for(let key in elses) this[key] = elses[key];
         /*
@@ -814,49 +918,103 @@ class alertD{
     };
 };
 //#endregion
-//#region observer
-let keys = {};
-document.addEventListener('keydown', e => {
+//#region OBS
+let OBS = {
+    keys: {},
+    cling: 0,
+    cring: 0,
+    mx: 0,
+    my: 0
+}
+
+OBS.KeysA = (e) => {
     let key = e.key.toLowerCase();
     if(e.key == ' ') key = 'space';
-    keys[key] = true;
-});
-document.addEventListener('keyup', e => {
+    OBS.keys[key] = 1;
+};
+OBS.KeysR = (e) => {
     let key = e.key.toLowerCase();
     if(e.key == ' ') key = 'space';
-    keys[key] = false;
-});
+    OBS.keys[key] = 0;
+};
 
-let clicking = false;
-let cricking = false;
-document.addEventListener('pointerdown', (e) => {
-    if(e.buttons == 0) clicking = true;
-    if(e.buttons == 2) cricking = true;
-});
-document.addEventListener('pointerup', (e) => {
-    if(e.buttons == 0) clicking = false;
-    if(e.buttons == 2) cricking = false;
-});
-document.addEventListener('pointercancel', (e) => {
-    if(e.buttons == 0) clicking = false;
-    if(e.buttons == 2) cricking = false;
-});
-window.addEventListener('blur', () => {clicking = cricking = false});
+OBS.PonD = (e) => {
+    if(e.button == 0) OBS.cling = 1;
+    if(e.button == 2) OBS.cring = 1;
+};
+OBS.PonU = (e) => {
+    if(e.button == 0) OBS.cling = 0;
+    if(e.button == 2) OBS.cring = 0;
+};
+OBS.ponC = (e) => {
+    if(e.button == 0) OBS.cling = 0;
+    if(e.button == 2) OBS.cring = 0;
+};
+OBS.PonB = () => {
+    OBS.cling = 0;
+    OBS.cring = 0;
+}
 
-let mouseX = 0;
-let mouseY = 0;
-document.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-});
+OBS.Mouse = (e) => {
+    OBS.mx = e.clientX;
+    OBS.my = e.clientY;
+};
+
+OBS.Paste = (e) => {
+    // プレーンペーストに強制的にするやつ？
+    e.preventDefault();
+    let text = e.clipboardData.getData("text/plain");
+
+    let div = e.target;
+
+    if(div.tagName == "INPUT" || div.tagName == "TEXTAREA"){
+        let start = div.selectionStart;
+        let end = div.selectionEnd;
+
+        div.value = div.value.slice(0, start) + text + div.value.slice(end);
+        div.selectionStart = div.selectionEnd = start+text;
+        return;
+    }
+
+    let selection = window.getSelection();
+    if(!selection.rangeCount) return;
+    selection.deleteFromDocument();
+    selection.getRangeAt(0).insertNode(document.createTextNode(text));
+    selection.collapseToEnd();
+};
+
+OBS.load = () => {
+    let sts = {
+        "Keys": 1,
+        "Mouse": 1,
+        "Click": 1,
+        "Paste": 0,
+    }
+
+    if(sts["Keys"]){
+        window.addEventListener('keydown', OBS.KeysA);
+        window.addEventListener('keyup', OBS.KeysR);
+    }
+
+    if(sts["Mouse"]){
+        window.addEventListener('mousemove', OBS.Mouse);
+    }
+
+    if(sts["Click"]){
+        window.addEventListener('pointerdown', OBS.PonD);
+        window.addEventListener('pointerup', OBS.PonU);
+        window.addEventListener('pointercancel', OBS.ponC);
+        window.addEventListener('blur', OBS.PonB);
+    }
+
+    if(sts["Paste"]){
+        window.addEventListener('paste', OBS.Paste);
+    }
+}
 //#endregion
 //#region fonts
 let Fonts = [
-    {src:'comicsans', type:'ttf'},
-    {src:'hangyaku', type:'ttf'},
-    {src:'kurobara', type:'ttf'},
-    {src:'misaki', type:'ttf'},
-    {src:'cube12', type:'ttf'},
+    // {src:'comicsans', type:'ttf'},
 ];
 function fontsLoad(){
     let id = "font_load_css";
@@ -864,7 +1022,7 @@ function fontsLoad(){
     if(existing) existing.remove();
 
     let css = Fonts.map(f => {
-        let src = `url('assets/fonts/${f.src}.${f.type}')`;
+        let src = `url('${Pathes[1]}assets/fonts/${f.src}.${f.type}')`;
         let weight = f.weight ?? 'normal';
         return `@font-face{
             font-family:'${f.src}';
@@ -883,8 +1041,239 @@ function fontsLoad(){
 }
 fontsLoad();
 //#endregion
+//#region 画像と音声のロード
+let images = {};
+let sounds = {};
+let loaC = {
+    imgT: 0,
+    imgD: 0,
+    souT: 0,
+    souD: 0,
+    erd: 0,
+    deep:0
+}
+let loaF = {};
+loaC.imgL = {
+    systems:['select','circle','phone','star1','star1_pre','star2','star2_pre','star3','star3_pre','dungeon'],
+    // 草原:['蒼白の粘液','翡翠の風刃','顎剛なる草獣','茎槍の狩人','の茎針','攣縮する茎針','共鳴する茎赤黄','黄昏の穿影','燦爛する緑夢','紫苑の花姫','新緑なる剣士']
+}
 
-//#region セクラテス
+loaC.souL = ['error', 'doom', 'money']
+loaC.souT = Object.values(loaC.souL).length;
+
+loaF.load = async() => {
+    if(await loaF.loadI()) return 'error';
+    else '終わり'
+}
+loaF.loadI = async() => {
+    let stas0 = Stages.filter(a => !a.no).map(a => a.name);
+    let stas = stas0.concat(['すべて']);
+    
+    loaC.imgL.maps = {};
+    loaC.imgL.enemies = {};
+    for(let sta of stas){
+        if(!loaC.imgL.maps[sta]) loaC.imgL.maps[sta] = [];
+        Objects.filter(a => a.in == sta).map(a => a.name).forEach(name => {
+            loaC.imgT += 1;
+            if(sta != 'すべて') loaC.imgL.maps[sta].push(name);
+            
+            else for(let sta2 of stas0) loaC.imgL.maps[sta2].push(name);
+        });
+
+        if(sta == 'すべて') continue;
+
+        Stages.find(a => a.name == sta).tiles.forEach(name => {
+            loaC.imgT += 1;
+            loaC.imgL.maps[sta].push(name);
+        })
+
+        if(!loaC.imgL.enemies[sta]) loaC.imgL.enemies[sta] = [];
+        Enemies.filter(a => !a.no && (a.ins.includes(sta) || a.ins == 'すべて')).map(a => a.name).forEach(name => {
+            loaC.imgT += 1;
+            // loaC.imgL.enemies.push(name);
+            
+            if(sta != 'すべて') loaC.imgL.enemies[sta].push(name);
+            else for(let sta2 of stas0) loaC.imgL.enemies[sta2].push(name);
+        });
+    }
+
+    loaC.imgL.charas = [];
+    for(let ch of Charas){
+        let toku = 0;
+        if(ch.name == "color_slime") toku = 1;
+        if(toku == 0){
+            let img = `${ch.img}`;
+            loaC.imgL.charas.push(img);
+        }
+        else{
+            switch(ch.name){
+                case "color_slime":
+                    for(let c of ch.data.colors){
+                        let img = `${ch.data.colorp}${c}`;
+                        loaC.imgL.charas.push(img);
+                    }
+            }
+        }
+    }
+    
+
+    // console.log('LETS GOOOOOOOOOOO!!')
+    let T1 = (Tk) => {
+        let Tv = loaC.imgL[Tk];
+        if(Array.isArray(Tv)) return loaC.imgT += Tv.length;
+        
+        T0(Tv);
+    }
+    let T0 = (moto) => {
+        for(let key in moto){
+            T1(key);
+        }
+    }
+
+    let loaloa = async(arr, route) => {
+        // console.log("Arrayでした lets 読み込み")
+        let src = "assets/images/";
+        for(let r of route) src += `${r}/`;
+        // console.log(src)
+
+        let yomi = (mono, img) => {
+            loaC.imgD += 1;
+            tar[mono] = img;
+            if(loaC.imgD == loaC.imgT) return loaF.loadS(), 4;
+        }
+
+        let tar = images;
+        for(let r of route){
+            // console.log(r, tar)
+            if(!tar[r]) tar[r] = {};
+            tar = tar[r];
+        }
+        // console.log("終わり", tar)
+        // console.log(images)
+        // console.log(arr);
+        // console.log(route);
+        // console.log(images);
+
+        let all = arr.length;
+        // console.error(`--- ${route.join('/')}:${all} ---`)
+        for(let mono of arr){
+            // console.log(mono);
+            let img = new Image();
+            img.src = `${src}${mono}.png`;
+            img.onload = () => {
+                yomi(mono, img);
+            }
+
+            img.onerror = () => {
+                console.error(`Image ${src}${mono}.png failed to load.`);
+                loaC.erd += 1;
+                 if(loaC.erd > 50) return console.error('さすがにやりすぎbonus'), loaC.kokokomai = 32
+                img.src = `assets/images/systems/error.png`;
+                yomi(mono, img);
+                erd = 1
+            };
+        }
+
+        // console.log('読み込み完了 これよりユグドラシルに帰還する')
+        return 0;
+    }
+
+    // let gensho = Object.keys(loaC.imgL);
+    let loaloa0 = async(mono, route = []) => {
+        let sink = route.length ? 1 : 0
+        // if(sink) console.log("not Arrayでした lets 再帰");
+        let hzd = loaC.deep;
+        // console.log("[loaloa0] route:[" + route + "]");
+        // console.log('次:monoです')
+        // console.log(mono)
+        for(let key in mono){
+            // console.log(`key:${key} (all:[${Object.keys(mono)}])`)
+            if(key == 'すべて'){
+                // console.error('"すべて"だったのでスキップ');
+                route.pop()
+                continue;
+            }
+
+            route.push(key);
+            loaC.deep += 1;
+            // console.log(`[loaloa0ed] route:[${route}]`);
+            
+            let val = mono[key]??null;
+            if(!val) return console.error('↓↓null↓↓'), console.log(tar), console.log(mono), console.log(key), console.error('↑↑null↑↑');
+            // console.log("次、valです");
+            // console.log(val);
+            // console.log("↑Arrayかな? 結果 => "+Array.isArray(val));
+            if(Array.isArray(val)){
+                if(await loaloa(val, route)) return console.error('南ノ南');
+                let pop = route.pop()
+                // console.log(`帰還成功、${pop}を排除`)
+                loaC.deep -= 1;
+            }//arrayなら => ロードへ
+            else await loaloa0(val, route); //まだオブジェクトなら => もっかい
+        }
+        route.pop();
+        loaC.deep -= 1;
+    }
+
+    loaloa0(loaC.imgL);
+
+}
+
+loaF.loadS = async() => {
+    loaC.souL.forEach(num => {
+        let sound = new Audio();
+        sound.preload = 'auto';
+        sound.src = `assets/sounds/${num}.mp3`;
+        sound.addEventListener('canplaythrough', () => {
+            // console.log(`Sound ${num} loaded.`);
+            loaC.souD += 1;
+            if(loaC.souD == loaC.souT) start();
+        }, {once: 1});
+        sound.onerror = () => {
+            console.error(`Sound ${num} failed to load.`);
+            loaC.erd += 1;
+            if(loaC.erd > 20) return console.error('さすがにやりすぎbonus'), 1;
+            sound.src = `assets/sounds/error.mp3`;
+            loaC.souD += 1;
+            if(loaC.souD == loaC.souT) start();
+        };
+        sounds[num] = sound;
+    });
+}
+
+let souC = {
+    volume: 0.5
+}
+
+function soundPlay(name){
+    let sound = sounds[name];
+    if(!sound) return soundPlay("error");
+
+    sound.currentTime = 0;
+    sound.volume = souC.volume;
+    sound.play();
+}
+
+function soundStop(){
+    document.querySelectorAll('audio,video').forEach(el => {
+        el.pause();
+        el.currentTime = 0;
+    });
+}
+
+function soundVolume(val){
+    let v = Math.max(0, Math.min(1, val/100));
+    console.log(`[soundVolume] ${souC.volume??null} => ${v}`);
+    souC.volume = v;
+    document.querySelectorAll('audio,video').forEach(el => {
+        el.volume = v
+    });
+}
+
+
+document.addEventListener('DOMContentLoaded', async() => await loaF.load())
+//#endregion
+//#region 幸せになれる隠しコマンドがあるらしい
 let secrates = [
     {
         ind:0,
@@ -897,46 +1286,13 @@ let secrates = [
     },
     {
         ind:0,
-        name:'dadas',
-        arr:['d','a','d','a','s'],
-        limit:3,
-        func: async function(){
-            mapMake();
-        }
-    },
-    {
-        ind:0,
-        name:'darkness',
-        arr:['d','a','r','k','n','e','s','s'],
-        limit:'n',
-        func: async function(){
-            buffadd(cm(), cm(), 'pow', 2, 1);
-            buffadd(cm(), cm(), 'she', 2, 1);
-            buffadd(cm(), cm(), 'burn', 2, 1);
-            buffadd(cm(), cm(), 'poison', 2, 1);
-            buffadd(cm(), cm(), 'palsy', 2, 1);
-            buffadd(cm(), cm(), 'freeze', 2, 1);
-        }
-    },
-    {
-        ind:0,
-        name:'givememoney',
-        arr:['g','i','v','e','m','e','m','o','n','e','y'],
-        limit:'n',
-        func: async function(){
-            // if(hit(60)) nicoText('乞食成功！'), euroF.add(100);
-            // else nicoText('乞食失敗');
-        }
-    },
-    {
-        ind:0,
         name:'re',
         arr:['r','e'],
         limit:1,
         func: async function(){
             let img = document.createElement('img');
             img.id = 'hakaisatsu';
-            img.src = 'assets/images/systems/hakai[1].png'
+            img.src = 'assets/images/systems/hakai_1.png'
             img.dataset.phase = 1;
             document.querySelector('body').appendChild(img);
 
@@ -958,7 +1314,7 @@ let secrates = [
             let img = document.getElementById('hakaisatsu');
             if(!img) return;
 
-            img.src = 'assets/images/systems/hakai[2].png'
+            img.src = 'assets/images/systems/hakai_2.png'
             img.dataset.phase = 2;
 
             setTimeout(() => {
@@ -978,7 +1334,7 @@ let secrates = [
         func: async function(){
             let img = document.getElementById('hakaisatsu');
             if(!img) return 1;
-            console.log(img.dataset.phase);
+            // console.log(img.dataset.phase);
             if(img.dataset.phase != '2') return 1;
             location.reload();
         }
@@ -988,8 +1344,6 @@ document.addEventListener('keydown', async function(e){
     let key = e.key.toLowerCase();
     if(key == 'escape') loop = 0;
 
-
-    //これ以降はinput内では機能しない
     if(document.activeElement.tagName == 'INPUT') return;
     if(document.activeElement.tagName == 'TEXTAREA') return;
 
@@ -999,7 +1353,7 @@ document.addEventListener('keydown', async function(e){
         if(key == nke){
             sec.ind += 1;
             if(sec.ind == sec.arr.length && sec.limit){
-                console.log(`ジャンゴ！ ${sec.name}発動！！`);
+                console.log(`${sec.name}発動！！[${sec.arr.join(' ')}]`);
                 sec.ind = 0;
                 let res = await sec.func();
                 if(!res && sec.limit != 'n') sec.limit -= 1;
@@ -1010,9 +1364,10 @@ document.addEventListener('keydown', async function(e){
 })
 //#endregion
 
+
 const context = {};
 
-//#region ゲーム開始時ログインの動き
+//#region Login
 let firebaseConfig = {
     apiKey: "AIzaSyBN5V_E6PzwlJn7IwVsluKIWNIyathhxj0",
     authDomain: "koppepan-orange.firebaseapp.com",
@@ -1025,137 +1380,219 @@ let firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 let database = firebase.database();
-let noname = "no name";
-let chatroom = 1;
-let userDataGen;
-let loginD = document.querySelector('#loginArea');
-let loginC = {
-    nameD: loginD.querySelector('.username input'),
-    passD: loginD.querySelector('.password input'),
-    sendD: loginD.querySelector('.send'),
-    XD: loginD.querySelector('.x'),
-
-    dolD: loginD.querySelector('.dolphin'),
-     dolDT: loginD.querySelector('.dolphin .text'),
-     dolDI: loginD.querySelector('.dolphin img'),
-    dolP: 0,
-}
-// let loginTD = document.querySelector('#upper .login');
-
+let noname = 'no name';
 let User = {
     truth: noname,
     idora: noname,
-    
+    ref: null,
+    data: null,
+    ronC: {
+        ref: database.ref(`users/null/rontoConnect`),
+        data: null,
+    }
 }
 
-let messagesRef = database.ref(`rontoConnect/rooms/${chatroom}/messages`);
-let usersRef = database.ref(`users/null`);
-let rontoRef = database.ref(`users/null/rontoConnect`);
+let logiD = document.getElementById('login');
+let logiC = {
+    nameI: logiD.querySelector('.username'),
+    passI: logiD.querySelector('.password'),
+    senD: logiD.querySelector('.send'),
+	tog:1,
 
-// loginTD.addEventListener('click', () => loginD.classList.add('appe'));
-loginC.XD.addEventListener('click', () => loginD.classList.remove('appe'));
-// loginC.XD.addEventListener('click', () => error('では！'));
+    acsD: logiD.querySelector('.acs'),
+     acsBD: logiD.querySelector('.acs .tog'),
+     acsLD: logiD.querySelector('.acs .list'),
+    acsC: {
+        tog: 0,
+    },
+    acsF: {},
 
-loginC.sendD.addEventListener('click', async function(e){
-    username = loginC.nameD.value;
-    let password = loginC.passD.value;
-    usersRef = database.ref(`users/${username}`);
+    dolD: logiD.querySelector('.dolphin'),
+     dolDT: logiD.querySelector('.dolphin .text'),
+     dolDI: logiD.querySelector('.dolphin img'),
+    dolP: 0,
+}
+let logiF = {};
 
-    // データベースでユーザーが存在するか確認
-    usersRef.once('value').then(async function(snapshot){
+
+logiF.auto = () => {
+    let name = lsdGet("username");
+    // console.log(name)
+    if(name){
+        nicoText('オカエリナサイ マセ');
+        // nicoText("自動ログインしました");
+        login(name);
+    }
+    else{
+        nicoText("ログインしてください");
+        areF.move('login');
+    }
+}
+
+logiF.lsdHozon = (name, pass) => {
+    console.log(`${name}をlsdに保存しま〜す`)
+    lsdSet("username", name);
+
+    let arr = logiF.lsdList();
+    arr = arr.filter(a => a.name != name);
+
+    arr.push({
+        name:name,
+        pass:pass
+    });
+    lsdSet('accounts', arr);
+}
+logiF.lsdRHozon = (name) => {
+    lsdRem("username");
+    let arr = logiF.lsdList();
+    arr = arr.filter(a => a.name != name);
+    lsdSet('accounts', arr);
+}
+logiF.lsdList = () => {
+    let arr = lsdGet('accounts');
+    if(!arr) arr = [];
+    return arr;
+}
+
+async function login(name){
+    User.truth = name;
+    User.idora = name;
+    User.ref = database.ref(`users/${name}`);
+    User.ronC.ref = database.ref(`users/${name}/rontoConnect`);
+    User.data = (await User.ref.get()).val();
+    User.ronC.data = (await User.ronC.ref.get()).val();
+    await delay(10);
+    // update();
+
+    areF.move('home');
+}
+function logout(){
+    User.truth = noname;
+    User.idora = noname;
+    User.ref = null;
+    User.data = null;
+    User.ronC.ref = null;
+    User.ronC.data = null;
+
+    lsdRem("username");
+    logiC.nameI.value = '';
+    logiC.passI.value = '';
+    
+    areF.move('login');
+}
+
+logiF.going = () => {
+    let name = logiC.nameI.value;
+    let pass = logiC.passI.value;
+    if(name == '' || pass == '') return;
+    console.log(`username => ${name}`)
+    console.log(`password => ${pass}`)
+    
+    let success = () => {
+        nicoText('ようこそ');
+        logiF.lsdHozon(name, pass);
+        login(name);
+    }
+
+    let kariRef = database.ref(`users/${name}`);
+    kariRef.once('value', function(snapshot){
         if(snapshot.exists()){
-            nicoText('オカエリナサイ マセ');
-            userData = snapshot.val();
-            if(userData.password == password){
-                console.log('success')
-                login();
-                setLocalStorage("username", username); // ログイン成功時
-            }else{
-                nicoText('パスワードが間違っています');
-            }
+            if(snapshot.val().password == pass) success();
+            else tobiText(logiC.senD, "パスワードまたはユーザー名が間違っています"); //ふぅぅわかりにくいねぇ！
         }else{
             nicoText('初回起動 感謝シマス-- シバシ オ待チヲ  ガピッ');
-            usersRef = database.ref(`users/${username}`);
-            await delay(100);
+            let usersRef = database.ref(`users/${name}`);
             usersRef.update({
-                password: password,
-            });
-            await delay(50);
-            
+                password:pass,
+                blocked: ['null'],
+            })
+
             valorimar = 0;
             bankvalorimar = 0;
             rank = 1;
             rpt = 0;
-
-            console.log('user maked!!');
-            login();
-            // if(username != 'dolphin') setLocalStorage("username", username);
-            setLocalStorage("username", username);
+            
+            success();
         }
-    });
-    
-});
+    })
+}
+logiC.senD.addEventListener('click', logiF.going);
 
-loginC.dolDI.addEventListener('click', () => {
-    switch(loginC.dolP){
+
+logiC.acsF.tog = (co = NaN) => {
+    if(logiC.acsLD.innerHTML == '') return;
+
+    if(typeof co != 'number') co = fl(logiC.acsC.tog);
+
+    if(co == 1) logiC.acsD.classList.add('tog');
+    if(co == 0) logiC.acsD.classList.remove('tog');
+    logiC.acsC.tog = co;
+}
+logiC.acsBD.addEventListener('click', logiC.acsF.tog);
+
+logiC.acsF.load = async() => {
+    logiC.acsLD.innerHTML = '';
+    
+    let arr = logiF.lsdList();
+    if(!arr.length) return;
+
+    for(let ac of arr){
+        let warn = 0;
+        //今のpassと、ac.pass(過去ログイン時のpass)が違えばcontinue
+        let acRef = database.ref(`users/${ac.name}`);
+        let snash = await acRef.once('value'); 
+        if(!snash.exists() || snash.val().password != ac.pass) warn = 1;
+
+        let div = El('div', 'item');
+    
+        let name = El('div', 'name');
+        name.textContent = ac.name;
+        name.addEventListener('click', () => {
+            if(warn) tobiText(name, "パスワードが変更されています。\n再度ログインしてください");
+
+            logiC.nameI.value = ac.name;
+            if(!warn) logiC.passI.value = ac.pass;
+            logiC.acsF.tog(0);
+        })
+        div.appendChild(name);
+
+        let del = El('div', 'del');
+        del.textContent = "×";
+        del.addEventListener('click', () => {
+            logiF.lsdRHozon(ac.name);
+            logiC.acsF.load();
+        })
+        div.appendChild(del);
+
+        let warnD = El('div', 'warn');
+        warnD.textContent = "！";
+        if(warn) div.appendChild(warnD);
+
+
+        logiC.acsLD.appendChild(div);
+    }   
+}
+
+
+logiC.dolDI.addEventListener('click', () => {
+    switch(logiC.dolP){
         case 0:
-            loginC.dolDT.innerHTML = '規約に同意する？\n→<a href="assets/txts/dolphin.html" target="_blank">イルカ:利用規約</a>';
-            loginC.dolP = 1;
+            logiC.dolDT.innerHTML = '規約に同意する？\n→<a href="assets/txts/dolphin.html" target="_blank">イルカ:利用規約</a>';
+            logiC.dolP = 1;
             break;
         
         case 1:
-            loginC.nameD.value = 'dolphin';
-            loginC.passD.value = 'Iloveirukaice';
-            loginC.sendD.click();
+            logiC.nameD.value = 'dolphin';
+            logiC.passD.value = 'Iloveirukaice';
+            logiC.sendD.click();
 
-            loginC.dolP = 0;
-            loginC.dolDT.textContent = 'お前を消す方法';
+            logiC.dolP = 0;
+            logiC.dolDT.textContent = 'お前を消す方法';
             break;
     }
 });
-
-async function login(){
-    usersRef.update({
-        status: 'online'
-    });
-    loginD.classList.remove('appe');
-
-
-    // データを取得する関数)
-    userData = await load();
-    await delay(50);
-
-
-    uppF.tekiou();
-}
-
-function save(){
-    if(!usersRef) return 1;
-    updateUI();
-
-    usersRef.update(newData);
-    
-    return 0;
-}
-
-
-async function load0(){
-    let snapshot = await usersRef.once('value');
-    if(snapshot.exists()){
-        userDataGen = snapshot.child('rontoConnect').val();
-        console.log('rontoConnect:', userDataGen);
-    }else{
-        nicoText('データガ ミツカリマセン デシタ');
-    }
-
-    return userDataGen;
-}
-async function load(){
-    let data = await load0();
-    // rank|rpt|valorimar|euro|bankeuro|
-}
-
 //#endregion
+
 
 
 //#region アッパーエンジン
@@ -1285,12 +1722,12 @@ FriF.numold = (num) => {
 
 
 //#region areaについて
-let AreC = {
+let areC = {
     now:null,
 }
-let AreF = {};
+let areF = {};
 
-AreC.list = [
+areC.list = [
     {
         name:'login',
         rank:5,
@@ -1322,45 +1759,48 @@ AreC.list = [
         back:'#8feb87'
     },
     {
-        name:'bt',
+        name:'battle',
         rank:4,
         back:'#001748'
     }
 ]
 
-AreF.move = (to) => {
-    console.log(`[area移動] ${AreC.now} => ${to}`);
-    let area = AreC.list.find(a => a.name == to);
+areF.move = (to) => {
+    if(areC.now == to) return console.log('どういうわけか もう そこにいる');
+    console.log(`[area移動] ${areC.now} => ${to}`);
+
+    let area = areC.list.find(a => a.name == to);
     if(!area) return console.log('そんなエリアないっすよ〜？');
-    AreC.now = area.name;
+    
+    areC.now = area.name;
     Style.area.back = area.back;
     Style.area.rank = area.rank;
     Style.tekiou();
 
-    for(let n of AreC.list){
-        let div = document.getElementById(`${n.name}Area`);
+    for(let n of areC.list){
+        let div = document.getElementById(`${n.name}`);
         if(n.name == to) div.classList.add('appe');
         else div.classList.remove('appe');
     }
 }
-AreF.move('home');
+areF.move('home');
 
 
 let movlis = document.getElementById('movlis');
 let movlising = 0;
-for(let n of AreC.list){
+for(let n of areC.list){
     let li = document.createElement('div');
     li.textContent = n.name;
     li.className = 'item';
 
-    li.addEventListener('click', () => AreF.move(n.name));
+    li.addEventListener('click', () => areF.move(n.name));
 
     movlis.querySelector('.list').appendChild(li);
 }
 document.addEventListener('keydown', (e) => {
     if(e.key != 'm' || movlising) return;
-    movlis.style.left = `${mouseX - movlis.offsetWidth/2}px`;
-    movlis.style.top = `${mouseY}px`;
+    movlis.style.left = `${OBS.mx - movlis.offsetWidth/2}px`;
+    movlis.style.top = `${OBS.my}px`;
     movlis.classList.add('tog');
     movlising = 1;
 })
@@ -1374,7 +1814,7 @@ document.addEventListener('keyup',e => {
 
 
 //#region ホーム
-let homD = document.getElementById('homeArea');
+let homD = document.getElementById('home');
 let homC = {
     roZ:homD.querySelector('.col.c1'),
      goLobyD:homD.querySelector('.launch'),
@@ -1389,18 +1829,18 @@ homF.owarune = () => {
 homC.endD.addEventListener('click', homF.owarune);
 
 homF.goLoby = async() => {
-    AreF.move('title');
+    areF.move('title');
     await delay(1500);
-    AreF.move('loby');
+    areF.move('loby');
 }
 homC.goLobyD.addEventListener('click', homF.goLoby);
 
-homC.goFarmD.addEventListener('click', () => AreF.move('farm'));
+homC.goFarmD.addEventListener('click', () => areF.move('farm'));
 
 //#endregion
 
 //#region 農業しようぜ！
-let farmD = document.getElementById('farmArea');
+let farmD = document.getElementById('farm');
 let farmC = {
     c: farmD.querySelector('.farm'),
     ctx: farmD.querySelector('.farm').getContext('2d'),
@@ -1419,7 +1859,7 @@ window.addEventListener('resize', farmF.resize);
 //#endregion
 
 //#region ロント・コネクト(loby)
-let lobD = document.getElementById('lobyArea');
+let lobD = document.getElementById('loby');
 let lobC = {
     main:lobD.querySelector('.main'),
 }
@@ -1447,7 +1887,7 @@ lobF.load = () => {
 //#endregion
 
 //#region dungeon
-let dunD = document.getElementById('dungeonArea');
+let dunD = document.getElementById('dungeon');
 let dunC = {
     can: dunD.querySelector('.field'),
     ctx: dunD.querySelector('.field').getContext('2d'),
@@ -1483,7 +1923,7 @@ dunF.select = async() => {
             let div = e.target;
             let name = div.classList[1];
             div0.remove();
-            solve(name)
+            solve(name);
         }
 
         for(let ma of Stages.filter(a => !a.no)){
@@ -1540,7 +1980,7 @@ dunF.select = async() => {
 
     batC.now = 1;
 
-    AreF.move('dungeon');
+    areF.move('dungeon');
 
     //はじまりはじまり～
     let cd = Charas.find(a => a.name == chara);
@@ -1557,26 +1997,24 @@ dunF.update = async() => {
     
     let moved = 0;
     let mv = 1;
-    {
-        if((keys.w || keys.arrowup)){
-            if(p.dir == 0) await dunF.move(p, 'add', 0, -mv);
-            else p.dir = 0;
-        }
-        if((keys.s || keys.arrowdown)){
-            if(p.dir == 180) await dunF.move(p, 'add', 0, mv);
-            else p.dir = 180;
-        };
-        if((keys.a || keys.arrowleft)){
-            if(p.dir == 270) await dunF.move(p, 'add', -mv, 0);
-            else p.dir = 270;
-        };
-        if((keys.d || keys.arrowright)){
-            if(p.dir == 90) await dunF.move(p, 'add', mv, 0);
-            else p.dir = 90;
-        };
+    if((OBS.keys.w || OBS.keys.arrowup)){
+        if(p.dir == 0) await dunF.move(p, 'add', 0, -mv);
+        else p.dir = 0;
     }
+    if((OBS.keys.s || OBS.keys.arrowdown)){
+        if(p.dir == 180) await dunF.move(p, 'add', 0, mv);
+        else p.dir = 180;
+    };
+    if((OBS.keys.a || OBS.keys.arrowleft)){
+        if(p.dir == 270) await dunF.move(p, 'add', -mv, 0);
+        else p.dir = 270;
+    };
+    if((OBS.keys.d || OBS.keys.arrowright)){
+        if(p.dir == 90) await dunF.move(p, 'add', mv, 0);
+        else p.dir = 90;
+    };
 
-    if((keys.z || keys.enter) && logC.ing == 0){
+    if((OBS.keys.z || OBS.keys.enter) && logC.ing == 0){
         // 今乗ってる（on == true かつ 座標が同じ） => obon認定
         let obon = dunC.objs.filter(a => a.x == p.x && a.y == p.y && a.on);
         if(obon.length > 1) return console.log(obon,'←onのやつらが重なってるみたいっす！');
@@ -1670,10 +2108,32 @@ dunF.draw = async() => {
         if(bel == 'maps' || bel == 'enemies') img = images[bel][sta][src].cloneNode();
         else img = images[bel][src].cloneNode();
          if(!img) console.log(`assets/${bel}/(${sta}/)${src}.png is not found.`), img = images['systems']['error'];
+
+        
         if(img) dunC.ctx.drawImage(img, obs.ox, obs.oy, obs.w, obs.h);
+
+
+        if(obs.id == 'player'){
+            let circle = images['systems']['circle'].cloneNode();
+            
+            let cirX = obs.ox + obs.w/2;
+            let cirY = obs.oy + obs.h/2;
+            let cirS = Math.min(obs.w, obs.h) * 0.75;
+            let rot = obs.dir * Math.PI / 180;
+            
+            
+            dunC.ctx.save();
+            dunC.ctx.translate(cirX, cirY);
+            dunC.ctx.rotate(rot);
+            dunC.ctx.globalAlpha = 0.3;
+            dunC.ctx.drawImage(circle, -cirS, -cirS, cirS * 2, cirS * 2);
+            dunC.ctx.globalAlpha = 1;
+            dunC.ctx.restore();
+        }
 
         // await delay(2)
     }
+    
 }
 
 dunF.get = (me = '指定なし') => {
@@ -1783,6 +2243,13 @@ dunF.gameloop = async() => {
     dunF.draw();
     if(dunC.loop) requestAnimationFrame(dunF.gameloop);
 }
+document.addEventListener('keydown', (e) => {
+    if(areC.now != 'dungeon') return;
+    if(e.key == 'p'){
+        dunC.loop = fl(dunC.loop);
+        if(dunC.loop) dunF.gameloop();
+    }
+})
 
 function nextFloor(){
     dunC.floor += 1;
@@ -1847,7 +2314,7 @@ function mapMake(code){
         if(obs.n != 0 && sude.length+1 >= obs.n) obsList.splice(obsInd, 1); // 重複できない子なら消し去る
 
         if(obs.name == 'enemy'){
-            let arr = Enemies.filter(a => a.ins.includes(dunC.stage) || a.ins == 'すべて');
+            let arr = Enemies.filter(a => !a.no && (a.ins.includes(dunC.stage) || a.ins == 'すべて'));
             // let data0 = arrayGacha(arr, arr.map(a => a.p))
             let data0 = arraySelect(arr);
             //  console.log(data0)
@@ -1960,7 +2427,7 @@ function nextStage(kakutey = null){
 //#endregion
 
 //#region inventory
-let invD = document.querySelector('#inventory');
+let invD = document.getElementById('inventory');
 let invC = {}
 let invF = {}
 document.addEventListener('keydown', (event) => {
@@ -1990,7 +2457,7 @@ document.addEventListener('keydown', (event) => {
 
 
 //#region battle-DOM
-let batD = document.getElementById('btArea');
+let batD = document.getElementById('battle');
 let batC = {
     now: 0,
     pD: batD.querySelector('.players'),
@@ -2114,7 +2581,7 @@ function makeHuman(cam, me){
     let sd = Stages.find(a => a.name == dunC.stage);
 
     let name = El('div', 'name');
-    name.style.color = mixshoku('#cecece', sd.color);
+    name.style.color = irohaMix('#cecece', sd.color);
 
     let img = El('img', 'img');
     img.src = 'assets/images/systems/error.png';
@@ -2123,7 +2590,7 @@ function makeHuman(cam, me){
     back.src = 'assets/images/systems/error.png';
     
     let skill = El('div', 'skill', [back, El('div', 'liquid')])
-    skill.style.borderColor = mixshoku('#2b2b2b', sd.color);
+    skill.style.borderColor = irohaMix('#2b2b2b', sd.color);
 
     const baa = (type) => El('div', `${type} status`, [
         El('div', 'text'),
@@ -2183,7 +2650,7 @@ function makeUnit(type, code, name){
     unit.hp = unit.maxhp;
     unit.mp = unit.maxmp;
     unit.ep = 0;
-    unit.status = 1;
+    unit.jotie = 1;
     unit.buffs = [];
     unit.cam = (type == 'player') ? 'players' : 'enemies';
     unit.me = humans.filter(a => a.cam == unit.cam).length;
@@ -2206,8 +2673,8 @@ function makeUnit(type, code, name){
             unit.ps = data.ps;  unit.ts = data.ts;
 
             Style.button.solid = data.buttonsolid;
-            Style.button.back  = data.buttonback;
-            Style.button.aima  = mixshoku(data.buttonsolid, data.buttonback);
+            Style.button.back = data.buttonback;
+            Style.button.aima = irohaMix(data.buttonsolid, data.buttonback);
             Style.tekiou();
         }else{
             unit.e = data.e;  unit.s = data.s;
@@ -2322,7 +2789,7 @@ async function nextTurn(who = 0){
     acted += 1;
     if(acted >= bar.me.length){
         turn += 1;
-        let combined = humans.filter(a => a.status && a.hp > 0)// オブジェクトをリストに変換して合体
+        let combined = humans.filter(a => a.jotie && a.hp > 0)// オブジェクトをリストに変換して合体
         .sort((a, b) => {// 降順でソート
             if(b.spd == a.spd){
                 if(a.cam == b.cam){
@@ -2608,12 +3075,12 @@ function selectSyudou(code = 1){
                 tcam
             ]
 
-            console.log(target);
+            // console.log(target);
 
             if(code == 2){ //拡散-3
-                let zin = humans.filter(a => a.cam == tcam && a.status);
-                let pnum = (zin[tme-1]?.status??0) ? tme - 1 : null;
-                let nnum = (zin[tme+1]?.status??0) ? tme + 1 : null;
+                let zin = humans.filter(a => a.cam == tcam && a.jotie);
+                let pnum = (zin[tme-1]?.jotie??0) ? tme - 1 : null;
+                let nnum = (zin[tme+1]?.jotie??0) ? tme + 1 : null;
                 
                 let cn = 1;
                 if(pnum) cn += 1;
@@ -2627,11 +3094,11 @@ function selectSyudou(code = 1){
                 ];
             }
             if(code == 3){// 拡散-5
-                let zin = humans.filter(a => a.cam == tcam && a.status);
-                let p2num = (zin[tme-2]?.status??0 == 1) ? tme - 2 : null;
-                let pnum = (zin[tme-1]?.status??0 == 1) ? tme - 1 : null;
-                let nnum = (zin[tme+1]?.status??0 == 1) ? tme + 1 : null;
-                let n2num = (zin[tme+2]?.status??0 == 1) ? tme + 2 : null;
+                let zin = humans.filter(a => a.cam == tcam && a.jotie);
+                let p2num = (zin[tme-2]?.jotie??0 == 1) ? tme - 2 : null;
+                let pnum = (zin[tme-1]?.jotie??0 == 1) ? tme - 1 : null;
+                let nnum = (zin[tme+1]?.jotie??0 == 1) ? tme + 1 : null;
+                let n2num = (zin[tme+2]?.jotie??0 == 1) ? tme + 2 : null;
                 
                 let cn = 1;
                 if(pnum) cn += 1;
@@ -2647,7 +3114,7 @@ function selectSyudou(code = 1){
                 ];
             }
             if(code == 4){ //相手陣営全員
-                let nums = cm(tcam).filter(a => a.cam == tcam && a.status);
+                let nums = cm(tcam).filter(a => a.cam == tcam && a.jotie);
                 let cams = Array(nums.length).fill(tcam); //fillは全ての値を同じ値にするやつ。同数にするために使用されがち
                 target = [
                     nums,
@@ -2655,9 +3122,9 @@ function selectSyudou(code = 1){
                 ];
             }
             if(code == 5){ //全員
-                let tnums = cm(tcam).filter(a => a.status);
+                let tnums = cm(tcam).filter(a => a.jotie);
                 let gyaku = fl(tcam, ['players','enemies']);
-                let nums = cm(gyaku).filter(a => a.status);
+                let nums = cm(gyaku).filter(a => a.jotie);
 
                 let awase = [...tnums, ...nums];
                 
@@ -2835,7 +3302,7 @@ function turretPlace(cam){
         cm(cam).t.hp = 0;
         document.querySelector(`#${cam}`).appendChild(newDiv);
     }
-    cm(cam).t.status = 1;
+    cm(cam).t.jotie = 1;
     cm(cam).t.kazu += 1;
     cm(cam).t.maxhp += 15;
     cm(cam).t.hp += 15;
@@ -2845,7 +3312,7 @@ function turretPlace(cam){
     document.querySelector(`#${cam}t`).style.backgroundColor = '#f7f7f7'
 }
 function turretBreak(cam){
-    cm(cam).t.status = 0;
+    cm(cam).t.jotie = 0;
     cm(cam).t.kazu -= 1;
     if(cm(cam).t.kazu <= 0){
         cm(cam).t.kazu = 0;
@@ -2855,15 +3322,15 @@ function turretBreak(cam){
     }
 }
 function turretAllClear(){
-    if(document.querySelector('#playerst')){
-        document.querySelector('#playerst').remove();
+    if(document.getElementById('playerst')){
+        document.getElementById('playerst').remove();
         humans.players.t.kazu = 0;
-        humans.players.t.status = 0;
+        humans.players.t.jotie = 0;
     };
-    if(document.querySelector('#enemiest')){
-        document.querySelector('#enemiest').remove();
+    if(document.getElementById('enemiest')){
+        document.getElementById('enemiest').remove();
         humans.enemies.t.kazu = 0;
-        humans.enemies.t.status = 0
+        humans.enemies.t.jotie = 0
     }
 }
 
@@ -2895,16 +3362,16 @@ async function enemyturn(who){
     let are;
     if(data){
         let act = enemySelectAction(who)
-        let res = await act.func(who);
+        let res = await act.func(who); //いやこいつの場合areどうすんの???
         if(res) return 1;
     }else{
         await logText(`${who.name}は何かで攻撃した！`)
-        are = selectJodou(who, 'phpl');
+        are = selectJodou(who);
         let res = await damage(who, are, 100, 'ph'); //areの後、1の前に"何の倍率か"を入れるべき。基本atkかもだけどfixで固定、とかできそう
         if(res) return 1;
     }
 
-    nextTurn(who);
+    nextTurn(who, are);
 }
 function enemySelectAction(who){
     let data = Enemies.find(a => a.name == who.name);
@@ -2916,10 +3383,10 @@ function enemySelectAction(who){
         who.lasts.forEach(last => {
             data.acts.forEach(a => {
                 let props = a.prop;
-                props.filter(p => p.startsWith('ab') && p.endsWith(last)).forEach(p => {
-                    console.log(a, p)
+                props.filter(b => b.startsWith('ab') && b.endsWith(last)).forEach(b => {
+                    console.log(`ノア「re${last}が記録されていますので、ab${last}である${a.name}を実行しますね♪」`)
                     acts.push(a);
-                    pros.push(a.probable);
+                    pros.push(a.p);
                 });
             })
         })
@@ -2927,7 +3394,7 @@ function enemySelectAction(who){
     }else{
         data.acts.forEach(a => {
             acts.push(a);
-            pros.push(a.probable);
+            pros.push(a.p);
         })
     }
     // console.log(acts);
@@ -2936,57 +3403,76 @@ function enemySelectAction(who){
     //reをするとlastを記録
     let act = arrayGacha(acts, pros);
     // console.log(act);
-    console.log(`act: 「${act.name}」(${act.probable}%)`);
+    console.log(`act: 「${act.name}」(${act.p}%)`);
     let props = act.prop ?? [];
     props.forEach(p => {
-        if(p.startsWith('re')){
+        if(p.startsWith('re')){ // reInvisi
+            console.log(`ノア「${item}を記録しました」`);
             let item = p.slice(2);
             who.lasts.push(item);
-            console.log(`ノア「${item}を記録しました」`);
         }
     })
 
     return act;
 }
-function selectJodou(who, code, both = 0){
-    console.log(`selectJodou::: ${code}(both:${both})`)
-    
-    let side = code[0]   == 'm' ? who.cam : fl(who.cam, ['players', 'enemies']);
-    let stat = code.includes('hp') ? 'hp' : code.includes('atk') ? 'atk' : 'def';
-    let mode = code.endsWith('l') ? 'low' : code.endsWith('h') ? 'high' : 'random';
-    console.log(`>> ${side}, ${stat}, ${mode}`);
+//受動的な選択
+function selectJodou(who, tar = "are", stat = "hp", hl = "low", spread = 1){
+    let cam = who.cam;
+    if(tar == "who") tar = cam;
+    if(tar == "are") tar = fl(cam, ['players', 'enemies']);
 
-    let list = cm(side).filter(c => c.status).sort((a, b) => a[stat] - b[stat]);
+    console.log(`[selectJodou] ${cam}${who.me} => ${tar}の${stat}順で${hl}なやつ！ (spread: ${spread})`)
+    if(spread != 0 && spread % 2 == 0) return console.error('エラー発生 エラー発生 rangeに偶数を発見しました rangeに偶数を発見しました');
+
+    /*
+    who: それを実行した者
+    tar: 標的軍団。基本whoかareで、whoなら自軍、areなら相手軍。players/enemiesも可。allで全体も可。
+    stat: どのステータスで選ぶか。hpとかatkとか。
+    hl: [high/low/cen/random]のどれかで、statの高い方を選ぶか低い方を選ぶか自分の正面を選ぶかランダムで選ぶか。
+    spread: 1ならその一体だけ、3なら両隣も(いるなら)対象にする。5なら両隣2体も(いるなら)対象にする。2,4は存在しないぜ。0は何？全体？
+
+    spreadを0にするならば、stat,hlは0にして省略してもおk
+    つまり「敵全体」を表すならば selectJodou(who, 'are', 0, 0, 0); 無駄になげぇ まあいいけれども
+    一応0の場合の処理もおいてはおきますけどね 私は優しいので
+    */
+
+    let list0 = null;
+    if(tar != 'all') list0 = cm(tar);
+    else list0 = [...cm('players'), ...cm('enemies')];
+    let list = list0.filter(c => c.jotie); //not ソート
+     if(list.length == 0) return console.error(`errored! ${tar} is inai desu war!!`);
+
+    if(spread == 0) return list; //0は全体、そう決めたのです
+
+    let listed;
+    if(stat != 0) listed = copy(list).sort((a, b) => a[stat] - b[stat]); //ソートされたってことでed sortは元の子を破壊するらしい
+    else listed = copy(list);
     // console.log(list);
+    
 
-    if(list.length == 0) return `errored! ${side} is inai desuwa!!`;
-
-    let target;
-    if(mode == 'low')  target = list[0];
-    else if(mode == 'high') target = list[list.length - 1];
-    else target = arraySelect(list);
-
-    let ret = [];
-    if(both == 0) ret.push(target.me);
-    else{
-        let ids = list.map(c => c.me);
-        let i = ids.indexOf(target.me);
-        let adj = [];
-        if(i > 0) adj.push(ids[i - 1]);
-        adj.push(ids[i]);
-        if(i < ids.length - 1) adj.push(ids[i + 1]);
-        ret.push(adj);
+    let zero;
+    if(hl == 'low') zero = listed[0];
+    if(hl == 'high') zero = listed[listed.length - 1];
+    if(hl == 'random' || hl == 0) zero = arraySelect(listed);
+    if(hl == 'cen'){
+        let whol = cm(who.cam).filter(c => c.jotie);
+        let whoi = whol.findIndex(c => c.me == who.me); //whoiが-1はまずありえん
+        zero = list[whoi]; //これは正面に無いと失敗。拡散でも同じく。
     }
-    // console.log(ret)
+    if(!zero) return console.error('errored! な、なんかzeroが無かったッス！これはバグの発生ッス！');
 
+    let tme = zero.me;
+    let i = list.findIndex(c => c.me == tme);
+    let range = (spread-1)/2;
+     if(range < 0) range = 0;
+    
     let ares = [];
-    for(let num of ret){
-        let are = cm(side, num);
-        ares.push(are);
+    for(let i2 = i-range; i2 <= i+range; i2++){
+        let are = list[i2];
+        if(are) ares.push(are);
     }
-    // console.log(ares)
 
-    return ares;
+    return ares; // [{...},{...},{...}]
 }
 //#endregion
 
@@ -3438,254 +3924,14 @@ async function finale(cam){
 
 
 async function start(){
-    //console.log("====Ronto Connect connecten====")
+    console.log("====Ronto Connect connecten====")
     soundVolume(50);
+    Style.tekiou();
+    OBS.load();
+
     dunF.load();
     lobF.load();
 
-    //autoLogin
-    username = getLocalStorage("username");
-    if(username){
-        console.log("自動ログインしました");
-        usersRef = database.ref(`users/${username}`);
-        rontoRef = database.ref(`users/${username}/rontoConnect`);
-        nicoText('wait for now...')
-        login();
-    }else{
-        console.log("ログインしてください");
-        loginD.classList.add('appe')
-    }
+    logiF.auto();
 }
 
-
-//#region 画像と音声のロード
-let images = {};
-let sounds = {};
-let loaC = {
-    imgT: 0,
-    imgD: 0,
-    souT: 0,
-    souD: 0,
-    erd: 0,
-    deep:0
-}
-let loaF = {};
-loaC.imgL = {
-    systems:['select','phone','star1','star1_pre','star2','star2_pre','star3','star3_pre','dungeon'],
-    // 草原:['蒼白の粘液','翡翠の風刃','顎剛なる草獣','茎槍の狩人','の茎針','攣縮する茎針','共鳴する茎赤黄','黄昏の穿影','燦爛する緑夢','紫苑の花姫','新緑なる剣士']
-}
-
-loaC.souL = ['error', 'doom', 'money']
-loaC.souT = Object.values(loaC.souL).length;
-
-loaF.load = async() => {
-    if(await loaF.loadI()) return 'error';
-    else '終わり'
-}
-loaF.loadI = async() => {
-    let stas0 = Stages.filter(a => !a.no).map(a => a.name);
-    let stas = stas0.concat(['すべて']);
-    
-    loaC.imgL.maps = {};
-    loaC.imgL.enemies = {};
-    for(let sta of stas){
-        if(!loaC.imgL.maps[sta]) loaC.imgL.maps[sta] = [];
-        Objects.filter(a => a.in == sta).map(a => a.name).forEach(name => {
-            loaC.imgT += 1;
-            if(sta != 'すべて') loaC.imgL.maps[sta].push(name);
-            
-            else for(let sta2 of stas0) loaC.imgL.maps[sta2].push(name);
-        });
-
-        if(sta == 'すべて') continue;
-
-        Stages.find(a => a.name == sta).tiles.forEach(name => {
-            loaC.imgT += 1;
-            loaC.imgL.maps[sta].push(name);
-        })
-
-        if(!loaC.imgL.enemies[sta]) loaC.imgL.enemies[sta] = [];
-        Enemies.filter(a => a.ins.includes(sta) || a.ins == 'すべて').map(a => a.name).forEach(name => {
-            loaC.imgT += 1;
-            // loaC.imgL.enemies.push(name);
-            
-            if(sta != 'すべて') loaC.imgL.enemies[sta].push(name);
-            else for(let sta2 of stas0) loaC.imgL.enemies[sta2].push(name);
-        });
-    }
-
-    loaC.imgL.charas = [];
-    for(let ch of Charas){
-        let toku = 0;
-        if(ch.name == "color_slime") toku = 1;
-        if(toku == 0){
-            let img = `${ch.img}`;
-            loaC.imgL.charas.push(img);
-        }
-        else{
-            switch(ch.name){
-                case "color_slime":
-                    for(let c of ch.data.colors){
-                        let img = `${ch.data.colorp}${c}`;
-                        loaC.imgL.charas.push(img);
-                    }
-            }
-        }
-    }
-    
-
-    // console.log('LETS GOOOOOOOOOOO!!')
-    let T1 = (Tk) => {
-        let Tv = loaC.imgL[Tk];
-        if(Array.isArray(Tv)) return loaC.imgT += Tv.length;
-        
-        T0(Tv);
-    }
-    let T0 = (moto) => {
-        for(let key in moto){
-            T1(key);
-        }
-    }
-
-    let loaloa = async(arr, route) => {
-        // console.log("Arrayでした lets 読み込み")
-        let src = "assets/images/";
-        for(let r of route) src += `${r}/`;
-        // console.log(src)
-
-        let yomi = (mono, img) => {
-            loaC.imgD += 1;
-            tar[mono] = img;
-            if(loaC.imgD == loaC.imgT) return loaF.loadS(), 4;
-        }
-
-        let tar = images;
-        for(let r of route){
-            // console.log(r, tar)
-            if(!tar[r]) tar[r] = {};
-            tar = tar[r];
-        }
-        // console.log("終わり", tar)
-        // console.log(images)
-        // console.log(arr);
-        // console.log(route);
-        // console.log(images);
-
-        let all = arr.length;
-        // console.error(`--- ${route.join('/')}:${all} ---`)
-        for(let mono of arr){
-            // console.log(mono);
-            let img = new Image();
-            img.src = `${src}${mono}.png`;
-            img.onload = () => {
-                yomi(mono, img);
-            }
-
-            img.onerror = () => {
-                console.error(`Image ${src}${mono}.png failed to load.`);
-                loaC.erd += 1;
-                 if(loaC.erd > 50) return console.error('さすがにやりすぎbonus'), loaC.kokokomai = 32
-                img.src = `assets/images/systems/error.png`;
-                yomi(mono, img);
-                erd = 1
-            };
-        }
-
-        // console.log('読み込み完了 これよりユグドラシルに帰還する')
-        return 0;
-    }
-
-    // let gensho = Object.keys(loaC.imgL);
-    let loaloa0 = async(mono, route = []) => {
-        let sink = route.length ? 1 : 0
-        // if(sink) console.log("not Arrayでした lets 再帰");
-        let hzd = loaC.deep;
-        // console.log("[loaloa0] route:[" + route + "]");
-        // console.log('次:monoです')
-        // console.log(mono)
-        for(let key in mono){
-            // console.log(`key:${key} (all:[${Object.keys(mono)}])`)
-            if(key == 'すべて'){
-                // console.error('"すべて"だったのでスキップ');
-                route.pop()
-                continue;
-            }
-
-            route.push(key);
-            loaC.deep += 1;
-            // console.log(`[loaloa0ed] route:[${route}]`);
-            
-            let val = mono[key]??null;
-            if(!val) return console.error('↓↓null↓↓'), console.log(tar), console.log(mono), console.log(key), console.error('↑↑null↑↑');
-            // console.log("次、valです");
-            // console.log(val);
-            // console.log("↑Arrayかな? 結果 => "+Array.isArray(val));
-            if(Array.isArray(val)){
-                if(await loaloa(val, route)) return console.error('南ノ南');
-                let pop = route.pop()
-                // console.log(`帰還成功、${pop}を排除`)
-                loaC.deep -= 1;
-            }//arrayなら => ロードへ
-            else await loaloa0(val, route); //まだオブジェクトなら => もっかい
-        }
-        route.pop();
-        loaC.deep -= 1;
-    }
-
-    loaloa0(loaC.imgL);
-
-}
-
-loaF.loadS = async() => {
-    loaC.souL.forEach(num => {
-        let sound = new Audio();
-        sound.preload = 'auto';
-        sound.src = `assets/sounds/${num}.mp3`;
-        sound.addEventListener('canplaythrough', () => {
-            // console.log(`Sound ${num} loaded.`);
-            loaC.souD += 1;
-            if(loaC.souD == loaC.souT) start();
-        }, {once: 1});
-        sound.onerror = () => {
-            console.error(`Sound ${num} failed to load.`);
-            loaC.erd += 1;
-            if(loaC.erd > 20) return console.error('さすがにやりすぎbonus'), 1;
-            sound.src = `assets/sounds/error.mp3`;
-            loaC.souD += 1;
-            if(loaC.souD == loaC.souT) start();
-        };
-        sounds[num] = sound;
-    });
-}
-
-let souC = {
-    volume: 0.5
-}
-
-function soundPlay(name){
-    let sound = sounds[name];
-    if(!sound) return soundPlay("error");
-
-    sound.currentTime = 0;
-    sound.volume = souC.volume;
-    sound.play();
-}
-
-function soundStop(){
-    document.querySelectorAll('audio,video').forEach(el => {
-        el.pause();
-        el.currentTime = 0;
-    });
-}
-
-function soundVolume(val){
-    let v = Math.max(0, Math.min(1, val/100));
-    console.log(`[soundVolume] ${souC.volume??null} => ${v}`);
-    souC.volume = v;
-    document.querySelectorAll('audio,video').forEach(el => {
-        el.volume = v
-    });
-}
-//#endregion
-
-document.addEventListener('DOMContentLoaded', async() => await loaF.load())

@@ -6,6 +6,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+
     <meta name="description" content="VRゲーム「ロント・コネクト」が流行した世界観で送る、学園x青春x物語RPG">
     <meta name="keywords" content="ロント・コネクト,ronto_connect,ronto-connect,ゲーム,インディーゲーム,RPG">
     <link rel="stylesheet" href="mitame.css">
@@ -44,7 +45,7 @@
     </div>
 
 
-    <div id="loginArea" class="area">
+    <div id="login" class="area">
         <div class="center">
             <div class="x">
                 <div class="inner"></div>
@@ -62,6 +63,11 @@
                 <div class="send">Login</div>
             </div>
 
+            <div class="acs">
+                <div class="tog"></div>
+                <div class="list"></div>
+            </div>
+
             <div class="dolphin">
                 <div class="fuki">
                     <div class="text">お前を消す方法</div>
@@ -71,7 +77,7 @@
         </div>
     </div>
 
-    <div id="homeArea" class="area appe">
+    <div id="home" class="area appe">
         <div class="col c1">
             <!-- ロント・コネクト -->
             <div class="launch button a">起動する</div>
@@ -84,7 +90,7 @@
         </div>
     </div>
 
-    <div id="farmArea" class="area">
+    <div id="farm" class="area">
         <canvas class="farm"></canvas>
         <div class="row BTS">
             <div class="bt shop">shop</div> <!--どっかからウィンドウだして〜ってかんじに。背景は透明に。この文字はpolygonで頑張ってもいいかも-->
@@ -93,33 +99,33 @@
         </div>
     </div>
 
-    <div id="titleArea" class="area">
+    <div id="title" class="area">
         <div class="title">
             <img src="assets/images/systems/logo.png"/>
             <div class="text">ロント・コネクト</div>
         </div>
     </div>
 
-    <div id="lobyArea" class="area">
+    <div id="loby" class="area">
         <div class="main">
         </div>
     </div>
 
-    <div id="dungeonArea" class="area">
+    <div id="dungeon" class="area">
         <canvas class="field"></canvas>
         
     </div>
 
-    <div id="btArea" class="area appe">
+    <div id="battle" class="area appe">
         <div class="column">
             <div class="humans enemies"></div>
             <div class="humans players"></div>
     
             <div class="sele">
-                <div class="s1"></div>
-                <div class="s2"></div>
-                <div class="s3"></div>
-                <div class="s4"></div>
+                <div class="bt s1"></div>
+                <div class="bt s2"></div>
+                <div class="bt s3"></div>
+                <div class="bt s4"></div>
             </div>
         </div>
     </div>

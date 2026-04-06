@@ -518,11 +518,11 @@ img{
 
 /* #endregion */
 
-/* #region loginArea 5 */
-#loginArea{
+/* #region login 5 */
+#login{
     content: 'login';
 }
-#loginArea .center{
+#login .center{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -536,7 +536,7 @@ img{
     left: 50%;
     transform: translate(-50%, -50%);
 }
-#loginArea .center .x{
+#login .center .x{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -547,7 +547,7 @@ img{
     right: 5px;
     cursor: pointer;
 }
-#loginArea .center .x .inner{
+#login .center .x .inner{
     display: block;
     width: 100%;
     height: 100%;
@@ -555,31 +555,31 @@ img{
     clip-path: polygon(0 7.5%, 7.5% 0, 50% 40%, 92.5% 0, 100% 7.5%, 60% 50%, 100% 92.5%, 92.5% 100%, 50% 60%, 7.5% 100%, 0% 92.5%, 40% 50%);
     pointer-events: none;
 }
-#loginArea .center .column{
+#login .center .column{
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
     gap: 5px;
 }
-#loginArea .center .column .youso{
+#login .center .column .youso{
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
     color: #ffffff;
 }
-#loginArea .center .column .youso .label{
+#login .center .column .youso .label{
     font-size: 16px;
 }
-#loginArea .center .column .youso input{
+#login .center .column .youso input{
     padding: 4px 7px;
     border: none;
     border-radius: 5px;
     font-size: 21px;
     color: #4d4d4d;
 }
-#loginArea .center .column .send{
+#login .center .column .send{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -596,21 +596,89 @@ img{
     transition: all 0.1s ease;
     cursor: pointer;
 }
-#loginArea .center .column .send:hover{
+#login .center .column .send:hover{
     scale: 1.1;
 }
-#loginArea .center .column .send:active{
+#login .center .column .send:active{
     scale: 0.9;
 }
 
-#loginArea .dolphin{
+#login .acs{
+    position: absolute;
+    top: 400px;
+    left: 10px;
+}
+#login .acs .tog{
+    width: 40px;
+    aspect-ratio: 1/1;
+    background: #27a227;
+    border-radius: 50%;
+    box-sizing: border-box;
+}
+#login .acs.tog .tog{
+    border-radius: 50% 50% 0 0;
+}
+#login .acs .list{
+    display: none;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 0;
+    width: 230px;
+    height: fit-content;
+     max-height: 400px;
+    border: 1px groove #27a227;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+#login .acs.tog .list{
+    display: flex;
+}
+#login .acs .list .item{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    height: 40px;
+    background: #71af71;
+    position: relative;
+    box-sizing: border-box;
+}
+#login .acs .list .item .name{
+    /* display: flex; */
+    justify-content: flex-start;
+    align-items: center;
+    width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 10px 5px;
+    box-sizing: border-box;
+}
+#login .acs .list .item .name:hover{
+    background: #27a227;
+}
+#login .acs .list .item .del{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    height: 100%;
+    font-size: 16px;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+#login .acs .list .item .del:hover{
+    background: #c65252;
+}
+
+#login .dolphin{
     width: 70px;
     height: fit-content;
     position: absolute;
     bottom: 5px;
     right: 15px;
 }
-#loginArea .dolphin .fuki{
+#login .dolphin .fuki{
     opacity: 1;
     width: 175%;
     padding: 2.5px;
@@ -622,29 +690,29 @@ img{
     right: 10px;
     transition: opacity 0.3s ease;
 }
-#loginArea .dolphin .fuki:hover{
+#login .dolphin .fuki:hover{
     opacity: 0.2;
 }
-#loginArea .dolphin .fuki:active{
+#login .dolphin .fuki:active{
     opacity: 1;
 }
-#loginArea .dolphin .fuki .text{
+#login .dolphin .fuki .text{
     font-size: 14px;
     color: #000000;
 }
-#loginArea .dolphin img{
+#login .dolphin img{
     width: 100%;
     aspect-ratio: 1/1;
     object-fit: cover;
 }
 /* #endregion */
 
-/* #region homeArea 2 */
-#homeArea{
+/* #region home 2 */
+#home{
     content: 'home';
 }
 
-#homeArea .col{
+#home .col{
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -654,7 +722,7 @@ img{
     height: fit-content;
     padding: 30px 0;
 }
-#homeArea .col .button{
+#home .col .button{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -665,38 +733,38 @@ img{
     cursor: pointer;
     box-sizing: border-box;
 }
-#homeArea .col .button:hover{
+#home .col .button:hover{
     scale: 1.1;
 }
-#homeArea .col .button:active{
+#home .col .button:active{
     scale: 0.95;
 }
 
-#homeArea .col .button.a{
+#home .col .button.a{
     width: 40%;
     aspect-ratio: 5/1;
 }
-#homeArea .col .button.b{
+#home .col .button.b{
     width: 30%;
     aspect-ratio: 4/1;
 }
 
-#homeArea .col.c1{
+#home .col.c1{
     /* ロント・コネクト */
     background: #09004b;
     border: 2px solid #5eff52;
     box-shadow: 0 0 15px #5eff52b7;
 }
-#homeArea .col.c1 .button{
+#home .col.c1 .button{
     background: #14b13b;
     color: #85ff4c;
 }
-#homeArea .col.c2 .button{
+#home .col.c2 .button{
     background: #b5791f;
     color: #f4c836;
 }
 
-#homeArea .col.c2{
+#home .col.c2{
     /* 農業！ */
     margin-top: 20px;
     background: #ab8725;
@@ -704,11 +772,11 @@ img{
 }
 /* #endregion */
 
-/* #region farmArea 2 */
-#farmArea{
+/* #region farm 2 */
+#farm{
     content: 'farm';
 }
-#farmArea .farm{
+#farm .farm{
     display: grid;
     gap: 5px;
     grid-template-columns: repeat(8, 1fr);
@@ -718,14 +786,14 @@ img{
     background: #ffe096;
     margin: 0 auto;
 }
-#farmArea .BTS{
+#farm .BTS{
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     gap: 10px;
 }
-#farmArea .BTS .bt{
+#farm .BTS .bt{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -739,24 +807,24 @@ img{
     transition: all 0.1s ease;
     cursor: pointer;
 }
-#farmArea .BTS .bt:hover{
+#farm .BTS .bt:hover{
     scale: 1.1;
 }
-#farmArea .BTS .bt:active{
+#farm .BTS .bt:active{
     scale: 0.95;
 }
 /* #endregion */
 
-/* #region titleArea 7 */
-#titleArea{
+/* #region title 7 */
+#title{
     content: 'title';
 }
-#titleArea .title{
+#title .title{
     display: flex;
     flex-direction: row;
     gap: 4px;
 }
-#titleArea .title .text{
+#title .title .text{
     display: inline-block;
     background: linear-gradient(345deg, #c5faff 23%, #ffffff 80%);
     background-clip: text;
@@ -765,11 +833,11 @@ img{
 }
 /* #endregion */
 
-/* #region lobyArea 2 */
-#lobyArea{
+/* #region loby 2 */
+#loby{
     content:'loby'
 }
-#lobyArea .main{
+#loby .main{
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     align-content: start;
@@ -781,7 +849,7 @@ img{
     padding: 0 50px;
     box-sizing: border-box;
 }
-#lobyArea .main .icon{
+#loby .main .icon{
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -790,12 +858,12 @@ img{
     width: 250px;
     aspect-ratio: 1/1;
 }
-#lobyArea .main .icon img{
+#loby .main .icon img{
     width: 60%;
     aspect-ratio: 1/1 ;
     object-fit: contain;
 }
-#lobyArea .main .icon .text{
+#loby .main .icon .text{
     line-height: 20px;
     text-align: center;
 }
@@ -875,11 +943,11 @@ img{
 }
 /* #endregion */
 
-/* #region dungeonArea 3 */
-#dungeonArea{
+/* #region dungeon 3 */
+#dungeon{
     content:'dungeon'
 }
-#dungeonArea .field{
+#dungeon .field{
     /* canvas*/
     display: block;
     margin: 0 auto;
@@ -888,22 +956,22 @@ img{
 }
 /* #endregion */
 
-/* #region btArea 4 */
-#btArea{
-    content:'bt';
+/* #region battle 4 */
+#battle{
+    content:'battle';
 }
-#btArea .column{
+#battle .column{
     display: flex;
     flex-direction: column;
     gap: 20px;
     width: 90%;
     margin: 0 auto;
 }
-#btArea .humans{
+#battle .humans{
     width: fit-content;
     height: auto;
 }
-#btArea .humans .human{
+#battle .humans .human{
     display: flex;
     flex-direction: column;
     width: 150px;
@@ -914,7 +982,7 @@ img{
     border-radius: 15px 15px 5px 5px;
     position: relative;
 }
-#btArea .humans .human .name{
+#battle .humans .human .name{
     display: block;
     position: absolute;
     top: 5px;
@@ -923,7 +991,7 @@ img{
     font-size: 14px;
     z-index: 1;
 }
-#btArea .humans .human .img{
+#battle .humans .human .img{
     /* img */
     width: 80%;
     aspect-ratio: 1/1;
@@ -937,7 +1005,7 @@ img{
     object-fit: contain;
     z-index: 2;
 }
-#btArea .humans .human .skill{
+#battle .humans .human .skill{
     display: block;
     width: 20%;
     aspect-ratio: 1/1;
@@ -949,7 +1017,7 @@ img{
     overflow: hidden;
     z-index: 3;
 }
-#btArea .humans .human .skill .back{
+#battle .humans .human .skill .back{
     /* img */
     width: 100%;
     aspect-ratio: 1/1;
@@ -959,7 +1027,7 @@ img{
     left: 0;
     pointer-events: none;
 }
-#btArea .humans .human .skill .liquid{
+#battle .humans .human .skill .liquid{
     width: 100%;
     height: 0;
     position: absolute;
@@ -968,7 +1036,7 @@ img{
     background: #4473ad;
     pointer-events: none;
 }
-#btArea .humans .human .lv{
+#battle .humans .human .lv{
     display: block;
     position: absolute;
     top: 35%;
@@ -978,42 +1046,55 @@ img{
     color: #2b2b2b;
 }
 
-#btArea .humans .human .bars{
+#battle .humans .human .bars{
     width: 95%;
     margin: -20px auto 0;
     pointer-events: none;
 }
-#btArea .humans .human .bars .status{
+#battle .humans .human .bars .status{
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     gap: 0;
     height: 30px;
 }
-#btArea .humans .human .bars .status .text{
+#battle .humans .human .bars .status .text{
     display: block;
     font-size: 12px;
 }
-#btArea .humans .human .bars .status .bar{
+#battle .humans .human .bars .status .bar{
     width: 100%;
     flex: 1;
     background: #b2b2b2;
 }
-#btArea .humans .human .bars .status .bar .inner{
+#battle .humans .human .bars .status .bar .inner{
     width: 0;
     height: 100%;
 }
-#btArea .humans .human .bars .status.hp .bar .inner{
+#battle .humans .human .bars .status.hp .bar .inner{
     background: #ff8080;
 }
-#btArea .humans .human .bars .status.mp .bar .inner{
+#battle .humans .human .bars .status.mp .bar .inner{
     background: #8080ff;
 }
 
-#btArea .sele{
+#battle .sele{
     display: flex;
     flex-direction: row;
     justify-content: space-around;
+    padding: 0 25px;
+    gap: 25px;
+}
+#battle .sele .bt{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* width: 100%; */
+    flex: 1;
+    aspect-ratio: 2 / 1;
+    border-radius: 15px;
+    background: #f1a34b;
+    font-size: 28px;
 }
 /* #endregion */
 
