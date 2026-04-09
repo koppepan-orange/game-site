@@ -1173,7 +1173,6 @@ function soundVolume(code, val){
 }
 soundVolume(50);
 
-document.addEventListener('DOMContentLoaded', async() => await loaF.load());
 //#endregion
 //#region 幸せになれる隠しコマンドがあるらしい
 let secrates = [
@@ -1284,7 +1283,7 @@ mainF.move = (to) => {
     if(mainC.spa == to) return console.log('どういうわけか もう そこにいる');
 	if(!to) return console.error(`せんぱ〜い？${to}ってどこですか〜？笑`);
 	
-	for(let a of mainC.spas) document.getElementById(a).classList.remove('show');
+	for(let a of mainC.spas) document.getElementById(a.name).classList.remove('show');
     document.getElementById(to).classList.add('show');
 }
 
@@ -1306,7 +1305,7 @@ for(let n of mainC.spas){
 
     li.addEventListener('click', () => mainF.move(n.name));
 
-    mainC.mvlsLD.querySelector('.list').appendChild(li);
+    mainC.mvlsLD.appendChild(li);
 }
 document.addEventListener('keydown', (e) => {
     if(e.key != 'm' || mainC.mvlsi) return;
@@ -1335,5 +1334,18 @@ function start(){
 
 
     mainF.move('home');
+}
+//#endregion
+
+//#region DOM
+let LoadOfWait = async() => await loaF.load();
+if(document.readyState == "loading"){
+    document.addEventListener("DOMContentLoaded", init);
+}
+else LoadOfWait();
+
+async function init() {
+    await LoadOfWait();
+    start();
 }
 //#endregion
