@@ -1031,6 +1031,8 @@ let loaC = {
 let loaF = {};
 loaC.imgL = {
     systems:['error'],
+    balls:["normal"],
+    humans:['pit_idol','pit_pre','pit_act','bat_idol','bat_pre','bat_act'],
 }
 loaC.imgT = Object.values(loaC.imgL).reduce((a,b) => a + b.length, 0);
 
@@ -1041,6 +1043,7 @@ loaC.souL = {
 loaC.souT = Object.values(loaC.souL).reduce((a,b) => a + b.length, 0);
 
 loaF.load = async() => {
+    console.log("loadを開始しました。少々お待ちください");
     if(await loaF.loadI()) return 1;
     return 0;
 }
@@ -1111,6 +1114,7 @@ loaF.loadS = async() => {
 }
 loaF.end = () => {
     console.log(`images & sounds loaded! (error: ${loaC.erd})`);
+    soundVolume(50);
     start();
 }
 
@@ -1171,7 +1175,6 @@ function soundVolume(code, val){
 
     console.log(`[soundVolume] se:${souC.se} bgm:${souC.bgm}`);
 }
-soundVolume(50);
 
 document.addEventListener('DOMContentLoaded', async() => await loaF.load());
 //#endregion
@@ -1277,14 +1280,14 @@ let mainC = {
     mvlsi: 0
 }
 mainC.spas = [ //classはspace想定、shoは1つだけ
-    // { name:'home', rank:2, back:'#f0f8ff', sho:1 }, 
+    { name:'batt', rank:2, back:'#f0f8ff', sho:1 }, 
 ];
 let mainF = {};
 mainF.move = (to) => {
     if(mainC.spa == to) return console.log('どういうわけか もう そこにいる');
 	if(!to) return console.error(`せんぱ〜い？${to}ってどこですか〜？笑`);
 	
-	for(let a of mainC.spas) document.getElementById(a).classList.remove('show');
+	for(let a of mainC.spas) document.getElementById(a.name).classList.remove('show');
     document.getElementById(to).classList.add('show');
 }
 
@@ -1306,7 +1309,7 @@ for(let n of mainC.spas){
 
     li.addEventListener('click', () => mainF.move(n.name));
 
-    mainC.mvlsLD.querySelector('.list').appendChild(li);
+    mainC.mvlsLD.appendChild(li);
 }
 document.addEventListener('keydown', (e) => {
     if(e.key != 'm' || mainC.mvlsi) return;
@@ -1325,15 +1328,125 @@ document.addEventListener('keyup',e => {
 //#endregion main
 
 
+// #region batt -Batting Game-
+let battD = document.getElementById('batt');
+let battC = {
+    can: battD.querySelector('canvas'),
+    ctx: battD.querySelector('canvas').getContext('2d'),
+    
+    loop: 1,
+    phase: 'idol', //idol, pre, ing, ed || space押されていない, space押された, ball投げられた, space離された
+    ball: null,
+
+    batID: battD.querySelector('.yukkuri .human.bat img'),
+    batTD: battD.querySelector('.yukkuri .human.bat .text'),
+    pitID: battD.querySelector('.yukkuri .human.pit img'),
+    pitTD: battD.querySelector('.yukkuri .human.pit .text'),
+    bat: "idol",
+    pit: "idol",
+
+}
+let battF = {};
+
+battF.load = () => {
+    battC.loop = 1;
+    battF.resize();
+}
+battF.resize = () => {
+    let wid = window.innerWidth * 0.8;
+    battC.can.width = wid;
+    battC.can.height = 300;
+}
+
+// humans:['pit_idol','pit_pre','pit_act','bat_idol','bat_pre','bat_act'],
+battF.tekiou = () => {
+    battC.batID.src = `assets/images/humans/bat_${battC.bat}.png`;
+    battC.pitID.src = `assets/images/humans/pit_${battC.pit}.png`;
+}
+battF.draw = () => {
+    battC.ctx.clearRect(0, 0, battC.can.width, battC.can.height);
+    battC.ctx.fillStyle = '#f0f8ff';
+    battC.ctx.fillRect(0, 0, battC.can.width, battC.can.height);
+
+    // ballの描画
+    if(!battC.ball) return;
+    let bl = battC.ball;
+    battC.ctx.drawImage(bl.img ?? images['balls']["normal"], bl.x, bl.y, bl.w, bl.h);
+}
+battF.stat = (stat, who = 0) => {
+    if(who == 0) battF.stat(stat, "bat"), battF.stat(stat, "pit");
+    battC[who] = stat;
+}
+
+battC.thrown = [
+    {
+        name:"normal",
+        func: (time) => {
+            // ここに動きの処理。え動かすのってどうやるの、、、？！？！？
+        }
+        
+    }
+];
+battF.throw = (code = NaN) => {
+    let kind = null;
+    jump:{
+        if(!isNaN(code)){
+            kind = battC.thrown.find(a => a.code == code);
+            break jump;
+        };
+
+        let arr = battC.thrown.filter(a => !a.no);
+        kind = arraySelect(arr);
+        if(!kind) return;
+    }
+
+    let ball = {
+        x: 50,
+        y: 150,
+        w: 30,
+        h: 30,
+        // img: images['balls'][kind.name],
+    };
+    
+    battC.ball = ball;
+
+    kind.func();
+}
+
+battF.gameloop = () => {
+    if(!battC.loop) return;
+    battF.draw();
+    battF.tekiou();
+
+    requestAnimationFrame(battF.gameloop);
+}
+// #endregion
+
 //#region start
 function start(){
+    console.log('load完了ed');
     Style.tekiou();
     OBS.load();
 
     mainF.load();
+    battF.load();
 
+    mainF.move('batt');
 
-
-    mainF.move('home');
+    battF.gameloop();
 }
 //#endregion
+
+//#region DOM
+let LoadOfWait = async() => await loaF.load();
+if(document.readyState == "loading"){
+    document.addEventListener("DOMContentLoaded", init);
+}
+else LoadOfWait();
+
+async function init() {
+    await LoadOfWait();
+    start();
+}
+//#endregion
+

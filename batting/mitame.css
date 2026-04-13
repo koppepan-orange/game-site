@@ -365,7 +365,7 @@ img{
 
 #main{
     display: block;
-    width: var(--iPhone-width);
+    width: 100%;
     height: 100%;
     position: relative;
     overflow: hidden;
@@ -386,4 +386,35 @@ img{
 }
 .space.show{
     display: flex;
+}
+
+#batt{
+    content: "battingです";    
+}
+#batt .yukkuri{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    height: fit-content;
+    position: fixed;
+    top: 100px;
+    box-sizing: border-box;
+}
+#batt .yukkuri .human{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    aspect-ratio: 1/1;
+    position: relative;
+    box-sizing: border-box;
+}
+#batt .yukkuri .human img{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    aspect-ratio: 1/1;
 }

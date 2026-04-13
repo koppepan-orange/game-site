@@ -1041,6 +1041,7 @@ loaC.souL = {
 loaC.souT = Object.values(loaC.souL).reduce((a,b) => a + b.length, 0);
 
 loaF.load = async() => {
+    console.log("loadを開始しました。少々お待ちください");
     if(await loaF.loadI()) return 1;
     return 0;
 }
@@ -1111,6 +1112,7 @@ loaF.loadS = async() => {
 }
 loaF.end = () => {
     console.log(`images & sounds loaded! (error: ${loaC.erd})`);
+    soundVolume(50);
     start();
 }
 
@@ -1171,7 +1173,6 @@ function soundVolume(code, val){
 
     console.log(`[soundVolume] se:${souC.se} bgm:${souC.bgm}`);
 }
-soundVolume(50);
 
 //#endregion
 //#region 幸せになれる隠しコマンドがあるらしい
@@ -1276,7 +1277,7 @@ let mainC = {
     mvlsi: 0
 }
 mainC.spas = [ //classはspace想定、shoは1つだけ
-    // { name:'home', rank:2, back:'#f0f8ff', sho:1 }, 
+    { name:'home', rank:2, back:'#f0f8ff', sho:1 }, 
 ];
 let mainF = {};
 mainF.move = (to) => {
@@ -1349,3 +1350,4 @@ async function init() {
     start();
 }
 //#endregion
+
