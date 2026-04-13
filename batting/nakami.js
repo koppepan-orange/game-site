@@ -1338,6 +1338,13 @@ let battC = {
     phase: 'idol', //idol, pre, ing, ed || space押されていない, space押された, ball投げられた, space離された
     ball: null,
 
+    pad: {
+        x: 425,
+        y: 135,
+        w: 45,
+        h: 45
+    },
+
     batID: battD.querySelector('.yukkuri .human.bat img'),
     batTD: battD.querySelector('.yukkuri .human.bat .text'),
     pitID: battD.querySelector('.yukkuri .human.pit img'),
@@ -1363,10 +1370,20 @@ battF.tekiou = () => {
     battC.batID.src = `assets/images/humans/bat_${battC.bat}.png`;
     battC.pitID.src = `assets/images/humans/pit_${battC.pit}.png`;
 }
+battF.iscrash = (a, b) => {
+    return !(a.x + a.w < b.x || a.x > b.x + b.w || a.y + a.h < b.y || a.y > b.y + b.h);
+}
+
 battF.draw = () => {
     battC.ctx.clearRect(0, 0, battC.can.width, battC.can.height);
     battC.ctx.fillStyle = '#f0f8ff';
     battC.ctx.fillRect(0, 0, battC.can.width, battC.can.height);
+
+    // padの描画
+    // battC.ctx.drawImage(images['pad'], battC.pad.x, battC.pad.y, battC.pad.w, battC.pad.h);
+    // padはimageではなく、色でお願いします。b2b2b2
+    battC.ctx.fillStyle = '#b2b2b2';
+    battC.ctx.fillRect(battC.pad.x, battC.pad.y, battC.pad.w, battC.pad.h);
 
     // ballの描画
     if(!battC.ball) return;
