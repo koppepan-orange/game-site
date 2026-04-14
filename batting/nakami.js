@@ -1583,6 +1583,13 @@ document.addEventListener('keyup', (e) => {
     
     if(key == ' ') battF.hanate();
 })
+document.addEventListener('pointerdown', (e) => {
+    battF.throw();
+});
+
+document.addEventListener('pointerup', (e) => {
+    battF.hanate();
+});
 
 battF.gameloop = () => {
     if(!battC.loop) return;
