@@ -231,6 +231,14 @@ function random(min, max){
     let num = Math.floor(Math.random() * (max - min + 1)) + min;
     return Math.floor(num);
 };
+function randomfloat(min, max, digit = NaN){
+    if(max < min) [min, max] = [max, min];
+    let num = Math.random() * (max - min) + min;
+
+    let res = num;
+    if(!isNaN(digit)) res = Number(num.toFixed(digit));
+    return res;
+}
 function fl(val, arr = [0, 1]){
     let res = val == arr[0] ? arr[1] : arr[0];
     return res;
@@ -1031,7 +1039,7 @@ let loaC = {
 let loaF = {};
 loaC.imgL = {
     systems:['error'],
-    balls:["normal"],
+    balls:["normal", "hited"],
     humans:['pit_idol','pit_pre','pit_act','bat_idol','bat_pre','bat_act'],
 }
 loaC.imgT = Object.values(loaC.imgL).reduce((a,b) => a + b.length, 0);
@@ -1336,13 +1344,16 @@ let battC = {
     
     loop: 1,
     phase: 'idol', //idol, pre, ing, ed || space押されていない, space押された, ball投げられた, space離された
-    ball: null,
+    pt: 0,
+    
+    balls: [],
 
     pad: {
-        x: 425,
-        y: 135,
-        w: 45,
-        h: 45
+        disp: 1,
+        x: 410,
+        y: 145,
+        w: 40,
+        h: 40
     },
 
     batID: battD.querySelector('.yukkuri .human.bat img'),
@@ -1361,7 +1372,7 @@ battF.load = () => {
 }
 battF.resize = () => {
     let wid = window.innerWidth * 0.8;
-    battC.can.width = wid;
+    battC.can.width = 560;
     battC.can.height = 300;
 }
 
@@ -1383,13 +1394,34 @@ battF.draw = () => {
     // battC.ctx.drawImage(images['pad'], battC.pad.x, battC.pad.y, battC.pad.w, battC.pad.h);
     // padはimageではなく、色でお願いします。b2b2b2
     battC.ctx.fillStyle = '#b2b2b2';
-    battC.ctx.fillRect(battC.pad.x, battC.pad.y, battC.pad.w, battC.pad.h);
+    if(battC.pad.disp) battC.ctx.fillRect(battC.pad.x, battC.pad.y, battC.pad.w, battC.pad.h);
 
     // ballの描画
-    if(!battC.ball) return;
-    let bl = battC.ball;
-    battC.ctx.drawImage(bl.img ?? images['balls']["normal"], bl.x, bl.y, bl.w, bl.h);
+    for(let ball of battC.balls){
+        battC.ctx.drawImage(ball.img ?? images['balls']["normal"], ball.x, ball.y, ball.w, ball.h);
+    }
 }
+battF.calc = () => {
+    // a:加速度 v:速度 m:質量
+    for(let ball of battC.balls){
+        ball.vx += ball.ax;
+        ball.vy += ball.ay;
+
+        ball.x += ball.vx;
+        ball.y += ball.vy;
+
+        if(battF.iscrash(ball, battC.pad)) ball.can = 1, ball.caned = 1;
+        else ball.can = 0;
+        
+        // if(ball.w < 0 || ball.h < 0 || 560 < ball.x+ball.w || 300 < ball.y+ball.h) battF.delete(ball);
+        if(ball.w < 0 || 560 < ball.x+ball.w){
+            battF.delete(ball);
+                
+            if(!ball.caned) battF.outball();
+        }
+    }
+}
+
 battF.stat = (stat, who = 0) => {
     if(who == 0) battF.stat(stat, "bat"), battF.stat(stat, "pit");
     battC[who] = stat;
@@ -1398,13 +1430,68 @@ battF.stat = (stat, who = 0) => {
 battC.thrown = [
     {
         name:"normal",
-        func: (time) => {
-            // ここに動きの処理。え動かすのってどうやるの、、、？！？！？
+        vx: 6,
+        vy: 0,
+        dx: 3,
+        dy: 0,
+        ax: 0,
+        ay: 0,
+        type: "none",
+        func: (ball) => {}
+    },
+    {
+        name:"ksk",
+        vx: 2,
+        vy: 0,
+        dx: 1,
+        dy: 0,
+        ax: 0.5,
+        ay: 0,
+        type: "none",
+        func: (ball) => {}
+    },
+    {
+        name:"rapid_ksk",
+        vx: 2,
+        vy: 0,
+        dx: 1,
+        dy: 0,
+        ax: 0,
+        ay: 0,
+        type: "impluse",
+        time: 1000,
+        func: (ball) => {
+            ball.ax = random(1,3);
         }
-        
+    },
+    {
+        name:"uneune",
+        vx: 5,
+        vy: 3,
+        dx: 1,
+        dy: 2,
+        ax: 0,
+        ay: 0,
+        type: "repeat",
+        time: 200,
+        timed: 100,
+        func: (ball, i) => {
+            if(i == 0) ball.vy *= -2;
+            else ball.vy *= -1;
+        }
     }
 ];
-battF.throw = (code = NaN) => {
+
+
+battF.throw = async(code = NaN) => {
+    battF.stat('pre');
+
+    let matte = random(100, 3000);
+    await delay(matte);
+    
+    
+    battF.stat('act', "pit");
+
     let kind = null;
     jump:{
         if(!isNaN(code)){
@@ -1419,19 +1506,87 @@ battF.throw = (code = NaN) => {
 
     let ball = {
         x: 50,
-        y: 150,
-        w: 30,
-        h: 30,
+        y: 150, 
+        w: kind.w ?? 30,
+        h: kind.h ?? 30,
+        ax: kind.ax,
+        ay: kind.ay,
+        vx: kind.vx + randomfloat(-kind.dx, kind.dx),
+        vy: kind.vy + randomfloat(-kind.dy, kind.dy),
         // img: images['balls'][kind.name],
     };
     
-    battC.ball = ball;
+    battC.balls.push(ball);
 
-    kind.func();
+    // kind.func();
+    
+    if(kind.type == 'none') return;
+    if(kind.type == 'impluse'){
+        await delay(kind.time);
+        kind.func(ball);
+    }
+    if(kind.type == 'repeat'){
+        let i = 0;
+        ball.interval = setInterval(() => {
+            kind.func(ball, i);
+            i++;
+        }, kind.time + random(-kind.timed, kind.timed));
+    }
 }
+battF.delete = (ball) => {
+    if(!ball) return;
+
+    if(ball.interval) clearInterval(ball.interval);
+
+    battC.balls.splice(battC.balls.indexOf(ball), 1);
+}
+battF.outball = (ball) => {
+    // if(!ball) return;
+    tobiText(battC.batID, "BALL")
+}
+
+
+battF.hanate = async() => {
+    battF.stat('act', "bat");
+
+    let balls = battC.balls;
+    let arr = balls.filter(a => a.can);
+    if(!arr.length) return nicoText('ざーこざーこ♡');
+    
+    for(let ball of arr){
+        ball.img = images['balls']['hited'];
+        ball.vx *= -2;
+        if(ball.vy <= 0) ball.vy = 2;
+        ball.vy *= -4;
+        battC.pt += 1;
+    }
+
+    await delay(200);
+
+    battF.stat('idol');
+}
+
+document.addEventListener('keydown', (e) => {
+    let key = e.key.toLowerCase();
+    if(e.repeat) return;
+
+    if(key == ' ') battF.throw();
+
+    if(key == 'p') battC.pad.disp = fl(battC.pad.disp);
+    if(key == "l"){
+        battC.loop = fl(battC.loop)
+        if(battC.loop) battF.gameloop()
+    };
+})
+document.addEventListener('keyup', (e) => {
+    let key = e.key.toLowerCase();
+    
+    if(key == ' ') battF.hanate();
+})
 
 battF.gameloop = () => {
     if(!battC.loop) return;
+    battF.calc();
     battF.draw();
     battF.tekiou();
 

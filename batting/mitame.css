@@ -1,7 +1,7 @@
 /* #region スターターパック */
 html{
     margin: -8px;
-    overflow-x: hidden;
+    overflow: hidden;
     user-select:none;
 }
 body{
@@ -390,6 +390,7 @@ img{
 
 #batt{
     content: "battingです";    
+    width: 700px;
 }
 #batt .yukkuri{
     display: flex;
