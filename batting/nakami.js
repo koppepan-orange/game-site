@@ -1001,7 +1001,9 @@ OBS.load = () => {
 //#endregion
 //#region fonts
 const Fonts = [
-    // {src:'comicsans', type:'ttf'},
+    {src:'comicsans', type:'ttf'},
+    {src:'cube12', type:'ttf'},
+    {src:'nyashi', type:'ttf'},
 ];
 function fontsLoad(){
     let id = "font_load_css";
@@ -1345,6 +1347,7 @@ let battC = {
     loop: 1,
     phase: 'idol', //idol, pre, ing, ed || space押されていない, space押された, ball投げられた, space離された
     pt: 0,
+    kind: 'normal',
     
     balls: [],
 
@@ -1363,12 +1366,17 @@ let battC = {
     bat: "idol",
     pit: "idol",
 
+    UI: {
+        kind: battD.querySelector('.UI .kind'),
+        point: battD.querySelector('.UI .point')
+    }
 }
 let battF = {};
 
 battF.load = () => {
     battC.loop = 1;
     battF.resize();
+    battF.tekiou();
 }
 battF.resize = () => {
     let wid = window.innerWidth * 0.8;
@@ -1380,6 +1388,9 @@ battF.resize = () => {
 battF.tekiou = () => {
     battC.batID.src = `assets/images/humans/bat_${battC.bat}.png`;
     battC.pitID.src = `assets/images/humans/pit_${battC.pit}.png`;
+
+    battC.UI.kind.textContent = `球種:${battC.kind}`;
+    battC.UI.point.textContent = `${battC.pt}Pt`;
 }
 battF.iscrash = (a, b) => {
     return !(a.x + a.w < b.x || a.x > b.x + b.w || a.y + a.h < b.y || a.y > b.y + b.h);
@@ -1425,11 +1436,13 @@ battF.calc = () => {
 battF.stat = (stat, who = 0) => {
     if(who == 0) battF.stat(stat, "bat"), battF.stat(stat, "pit");
     battC[who] = stat;
+    battF.tekiou();
 }
 
 battC.thrown = [
     {
         name:"normal",
+        jpnm:"直進",
         vx: 6,
         vy: 0,
         dx: 3,
@@ -1441,6 +1454,7 @@ battC.thrown = [
     },
     {
         name:"ksk",
+        jpnm:"ksk",
         vx: 2,
         vy: 0,
         dx: 1,
@@ -1452,6 +1466,7 @@ battC.thrown = [
     },
     {
         name:"rapid_ksk",
+        jpnm:"超！ksk",
         vx: 2,
         vy: 0,
         dx: 1,
@@ -1465,7 +1480,25 @@ battC.thrown = [
         }
     },
     {
+        name:"reverse_ksk",
+        jpnm:"逆ksk",
+        vx: 3,
+        vy: 0,
+        dx: 1,
+        dy: 0,
+        ax: 1,
+        ay: 0,
+        type: "impluse",
+        time: 300,
+        timed: 50,
+        func: (ball) => {
+            ball.ax = 0;
+            ball.vx *= randomfloat(0.05, 0.25);
+        }
+    },
+    {
         name:"uneune",
+        jpnm:"ラビット",
         vx: 5,
         vy: 3,
         dx: 1,
@@ -1517,6 +1550,8 @@ battF.throw = async(code = NaN) => {
     };
     
     battC.balls.push(ball);
+    battC.kind = kind.jpnm ?? "エラー";
+    battF.tekiou();
 
     // kind.func();
     
@@ -1560,6 +1595,7 @@ battF.hanate = async() => {
         ball.vy *= -4;
         battC.pt += 1;
     }
+    battF.tekiou();
 
     await delay(200);
 
@@ -1595,7 +1631,6 @@ battF.gameloop = () => {
     if(!battC.loop) return;
     battF.calc();
     battF.draw();
-    battF.tekiou();
 
     requestAnimationFrame(battF.gameloop);
 }
