@@ -1383,7 +1383,6 @@ battF.load = () => {
     battF.tekiou();
 }
 battF.resize = () => {
-    let wid = window.innerWidth * 0.8;
     battC.can.width = battC.wid;
     battC.can.height = battC.hei;
 }
