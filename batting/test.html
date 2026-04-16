@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>BLOCK WORLD - 洗練版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+            background: #0a0a2a;
+        }
+        /* クロスヘア */
+        #crosshair {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 24px;
+            height: 24px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 100;
+        }
+        #crosshair::before, #crosshair::after {
+            content: '';
+            position: absolute;
+            background: rgba(255,255,255,0.9);
+            box-shadow: 0 0 2px rgba(0,0,0,0.5);
+        }
+        #crosshair::before {
+            top: 11px;
+            left: 0;
+            width: 24px;
+            height: 2px;
+        }
+        #crosshair::after {
+            top: 0;
+            left: 11px;
+            width: 2px;
+            height: 24px;
+        }
+        /* パレット (インベントリ) */
+        #palette {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120%);
+            background: rgba(20, 20, 40, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 48px;
+            padding: 12px 24px;
+            display: flex;
+            gap: 16px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            z-index: 200;
+        }
+        #palette.open {
+            transform: translateX(-50%) translateY(0);
+        }
+        .color-swatch {
+            width: 48px;
+            height: 48px;
+            border-radius: 24px;
+            cursor: pointer;
+            border: 3px solid rgba(255,255,255,0.3);
+            transition: all 0.1s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .color-swatch.selected {
+            border-color: white;
+            transform: scale(1.1);
+            box-shadow: 0 0 16px rgba(255,255,255,0.6);
+        }
+        .color-swatch:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+        /* デバッグパネル (Gキーで開閉) */
+        #debug-panel {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            padding: 12px 18px;
+            border-radius: 20px;
+            color: #0f0;
+            font-family: monospace;
+            font-size: 12px;
+            border-left: 4px solid #0f0;
+            pointer-events: none;
+            z-index: 300;
+            transition: opacity 0.2s;
+        }
+        /* ミニタイマー (空中滞在時間) */
+        #air-timer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-family: monospace;
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffaa66;
+            letter-spacing: 2px;
+            z-index: 300;
+        }
+        /* 操作ヒント */
+        #controls-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #ccc;
+            font-family: monospace;
+            pointer-events: none;
+            z-index: 300;
+        }
+        /* トーストメッセージ */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e1e2fdd;
+            backdrop-filter: blur(12px);
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: white;
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 400;
+            animation: fadeUp 2s ease forwards;
+        }
+        @keyframes fadeUp {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+    </style>
+</head>
+<body>
+    <div id="crosshair"></div>
+    <div id="palette">
+        <!-- 色見本は JS で動的生成 -->
+    </div>
+    <div id="debug-panel" style="display: none;">
+        <div>XYZ: <span id="posX">0</span> <span id="posY">0</span> <span id="posZ">0</span></div>
+        <div>VEL: <span id="velX">0</span> <span id="velY">0</span> <span id="velZ">0</span></div>
+        <div>GROUND: <span id="groundStatus">false</span></div>
+        <div>BLOCKS: <span id="blockCount">0</span></div>
+    </div>
+    <div id="air-timer">00:00.00</div>
+    <div id="controls-hint">
+        🖱️ WASD + マウス | 左クリック: 破壊 | 右クリック: 設置 | E: パレット | G: デバッグ
+    </div>
+
+    <!-- Three.js ライブラリ -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        // ---------- 設定 ----------
+        const BLOCK_SIZE = 1.0;
+        const WORLD_SIZE = 60;          // -20 〜 +20 の範囲
+        const PLAYER_HEIGHT = 1.6;
+        const PLAYER_RADIUS = 0.45;
+        const JUMP_POWER = 5.2;
+        const GRAVITY = -18.0;
+        const MOVE_SPEED = 6.5;
+        const DASH_MULTIPLIER = 2.2;
+        
+        // パレット色一覧 (鮮やかで見やすい)
+        const COLOR_PALETTE = [
+            { name: "白", code: 0xf0f0f0 },
+            { name: "黒", code: 0x222222 },
+            { name: "赤", code: 0xef4444 },
+            { name: "青", code: 0x3b82f6 },
+            { name: "緑", code: 0x22c55e },
+            { name: "黄", code: 0xfacc15 },
+            { name: "紫", code: 0xa855f7 },
+            { name: "橙", code: 0xf97316 },
+            { name: "ピンク", code: 0xec4899 },
+            { name: "水色", code: 0x06b6d4 }
+        ];
+        let selectedColor = COLOR_PALETTE[0].code;
+        
+        // DOM 要素
+        const paletteDiv = document.getElementById('palette');
+        const debugPanel = document.getElementById('debug-panel');
+        const airTimerDiv = document.getElementById('air-timer');
+        
+        // ----- シーン初期化 -----
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a0a2a);
+        scene.fog = new THREE.FogExp2(0x0a0a2a, 0.008); // 軽量フォグ
+        
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 200);
+        camera.position.set(0, PLAYER_HEIGHT, 0);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true; // 影を有効に
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.body.appendChild(renderer.domElement);
+        
+        // ライティング (洗練された明るさ)
+        const ambient = new THREE.AmbientLight(0x404060, 0.65);
+        scene.add(ambient);
+        const mainLight = new THREE.DirectionalLight(0xfff5e0, 1.2);
+        mainLight.position.set(8, 20, 5);
+        mainLight.castShadow = true;
+        mainLight.receiveShadow = false;
+        mainLight.shadow.mapSize.width = 1024;
+        mainLight.shadow.mapSize.height = 1024;
+        mainLight.shadow.camera.near = 0.5;
+        mainLight.shadow.camera.far = 35;
+        mainLight.shadow.camera.left = -15;
+        mainLight.shadow.camera.right = 15;
+        mainLight.shadow.camera.top = 15;
+        mainLight.shadow.camera.bottom = -15;
+        scene.add(mainLight);
+        
+        const fillLight = new THREE.PointLight(0x4466cc, 0.4);
+        fillLight.position.set(-3, 5, 4);
+        scene.add(fillLight);
+        
+        const backLight = new THREE.PointLight(0xffaa66, 0.3);
+        backLight.position.set(0, 3, -6);
+        scene.add(backLight);
+        
+        // 地面グリッド (装飾)
+        const gridHelper = new THREE.GridHelper(WORLD_SIZE, 40, 0x88aaff, 0x335588);
+        gridHelper.position.y = -0.01;
+        gridHelper.material.transparent = true;
+        gridHelper.material.opacity = 0.35;
+        scene.add(gridHelper);
+        
+        // ---------- ブロック管理 ----------
+        const blocksMap = new Map(); // key: `${x},${y},${z}` → mesh
+        const blockGroup = new THREE.Group();
+        scene.add(blockGroup);
+        
+        function getBlockKey(x, y, z) {
+            return `${Math.floor(x)},${Math.floor(y)},${Math.floor(z)}`;
+        }
+        
+        function addBlock(worldX, worldY, worldZ, colorHex, updateMap = true) {
+            const ix = Math.floor(worldX);
+            const iy = Math.floor(worldY);
+            const iz = Math.floor(worldZ);
+            const key = getBlockKey(ix, iy, iz);
+            if (blocksMap.has(key)) return null;
+            
+            const geometry = new THREE.BoxGeometry(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+            const material = new THREE.MeshStandardMaterial({
+                color: colorHex,
+                roughness: 0.3,
+                metalness: 0.05,
+                emissive: 0x000000
+            });
+            const block = new THREE.Mesh(geometry, material);
+            block.position.set(ix + 0.5, iy + 0.5, iz + 0.5);
+            block.castShadow = true;
+            block.receiveShadow = true;
+            block.userData = { isBlock: true, color: colorHex };
+            blockGroup.add(block);
+            if (updateMap) blocksMap.set(key, block);
+            return block;
+        }
+        
+        function removeBlock(worldX, worldY, worldZ) {
+            const ix = Math.floor(worldX);
+            const iy = Math.floor(worldY);
+            const iz = Math.floor(worldZ);
+            const key = getBlockKey(ix, iy, iz);
+            const block = blocksMap.get(key);
+            if (block) {
+                blockGroup.remove(block);
+                blocksMap.delete(key);
+                // メモリ解放
+                block.geometry.dispose();
+                block.material.dispose();
+                return true;
+            }
+            return false;
+        }
+        
+        // ベースとなる地面を生成 (y = 0 のレイヤーを全面敷き詰める)
+        for (let x = -WORLD_SIZE/2; x <= WORLD_SIZE/2; x++) {
+            for (let z = -WORLD_SIZE/2; z <= WORLD_SIZE/2; z++) {
+                addBlock(x, 0, z, 0x9aa8b5, true);
+            }
+        }
+        
+        // ランダムに草/花ブロックを少し追加 (賑わい)
+        for (let i = 0; i < 300; i++) {
+            const x = Math.floor(Math.random() * (WORLD_SIZE - 2) - WORLD_SIZE/2 + 1);
+            const z = Math.floor(Math.random() * (WORLD_SIZE - 2) - WORLD_SIZE/2 + 1);
+            const y = 1;
+            if (!blocksMap.has(getBlockKey(x, y, z))) {
+                const grassColor = [0x7cb518, 0x5fad41, 0x3b8c36][Math.floor(Math.random()*3)];
+                addBlock(x, y, z, grassColor, true);
+            }
+        }
+        
+        // 木を数本 (簡単な木)
+        function addTree(cx, cz) {
+            const trunkColor = 0x8B5A2B;
+            const leafColor = 0x3c9e3c;
+            // 幹 y=1,2
+            addBlock(cx, 1, cz, trunkColor);
+            addBlock(cx, 2, cz, trunkColor);
+            // 葉っぱ
+            for (let dx = -1; dx <= 1; dx++) {
+                for (let dz = -1; dz <= 1; dz++) {
+                    if (dx === 0 && dz === 0) continue;
+                    addBlock(cx+dx, 3, cz+dz, leafColor);
+                }
+            }
+            addBlock(cx, 3, cz, leafColor);
+            addBlock(cx, 4, cz, leafColor);
+        }
+        addTree(-5, -4);
+        addTree(6, 3);
+        addTree(4, -6);
+        addTree(-3, 7);
+        addTree(-7, 5);
+        
+        // ---------- プレイヤー物理と当たり判定 (高精度) ----------
+        let velocity = new THREE.Vector3(0, 0, 0);
+        let isGrounded = false;
+        let isDashing = false;
+        let lastDashTime = 0;
+        let airTime = 0;        // 空中滞在時間 (フレーム単位で計測, 表示用)
+        let airTimerInterval = null;
+        
+        // キー入力管理
+        const keyState = {
+            w: false, s: false, a: false, d: false, space: false
+        };
+        
+        window.addEventListener('keydown', (e) => {
+            const k = e.key.toLowerCase();
+            if (k === 'w') keyState.w = true;
+            if (k === 's') keyState.s = true;
+            if (k === 'a') keyState.a = true;
+            if (k === 'd') keyState.d = true;
+            if (k === ' ') {
+                keyState.space = true;
+                e.preventDefault();
+            }
+            // ダッシュ (W 連打)
+            if (k === 'w' && isGrounded && Date.now() - lastDashTime < 220) {
+                isDashing = true;
+                setTimeout(() => { isDashing = false; }, 200);
+                // 視覚エフェクト: 少しFOVを広げる
+                camera.fov = 85;
+                camera.updateProjectionMatrix();
+                setTimeout(() => {
+                    if (!isDashing) { camera.fov = 75; camera.updateProjectionMatrix(); }
+                }, 220);
+            }
+            if (k === 'w') lastDashTime = Date.now();
+            
+            // Eキー: パレット開閉
+            if (k === 'e') {
+                paletteDiv.classList.toggle('open');
+                showToast(paletteDiv.classList.contains('open') ? "パレットを開きました" : "パレットを閉じました");
+            }
+            // Gキー: デバッグ表示
+            if (k === 'g') {
+                const isVisible = debugPanel.style.display === 'block';
+                debugPanel.style.display = isVisible ? 'none' : 'block';
+                showToast(isVisible ? "デバッグ非表示" : "デバッグ表示");
+            }
+        });
+        
+        window.addEventListener('keyup', (e) => {
+            const k = e.key.toLowerCase();
+            if (k === 'w') keyState.w = false;
+            if (k === 's') keyState.s = false;
+            if (k === 'a') keyState.a = false;
+            if (k === 'd') keyState.d = false;
+            if (k === ' ') { keyState.space = false; }
+        });
+        
+        // 衝突解決 (AABB vs ワールド)
+        function resolveCollisionAndMove(deltaTime) {
+            const moveDelta = velocity.clone().multiplyScalar(deltaTime);
+            let newPos = camera.position.clone();
+            
+            // X軸移動
+            newPos.x += moveDelta.x;
+            if (checkCollisionAt(newPos, PLAYER_RADIUS, PLAYER_HEIGHT)) {
+                newPos.x -= moveDelta.x;
+                velocity.x = 0;
+            }
+            // Z軸移動
+            newPos.z += moveDelta.z;
+            if (checkCollisionAt(newPos, PLAYER_RADIUS, PLAYER_HEIGHT)) {
+                newPos.z -= moveDelta.z;
+                velocity.z = 0;
+            }
+            // Y軸移動
+            newPos.y += moveDelta.y;
+            if (checkCollisionAt(newPos, PLAYER_RADIUS, PLAYER_HEIGHT)) {
+                if (moveDelta.y > 0) velocity.y = 0;
+                newPos.y -= moveDelta.y;
+                if (moveDelta.y <= 0) {
+                    isGrounded = true;
+                    velocity.y = 0;
+                    // 着地時に空中タイマーをリセット表示
+                    if (airTime > 0.1) showToast(`着地！ 滞空時間: ${airTime.toFixed(2)}秒`);
+                    airTime = 0;
+                }
+            } else {
+                isGrounded = false;
+            }
+            
+            camera.position.copy(newPos);
+            
+            // 地面チェック (y <= 1.0 なら強制接地)
+            if (camera.position.y <= PLAYER_HEIGHT + 0.05) {
+                camera.position.y = PLAYER_HEIGHT;
+                isGrounded = true;
+                velocity.y = 0;
+            }
+            // 天井上限
+            if (camera.position.y > 30) camera.position.y = 30;
+        }
+        
+        // 円柱衝突 (半径, 高さ) で周囲のブロックと衝突検出
+        function checkCollisionAt(pos, radius, height) {
+            const minX = pos.x - radius;
+            const maxX = pos.x + radius;
+            const minY = pos.y - 0.2;        // 足元少し下まで
+            const maxY = pos.y + height - 0.2;
+            const minZ = pos.z - radius;
+            const maxZ = pos.z + radius;
+            
+            const ixMin = Math.floor(minX);
+            const ixMax = Math.floor(maxX);
+            const iyMin = Math.floor(minY);
+            const iyMax = Math.floor(maxY);
+            const izMin = Math.floor(minZ);
+            const izMax = Math.floor(maxZ);
+            
+            for (let ix = ixMin; ix <= ixMax; ix++) {
+                for (let iy = iyMin; iy <= iyMax; iy++) {
+                    for (let iz = izMin; iz <= izMax; iz++) {
+                        const key = getBlockKey(ix, iy, iz);
+                        if (blocksMap.has(key)) {
+                            // AABB vs 円柱の簡易チェック
+                            const blockMin = { x: ix, y: iy, z: iz };
+                            const blockMax = { x: ix+1, y: iy+1, z: iz+1 };
+                            if (maxX > blockMin.x && minX < blockMax.x &&
+                                maxY > blockMin.y && minY < blockMax.y &&
+                                maxZ > blockMin.z && minZ < blockMax.z) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+        
+        // 視線方向のブロックを取得 (レイキャスト)
+        const raycaster = new THREE.Raycaster();
+        function getTargetBlock(distance = 4.5) {
+            raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+            const intersects = raycaster.intersectObjects(Array.from(blocksMap.values()));
+            if (intersects.length > 0 && intersects[0].distance <= distance) {
+                const hit = intersects[0];
+                const normal = hit.face.normal;
+                const pos = hit.point;
+                return { hitBlock: hit.object, hitPoint: pos, normal };
+            }
+            return null;
+        }
+        
+        // ブロック追加 (隣接位置を計算)
+        function addAdjacentBlock(hit) {
+            const normal = hit.normal;
+            const blockPos = hit.hitBlock.position;
+            const adjX = blockPos.x + normal.x;
+            const adjY = blockPos.y + normal.y;
+            const adjZ = blockPos.z + normal.z;
+            const ix = Math.floor(adjX);
+            const iy = Math.floor(adjY);
+            const iz = Math.floor(adjZ);
+            if (!blocksMap.has(getBlockKey(ix, iy, iz))) {
+                addBlock(ix, iy, iz, selectedColor, true);
+                showToast(`ブロックを設置 (色: ${selectedColor.toString(16)})`);
+            } else {
+                showToast("そこには置けません", 800);
+            }
+        }
+        
+        // トースト表示
+        let activeToast = null;
+        function showToast(msg, duration = 1500) {
+            if (activeToast) activeToast.remove();
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            activeToast = toast;
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, duration);
+        }
+        
+        // マウス操作 (設置/破壊)
+        window.addEventListener('mousedown', (e) => {
+            if (document.pointerLockElement !== document.body) return;
+            const target = getTargetBlock();
+            if (!target) return;
+            if (e.button === 0) { // 左クリック破壊
+                const block = target.hitBlock;
+                const pos = block.position;
+                removeBlock(pos.x - 0.5, pos.y - 0.5, pos.z - 0.5);
+                showToast("ブロックを破壊");
+            } else if (e.button === 2) { // 右クリック設置
+                addAdjacentBlock(target);
+            }
+        });
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+        
+        // ポインターロック
+        document.body.addEventListener('click', () => {
+            document.body.requestPointerLock();
+        });
+        
+        // カメラ回転
+        let pitch = 0, yaw = 0;
+        document.addEventListener('mousemove', (e) => {
+            if (document.pointerLockElement !== document.body) return;
+            yaw -= e.movementX * 0.0025;
+            pitch -= e.movementY * 0.0025;
+            pitch = Math.max(-Math.PI / 2.4, Math.min(Math.PI / 2.4, pitch));
+            camera.rotation.order = 'YXZ';
+            camera.rotation.y = yaw;
+            camera.rotation.x = pitch;
+        });
+        
+        // 移動と物理更新
+        let lastTime = performance.now();
+        function updateMovement(deltaSec) {
+            if (deltaSec > 0.03) deltaSec = 0.03;
+            
+            const move = new THREE.Vector3();
+            const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+            const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
+            forward.y = 0; forward.normalize();
+            right.y = 0; right.normalize();
+            
+            let speed = MOVE_SPEED;
+            if (isDashing) speed *= DASH_MULTIPLIER;
+            if (keyState.w) move.z -= 1;
+            if (keyState.s) move.z += 1;
+            if (keyState.a) move.x -= 1;
+            if (keyState.d) move.x += 1;
+            move.normalize();
+            
+            const moveVec = new THREE.Vector3().addScaledVector(forward, move.z).addScaledVector(right, move.x);
+            velocity.x = moveVec.x * speed;
+            velocity.z = moveVec.z * speed;
+            
+            // ジャンプ処理
+            if (keyState.space && isGrounded) {
+                velocity.y = JUMP_POWER;
+                isGrounded = false;
+                showToast("ジャンプ！");
+                keyState.space = false; // 連続防止
+            }
+            
+            // 重力
+            if (!isGrounded) {
+                velocity.y += GRAVITY * deltaSec;
+                airTime += deltaSec;
+            } else {
+                velocity.y = 0;
+                if (airTime > 0.05) airTime = 0;
+            }
+            
+            // 衝突解決 & 位置更新
+            resolveCollisionAndMove(deltaSec);
+            
+            // 空中タイマー表示 (00:00.00 形式)
+            const totalSeconds = Math.max(0, airTime);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = Math.floor(totalSeconds % 60);
+            const centi = Math.floor((totalSeconds % 1) * 100);
+            airTimerDiv.textContent = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}.${centi.toString().padStart(2,'0')}`;
+        }
+        
+        // パレットUI生成
+        function buildPalette() {
+            paletteDiv.innerHTML = '';
+            COLOR_PALETTE.forEach((colorItem, idx) => {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                swatch.style.backgroundColor = `#${colorItem.code.toString(16).padStart(6,'0')}`;
+                if (selectedColor === colorItem.code) swatch.classList.add('selected');
+                swatch.addEventListener('click', () => {
+                    selectedColor = colorItem.code;
+                    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+                    swatch.classList.add('selected');
+                    showToast(`色を変更: ${colorItem.name}`);
+                });
+                paletteDiv.appendChild(swatch);
+            });
+        }
+        buildPalette();
+        
+        // デバッグ更新
+        function updateDebugInfo() {
+            if (debugPanel.style.display !== 'block') return;
+            document.getElementById('posX').textContent = camera.position.x.toFixed(2);
+            document.getElementById('posY').textContent = camera.position.y.toFixed(2);
+            document.getElementById('posZ').textContent = camera.position.z.toFixed(2);
+            document.getElementById('velX').textContent = velocity.x.toFixed(2);
+            document.getElementById('velY').textContent = velocity.y.toFixed(2);
+            document.getElementById('velZ').textContent = velocity.z.toFixed(2);
+            document.getElementById('groundStatus').textContent = isGrounded ? "接地" : "空中";
+            document.getElementById('blockCount').textContent = blocksMap.size;
+        }
+        
+        // アニメーションループ
+        let previousTime = performance.now();
+        function animate() {
+            const now = performance.now();
+            let delta = Math.min(0.033, (now - previousTime) / 1000);
+            if (delta <= 0) { previousTime = now; requestAnimationFrame(animate); return; }
+            previousTime = now;
+            
+            updateMovement(delta);
+            updateDebugInfo();
+            
+            // 小さな視覚演出: ダッシュ中のFOV補正
+            if (isDashing && camera.fov !== 85) {
+                camera.fov = 85;
+                camera.updateProjectionMatrix();
+            } else if (!isDashing && camera.fov !== 75) {
+                camera.fov = 75;
+                camera.updateProjectionMatrix();
+            }
+            
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+        
+        // リサイズ対応
+        window.addEventListener('resize', onWindowResize, false);
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        // 開始
+        animate();
+        showToast("ようこそ！ WASD移動、マウスで視点、右クリックでブロック設置", 3000);
+        
+        // 簡易的な影のヘルパー (床の影を受け取るために地面ブロックの影設定)
+        blocksMap.forEach(block => {
+            block.receiveShadow = true;
+        });
+        
+        console.log("初期化完了 ブロック数:", blocksMap.size);
+    </script>
+</body>
+</html>

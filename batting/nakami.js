@@ -1343,9 +1343,11 @@ let battD = document.getElementById('batt');
 let battC = {
     can: battD.querySelector('canvas'),
     ctx: battD.querySelector('canvas').getContext('2d'),
+    wid: 560,
+    hei: 300,
     
     loop: 1,
-    phase: 'idol', //idol, pre, ing, ed || space押されていない, space押された, ball投げられた, space離された
+    phase: 'idol', //idol, pre, ing, ed || space押されていない,  space押された, ball投げられた, space離された
     pt: 0,
     kind: 'normal',
     
@@ -1366,6 +1368,8 @@ let battC = {
     bat: "idol",
     pit: "idol",
 
+    dokuzu: 0, //matta
+
     UI: {
         kind: battD.querySelector('.UI .kind'),
         point: battD.querySelector('.UI .point')
@@ -1380,8 +1384,8 @@ battF.load = () => {
 }
 battF.resize = () => {
     let wid = window.innerWidth * 0.8;
-    battC.can.width = 560;
-    battC.can.height = 300;
+    battC.can.width = battC.wid;
+    battC.can.height = battC.hei;
 }
 
 // humans:['pit_idol','pit_pre','pit_act','bat_idol','bat_pre','bat_act'],
@@ -1424,19 +1428,29 @@ battF.calc = () => {
         if(battF.iscrash(ball, battC.pad)) ball.can = 1, ball.caned = 1;
         else ball.can = 0;
         
-        // if(ball.w < 0 || ball.h < 0 || 560 < ball.x+ball.w || 300 < ball.y+ball.h) battF.delete(ball);
-        if(ball.w < 0 || 560 < ball.x+ball.w){
+        // if(ball.w < 0 || ball.h < 0 || battC.wid < ball.x+ball.w || battC.hei < ball.y+ball.h) battF.delete(ball);
+        if(ball.w < 0 || battC.wid < ball.x+ball.w){
             battF.delete(ball);
                 
             if(!ball.caned) battF.outball();
         }
     }
+
+    battC.dokuzu -= 1;
+    if(battC.dokuzu < 0) battC.dokuzu = 0;
+    battF.speak('pit', `wait ${battC.dokuzu}`);
 }
 
 battF.stat = (stat, who = 0) => {
+    if(stat == 0 && who != 0) return battC[who];
     if(who == 0) battF.stat(stat, "bat"), battF.stat(stat, "pit");
     battC[who] = stat;
     battF.tekiou();
+}
+
+battF.speak = (who, text) => {
+    if(!who) return;
+    battC[`${who}TD`].textContent = text;
 }
 
 battC.thrown = [
@@ -1582,6 +1596,8 @@ battF.outball = (ball) => {
 
 
 battF.hanate = async() => {
+    battF.atolike(20);
+
     battF.stat('act', "bat");
 
     let balls = battC.balls;
@@ -1601,9 +1617,24 @@ battF.hanate = async() => {
 
     battF.stat('idol');
 }
+battF.atolike = (num) => {
+
+    // 後隙（最近好きな言葉）
+    if(typeof num == "string"){
+        if(num.endsWith("%")){
+            num = num.slice(0, -1) / 100;
+            num *= battC.dokuzu;
+            return;
+        }
+    }
+
+    battC.dokuzu += num;
+}
+
 
 document.addEventListener('keydown', (e) => {
     let key = e.key.toLowerCase();
+    if(key == " " && battF.stat(0, "bat") == "idol") battF.stat('pre', "bat"); 
     if(e.repeat) return;
 
     if(key == ' ') battF.throw();
@@ -1617,6 +1648,8 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('keyup', (e) => {
     let key = e.key.toLowerCase();
     
+    if(0 < battC.dokuzu) return;
+    
     if(key == ' ') battF.hanate();
 })
 document.addEventListener('pointerdown', (e) => {
@@ -1624,6 +1657,7 @@ document.addEventListener('pointerdown', (e) => {
 });
 
 document.addEventListener('pointerup', (e) => {
+    if(0 < battC.dokuzu) return;
     battF.hanate();
 });
 

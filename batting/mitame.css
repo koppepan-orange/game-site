@@ -448,3 +448,16 @@ img{
     height: 100%;
     aspect-ratio: 1/1;
 }
+#batt .yukkuri .human .text{
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    font-family: nyashi;
+    font-size: 22px;
+    color: #000000;
+}
