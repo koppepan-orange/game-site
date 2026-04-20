@@ -924,16 +924,13 @@ OBS.KeysR = (e) => {
 };
 
 OBS.PonD = (e) => {
-    if(e.buttons == 0) OBS.cling = 1;
-    if(e.buttons == 2) OBS.cring = 1;
+    if(e.buttons & 1) OBS.cling = 1;
+    if(e.buttons & 2) OBS.cring = 1;
+    console.log(OBS.cling)
 };
 OBS.PonU = (e) => {
-    if(e.buttons == 0) OBS.cling = 0;
-    if(e.buttons == 2) OBS.cring = 0;
-};
-OBS.ponC = (e) => {
-    if(e.buttons == 0) OBS.cling = 0;
-    if(e.buttons == 2) OBS.cring = 0;
+    if(!(e.buttons & 1)) OBS.cling = 0;
+    if(!(e.buttons & 2)) OBS.cring = 0;
 };
 OBS.PonB = () => {
     OBS.cling = 0;
@@ -977,7 +974,7 @@ OBS.load = () => {
     if(sts["Click"]){
         window.addEventListener('pointerdown', OBS.PonD);
         window.addEventListener('pointerup', OBS.PonU);
-        window.addEventListener('pointercancel', OBS.ponC);
+        window.addEventListener('pointercancel', OBS.PonU);
         window.addEventListener('blur', OBS.PonB);
     }
 
@@ -1473,7 +1470,7 @@ dunF.wallDest = (obj, oku, sau) => {
             let nx = x + okux*i + saux*j;
             let ny = y + okuy*i + sauy*j;
             if(nx < 0 || ny < 0 || nx >= dunC.zen || ny >= dunC.zen) continue;
-            
+
             dunC.wall[ny][nx] = 0;
             console.log(`${nx}, ${ny}を掘ったわよ`);
         }
@@ -1580,7 +1577,7 @@ dunF.calc = async() => {
         
         
         // key系
-        if(OBS.keys.z && p.have == "pickaxe"){
+        if((OBS.keys.z || OBS.cling) && p.have == "pickaxe"){
             dunF.wallDest(p, 1, 0);
         }
     }
