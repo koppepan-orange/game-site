@@ -1240,6 +1240,17 @@ let secrates = [
             location.reload();
         }
     },
+    {
+        ind:0,
+        name:"hori",
+        arr:["h","o","r","i"],
+        limit:"n",
+
+        func: async function(){
+            let p = dunC.objs.find(o => o.name == 'player');
+            p.have = "pickaxe"
+        }
+    }
 ]
 document.addEventListener('keydown', async function(e){
     let key = e.key.toLowerCase();
@@ -1303,52 +1314,55 @@ function resizeCanvas() {
 	dunC.size = wid / dunC.mas;
 }
 
-function draw() {
-	let cam = dunC.cam;
-	dunctx.clearRect(0, 0, duncan.width, duncan.height);
-	dunctx.fillStyle = '#271605';
-	dunctx.fillRect(0, 0, duncan.width, duncan.height);
+dunF.draw = () => {
+    let cam = dunC.cam;
+    let size = dunC.size;
+    dunctx.clearRect(0, 0, duncan.width, duncan.height);
+    
+    // 背景色
+    dunctx.fillStyle = '#271605';
+    dunctx.fillRect(0, 0, duncan.width, duncan.height);
 
-	let n = dunC.size*7;
-	// let n = 0;
-	let startX = Math.floor((cam.sx + n - duncan.width/2) / dunC.size);
-	let startY = Math.floor((cam.sy + n - duncan.height/2) / dunC.size);
-	let endX   = Math.ceil((cam.sx + n + duncan.width/2) / dunC.size);
-	let endY   = Math.ceil((cam.sy + n + duncan.height/2) / dunC.size);
+    // 画面内に映るタイルの範囲を計算
+    let startX = Math.floor(cam.sx / size);
+    let startY = Math.floor(cam.sy / size);
+    let endX = Math.ceil((cam.sx + duncan.width) / size);
+    let endY = Math.ceil((cam.sy + duncan.height) / size);
 
-	startX = Math.max(0, startX); //最小:0
-	startY = Math.max(0, startY);
-	endX = Math.min(dunC.zen - 1, endX);
-	endY = Math.min(dunC.zen - 1, endY); //	最大:canvas-1
+    // 範囲外をクランプ
+    startX = Math.max(0, startX);
+    startY = Math.max(0, startY);
+    endX = Math.min(dunC.zen - 1, endX);
+    endY = Math.min(dunC.zen - 1, endY);
 
-	// console.log(`(${startX}, ${startY}) (${endX}, ${endY})`);
+    for (let y = startY; y <= endY; y++) {
+        for (let x = startX; x <= endX; x++) {
+            let px = x * size - cam.sx;
+            let py = y * size - cam.sy;
 
-	for(let y = startY; y <= endY; y++){
-		for(let x = startX; x <= endX; x++){
-			let code = dunC.back[y][x];
-			let img = images['maps'][code];
-			let px = x * dunC.size - cam.sx;
-			let py = y * dunC.size - cam.sy;
-			dunctx.drawImage(img, px, py, dunC.size, dunC.size);
+            // 床の描画
+            let code = dunC.back[y][x];
+            if (images['maps'][code]) {
+                dunctx.drawImage(images['maps'][code], px, py, size, size);
+            }
 
-			// wall
-			let imgn = dunC.wall[y][x];
-			img = images['maps'][imgn];
-			dunctx.drawImage(img, px, py, dunC.size, dunC.size);
-		}
-	}
+            // 壁の描画
+            let imgn = dunC.wall[y][x];
+            if (imgn !== 0 && images['maps'][imgn]) {
+                dunctx.drawImage(images['maps'][imgn], px, py, size, size);
+            }
+        }
+    }
 
-	dunctx.drawImage(images['charas']['cameraman'], cam.sx, cam.sy, dunC.size, dunC.size);
-
-	dunC.objs.forEach(obj => {
-		let ox = obj.sx - cam.sx;
-		let oy = obj.sy - cam.sy;
-
-		// if(obj.name == 'player') ox = dunC.size*7, oy = dunC.size*7;
-		
-		dunctx.drawImage(obj.img, ox, oy, dunC.size, dunC.size);
-	});
+    // オブジェクトの描画
+    dunC.objs.forEach(obj => {
+        let ox = obj.sx - cam.sx;
+        let oy = obj.sy - cam.sy;
+        dunctx.drawImage(obj.img, ox, oy, size, size);
+    });
 }
+
+
 
 function chooseWeighted(weights){
 	let total = weights.reduce((a, b) => a + b, 0);
@@ -1359,8 +1373,8 @@ function chooseWeighted(weights){
 	}
 	return weights.length - 1;
 }
-// --- 1) dun_back の先頭タイル選択を修正 (arraySelect を使わない)
-function dun_back(){
+
+dunF.back = () => {
 	console.log('床つくるよ～ん');
 	let tiles = ['a','b','c'];
 	let zen = dunC.zen;
@@ -1388,14 +1402,31 @@ function dun_back(){
 }
 
 
-function dun_wall(){
+dunF.wall = () => {
+	for(let y = 0; y < dunC.zen; y++){
+		for(let x = 0; x < dunC.zen; x++){
+			let wa = dunC.wall[y][x];
+			if(wa == 0) continue;
+
+			let hure = [1,1,1,1];
+			if(0 < y && dunC.wall[y-1][x] == 0) hure[0] = 0;
+			if(y < dunC.zen-1 && dunC.wall[y+1][x] == 0) hure[2] = 0;
+			if(x > 0 && dunC.wall[y][x-1] == 0) hure[3] = 0;
+			if(x < dunC.zen-1 && dunC.wall[y][x+1] == 0) hure[1] = 0;
+			let atai = hure.join('');
+
+			let imgn = `w${atai}`;
+			dunC.wall[y][x] = imgn;
+		}
+	}
+}
+dunF.wallMake = () => {
 	console.log('壁つくるよ～ん');
 	// 4x4 のランダム部屋選択
 	let rooms = [];
 	for(let r=0;r<4;r++){
-		let row=[];
+		let row = [];
 		for(let c=0;c<4;c++){
-			// 深いコピーしないと調整で元のRoomsが壊れる
 			let base = arraySelect(Rooms);
 			let clone = copy(base);
 			row.push(clone);
@@ -1420,25 +1451,35 @@ function dun_wall(){
 	}
 	dunC.wall = out;
 
-	//wallのimgを整える
-	for(let y = 0; y < dunC.zen; y++){
-		for(let x = 0; x < dunC.zen; x++){
-			let wa = dunC.wall[y][x];
-			if(wa == 0) continue;
-
-			let hure = [1,1,1,1];
-			if(0 < y && dunC.wall[y-1][x] == 0) hure[0] = 0;
-			if(y < dunC.zen-1 && dunC.wall[y+1][x] == 0) hure[2] = 0;
-			if(x > 0 && dunC.wall[y][x-1] == 0) hure[3] = 0;
-			if(x < dunC.zen-1 && dunC.wall[y][x+1] == 0) hure[1] = 0;
-			let atai = hure.join('');
-
-			let imgn = `w${atai}`;
-			dunC.wall[y][x] = imgn;
-		}
-	}
+    dunF.wall();
 
 	return
+}
+dunF.wallDest = (obj, oku, sau) => {
+    // 人, 奥に掘る量, 共に横に掘る量(0で1, 1で3, 2で5)
+    let dir = obj.dir;
+    let [x, y] = [obj.x, obj.y];
+    // dirの方向に、okuマス...と、その上下(左右)にsauずつ だからforは-sauからsauまでの中でoku回？うへぇ
+
+    let [okux, okuy, saux, sauy] = [0, 0, 0, 0]
+
+    if(dir == 0) [okux, okuy, saux, sauy] = [0, -1, 1, 0];
+    if(dir == 1) [okux, okuy, saux, sauy] = [1, 0, 0, 1];
+    if(dir == 2) [okux, okuy, saux, sauy] = [0, 1, 1, 0];
+    if(dir == 3) [okux, okuy, saux, sauy] = [-1, 0, 0, 1];
+
+    for(let i = 1; i <= oku; i++){
+        for(let j = -sau; j <= sau; j++){
+            let nx = x + okux*i + saux*j;
+            let ny = y + okuy*i + sauy*j;
+            if(nx < 0 || ny < 0 || nx >= dunC.zen || ny >= dunC.zen) continue;
+            
+            dunC.wall[ny][nx] = 0;
+            console.log(`${nx}, ${ny}を掘ったわよ`);
+        }
+    }
+    
+    dunF.wall();
 }
 
 function adjustHoriz(left, right){
@@ -1483,21 +1524,10 @@ function adjustVert(top, bottom){
 		}
 	}
 }
+//#endregion canvas
 
 //#region player
-let keys = {}
-document.addEventListener('keydown', e => {
-   let key = e.key.toLowerCase();
-   if(e.key == ' ') key = 'space';
-   keys[key] = true;
-});
-document.addEventListener('keyup', e => {
-   let key = e.key.toLowerCase();
-   if(e.key == ' ') key = 'space';
-   keys[key] = false;
-});
-
-function dun_p_make(){
+dunF.pMake = () => {
 	let sh = 4;
 	let ob = {
 		id: dunC.objs.length,
@@ -1507,6 +1537,8 @@ function dun_p_make(){
 		y: sh,
 		sx: sh * dunC.size, // ピクセル座標
 		sy: sh * dunC.size,
+        dir: 1, // 0:上 1:右 2:下 3:左
+        have: "none",
 		moving: 0,
 		able: ['move'],
 		img: images['enemies']['蒼白の粘液'],
@@ -1515,93 +1547,100 @@ function dun_p_make(){
 }
 
 
-async function dun_p_tekiou(){
+dunF.calc = async() => {
 	let p = dunC.objs.find(o => o.name == 'player');
-	let cam = dunC.cam;
-	let kaisu = 15;
-	let ippo = dunC.size/kaisu;
-	let tyomateyo = 0;
-	if((keys.w || keys.arrowup) && !p.moving){
-		if(!keys.shift && (dunC.wall[p.y-1][p.x] || p.y-1 < 0)) return;
-		p.moving = 1;
-		for(let i = 0; i < kaisu; i++){
-			cam.sy -= ippo;
-			p.sy -= ippo;
-			draw();
-			await delay(5);
-		}
-		await delay(tyomateyo)
-		p.y -= 1;
-		p.moving = 0;
-	}
-	if((keys.a || keys.arrowleft) && !p.moving){
-		if(!keys.shift && (dunC.wall[p.y][p.x-1] || p.x-1 < 0)) return;
-		p.moving = 1;
-		for(let i = 0; i < kaisu; i++){
-			cam.sx -= ippo;
-			p.sx -= ippo;
-			draw()
-			await delay(5);
-		} 
-		await delay(tyomateyo)
-		p.x -= 1;
-		p.moving = 0;
-	}
-	if((keys.s || keys.arrowdown) && !p.moving){
-		if(!keys.shift && (dunC.wall[p.y+1][p.x] || p.y+1 >= dunC.zen)) return;
-		p.moving = 1;
-		for(let i = 0; i < kaisu; i++){
-			cam.sy += ippo;
-			p.sy += ippo;
-			draw();
-			await delay(5);
-		}
-		await delay(tyomateyo)
-		p.y += 1;
-		p.moving = 0;
-	}
-	if((keys.d || keys.arrowright) && !p.moving){
-		if(!keys.shift && (dunC.wall[p.y][p.x+1] || p.x + 1 >= dunC.zen)) return;
-		p.moving = 1;
-		for(let i = 0; i < kaisu; i++){
-			cam.sx += ippo;
-			p.sx += ippo;
-			draw();
-			await delay(5);
-		}
-		await delay(tyomateyo)
-		p.x += 1;
-		p.moving = 0;
-	}
+    let cam = dunC.cam;
+
+    let kaisu = 15;
+    let ippo = dunC.size/kaisu;
+    let tyomateyo = 0;
+
+    jump:{
+        if(p.moving) break jump;
+        
+        let moveX = 0;
+        let moveY = 0;
+
+        if(OBS.keys.w || OBS.keys.arrowup) moveY = -1;
+        else if(OBS.keys.s || OBS.keys.arrowdown) moveY = 1;
+        else if(OBS.keys.a || OBS.keys.arrowleft) moveX = -1;
+        else if(OBS.keys.d || OBS.keys.arrowright) moveX = 1;
+
+        if(moveX != 0 || moveY != 0){
+            // 壁判定
+            if(moveY == -1) p.dir = 0;
+            if(moveX ==  1) p.dir = 1;
+            if(moveY ==  1) p.dir = 2;
+            if(moveX == -1) p.dir = 3;
+
+            if(OBS.keys.shift || (dunC.wall[p.y + moveY]?.[p.x + moveX] == 0)){
+                move(p, moveX, moveY);
+            }
+        }
+        
+        
+        // key系
+        if(OBS.keys.z && p.have == "pickaxe"){
+            dunF.wallDest(p, 1, 0);
+        }
+    }
+}
+
+async function move(obj, mx, my) {
+    obj.moving = 1;
+    let kaisu = 15;
+    let ippo = dunC.size / kaisu;
+    
+    for (let i = 0; i < kaisu; i++) {
+        obj.sx += mx * ippo;
+        obj.sy += my * ippo;
+
+        if(obj.name === 'player'){
+            dunC.cam.sx += mx * ippo;
+            dunC.cam.sy += my * ippo;
+        }
+        await delay(5);
+    }
+    obj.x += mx;
+    obj.y += my;
+    // 最後に座標のズレを補正
+    obj.sx = obj.x * dunC.size;
+    obj.sy = obj.y * dunC.size;
+    obj.moving = 0;
 }
 
 //#endregion player
 
 
-//#endregion canvas
 
 //#region battle
+
+
 //#endregion
 
+
 function start(){
+    Style.tekiou();
+    OBS.load();
+
 	resizeCanvas();
 	dunF.load();
-	dun_back();
-	dun_wall();
+	dunF.back();
+	dunF.wallMake();
 	console.log(images)
-	dun_p_make();
-	
-	let cam = dunC.cam;
-	cam.sx =  dunC.size*7
-	cam.sy =  dunC.size*7
+	dunF.pMake();
+    
+	let p = dunC.objs.find(o => o.name == 'player');
+    dunC.cam.sx = p.sx - (duncan.width/2) + (dunC.size/2);
+    dunC.cam.sy = p.sy - (duncan.height/2) + (dunC.size/2);
 
 	gameloop();
 }
 
 let loop = 1;
 let looped = 0;
-function gameloop(){
-	draw();
-	dun_p_tekiou()
+async function gameloop(){
+	dunF.draw();
+	dunF.calc()
 	if(loop) requestAnimationFrame(gameloop);
 }
