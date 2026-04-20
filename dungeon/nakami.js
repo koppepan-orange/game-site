@@ -1472,10 +1472,10 @@ dunF.wallDest = (obj, oku, sau) => {
             if(nx < 0 || ny < 0 || nx >= dunC.zen || ny >= dunC.zen) continue;
 
             dunC.wall[ny][nx] = 0;
-            console.log(`${nx}, ${ny}を掘ったわよ`);
+            // console.log(`${nx}, ${ny}を掘ったわよ`);
         }
     }
-    
+   あ
     dunF.wall();
 }
 
