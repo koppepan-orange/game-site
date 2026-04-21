@@ -21,6 +21,7 @@ let mapItems = [
     {
         name: "start",
         jpnm: "すた〜と",
+        img: "blank",
         desc: "スタート地点なのです",
         n:[1,1],
         able:1,

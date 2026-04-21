@@ -1475,7 +1475,7 @@ dunF.wallDest = (obj, oku, sau) => {
             // console.log(`${nx}, ${ny}を掘ったわよ`);
         }
     }
-   あ
+   
     dunF.wall();
 }
 
