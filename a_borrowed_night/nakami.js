@@ -146,6 +146,28 @@ function kaikyu(sta, end, row, val){
 
     return arr;
 };
+async function zouka(moto, key, d, type, n, wait){
+    // type:: kouならi<n madeならwhileでif抜け
+    switch(type){
+        case 'kou':{
+            for(let i=0; i<n; i++){
+                await delay(wait);
+                moto[key] += d;
+            }
+            break;
+        }
+
+        case "made":{
+            while(true){
+                await delay(wait);
+                moto[key] += d;
+                if(d < 0 && moto[key] <= n) break;
+                if(0 < d && n <= moto[key]) break;
+            }
+            break;
+        }
+    }
+}
 function arraySelect(array){
     let select = Math.floor(Math.random()*array.length);
     return array[select];
@@ -1346,10 +1368,11 @@ let mapC = {
     mases:[],
     sentk:{}, //[y, x]
     p:{
-        x:0,
-        y:0,
+        x: 0,
+        y: 0,
         div: mapD.querySelector('.coma'),
-        moving:1,
+        moving: 1,
+        sokai: 0
     }
 };
 let mapF = {};
@@ -1467,10 +1490,10 @@ mapF.save = (tuyoi = 0) => {
                 mono.appendChild(img);
             }
 
-            mono.addEventListener('click', () => {
-                mono.classList.toggle('consored');
-                mapF.load()
-            })
+            // mono.addEventListener('click', () => {
+            //     mono.classList.toggle('consored');
+            //     mapF.load()
+            // })
 
             row.appendChild(mono);
         }
@@ -1651,15 +1674,24 @@ mapF.tekiou = () => {
     mono.classList.add('iru');
     mono.appendChild(coma);
 
+    // 開く処理(のっと地震)
+    if(0 < p.sokai) mapF.sokai(p.x, p.y);
+}
+
+mapF.sokai = (genx, geny) => {
     let quake = copy(mapC.sentk['quake'].uni);
-    if((p.y+1) % 2 == 0) quake = copy(mapC.sentk['quake'].due);
+    if((geny+1) % 2 == 0) quake = copy(mapC.sentk['quake'].due);
     quake.push([0, 0]);
     for(let q of quake){
         let [y, x] = q;
-        let [ty, tx] = [p.y + y, p.x + x];
+        let [ty, tx] = [geny + y, genx + x];
         let mono = mapC.conD.querySelector(`.mas.m${ty}${tx}`);
         if(mono) mono.classList.remove('consored');
     }
+
+    let p = mapC.p;
+    p.sokai -= 1;
+    if(p.sokai == 0) console.log("ねえ聞いて！さっきまで空が喋ってたのに急に既読無視された！あいつ感じ悪くない！？もうみんなであいつ無視しようぜ！！！！！！")
 }
 
 mapF.move = async function(x, y, mode, issyun = 0){
@@ -1688,7 +1720,7 @@ mapF.move = async function(x, y, mode, issyun = 0){
         let kyori = ugoku[u];
         if(kyori == 0) continue;
 
-        let ippo = Math.sign(kyori);
+        let ippo = Math.sign(kyori); //1か-1を返すやつ
         // console.log(`[${u}] ${kyori}m移動予定、一歩は${ippo}m`);
 
         for(let i=0; i<Math.abs(ugoku[u]); i++){
@@ -1765,6 +1797,7 @@ mapF.restart = () => {
     if(!startI) return;
 
     mapF.move(startI.x, startI.y, 'set', 1);
+    mapC.p.sokai += 3
 }
 
 mapF.quake = () => {
