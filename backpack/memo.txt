@@ -1,0 +1,28 @@
+バックパック系のやつをやりたい
+4x5あって、2x3の斧とかを収納したりしてそれがインベントリ〜〜みたいな
+そういうやつ Nunholyってゲームみたいなって誰がわかるかーーいつってね
+Backpack_BattlesっていうSteamのやつがわかりやすいか、、？
+もしくはバイオハザードシリーズ あれはたしかそんな感じのはず、、？やったことないけど
+grid合わせとかむずいよなぁ〜〜〜 がんばって
+
+
+以下ChatGPTによる案？コード案？
+
+function canPlace(grid, x, y, w, h){
+    if(x + w > 4 || y + h > 5) return false;
+
+    for(let i = 0; i < h; i++){
+        for(let j = 0; j < w; j++){
+            if(grid[y + i][x + j]) return false;
+        }
+    }
+    return true;
+}
+
+function place(grid, item){
+    for(let i = 0; i < item.h; i++){
+        for(let j = 0; j < item.w; j++){
+            grid[item.y + i][item.x + j] = item.id;
+        }
+    }
+}
