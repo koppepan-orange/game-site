@@ -146,10 +146,11 @@ function kaikyu(sta, end, row, val){
 
     return arr;
 };
+
 async function tousa(moto, key, d, n, wait = 0, s = 0){
     // type:: kouならi<n madeならwhileでif抜け
 	let a = moto[key]; //初項
-	if(a != 0 && (!a || typeof a != "number")) return 1;
+	if(a != 0 && (!a || typeof a != "number")) return console.error("..それ数字じゃないです...."), 1;
 	if(d == 0) return console.error("む、むむ無限が..見えますっ...."), 1;
 	
 	if(!wait) wait = 10;
@@ -162,11 +163,10 @@ async function tousa(moto, key, d, n, wait = 0, s = 0){
         moto[key] += d;
     }
 }
-
 async function touhi(moto, key, r, n, wait = 0, s = 0){
     // type:: kouならi<n madeならwhileでif抜け
 	let a = moto[key]; //初項
-	if(a != 0 && (!a || typeof a != "number")) return 1;
+	if(a != 0 && (!a || typeof a != "number")) return console.error("..それ数字じゃないです...."), 1;
     if(a == 0) return console.error("初項0の等比数列、、？"), 0;
 	if(r == 0) return console.error("...これは何？"), 0;
     if(r == 1) return console.error("あ、あの...これも無限が見えます..."), 1;
