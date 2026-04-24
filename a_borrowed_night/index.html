@@ -30,7 +30,16 @@
 
 
         <div class="space" id="map">
-            <div class="ui"></div>
+            <div class="ui">
+                <div class="mono sokai">
+                    <img class="icon" src="assets/images/tools/sokai.png"/>
+                    <div class="text"></div>
+                </div>
+                <div class="mono drill">
+                    <img class="icon" src="assets/images/tools/drill.png"/>
+                    <div class="text"></div>
+                </div>
+            </div>
 
             <div class="side">
                 <div class="opener"></div>
@@ -61,16 +70,20 @@
     <!-- <script src="nakami.js" defer></script> -->
 
     <script>
-        (function() {
+        (async() => {
             let ts = new Date().getTime(); 
 
-            let fs = ['data', 'nakami'];
-            for(let f of fs){
-                let script = document.createElement('script');
-                script.src = `${f}.js?v=${ts}`;
-                script.defer = true;
-                document.head.appendChild(script);
+            let ZettaiTukawarenaiKannsuu = async (f) => {
+                return new Promise(res => {
+                    let script = document.createElement('script');
+                    script.src = `${f}.js?v=${ts}`;
+                    script.defer = true;
+                    script.onload = res;
+                    document.head.appendChild(script);
+                });        
             }
+            await ZettaiTukawarenaiKannsuu(`data.js?v=${ts}`);
+            await ZettaiTukawarenaiKannsuu(`nakami.js?v=${ts}`);
 
             let link = document.createElement('link');
             link.rel = "stylesheet";

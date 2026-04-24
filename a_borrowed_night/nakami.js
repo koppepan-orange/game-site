@@ -147,7 +147,7 @@ function kaikyu(sta, end, row, val){
     return arr;
 };
 
-async function tousa(moto, key, d, n, wait = 0, s = 0){
+async function tousa(moto, key, d, n, wait = 0, s = 0, tabini = 0){
     // type:: kouならi<n madeならwhileでif抜け
 	let a = moto[key]; //初項
 	if(a != 0 && (!a || typeof a != "number")) return console.error("..それ数字じゃないです...."), 1;
@@ -161,6 +161,7 @@ async function tousa(moto, key, d, n, wait = 0, s = 0){
     for(let i=0; i<n; i++){
         await delay(wait);
         moto[key] += d;
+        if(tabini != 0) tabini(moto[key]);
     }
 }
 async function touhi(moto, key, r, n, wait = 0, s = 0){
@@ -180,6 +181,16 @@ async function touhi(moto, key, r, n, wait = 0, s = 0){
         await delay(wait);
         moto[key] *= r;
     }
+}
+function dogma(matu, shiki, k = 1){
+    let res = 0;
+
+    for(let i = k; i <= matu; i++){
+        res += shiki(i);
+        console.log(i, shiki(i));
+    }
+
+    return res;
 }
 function arraySelect(array){
     let select = Math.floor(Math.random()*array.length);
@@ -1280,6 +1291,15 @@ let secrates = [
             location.reload();
         }
     },
+    {
+        ind:0,
+        name:"drill",
+        arr:['d','r','i','l','l'],
+        limit:"n",
+        func: async function(){
+            tousa(mapC.p, "drill", 1, 3, 100, 0, () => mapF.tekiou());
+        }
+    }
 ]
 document.addEventListener('keydown', async function(e){
     let key = e.key.toLowerCase();
@@ -1385,8 +1405,18 @@ let mapC = {
         y: 0,
         div: mapD.querySelector('.coma'),
         moving: 1,
-        sokai: 0
-    }
+        sokai: 0,
+        drill: 0
+    },
+
+    UID: mapD.querySelector('.ui'),
+    UID_sokai: mapD.querySelector('.ui .sokai'),
+    UID_sokaiI: mapD.querySelector('.ui .sokai .icon'),
+    UID_sokaiT: mapD.querySelector('.ui .sokai .text'),
+    UID_drill: mapD.querySelector('.ui .drill'),
+    UID_drillI: mapD.querySelector('.ui .drill .icon'),
+    UID_drillT: mapD.querySelector('.ui .drill .text'),
+
 };
 let mapF = {};
 
@@ -1688,19 +1718,32 @@ mapF.tekiou = () => {
     mono.appendChild(coma);
 
     // 開く処理(のっと地震)
-    if(0 < p.sokai) mapF.sokai(p.x, p.y);
+    if(p.motonoP != `${p.x} ${p.y}` && 0 < p.sokai) mapF.sokai(p.x, p.y);
+
+    //UI
+    mapC.UID_sokaiT.textContent = `${p.sokai}x`;
+    mapC.UID_drillT.textContent = `${p.drill}x`;
 }
 
 mapF.sokai = (genx, geny) => {
     let quake = copy(mapC.sentk['quake'].uni);
     if((geny+1) % 2 == 0) quake = copy(mapC.sentk['quake'].due);
     quake.push([0, 0]);
+    let ed = 0;
     for(let q of quake){
         let [y, x] = q;
         let [ty, tx] = [geny + y, genx + x];
         let mono = mapC.conD.querySelector(`.mas.m${ty}${tx}`);
-        if(mono) mono.classList.remove('consored');
+        if(mono){
+            console.log(mono)
+            if(mono.classList.contains('none')) continue
+            console.log("通ったわよ！")
+            if(mono.classList.contains('consored')) ed += 1;
+            mono.classList.remove('consored')
+        }
     }
+    console.log(`consoredを破壊されたed: ${ed}`);
+    if(ed == 0) return;
 
     let p = mapC.p;
     p.sokai -= 1;
@@ -1728,6 +1771,8 @@ mapF.move = async function(x, y, mode, issyun = 0){
         y = y-p.y;
     }
 
+    p.motonoP = `${p.x} ${p.y}`;
+
     p.moving = 1;
     for(let u of ugokuyo){
         let kyori = ugoku[u];
@@ -1737,7 +1782,7 @@ mapF.move = async function(x, y, mode, issyun = 0){
         // console.log(`[${u}] ${kyori}m移動予定、一歩は${ippo}m`);
 
         for(let i=0; i<Math.abs(ugoku[u]); i++){
-            mapF.moving(u, ippo);
+            if(mapF.moving(u, ippo)) break;
             mapF.tekiou();
             await delay(100);
         }
@@ -1784,25 +1829,17 @@ mapF.moving = (u, ippo) => {
 
         let d;
         if(due && monol && !monol.none) d = 0;
-   else if(!due && monor && !monor.none) d = 1;
-   else if(due && monor && !monor.none) d = 1;
-   else if(!due && monol && !monol.none) d = 0;
-
-        if(d == 0){
-            // console.log('monolがあるので左側へ');
-            p.x += l;
-            p.y += ippo;
-            return 0;
-        }
-
-        if(d == 1){
-            // console.log('(monolはないけど)')
-            // console.log('monorがあるので右側へ');
-            p.x += r;
-            p.y += ippo;
-            return 0;
-        }
+        if(!due && monor && !monor.none) d = 1;
+        if(due && monor && !monor.none) d = 1;
+        if(!due && monol && !monol.none) d = 0;
+    
+        let [mx, my] = [l, ippo];
+        if(d) mx = r // ,console.log('monorがあるので右側へ');;
+        
+        p.x += mx;
+        p.y += my;
     }
+
 }
 
 mapF.restart = () => {
@@ -1810,7 +1847,8 @@ mapF.restart = () => {
     if(!startI) return;
 
     mapF.move(startI.x, startI.y, 'set', 1);
-    mapC.p.sokai += 3
+    mapC.p.sokai += 3;
+    tousa(mapC.p, "sokai", 1, () => mapF.tekiou());
 }
 
 mapF.quake = () => {
