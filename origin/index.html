@@ -29,16 +29,20 @@
     <!-- <script src="nakami.js" defer></script> -->
 
     <script>
-        (function() {
+        (async() => {
             let ts = new Date().getTime(); 
 
-            let fs = ['data', 'nakami'];
-            for(let f of fs){
-                let script = document.createElement('script');
-                script.src = `${f}.js?v=${ts}`;
-                script.defer = true;
-                document.head.appendChild(script);
+            let ZettaiTukawarenaiKannsuu = async (f) => {
+                return new Promise(res => {
+                    let script = document.createElement('script');
+                    script.src = `${f}.js?v=${ts}`;
+                    script.defer = true;
+                    script.onload = res;
+                    document.head.appendChild(script);
+                });        
             }
+            await ZettaiTukawarenaiKannsuu(`data.js`);
+            await ZettaiTukawarenaiKannsuu(`nakami.js`);
 
             let link = document.createElement('link');
             link.rel = "stylesheet";
