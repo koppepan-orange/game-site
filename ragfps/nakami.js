@@ -1397,7 +1397,11 @@ staF.search = () => {
 staF.move = (dir, num) => {
     let p = staC.p;
     if(dir == 'x'){
-        if(目の前に何もないなら)
+        for(let i = 0; i < num; i++){
+            if(目の前に何かあるなら) break;
+            p.x += 1;
+            if(p.x == staC.row) p.x = 0;
+        }
     }
 }
 
