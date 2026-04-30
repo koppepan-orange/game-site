@@ -12,3 +12,17 @@ let Style = {
         }
     }
 }
+
+const Fonts = [
+    // {src:'comicsans', type:'ttf'},
+];
+
+const Images = {
+    systems:['error'],
+}
+
+const Sounds = {
+    // se:['error'],
+    // bgm:[],
+}
+

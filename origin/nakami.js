@@ -1036,9 +1036,6 @@ OBS.load = () => {
 
 //#endregion
 //#region fonts
-const Fonts = [
-    // {src:'comicsans', type:'ttf'},
-];
 function fontsLoad(){
     let id = "font_load_css";
     let existing = document.getElementById(id);
@@ -1073,16 +1070,8 @@ let loaC = {
     erd: 0
 }
 let loaF = {};
-loaC.imgL = {
-    systems:['error'],
-}
-loaC.imgT = Object.values(loaC.imgL).reduce((a,b) => a + b.length, 0);
-
-loaC.souL = {
-    // se:['error'],
-    // bgm:[],
-}
-loaC.souT = Object.values(loaC.souL).reduce((a,b) => a + b.length, 0);
+loaC.imgT = Object.values(Images).reduce((a,b) => a + b.length, 0);
+loaC.souT = Object.values(Sounds).reduce((a,b) => a + b.length, 0);
 
 loaF.load = async() => {
     console.log("loadを開始しました。少々お待ちください");
@@ -1096,10 +1085,10 @@ loaF.loadI = async() => {
     }
 
     if(loaC.imgT == 0) return loaF.loadS();
-    for(let belong in loaC.imgL){
+    for(let belong in Images){
         images[belong] = {};
 
-        for(let name of loaC.imgL[belong]){
+        for(let name of Images[belong]){
             let img = new Image();
             img.src = `assets/images/${belong}/${name}.png`;
             img.onload = kasan();
@@ -1123,10 +1112,10 @@ loaF.loadS = async() => {
     }
     
     if(loaC.souT == 0) return loaF.end();
-    for(let belong in loaC.souL){
+    for(let belong in Sounds){
         sounds[belong] = {};
 
-        for(let name of loaC.souL[belong]){
+        for(let name of Sounds[belong]){
             let sound = new Audio();
             sound.preload = 'auto';
             sound.src = `assets/sounds/${belong}/${name}.mp3`;

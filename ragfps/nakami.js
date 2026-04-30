@@ -146,6 +146,50 @@ function kaikyu(sta, end, row, val){
 
     return arr;
 };
+async function tousa(moto, key, d, n, wait = 0, s = 0){
+    // type:: kouならi<n madeならwhileでif抜け
+	let a = moto[key]; //初項
+	if(a != 0 && (!a || typeof a != "number")) return console.error("..それ数字じゃないです...."), 1;
+	if(d == 0) return console.error("む、むむ無限が..見えますっ...."), 1;
+	
+	if(!wait) wait = 10;
+	if(s) n = (s-a)/d; //うわがき ほんとは等差数列の和の公式を使いたかった
+    if(n < 0) d = -d;
+    n = Math.ceil(Math.abs(n));
+	
+    for(let i=0; i<n; i++){
+        await delay(wait);
+        moto[key] += d;
+    }
+}
+async function touhi(moto, key, r, n, wait = 0, s = 0){
+    // type:: kouならi<n madeならwhileでif抜け
+	let a = moto[key]; //初項
+	if(a != 0 && (!a || typeof a != "number")) return console.error("..それ数字じゃないです...."), 1;
+    if(a == 0) return console.error("初項0の等比数列、、？"), 0;
+	if(r == 0) return console.error("...これは何？"), 0;
+    if(r == 1) return console.error("あ、あの...これも無限が見えます..."), 1;
+	
+	if(!wait) wait = 10;
+	if(s) n = Math.log(s/a) / Math.log(r); //うわがき ほんとは等比数列の和の公式を使いたかった
+    if(n < 0) r = 1/r;
+    n = Math.ceil(Math.abs(n));
+	
+    for(let i=0; i<n; i++){
+        await delay(wait);
+        moto[key] *= r;
+    }
+}
+function dogma(matu, shiki, k = 1){
+    let res = 0;
+
+    for(let i = k; i <= matu; i++){
+        res += shiki(i);
+        console.log(i, shiki(i));
+    }
+
+    return res;
+}
 function arraySelect(array){
     let select = Math.floor(Math.random()*array.length);
     return array[select];
@@ -992,9 +1036,6 @@ OBS.load = () => {
 
 //#endregion
 //#region fonts
-const Fonts = [
-    // {src:'comicsans', type:'ttf'},
-];
 function fontsLoad(){
     let id = "font_load_css";
     let existing = document.getElementById(id);
@@ -1029,16 +1070,8 @@ let loaC = {
     erd: 0
 }
 let loaF = {};
-loaC.imgL = {
-    systems:['error'],
-}
-loaC.imgT = Object.values(loaC.imgL).reduce((a,b) => a + b.length, 0);
-
-loaC.souL = {
-    // se:['error'],
-    // bgm:[],
-}
-loaC.souT = Object.values(loaC.souL).reduce((a,b) => a + b.length, 0);
+loaC.imgT = Object.values(Images).reduce((a,b) => a + b.length, 0);
+loaC.souT = Object.values(Sounds).reduce((a,b) => a + b.length, 0);
 
 loaF.load = async() => {
     console.log("loadを開始しました。少々お待ちください");
@@ -1052,10 +1085,10 @@ loaF.loadI = async() => {
     }
 
     if(loaC.imgT == 0) return loaF.loadS();
-    for(let belong in loaC.imgL){
+    for(let belong in Images){
         images[belong] = {};
 
-        for(let name of loaC.imgL[belong]){
+        for(let name of Images[belong]){
             let img = new Image();
             img.src = `assets/images/${belong}/${name}.png`;
             img.onload = kasan();
@@ -1079,10 +1112,10 @@ loaF.loadS = async() => {
     }
     
     if(loaC.souT == 0) return loaF.end();
-    for(let belong in loaC.souL){
+    for(let belong in Sounds){
         sounds[belong] = {};
 
-        for(let name of loaC.souL[belong]){
+        for(let name of Sounds[belong]){
             let sound = new Audio();
             sound.preload = 'auto';
             sound.src = `assets/sounds/${belong}/${name}.mp3`;
@@ -1278,6 +1311,7 @@ let mainC = {
 }
 mainC.spas = [ //classはspace想定、shoは1つだけ
     { name:'home', rank:2, back:'#f0f8ff', sho:1 }, 
+    { name:"stage", rank:3, back:'#a0dea5', sho:0 },
 ];
 let mainF = {};
 mainF.move = (to) => {
@@ -1323,6 +1357,65 @@ document.addEventListener('keyup',e => {
 //#endregion
 
 //#endregion main
+
+
+
+// #region stage
+let staD = document.getElementById('stage');
+let staC = {
+    can: staD.querySelector('canvas'),
+    ctx: staD.querySelector('canvas').getContext('2d'),
+    wid: 360,
+    hei: 360,
+    row: 10,
+    mas: 36,
+
+    now: 0,
+    max: 2,
+    
+    map: [], //二次配列にする予定 row**2
+    p: {
+        x: 3,
+        y: 0,
+        flavor: 0, //これはUndertaleの色マスパズルを参考に
+        state: 0, //これは簡易的バフ・デバフ的な
+    }
+}
+let staF = {};
+
+staF.load = () => {
+    staC.can.width = staC.wid;
+    staC.can.height = staC.hei;
+    staC.ctx.fillStyle = '#a0dea5';
+    staC.ctx.fillRect(0, 0, staC.wid, staC.hei);
+}
+
+staF.search = () => {
+    
+}
+
+staF.move = (dir, num) => {
+    let p = staC.p;
+    if(dir == 'x'){
+        if(目の前に何もないなら)
+    }
+}
+
+//key
+document.addEventListener('keydown', (e) => {
+    if(e.repeat) return;
+    let key = e.key.toLowerCase();
+    if(key == " ") key = 'space';
+
+    if(key == "w" || key == "arrowup") staF.move("y", -1);
+    if(key == "a" || key == "arrowleft") staF.move("x", -1);
+    if(key == "s" || key == "arrowdown") staF.move("y", 1);
+    if(key == "d" || key == "arrowright") staF.move("x", 1);
+});
+
+
+// #endregion
+
 
 
 //#region start

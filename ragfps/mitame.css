@@ -367,6 +367,7 @@ img{
     display: block;
     width: var(--iPhone-width);
     height: 100%;
+    margin: 0 auto;
     position: relative;
     overflow: hidden;
     box-sizing: border-box;
@@ -387,3 +388,28 @@ img{
 .space.show{
     display: flex;
 }
+
+
+/* #region home */
+#home{
+    content: "home";
+}
+/* #endregion */
+
+
+/* #region stage */
+#stage{
+    content: "stage";
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#stage .canvas{
+    display: block;
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: #ffffff;
+    position: relative;
+}
+/* #endregion */
+
