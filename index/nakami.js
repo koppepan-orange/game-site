@@ -972,16 +972,16 @@ OBS.KeysR = (e) => {
 };
 
 OBS.PonD = (e) => {
-    console.log('押されたわね')
-    if(e.buttons == 0) OBS.cling = 1;
+    if(e.buttons == 1) OBS.cling = 1;
     if(e.buttons == 2) OBS.cring = 1;
+    console.log('押されたわね', OBS.cling, OBS.cring);
 };
 OBS.PonU = (e) => {
-    if(e.buttons == 0) OBS.cling = 0;
+    if(e.buttons == 1) OBS.cling = 0;
     if(e.buttons == 2) OBS.cring = 0;
 };
 OBS.ponC = (e) => {
-    if(e.buttons == 0) OBS.cling = 0;
+    if(e.buttons == 1) OBS.cling = 0;
     if(e.buttons == 2) OBS.cring = 0;
 };
 OBS.PonB = () => {
@@ -1412,7 +1412,7 @@ frninF.score = function(num){
 
     if(frninC.score % 3 == 0 || frninC.score.toString().includes('3')) nicoText('ｻｧﾝ');
     let item = frninC.scoreTx.find(a => a.num == frninC.score);
-    if(item) for(let t of item.texts){addtext(t)};
+    if(item) for(let t of item.texts){logText(t)};
 }
 
 frninC.Fruits = [
