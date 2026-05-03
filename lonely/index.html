@@ -42,7 +42,22 @@
         </div>
     </div>
 
-    <script src="data.js" defer></script>
-    <script src="nakami.js" defer></script>
+    <script>
+        (async() => {
+            let ts = new Date().getTime(); 
+
+            let ZettaiTukawarenaiKannsuu = async (f) => {
+                return new Promise(res => {
+                    let script = document.createElement('script');
+                    script.src = `${f}.js?v=${ts}`;
+                    script.defer = true;
+                    script.onload = res;
+                    document.head.appendChild(script);
+                });        
+            }
+            await ZettaiTukawarenaiKannsuu(`data`);
+            await ZettaiTukawarenaiKannsuu(`nakami`);
+        })();
+    </script>
 </body>
 </html>

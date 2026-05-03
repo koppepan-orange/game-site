@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="mitame.css">
+    <title>スターターパック</title>
+</head>
+<body>
+    <div id="mobileDesc"></div>
+    <div id="log" class="hid">
+        <div class="opener"><</div>
+        <div class="main"></div>
+        <div class="text"></div>
+    </div>
+    <div id="movlis">
+        <div class="title">Move List</div>
+        <div class="list"></div>
+    </div>
+
+    <div id="main">
+
+        <div class="space" id="home"></div>
+        <div class="space" id="tet">
+            <div class="row">
+                <canvas class="hontai"></canvas>
+
+                <div class="column">
+                    <div class="mono score" class="ui">score: 0</div>
+
+                    <select class="mono jkTog" class="ui" onchange="eventallow = this.value">
+                        <option value='0'>event-off</option>
+                        <option value='1'>event-on</option>
+                    </select>
+
+                    <div class="mono controll">
+                        <div class="bts">
+                            <div class="bt none"></div> <div class="bt up">A</div> <div class="bt none"></div>
+                            <div class="bt left">く</div> <div class="bt none"></div> <div class="bt right">D</div>
+                            <div class="bt none"></div> <div class="bt down">V</div> <div class="bt none"></div>
+                        </div>
+                        <div class="bt rapid">rapid</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="effect"></div>
+            <canvas class="jk"></canvas> <!--JoKe-->
+        </div>
+
+    </div>
+    
+    <!-- <script src="data.js" defer></script> -->
+    <!-- <script src="nakami.js" defer></script> -->
+
+    <script>
+        (async() => {
+            let ts = new Date().getTime(); 
+
+            let ZettaiTukawarenaiKannsuu = async (f) => {
+                return new Promise(res => {
+                    let script = document.createElement('script');
+                    script.src = `${f}.js?v=${ts}`;
+                    script.defer = true;
+                    script.onload = res;
+                    document.head.appendChild(script);
+                });        
+            }
+            await ZettaiTukawarenaiKannsuu(`data`);
+            await ZettaiTukawarenaiKannsuu(`nakami`);
+        })();
+    </script>
+</body>
+</html>
