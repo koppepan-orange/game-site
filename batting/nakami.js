@@ -975,6 +975,7 @@ OBS.load = () => {
         "Mouse": 1,
         "Click": 1,
         "Paste": 0,
+        "Context": 1,
     }
 
     if(sts["Keys"]){
@@ -995,6 +996,10 @@ OBS.load = () => {
 
     if(sts["Paste"]){
         window.addEventListener('paste', OBS.Paste);
+    }
+
+    if(sts["Context"]){
+        window.addEventListener('contextmenu', e => e.preventDefault());
     }
 }
 

@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="mitame.css">
-    <title>スターターパック</title>
+    <title>backpack-test</title>
 </head>
 <body>
     <div id="mobileDesc"></div>
@@ -29,24 +29,20 @@
     <!-- <script src="nakami.js" defer></script> -->
 
     <script>
-        (function() {
+        (async() => {
             let ts = new Date().getTime(); 
 
-            let fs = ['data', 'nakami'];
-            for(let f of fs){
-                let script = document.createElement('script');
-                script.src = `${f}.js?v=${ts}`;
-                script.defer = true;
-                document.head.appendChild(script);
+            let ZettaiTukawarenaiKannsuu = async (f) => {
+                return new Promise(res => {
+                    let script = document.createElement('script');
+                    script.src = `${f}.js?v=${ts}`;
+                    script.defer = true;
+                    script.onload = res;
+                    document.head.appendChild(script);
+                });        
             }
-
-            let link = document.createElement('link');
-            link.rel = "stylesheet";
-            link.href = `mitame.css?v=${ts}`;
-            link.onload = () => {
-                document.body.style.visibility = "visible";
-            };
-            document.head.appendChild(link);
+            await ZettaiTukawarenaiKannsuu(`data.js`);
+            await ZettaiTukawarenaiKannsuu(`nakami.js`);
         })();
     </script>
 </body>
