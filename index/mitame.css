@@ -405,3 +405,109 @@ img{
 .space.show{
     display: flex;
 }
+
+
+#main{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #f6fff2;
+}
+#title{
+    margin: 0 auto;
+    font-size: 30px;
+    font-family: hangyaku;
+    text-decoration: underline dotted;
+    text-decoration-color: #b6e3a5;
+}
+#links{
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: #eeffe7;
+}
+#links a{
+    margin-top: -2px;
+    padding: 5px 15px;
+    border: 2px solid #ddffd0;
+    text-decoration: none;
+    font-size: 20px;
+    color: #0f3300;
+    font-family: cube12;
+}
+
+#right{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 35%;
+    height: 100%;
+    padding: 10px;
+    background: #f0f8ff;
+    border-left: 5px solid #cfe9ff;
+    position: fixed;
+    right: -35%;
+    top: 0;
+    transition: right 0.5s ease;
+    box-sizing: border-box;
+}
+#right.open{
+    right: 0;
+}
+#right .toggle{
+    width: calc(10% - 2px);
+    height: 100%;
+    background: #cfe9ff;
+    position: absolute;
+    left: calc(-10% + 2px);
+    top: 0;
+}
+#right .frnin{
+    width: 80px;
+    height: 80px;
+    background: #ddffd0;
+    border-radius: 50%;
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    cursor: pointer;
+}
+#right .frnin img{
+    display: block;
+    width: 60%;
+    height: 60%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    object-fit: contain;
+}
+.fruit {
+    position: fixed; /* これ必須 */
+    width: 50px;
+    height: 50px;
+    pointer-events: none;
+}
+#frninScore {
+    display: none;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    font-size: 24px;
+    font-family: cube12;
+    color: #007ea1;
+    text-shadow: 1.5px 1.5px 3px #000;
+}
+
+#trail {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* キャンバスがマウスイベントを妨げないようにする */
+    z-index: 1000; /* 必要に応じて調整 */
+}

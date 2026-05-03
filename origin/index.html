@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="js">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -43,14 +43,6 @@
             }
             await ZettaiTukawarenaiKannsuu(`data`);
             await ZettaiTukawarenaiKannsuu(`nakami`);
-
-            let link = document.createElement('link');
-            link.rel = "stylesheet";
-            link.href = `mitame.css?v=${ts}`;
-            link.onload = () => {
-                document.body.style.visibility = "visible";
-            };
-            document.head.appendChild(link);
         })();
     </script>
 </body>
