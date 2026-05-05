@@ -1378,7 +1378,7 @@ let homF = {};
 
 homC.startB.addEventListener('click', () => {
     gamF.start();
-});
+})
 // #endregion
 
 // #region ゲーム画面
@@ -1388,26 +1388,17 @@ let gamC = {
     can: null,
     ctx: null,
     ing: 0,
-    running: 0,
     loop: 0,
 
-    timerMax: 30,
-    timeLeft: 30,
-    countdown: 0,
-
-    spawnAcc: 0,
-    objs: [],
-    bgY: 0,
-    distance: 0,
-
+    mts: [],
     p: {
         x: 0,
         y: 0,
         w: 60,
         h: 30,
-        spd: 10,
-        vx: 0,
-        vy: 0.9
+        spd: 6,
+        vx: 0, // ?
+        vy: 0, // ?2
     },
 
     pad: null,
@@ -1418,344 +1409,60 @@ let gamC = {
         dir: 0,
         pow: 0
     },
-
-    ui: {
-        timer: null,
-        dist: null,
-        count: null,
-        result: null,
-        retry: null
-    }
 };
 let gamF = {};
-
-gamF.clamp = (num, min, max) => {
-    if(num < min) return min;
-    if(max < num) return max;
-    return num;
-};
 
 gamF.load = () => {
     let can = document.createElement('canvas');
     gamD.appendChild(can);
     gamC.can = can;
     gamC.ctx = can.getContext('2d');
-
-    let ui = document.createElement('div');
-    ui.className = 'gameui';
-    ui.style.cssText = `
-        position:absolute;
-        inset:0;
-        pointer-events:none;
-        font-family:sans-serif;
-    `;
-
-    let timer = document.createElement('div');
-    timer.className = 'gametimer';
-    timer.style.cssText = `
-        position:absolute;
-        left:12px;
-        top:10px;
-        color:#d8f1ff;
-        font-size:16px;
-        font-weight:700;
-        text-shadow:0 1px 3px rgba(0,0,0,.6);
-    `;
-    ui.appendChild(timer);
-
-    let dist = document.createElement('div');
-    dist.className = 'gamedist';
-    dist.style.cssText = `
-        position:absolute;
-        left:12px;
-        top:34px;
-        color:#d8f1ff;
-        font-size:14px;
-        font-weight:700;
-        text-shadow:0 1px 3px rgba(0,0,0,.6);
-    `;
-    ui.appendChild(dist);
-
-    let count = document.createElement('div');
-    count.className = 'countdown';
-    count.style.cssText = `
-        position:absolute;
-        left:50%;
-        top:42%;
-        transform:translate(-50%, -50%);
-        color:#ffffff;
-        font-size:64px;
-        font-weight:900;
-        letter-spacing:.08em;
-        text-shadow:0 4px 12px rgba(0,0,0,.7);
-        opacity:0;
-        transition:opacity .18s linear;
-    `;
-    ui.appendChild(count);
-
-    let result = document.createElement('div');
-    result.className = 'resultbox';
-    result.style.cssText = `
-        position:absolute;
-        left:50%;
-        top:50%;
-        transform:translate(-50%, -50%);
-        width:min(320px, calc(100vw - 28px));
-        background:rgba(0, 18, 38, .88);
-        border:1px solid rgba(181, 208, 255, .35);
-        border-radius:18px;
-        padding:18px 16px;
-        color:#e9f6ff;
-        box-shadow:0 10px 30px rgba(0,0,0,.35);
-        display:none;
-        pointer-events:auto;
-        text-align:center;
-    `;
-
-    let resultTitle = document.createElement('div');
-    resultTitle.className = 'resulttitle';
-    resultTitle.style.cssText = `
-        font-size:18px;
-        font-weight:800;
-        margin-bottom:8px;
-    `;
-    result.appendChild(resultTitle);
-
-    let resultText = document.createElement('div');
-    resultText.className = 'resulttext';
-    resultText.style.cssText = `
-        font-size:16px;
-        line-height:1.6;
-        margin-bottom:14px;
-    `;
-    result.appendChild(resultText);
-
-    let retry = document.createElement('button');
-    retry.type = 'button';
-    retry.textContent = 'もう一回';
-    retry.style.cssText = `
-        appearance:none;
-        border:none;
-        background:#b5d0ff;
-        color:#00203b;
-        font-weight:800;
-        border-radius:999px;
-        padding:10px 18px;
-        cursor:pointer;
-        pointer-events:auto;
-    `;
-    result.appendChild(retry);
-
-    ui.appendChild(result);
-    gamD.appendChild(ui);
+    gamF.resize();
 
     let pad = document.createElement('div');
     pad.className = 'pad';
-    pad.style.cssText = `
-        position:absolute;
-        width:70px;
-        height:70px;
-        border-radius:50%;
-        border:2px solid rgba(181, 208, 255, .65);
-        background:rgba(181, 208, 255, .12);
-        transform:translate(-50%, -50%);
-        pointer-events:none;
-        opacity:0;
-        transition:opacity .12s linear;
-        box-sizing:border-box;
-    `;
     gamD.appendChild(pad);
-
     gamC.pad = pad;
-    gamC.ui.timer = timer;
-    gamC.ui.dist = dist;
-    gamC.ui.count = count;
-    gamC.ui.result = result;
-    gamC.ui.retry = retry;
-
-    retry.addEventListener('click', () => {
-        gamF.start();
-    });
-
-    gamF.resize();
-};
-
+}
 gamF.resize = () => {
-    if(!gamC.can) return;
-
     let hei = window.innerHeight;
+    // gamC.can.width = Style.iPhone.width; //"393px"
     gamC.can.width = gamC.wid;
     gamC.can.height = hei;
 
     let p = gamC.p;
-    if(p.x == 0) p.x = (gamC.can.width - p.w) / 2;
-    p.y = gamC.can.height - p.h - 75;
-};
+    p.y = (gamC.can.height-p.h) - 75;
+}
 window.addEventListener('resize', gamF.resize);
+// window.addEventListener('orientationchange', gamF.resize);
 
-gamF.reset = () => {
-    let p = gamC.p;
-    p.x = (gamC.wid - p.w) / 2;
-    p.vx = 0;
-    p.vy = 0.9;
 
-    gamC.timeLeft = gamC.timerMax;
-    gamC.countdown = 3;
-    gamC.spawnAcc = 0;
-    gamC.objs = [];
-    gamC.bgY = 0;
-    gamC.distance = 0;
 
-    gamC.ui.timer.textContent = '';
-    gamC.ui.dist.textContent = '';
-    gamC.ui.count.style.opacity = '0';
-    gamC.ui.count.textContent = '';
-    gamC.ui.result.style.display = 'none';
-};
-
-gamF.start = async() => {
+gamF.start = () => {
     if(gamC.ing) return;
-
     gamC.ing = 1;
-    gamC.running = 0;
-    gamC.loop = 1;
-
     mainF.move('game');
-    gamF.reset();
+
+    gamC.loop = 1;
     gamF.gameloop();
+}
 
-    for(let i = 3; i >= 1; i--){
-        if(!gamC.ing) return;
-        gamC.ui.count.textContent = String(i);
-        gamC.ui.count.style.opacity = '1';
-        await delay(1000);
-    }
+gamF.draw = () => {
+    gamC.ctx.clearRect(0, 0, gamC.can.width, gamC.can.height);
+    gamC.ctx.fillStyle = '#001b32';
+    gamC.ctx.fillRect(0, 0, gamC.can.width, gamC.can.height);
 
-    if(!gamC.ing) return;
-    gamC.ui.count.textContent = 'GO!';
-    await delay(550);
-    gamC.ui.count.style.opacity = '0';
-
-    gamC.running = 1;
-    gamC.last = performance.now();
-};
-
-gamF.finish = () => {
-    if(!gamC.ing) return;
-
-    gamC.running = 0;
-    gamC.loop = 0;
-    gamC.ing = 0;
-
-    let score = Math.floor(gamC.distance);
-    let text = "おお";
-    if(score < 1000) text = "はいそこ変なことしないー";
-    else if(score < 2500) text = "いや下手すぎ下手すぎ";
-    else if(score < 4000) text = "まあまあかな いや下手だわ";
-    else if(score < 6500) text = "んーー、、まあいい方 よくやったじゃん";
-    else if(score < 8500) text = "なんか、普通だね しょうもないって感じ";
-    else if(score < 12723) text = "いいんじゃない？";
-    else if(score == 12723) text = "おめ、それ作者の最高スコア"
-    else if(score < 15000) text = "だいぶすごいと思う 誇りなよ";
-    else if(15000 < score) text = "楽しい？それならよかった";
-
-    gamC.ui.result.style.display = 'block';
-    gamC.ui.result.querySelector('.resulttitle').textContent = 'Times Up!';
-    gamC.ui.result.querySelector('.resulttext').innerHTML =
-        `進んだ距離：<b>${score}m</b><br>${text}`;
-};
-
-gamF.spawn = () => {
     let p = gamC.p;
-    let prog = 1 - (gamC.timeLeft / gamC.timerMax);
-    if(prog < 0) prog = 0;
-    if(prog > 1) prog = 1;
-
-    let pinkRate = 0.1 + 0.8 * prog;
-    let starRate = 0.72;
-    let kind = 'meteor';
-
-    if(Math.random() < starRate){
-        kind = Math.random() < pinkRate ? 'pink' : 'blue';
-    }
-
-    let w = 0;
-    let h = 0;
-    let spd = 0;
-    let x = random(8, gamC.wid - 8);
-
-    if(kind == 'blue'){
-        w = random(p.w - 14, p.w - 2);
-        h = random(14, 22);
-        spd = random(120, 165);
-    }
-
-    if(kind == 'pink'){
-        w = random(p.w - 10, p.w + 2);
-        h = random(16, 24);
-        spd = random(130, 175);
-    }
-
-    if(kind == 'meteor'){
-        w = random(p.w, p.w + 34);
-        h = random(Math.floor(p.h * 1.1), Math.floor(p.h * 1.8));
-        spd = random(105, 155);
-        x = random(8, gamC.wid - w - 8);
-    }
-
-    gamC.objs.push({
-        kind: kind,
-        x: x,
-        y: -h - random(20, 120),
-        w: w,
-        h: h,
-        spd: spd,
-        rot: Math.random() * Math.PI * 2
-    });
-};
-
-gamF.hitCheck = (a, b) => {
-    return !(a.x + a.w < b.x || b.x + b.w < a.x || a.y + a.h < b.y || b.y + b.h < a.y);
-};
-
-gamF.applyHit = (kind) => {
+    gamC.ctx.fillStyle = '#b5d0ff';
+    gamC.ctx.fillRect(p.x, p.y, p.w, p.h);
+}
+gamF.calc = () => {
     let p = gamC.p;
+    // // 左右移動のみ。上下はアイテム所得で加速が入ったり、隕石に衝突で減速が入ったりする想定
 
-    let Vals = {
-        blue: 0.70,
-        pink: 1.82,
-        meteor: -1.2
-    }
-
-    if(kind == 'blue'){
-        p.vy += Vals.blue;
-    }
-
-    if(kind == 'pink'){
-        p.vy += Vals.pink;
-    }
-
-    if(kind == 'meteor'){
-        p.vy += Vals.meteor;
-    }
-
-    p.vy = gamF.clamp(p.vy, 0, 12);
-
-    if(kind == 'blue') nicoText('青い流れ星！');
-    if(kind == 'pink') nicoText('桃色の流れ星！');
-    if(kind == 'meteor') nicoText('隕石！');
-};
-
-gamF.calc = (dt) => {
-    let p = gamC.p;
-    let sec = dt / 1000;
-
-    gamC.timeLeft -= sec;
-    if(gamC.timeLeft <= 0){
-        gamC.timeLeft = 0;
-        gamF.finish();
-        return;
-    }
+    // if(OBS.keys['arrowleft'] || OBS.keys['a']) p.vx = -p.spd;
+    // else if(OBS.keys['arrowright'] || OBS.keys['d']) p.vx = p.spd;
+    // else p.vx = 0; //減衰にしたいけどやり方は不明 加速度..?でもその場合最大速度みたいなやつ定めないかんよなぁ....
 
     let mv = 0;
     let sp = p.spd;
@@ -1763,6 +1470,7 @@ gamF.calc = (dt) => {
 
     if(OBS.keys['arrowleft'] || OBS.keys['a']) mv = -1;
     if(OBS.keys['arrowright'] || OBS.keys['d']) mv = 1;
+
     if(gamC.touch.ing) mv = gamC.touch.dir;
 
     if(mv != 0){
@@ -1771,9 +1479,10 @@ gamF.calc = (dt) => {
         p.vx += ((mv * tp) - p.vx) * 0.22;
     }
     else p.vx += (0 - p.vx) * 0.16;
-
-    p.x += p.vx * (dt / 16.666);
-
+    
+    p.x += p.vx;
+    // if(p.x < 0) p.x = 0;
+    // if(gamC.can.width < p.x + p.w) p.x = gamC.can.width - p.w;
     if(p.x < 0){
         p.x = 0;
         p.vx = 0;
@@ -1782,166 +1491,7 @@ gamF.calc = (dt) => {
         p.x = gamC.can.width - p.w;
         p.vx = 0;
     }
-
-    let worldSpd = 110 + p.vy * 38;
-    let fallBoost = p.vy * 6;
-
-    gamC.distance += worldSpd * sec;
-    gamC.bgY += worldSpd * sec * 0.65;
-
-    let prog = 1 - (gamC.timeLeft / gamC.timerMax);
-    if(prog < 0) prog = 0;
-    if(prog > 1) prog = 1;
-
-    gamC.spawnAcc += dt;
-    let spawnGap = 500 - prog * 180;
-    if(spawnGap < 180) spawnGap = 180;
-
-    while(gamC.spawnAcc >= spawnGap){
-        gamC.spawnAcc -= spawnGap;
-        gamF.spawn();
-    }
-
-    let i = gamC.objs.length;
-    while(i--){
-        let o = gamC.objs[i];
-        o.y += (o.spd + worldSpd * 0.55 + fallBoost) * sec;
-        o.rot += 0.01 + o.spd / 24000;
-
-        let pr = {
-            x: p.x,
-            y: p.y,
-            w: p.w,
-            h: p.h
-        };
-
-        if(gamF.hitCheck(pr, o)){
-            gamF.applyHit(o.kind);
-            gamC.objs.splice(i, 1);
-            continue;
-        }
-
-        if(o.y > gamC.can.height + 120) gamC.objs.splice(i, 1);
-    }
-};
-
-gamF.drawStar = (x, y, s, col, rot) => {
-    let ctx = gamC.ctx;
-    ctx.save();
-    ctx.translate(x + s / 2, y + s / 2);
-    ctx.rotate(rot);
-    ctx.fillStyle = col;
-    ctx.shadowColor = col;
-    ctx.shadowBlur = 10;
-
-    ctx.beginPath();
-    ctx.moveTo(0, -s * 0.55);
-    ctx.lineTo(s * 0.16, -s * 0.16);
-    ctx.lineTo(s * 0.55, 0);
-    ctx.lineTo(s * 0.16, s * 0.16);
-    ctx.lineTo(0, s * 0.55);
-    ctx.lineTo(-s * 0.16, s * 0.16);
-    ctx.lineTo(-s * 0.55, 0);
-    ctx.lineTo(-s * 0.16, -s * 0.16);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.restore();
-};
-
-gamF.drawMeteor = (x, y, w, h, rot) => {
-    let ctx = gamC.ctx;
-    ctx.save();
-    ctx.translate(x + w / 2, y + h / 2);
-    ctx.rotate(rot);
-
-    let grad = ctx.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2);
-    grad.addColorStop(0, '#7e8794');
-    grad.addColorStop(1, '#39434f');
-    ctx.fillStyle = grad;
-    ctx.shadowColor = '#000';
-    ctx.shadowBlur = 10;
-
-    ctx.beginPath();
-    ctx.ellipse(0, 0, w / 2, h / 2, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = 'rgba(255,255,255,.18)';
-    ctx.beginPath();
-    ctx.ellipse(-w * 0.12, -h * 0.12, w * 0.16, h * 0.12, 0.3, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.restore();
-};
-
-gamF.draw = () => {
-    let ctx = gamC.ctx;
-    let w = gamC.can.width;
-    let h = gamC.can.height;
-
-    ctx.clearRect(0, 0, w, h);
-
-    let bg = ctx.createLinearGradient(0, 0, 0, h);
-    bg.addColorStop(0, '#001327');
-    bg.addColorStop(1, '#00264a');
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, w, h);
-
-    // 背景の細やかな星々
-    ctx.fillStyle = 'rgba(255,255,255,.18)';
-    let base = gamC.bgY % 40;
-    for(let y = -40; y < h + 40; y += 40){
-        for(let x = 0; x < w; x += 48){
-            let yy = y + base + ((x * 13) % 24);
-            let xx = x + ((y * 7) % 16);
-            ctx.beginPath();
-            ctx.arc(xx, yy, 1.6, 0, Math.PI * 2); // 星のサイズを1.6に変更
-            ctx.fill();
-        }
-    }
-
-    for(let i = 0; i < gamC.objs.length; i++){
-        let o = gamC.objs[i];
-        if(o.kind == 'blue'){
-            gamF.drawStar(o.x, o.y, o.w, '#7ee8ff', o.rot);
-        }
-        if(o.kind == 'pink'){
-            gamF.drawStar(o.x, o.y, o.w, '#ff9ad7', o.rot);
-        }
-        if(o.kind == 'meteor'){
-            gamF.drawMeteor(o.x, o.y, o.w, o.h, o.rot);
-        }
-    }
-
-    // プレイヤーの描画
-    let p = gamC.p;
-    ctx.fillStyle = '#b5d0ff';
-    ctx.shadowColor = 'rgba(181, 208, 255, .45)';
-    ctx.shadowBlur = 8;
-    ctx.fillRect(p.x, p.y, p.w, p.h);
-    ctx.shadowBlur = 0;
-
-    // プレイヤーの謎の光沢
-    ctx.fillStyle = '#dff0ff';
-    ctx.fillRect(p.x + 8, p.y + 6, 10, 4);
-
-    gamC.ui.timer.textContent = `TIME ${Math.ceil(gamC.timeLeft)}s`;
-    gamC.ui.dist.textContent = `DIST ${Math.floor(gamC.distance)}`;
-};
-
-gamF.gameloop = (now) => {
-    if(!gamC.loop) return;
-
-    if(!gamC.last) gamC.last = now;
-    let dt = now - gamC.last;
-    gamC.last = now;
-
-    if(gamC.running) gamF.calc(dt);
-    gamF.draw();
-
-    requestAnimationFrame(gamF.gameloop);
-};
+}
 
 // 9割AIの！ touch関連〜〜〜
 window.addEventListener('touchstart', function(e){
@@ -1957,9 +1507,8 @@ window.addEventListener('touchstart', function(e){
 
     gamC.pad.style.left = t.clientX + 'px';
     gamC.pad.style.top = t.clientY + 'px';
-    gamC.pad.style.opacity = '1';
-}, {passive:false});
-
+    gamC.pad.classList.add('show');
+});
 window.addEventListener('touchmove', function(e){
     e.preventDefault();
     let t = e.touches[0];
@@ -1968,23 +1517,29 @@ window.addEventListener('touchmove', function(e){
     let dx = t.clientX - gamC.touch.sx;
     gamC.touch.dir = dx > 0 ? 1 : dx < 0 ? -1 : 0;
     gamC.touch.pow = Math.min(Math.abs(dx) / 140, 1);
-}, {passive:false});
-
+});
 window.addEventListener('touchend', function(){
     gamC.touch.ing = 0;
     gamC.touch.dir = 0;
     gamC.touch.pow = 0;
-    gamC.pad.style.opacity = '0';
+    gamC.pad.classList.remove('show');
 });
-
 window.addEventListener('touchcancel', function(){
     gamC.touch.ing = 0;
     gamC.touch.dir = 0;
     gamC.touch.pow = 0;
-    gamC.pad.style.opacity = '0';
+    gamC.pad.classList.remove('show');
 });
 
-//#endregion
+
+gamF.gameloop = () => {
+    gamF.draw();
+    gamF.calc();
+    if(gamC.loop) requestAnimationFrame(gamF.gameloop);
+}
+// #endregion
+
+
 
 //#region start
 function start(){
