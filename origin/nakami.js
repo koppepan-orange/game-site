@@ -1201,12 +1201,32 @@ function soundVolume(code, val){
 
     if(code == 'se' || code == 'both'){
         souC.se = v;
-        for(k in sounds) if(sounds[k].dataset.type == 'se') sounds[k].volume = souC.se;
+
+        for(let belong in sounds){
+            for(let name in sounds[belong]){
+                let sound = sounds[belong][name];
+                if(sound.dataset.type == 'se'){
+                    sound.volume = souC.se;
+                }
+            }
+        }
     }
+
     if(code == 'bgm' || code == 'both'){
         souC.bgm = v;
-        for(k in sounds) if(sounds[k].dataset.type == 'bgm') sounds[k].volume = souC.bgm;
-        if(souC.nowBgm && sounds[souC.nowBgm]) sounds[souC.nowBgm].volume = souC.bgm;
+
+        for(let belong in sounds){
+            for(let name in sounds[belong]){
+                let sound = sounds[belong][name];
+                if(sound.dataset.type == 'bgm'){
+                    sound.volume = souC.bgm;
+                }
+            }
+        }
+
+        if(souC.nowBgm && sounds.bgm[souC.nowBgm]){
+            sounds.bgm[souC.nowBgm].volume = souC.bgm;
+        }
     }
 
     console.log(`[soundVolume] se:${souC.se} bgm:${souC.bgm}`);

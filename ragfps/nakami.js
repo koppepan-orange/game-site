@@ -1367,13 +1367,16 @@ let staC = {
     ctx: staD.querySelector('canvas').getContext('2d'),
     wid: 360,
     hei: 360,
-    row: 10,
-    mas: 36,
+    row: 8, //横に長い
+    mas: 45, //大きさ
+
+    loop: 0, //可否
+    delta: 0,
 
     now: 0,
     max: 2,
     
-    map: [], //二次配列にする予定 row**2
+    objs: [],
     p: {
         x: 3,
         y: 0,
@@ -1389,6 +1392,35 @@ staF.load = () => {
     staC.ctx.fillStyle = '#a0dea5';
     staC.ctx.fillRect(0, 0, staC.wid, staC.hei);
 }
+
+staF.start = () => {
+    staC.loop = 1;
+    staF.gameloop();
+}
+staF.stop = () => staC.loop = 0;
+
+staF.draw = () => {
+    staC.ctx.clearRect(0, 0, staC.wid, staC.hei);
+    staC.ctx.fillStyle = '#d8ffdb';
+    staC.ctx.fillRect(0, 0, staC.wid, staC.hei);
+
+    // draw grid
+    staC.ctx.strokeStyle = '#2b2b2b';
+    staC.ctx.lineWidth = 0.25;
+    staC.ctx.strokeRect(0, 0, staC.wid, staC.hei);
+    for(let i = 0; i <= staC.mas; i++){
+        staC.ctx.beginPath();
+        staC.ctx.moveTo(i * staC.mas, 0);
+        staC.ctx.lineTo(i * staC.mas, staC.hei);
+        staC.ctx.stroke();
+
+        staC.ctx.beginPath();
+        staC.ctx.moveTo(0, i * staC.mas);
+        staC.ctx.lineTo(staC.wid, i * staC.mas);
+        staC.ctx.stroke();
+    };
+}
+
 
 staF.search = () => {
     
@@ -1418,6 +1450,15 @@ document.addEventListener('keydown', (e) => {
 });
 
 
+staF.gameloop = () => {
+    staC.delta += 1;
+
+    if(staC.delta % 10 == 0){
+        staF.draw();
+    }
+    
+    if(staC.loop) requestAnimationFrame(staF.gameloop);
+}
 // #endregion
 
 
@@ -1428,10 +1469,12 @@ function start(){
     OBS.load();
 
     mainF.load();
-
+    staF.load();
 
 
     mainF.move('home');
+
+    staF.start();
 }
 //#endregion
 

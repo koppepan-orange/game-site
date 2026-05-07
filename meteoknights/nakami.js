@@ -1415,8 +1415,10 @@ let gamC = {
         ing: 0,
         sx: 0,
         sy: 0,
+        px: 0, // ★追加：タッチ開始時の自機のX座標を保持する
         dir: 0,
-        pow: 0
+        pow: 0,
+        dx: 0  // ★追加：開始地点からの移動距離を保持する
     },
 
     ui: {
@@ -1740,10 +1742,6 @@ gamF.applyHit = (kind) => {
     }
 
     p.vy = gamF.clamp(p.vy, 0, 12);
-
-    if(kind == 'blue') nicoText('青い流れ星！');
-    if(kind == 'pink') nicoText('桃色の流れ星！');
-    if(kind == 'meteor') nicoText('隕石！');
 };
 
 gamF.calc = (dt) => {
@@ -1757,22 +1755,45 @@ gamF.calc = (dt) => {
         return;
     }
 
-    let mv = 0;
-    let sp = p.spd;
-    let mx = p.spd * 2.5;
+    // let mv = 0;
+    // let sp = p.spd;
+    // let mx = p.spd * 2.5;
 
+    // if(OBS.keys['arrowleft'] || OBS.keys['a']) mv = -1;
+    // if(OBS.keys['arrowright'] || OBS.keys['d']) mv = 1;
+    // if(gamC.touch.ing) mv = gamC.touch.dir;
+
+    // if(mv != 0){
+    //     let tp = sp + gamC.touch.pow * sp * 2;
+    //     if(tp > mx) tp = mx;
+    //     p.vx += ((mv * tp) - p.vx) * 0.22;
+    // }
+    // else p.vx += (0 - p.vx) * 0.16;
+
+    // p.x += p.vx * (dt / 16.666);
+
+    let mv = 0;
     if(OBS.keys['arrowleft'] || OBS.keys['a']) mv = -1;
     if(OBS.keys['arrowright'] || OBS.keys['d']) mv = 1;
-    if(gamC.touch.ing) mv = gamC.touch.dir;
 
-    if(mv != 0){
-        let tp = sp + gamC.touch.pow * sp * 2;
-        if(tp > mx) tp = mx;
-        p.vx += ((mv * tp) - p.vx) * 0.22;
+    if(gamC.touch.ing) {
+        // ★タッチ操作：開始時の位置に移動量を加算して、直接座標を叩き込む
+        p.x = gamC.touch.px + gamC.touch.dx;
+        p.vx = 0; // 追従操作なので速度（慣性）はリセットだ
+    } 
+    else if(mv != 0) {
+        // キーボード操作：従来通り
+        p.vx += ((mv * p.spd) - p.vx) * 0.22;
+        p.x += p.vx * (dt / 16.666);
     }
-    else p.vx += (0 - p.vx) * 0.16;
+    else {
+        // 摩擦による減速
+        p.vx += (0 - p.vx) * 0.16;
+        p.x += p.vx * (dt / 16.666);
+    }
 
-    p.x += p.vx * (dt / 16.666);
+    // 画面端の判定（clamp関数を使ってもいいだろう）
+    p.x = gamF.clamp(p.x, 0, gamC.can.width - p.w);
 
     if(p.x < 0){
         p.x = 0;
@@ -1944,45 +1965,32 @@ gamF.gameloop = (now) => {
 };
 
 // 9割AIの！ touch関連〜〜〜
+// touchstart 内
 window.addEventListener('touchstart', function(e){
-    e.preventDefault();
+    if(e.target.classList.contains('botan')) return;
     let t = e.touches[0];
     if(!t) return;
 
     gamC.touch.ing = 1;
     gamC.touch.sx = t.clientX;
-    gamC.touch.sy = t.clientY;
-    gamC.touch.dir = 0;
-    gamC.touch.pow = 0;
+    gamC.touch.px = gamC.p.x; // ★重要：今の自機の位置を覚えておく
+    gamC.touch.dx = 0;        // 移動量をリセット
 
+    // パッドの表示位置（視覚的なガイドとして残すなら）
     gamC.pad.style.left = t.clientX + 'px';
     gamC.pad.style.top = t.clientY + 'px';
     gamC.pad.style.opacity = '1';
-}, {passive:false});
+}, { passive: false });
 
+// touchmove 内
 window.addEventListener('touchmove', function(e){
     e.preventDefault();
     let t = e.touches[0];
     if(!gamC.touch.ing || !t) return;
 
-    let dx = t.clientX - gamC.touch.sx;
-    gamC.touch.dir = dx > 0 ? 1 : dx < 0 ? -1 : 0;
-    gamC.touch.pow = Math.min(Math.abs(dx) / 140, 1);
-}, {passive:false});
-
-window.addEventListener('touchend', function(){
-    gamC.touch.ing = 0;
-    gamC.touch.dir = 0;
-    gamC.touch.pow = 0;
-    gamC.pad.style.opacity = '0';
-});
-
-window.addEventListener('touchcancel', function(){
-    gamC.touch.ing = 0;
-    gamC.touch.dir = 0;
-    gamC.touch.pow = 0;
-    gamC.pad.style.opacity = '0';
-});
+    // ★指が開始地点からどれだけ動いたかを記録
+    gamC.touch.dx = t.clientX - gamC.touch.sx;
+}, { passive: false });
 
 //#endregion
 

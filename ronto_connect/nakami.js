@@ -146,6 +146,50 @@ function kaikyu(sta, end, row, val){
 
     return arr;
 };
+async function tousa(moto, key, d, n, wait = 0, s = 0){
+    // type:: kouならi<n madeならwhileでif抜け
+	let a = moto[key]; //初項
+	if(a != 0 && (!a || typeof a != "number")) return console.error("..それ数字じゃないです...."), 1;
+	if(d == 0) return console.error("む、むむ無限が..見えますっ...."), 1;
+	
+	if(!wait) wait = 10;
+	if(s) n = (s-a)/d; //うわがき ほんとは等差数列の和の公式を使いたかった
+    if(n < 0) d = -d;
+    n = Math.ceil(Math.abs(n));
+	
+    for(let i=0; i<n; i++){
+        await delay(wait);
+        moto[key] += d;
+    }
+}
+async function touhi(moto, key, r, n, wait = 0, s = 0){
+    // type:: kouならi<n madeならwhileでif抜け
+	let a = moto[key]; //初項
+	if(a != 0 && (!a || typeof a != "number")) return console.error("..それ数字じゃないです...."), 1;
+    if(a == 0) return console.error("初項0の等比数列、、？"), 0;
+	if(r == 0) return console.error("...これは何？"), 0;
+    if(r == 1) return console.error("あ、あの...これも無限が見えます..."), 1;
+	
+	if(!wait) wait = 10;
+	if(s) n = Math.log(s/a) / Math.log(r); //うわがき ほんとは等比数列の和の公式を使いたかった
+    if(n < 0) r = 1/r;
+    n = Math.ceil(Math.abs(n));
+	
+    for(let i=0; i<n; i++){
+        await delay(wait);
+        moto[key] *= r;
+    }
+}
+function dogma(matu, shiki, k = 1){
+    let res = 0;
+
+    for(let i = k; i <= matu; i++){
+        res += shiki(i);
+        console.log(i, shiki(i));
+    }
+
+    return res;
+}
 function arraySelect(array){
     let select = Math.floor(Math.random()*array.length);
     return array[select];
@@ -292,16 +336,9 @@ function lsdSet(name, value){
 };
 function lsdGet(name){
     let res = localStorage.getItem(name);
-    
-    // データが存在しない場合は null を返す
-    if(res == null) return null;
-    if(res == undefined) return null;
-
-    try{
-        return JSON.parse(res);
-    }catch(e){
-        return res;
-    }
+    if(res) res = JSON.parse(res);
+    else return null;
+    return res;
 };
 function lsdRem(name){
     localStorage.removeItem(name);
@@ -463,10 +500,6 @@ function cursorRect(){
     let range = selection.getRangeAt(0);
     return range.getBoundingClientRect();
 }
-
-function scrlEnd(div){
-    div.scrollTop = div.scrollHeight;
-};
 
 async function error(text = 'errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr'){
     await logText(text);
@@ -721,7 +754,7 @@ document.addEventListener('mousedown', e => {
 //#endregion
 //#region tk
 class tk{
-    letructor(type, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
+    constructor(type, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
         let youso = document.createElement(type);
         youso.className = `tk ${type}`;
 
@@ -761,7 +794,7 @@ class tk{
         if(dict == 'none') return;
         
         if(typeof dict == 'string'){
-            // attr: nanka
+            //attr: nanka
             let [key, val] = dict.split(':');
              key = key.trim();
              val = val.trim();
@@ -824,7 +857,7 @@ function tkTest(){
 //#endregion
 //#region alertD
 class alertD{
-    letructor(text, elses = {}){
+    constructor(text, elses = {}){
         this.text = text;
         for(let key in elses) this[key] = elses[key];
         /*
@@ -939,16 +972,16 @@ OBS.KeysR = (e) => {
 };
 
 OBS.PonD = (e) => {
-    if(e.button == 0) OBS.cling = 1;
-    if(e.button == 2) OBS.cring = 1;
+    if(e.buttons == 0) OBS.cling = 1;
+    if(e.buttons == 2) OBS.cring = 1;
 };
 OBS.PonU = (e) => {
-    if(e.button == 0) OBS.cling = 0;
-    if(e.button == 2) OBS.cring = 0;
+    if(e.buttons == 0) OBS.cling = 0;
+    if(e.buttons == 2) OBS.cring = 0;
 };
 OBS.ponC = (e) => {
-    if(e.button == 0) OBS.cling = 0;
-    if(e.button == 2) OBS.cring = 0;
+    if(e.buttons == 0) OBS.cling = 0;
+    if(e.buttons == 2) OBS.cring = 0;
 };
 OBS.PonB = () => {
     OBS.cling = 0;
@@ -960,22 +993,11 @@ OBS.Mouse = (e) => {
     OBS.my = e.clientY;
 };
 
-OBS.Paste = (e) => {
+
+OBS.Paste = (event) => {
     // プレーンペーストに強制的にするやつ？
-    e.preventDefault();
-    let text = e.clipboardData.getData("text/plain");
-
-    let div = e.target;
-
-    if(div.tagName == "INPUT" || div.tagName == "TEXTAREA"){
-        let start = div.selectionStart;
-        let end = div.selectionEnd;
-
-        div.value = div.value.slice(0, start) + text + div.value.slice(end);
-        div.selectionStart = div.selectionEnd = start+text;
-        return;
-    }
-
+    event.preventDefault();
+    let text = event.clipboardData.getData("text/plain");
     let selection = window.getSelection();
     if(!selection.rangeCount) return;
     selection.deleteFromDocument();
@@ -989,6 +1011,7 @@ OBS.load = () => {
         "Mouse": 1,
         "Click": 1,
         "Paste": 0,
+        "Context": 1,
     }
 
     if(sts["Keys"]){
@@ -1010,19 +1033,21 @@ OBS.load = () => {
     if(sts["Paste"]){
         window.addEventListener('paste', OBS.Paste);
     }
+
+    if(sts["Context"]){
+        window.addEventListener('contextmenu', e => e.preventDefault());
+    }
 }
+
 //#endregion
 //#region fonts
-let Fonts = [
-    // {src:'comicsans', type:'ttf'},
-];
 function fontsLoad(){
     let id = "font_load_css";
     let existing = document.getElementById(id);
     if(existing) existing.remove();
 
     let css = Fonts.map(f => {
-        let src = `url('${Pathes[1]}assets/fonts/${f.src}.${f.type}')`;
+        let src = `url('assets/fonts/${f.src}.${f.type}')`;
         let weight = f.weight ?? 'normal';
         return `@font-face{
             font-family:'${f.src}';
@@ -1041,76 +1066,69 @@ function fontsLoad(){
 }
 fontsLoad();
 //#endregion
-//#region 画像と音声のロード
+//#region images & sounds
 let images = {};
 let sounds = {};
 let loaC = {
-    imgT: 0,
-    imgD: 0,
-    souT: 0,
-    souD: 0,
-    erd: 0,
-    deep:0
+    imgT: 0, imgD: 0,
+    souT: 0, souD: 0,
+    erd: 0
 }
 let loaF = {};
-loaC.imgL = {
-    systems:['select','circle','phone','star1','star1_pre','star2','star2_pre','star3','star3_pre','dungeon'],
-    // 草原:['蒼白の粘液','翡翠の風刃','顎剛なる草獣','茎槍の狩人','の茎針','攣縮する茎針','共鳴する茎赤黄','黄昏の穿影','燦爛する緑夢','紫苑の花姫','新緑なる剣士']
-}
-
-loaC.souL = ['error', 'doom', 'money']
-loaC.souT = Object.values(loaC.souL).length;
+loaC.imgT = Object.values(Images).reduce((a,b) => a + b.length, 0);
+loaC.souT = Object.values(Sounds).reduce((a,b) => a + b.length, 0);
 
 loaF.load = async() => {
-    if(await loaF.loadI()) return 'error';
-    else '終わり'
+    console.log("loadを開始しました。少々お待ちください");
+    if(await loaF.loadI()) return 1;
+    return 0;
 }
 loaF.loadI = async() => {
     let stas0 = Stages.filter(a => !a.no).map(a => a.name);
     let stas = stas0.concat(['すべて']);
     
-    loaC.imgL.maps = {};
-    loaC.imgL.enemies = {};
+    Images.maps = {};
+    Images.enemies = {};
     for(let sta of stas){
-        if(!loaC.imgL.maps[sta]) loaC.imgL.maps[sta] = [];
+        if(!Images.maps[sta]) Images.maps[sta] = [];
         Objects.filter(a => a.in == sta).map(a => a.name).forEach(name => {
             loaC.imgT += 1;
-            if(sta != 'すべて') loaC.imgL.maps[sta].push(name);
+            if(sta != 'すべて') Images.maps[sta].push(name);
             
-            else for(let sta2 of stas0) loaC.imgL.maps[sta2].push(name);
+            else for(let sta2 of stas0) Images.maps[sta2].push(name);
         });
 
         if(sta == 'すべて') continue;
 
         Stages.find(a => a.name == sta).tiles.forEach(name => {
             loaC.imgT += 1;
-            loaC.imgL.maps[sta].push(name);
+            Images.maps[sta].push(name);
         })
 
-        if(!loaC.imgL.enemies[sta]) loaC.imgL.enemies[sta] = [];
+        if(!Images.enemies[sta]) Images.enemies[sta] = [];
         Enemies.filter(a => !a.no && (a.ins.includes(sta) || a.ins == 'すべて')).map(a => a.name).forEach(name => {
             loaC.imgT += 1;
-            // loaC.imgL.enemies.push(name);
+            // Images.enemies.push(name);
             
-            if(sta != 'すべて') loaC.imgL.enemies[sta].push(name);
-            else for(let sta2 of stas0) loaC.imgL.enemies[sta2].push(name);
+            if(sta != 'すべて') Images.enemies[sta].push(name);
+            else for(let sta2 of stas0) Images.enemies[sta2].push(name);
         });
     }
 
-    loaC.imgL.charas = [];
+    Images.charas = [];
     for(let ch of Charas){
         let toku = 0;
         if(ch.name == "color_slime") toku = 1;
         if(toku == 0){
             let img = `${ch.img}`;
-            loaC.imgL.charas.push(img);
+            Images.charas.push(img);
         }
         else{
             switch(ch.name){
                 case "color_slime":
                     for(let c of ch.data.colors){
                         let img = `${ch.data.colorp}${c}`;
-                        loaC.imgL.charas.push(img);
+                        Images.charas.push(img);
                     }
             }
         }
@@ -1119,7 +1137,7 @@ loaF.loadI = async() => {
 
     // console.log('LETS GOOOOOOOOOOO!!')
     let T1 = (Tk) => {
-        let Tv = loaC.imgL[Tk];
+        let Tv = Images[Tk];
         if(Array.isArray(Tv)) return loaC.imgT += Tv.length;
         
         T0(Tv);
@@ -1178,7 +1196,7 @@ loaF.loadI = async() => {
         return 0;
     }
 
-    // let gensho = Object.keys(loaC.imgL);
+    // let gensho = Object.keys(Images);
     let loaloa0 = async(mono, route = []) => {
         let sink = route.length ? 1 : 0
         // if(sink) console.log("not Arrayでした lets 再帰");
@@ -1215,63 +1233,131 @@ loaF.loadI = async() => {
         loaC.deep -= 1;
     }
 
-    loaloa0(loaC.imgL);
+    loaloa0(Images);
 
 }
 
 loaF.loadS = async() => {
-    loaC.souL.forEach(num => {
-        let sound = new Audio();
-        sound.preload = 'auto';
-        sound.src = `assets/sounds/${num}.mp3`;
-        sound.addEventListener('canplaythrough', () => {
-            // console.log(`Sound ${num} loaded.`);
-            loaC.souD += 1;
-            if(loaC.souD == loaC.souT) start();
-        }, {once: 1});
-        sound.onerror = () => {
-            console.error(`Sound ${num} failed to load.`);
-            loaC.erd += 1;
-            if(loaC.erd > 20) return console.error('さすがにやりすぎbonus'), 1;
-            sound.src = `assets/sounds/error.mp3`;
-            loaC.souD += 1;
-            if(loaC.souD == loaC.souT) start();
-        };
-        sounds[num] = sound;
-    });
+    let kasan = () => {
+        loaC.souD += 1;
+        if(loaC.souD == loaC.souT) loaF.end();
+    }
+    
+    if(loaC.souT == 0) return loaF.end();
+    for(let belong in Sounds){
+        sounds[belong] = {};
+
+        for(let name of Sounds[belong]){
+            let sound = new Audio();
+            sound.preload = 'auto';
+            sound.src = `assets/sounds/${belong}/${name}.mp3`;
+            if(belong == 'bgm'){
+                sound.loop = 1;
+                sound.dataset.type = 'bgm';
+                sound.volume = souC.bgm;
+            }
+            if(belong == 'se'){
+                sound.dataset.type = 'se';
+                sound.volume = souC.se;
+            }
+            sound.addEventListener('canplaythrough', () => {
+                kasan();
+            }, {once: 1});
+            sound.onerror = () => {
+                console.error(`Sound assets/sounds/${belong}/${name} failed to load.`);
+                loaC.erd += 1;
+                 if(loaC.erd > 20) return console.error('さすがにやりすぎbonus'), 1;
+                sound.src = `assets/sounds/se/error.mp3`;
+                kasan();
+            };
+
+            sounds[belong][name] = sound;
+        }
+    };
+}
+loaF.end = () => {
+    console.log(`images & sounds loaded! (error: ${loaC.erd})`);
+    soundVolume(50);
+    start();
 }
 
 let souC = {
-    volume: 0.5
+    se: 0.5,
+    bgm: 0.5,
+    nowBgm: null
 }
-
 function soundPlay(name){
-    let sound = sounds[name];
-    if(!sound) return soundPlay("error");
+    if(!sounds[name]) return soundPlay('error');
+    let proto = sounds[name];
 
-    sound.currentTime = 0;
-    sound.volume = souC.volume;
-    sound.play();
+    if(proto.dataset.type == 'bgm'){
+        if(souC.nowBgm == name && !proto.paused) return;
+        if(souC.nowBgm && sounds[souC.nowBgm] && !sounds[souC.nowBgm].paused){
+            sounds[souC.nowBgm].pause();
+            sounds[souC.nowBgm].currentTime = 0;
+        }
+        proto.volume = souC.bgm;
+        proto.play().catch(e => console.warn('BGM 再生エラー', e));
+        souC.nowBgm = name;
+    }else{
+        let clone = proto.cloneNode(1);
+        clone.volume = souC.se;
+        clone.dataset.type = 'se';
+        clone.addEventListener('ended', ()=> {
+            try{clone.src = '';}catch(e){}
+        });
+        clone.play().catch(e => console.warn('SE 再生エラー', e));
+    }
 }
-
 function soundStop(){
-    document.querySelectorAll('audio,video').forEach(el => {
-        el.pause();
-        el.currentTime = 0;
+    Object.keys(sounds).forEach(k => {
+        try{
+            sounds[k].pause();
+            sounds[k].currentTime = 0;
+        }catch(e){}
     });
+    souC.nowBgm = null;
+    document.querySelectorAll('audio,video').forEach(el => { el.pause(); el.currentTime = 0; });
 }
+function soundVolume(code, val){
+    if(typeof code == 'number' && typeof val == 'undefined') val = code, code = 'both';
+    if(typeof val !== 'number') return console.error('val は数値にして');
+    let v = val;
+    if(v > 1) v = Math.max(0, Math.min(1, v/100)); // 0-100 指定を 0-1 に
+    v = Math.max(0, Math.min(1, v));
 
-function soundVolume(val){
-    let v = Math.max(0, Math.min(1, val/100));
-    console.log(`[soundVolume] ${souC.volume??null} => ${v}`);
-    souC.volume = v;
-    document.querySelectorAll('audio,video').forEach(el => {
-        el.volume = v
-    });
+    if(code == 'se' || code == 'both'){
+        souC.se = v;
+
+        for(let belong in sounds){
+            for(let name in sounds[belong]){
+                let sound = sounds[belong][name];
+                if(sound.dataset.type == 'se'){
+                    sound.volume = souC.se;
+                }
+            }
+        }
+    }
+
+    if(code == 'bgm' || code == 'both'){
+        souC.bgm = v;
+
+        for(let belong in sounds){
+            for(let name in sounds[belong]){
+                let sound = sounds[belong][name];
+                if(sound.dataset.type == 'bgm'){
+                    sound.volume = souC.bgm;
+                }
+            }
+        }
+
+        if(souC.nowBgm && sounds.bgm[souC.nowBgm]){
+            sounds.bgm[souC.nowBgm].volume = souC.bgm;
+        }
+    }
+
+    console.log(`[soundVolume] se:${souC.se} bgm:${souC.bgm}`);
 }
-
-
-document.addEventListener('DOMContentLoaded', async() => await loaF.load())
 //#endregion
 //#region 幸せになれる隠しコマンドがあるらしい
 let secrates = [
@@ -1334,7 +1420,7 @@ let secrates = [
         func: async function(){
             let img = document.getElementById('hakaisatsu');
             if(!img) return 1;
-            // console.log(img.dataset.phase);
+            console.log(img.dataset.phase);
             if(img.dataset.phase != '2') return 1;
             location.reload();
         }
@@ -1363,6 +1449,105 @@ document.addEventListener('keydown', async function(e){
     }
 })
 //#endregion
+
+
+
+
+
+// #region main
+let mainD = document.getElementById('main');
+let mainC = {
+    spa: null,
+    
+    mvlsD: document.getElementById('movlis'),
+     mvlsLD: document.querySelector('#movlis .list'),
+    mvlsi: 0
+}
+mainC.spas = [
+    {
+        name:'login',
+        rank:5,
+        back:'#865e00'
+    },
+    {
+        name:'home',
+        rank:2,
+        back:'#e3e7eb',
+        sho:1
+    },
+    {
+        name:'farm',
+        rank:2,
+        back:'#ffc744'
+    },
+    {
+        name:'title',
+        rank:7,
+        back:'#001748'
+    },
+    {
+        name:'loby',
+        rank:2,
+        back:'#87ceeb'
+    },
+    {
+        name:'dungeon',
+        rank:3,
+        back:'#8feb87'
+    },
+    {
+        name:'battle',
+        rank:4,
+        back:'#001748'
+    }
+]
+
+let mainF = {};
+mainF.move = (to) => {
+    if(mainC.spa == to) return console.log('どういうわけか もう そこにいる');
+	if(!to) return console.error(`せんぱ〜い？${to}ってどこですか〜？笑`);
+	
+	for(let a of mainC.spas) document.getElementById(a.name).classList.remove('show');
+    document.getElementById(to).classList.add('show');
+}
+
+mainF.load = () => {
+    for(let spa of mainC.spas){
+        let div = document.getElementById(spa.name);
+        if(!div) continue;
+
+        div.style.zIndex = spa.rank;
+        div.style.background = spa.back;
+    }
+}
+
+//#region movlis
+for(let n of mainC.spas){
+    let li = document.createElement('div');
+    li.textContent = n.name;
+    li.className = 'item';
+
+    li.addEventListener('click', () => mainF.move(n.name));
+
+    mainC.mvlsLD.appendChild(li);
+}
+document.addEventListener('keydown', (e) => {
+    if(e.key != 'm' || mainC.mvlsi) return;
+    mainC.mvlsD.style.left = `${OBS.mx - mainC.mvlsD.offsetWidth/2}px`;
+    mainC.mvlsD.style.top = `${OBS.my}px`;
+    mainC.mvlsD.classList.add('tog');
+    mainC.mvlsi = 1;
+})
+document.addEventListener('keyup',e => {
+    if(e.key != 'm') return;
+    mainC.mvlsD.classList.remove('tog');
+    mainC.mvlsi = 0;
+})
+//#endregion
+
+//#endregion main
+
+
 
 
 const context = {};
@@ -1720,97 +1905,6 @@ FriF.numold = (num) => {
 }
 //#endregion
 
-
-//#region areaについて
-let areC = {
-    now:null,
-}
-let areF = {};
-
-areC.list = [
-    {
-        name:'login',
-        rank:5,
-        back:'#865e00'
-    },
-    {
-        name:'home',
-        rank:2,
-        back:'#e3e7eb'
-    },
-    {
-        name:'farm',
-        rank:2,
-        back:'#ffc744'
-    },
-    {
-        name:'title',
-        rank:7,
-        back:'#001748'
-    },
-    {
-        name:'loby',
-        rank:2,
-        back:'#87ceeb'
-    },
-    {
-        name:'dungeon',
-        rank:3,
-        back:'#8feb87'
-    },
-    {
-        name:'battle',
-        rank:4,
-        back:'#001748'
-    }
-]
-
-areF.move = (to) => {
-    if(areC.now == to) return console.log('どういうわけか もう そこにいる');
-    console.log(`[area移動] ${areC.now} => ${to}`);
-
-    let area = areC.list.find(a => a.name == to);
-    if(!area) return console.log('そんなエリアないっすよ〜？');
-    
-    areC.now = area.name;
-    Style.area.back = area.back;
-    Style.area.rank = area.rank;
-    Style.tekiou();
-
-    for(let n of areC.list){
-        let div = document.getElementById(`${n.name}`);
-        if(n.name == to) div.classList.add('appe');
-        else div.classList.remove('appe');
-    }
-}
-areF.move('home');
-
-
-let movlis = document.getElementById('movlis');
-let movlising = 0;
-for(let n of areC.list){
-    let li = document.createElement('div');
-    li.textContent = n.name;
-    li.className = 'item';
-
-    li.addEventListener('click', () => areF.move(n.name));
-
-    movlis.querySelector('.list').appendChild(li);
-}
-document.addEventListener('keydown', (e) => {
-    if(e.key != 'm' || movlising) return;
-    movlis.style.left = `${OBS.mx - movlis.offsetWidth/2}px`;
-    movlis.style.top = `${OBS.my}px`;
-    movlis.classList.add('tog');
-    movlising = 1;
-})
-document.addEventListener('keyup',e => {
-    if(e.key != 'm') return;
-    movlis.classList.remove('tog');
-    movlising = 0;
-})
-
-//#endregion
 
 
 //#region ホーム
@@ -3923,15 +4017,34 @@ async function finale(cam){
 //#endregion
 
 
-async function start(){
-    console.log("====Ronto Connect connecten====")
-    soundVolume(50);
+
+
+
+//#region start
+function start(){
     Style.tekiou();
     OBS.load();
 
+    console.log("====Ronto Connect connecten====")
+    mainF.load();
     dunF.load();
     lobF.load();
 
+    mainF.move('home');
     logiF.auto();
 }
+//#endregion
+
+//#region DOM
+let LoadOfWait = async() => await loaF.load();
+if(document.readyState == "loading"){
+    document.addEventListener("DOMContentLoaded", init);
+}
+else LoadOfWait();
+
+async function init() {
+    await LoadOfWait();
+    start();
+}
+//#endregion
 
