@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Ghost Researcher's Duel - Spectral Defense</title>
+    <style>
+        :root {
+            --bg-color: #1a1a2e;
+            --panel-color: #16213e;
+            --text-color: #e94560;
+            --path-color: #0f3460;
+            --tower-spot: #533483;
+            --spawn-spot: #e94560;
+            --card-bg: #1a1a2e;
+            --hp-pip: #00ff41;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        #game-container {
+            display: flex;
+            gap: 40px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .board-wrapper {
+            text-align: center;
+        }
+
+        .board-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--text-color);
+            font-weight: bold;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(5, 60px);
+            grid-template-rows: repeat(4, 60px);
+            gap: 4px;
+            background: #000;
+            padding: 4px;
+            border-radius: 8px;
+            border: 2px solid var(--text-color);
+        }
+
+        .cell {
+            width: 60px;
+            height: 60px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        /* 地形定義 */
+        .cell.path { background-color: var(--path-color); }
+        .cell.tower-spot { background-color: var(--tower-spot); cursor: pointer; }
+        .cell.spawn-spot { background-color: #3e1621; border: 1px dashed var(--spawn-spot); cursor: pointer;}
+        .cell.goal { background-color: #4e0000; border: 2px solid gold; }
+        .cell.tower-spot:hover { filter: brightness(1.3); }
+        .cell.spawn-spot:hover { background-color: var(--spawn-spot); }
+
+        /* ユニット表示 */
+        .unit {
+            width: 80%;
+            height: 80%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            z-index: 2;
+            transition: transform 1s ease-in-out;
+        }
+
+        .hp-bar {
+            position: absolute;
+            bottom: 2px;
+            display: flex;
+            gap: 2px;
+            z-index: 3;
+        }
+
+        .hp-pip {
+            width: 8px;
+            height: 8px;
+            background-color: var(--hp-pip);
+            border-radius: 50%;
+            border: 1px solid #000;
+        }
+
+        /* UIエリア */
+        #ui-panel {
+            width: 800px;
+            background: var(--panel-color);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--text-color);
+        }
+
+        #hand {
+            display: flex;
+            gap: 10px;
+        }
+
+        .card {
+            width: 80px;
+            height: 110px;
+            background: var(--card-bg);
+            border: 2px solid var(--text-color);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: transform 0.2s, background 0.2s;
+            padding: 5px;
+            text-align: center;
+        }
+
+        .card:hover { transform: translateY(-10px); background: #252a41; }
+        .card.selected { border-color: #fff; box-shadow: 0 0 15px var(--text-color); }
+        .card.disabled { opacity: 0.5; cursor: not-allowed; }
+        .card .cost { font-weight: bold; color: gold; }
+
+        #stats {
+            text-align: right;
+            min-width: 150px;
+        }
+
+        .coin-display { font-size: 1.5rem; color: gold; font-weight: bold; }
+        .hp-display { font-size: 1.2rem; margin-bottom: 5px; }
+
+        #next-turn-btn {
+            background: var(--text-color);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #next-turn-btn:hover { filter: brightness(1.2); }
+        
+        .telegraph {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 10px;
+            height: 20px;
+        }
+
+        /* アニメーション */
+        @keyframes damage {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.2); filter: brightness(3) sepia(1); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+        .taking-damage { animation: damage 0.5s; }
+
+    </style>
+</head>
+<body>
+
+    <h2 style="margin-top:20px;">Ghost Researcher's Duel</h2>
+    <div style="font-style: italic; color: #888;">「ふむ、この幽霊たちの動き……実に興味深いと思わないか？助手君」</div>
+
+    <div id="game-container">
+        <!-- Player Board -->
+        <div class="board-wrapper">
+            <div class="board-title">Your Mansion (Defense)</div>
+            <div id="telegraph-player" class="telegraph">予告: なし</div>
+            <div id="player-grid" class="grid"></div>
+        </div>
+
+        <!-- AI Board -->
+        <div class="board-wrapper">
+            <div class="board-title">Opponent's Mansion (Attack)</div>
+            <div id="telegraph-ai" class="telegraph">予告: なし</div>
+            <div id="ai-grid" class="grid"></div>
+        </div>
+    </div>
+
+    <div id="ui-panel">
+        <div id="hand">
+            <!-- Cards will be injected here -->
+        </div>
+
+        <div style="display:flex; flex-direction:column; align-items:center;">
+            <button id="next-turn-btn">ターン終了</button>
+            <div id="turn-counter" style="margin-top:5px; color:#888;">Turn 1</div>
+        </div>
+
+        <div id="stats">
+            <div id="player-life" class="hp-display">Mansion HP: ❤️❤️❤️</div>
+            <div id="player-coins" class="coin-display">🪙 1 / 1</div>
+            <div id="ai-life" class="hp-display" style="font-size:0.9rem; color:#888;">Opponent HP: ❤️❤️❤️</div>
+        </div>
+    </div>
+
+    <script>
+        /** 
+         * ゲーム定数とデータ
+         */
+        const GRID_W = 5;
+        const GRID_H = 4;
+        const MAX_COINS = 10;
+
+        // マップ定義 (0: path, 1: tower spot, 2: spawn, 3: goal)
+        // 4x5の蛇行パス
+        const MAP_LAYOUT = [
+            [2, 0, 1, 1, 1],
+            [1, 0, 0, 0, 1],
+            [1, 1, 1, 0, 1],
+            [1, 1, 1, 0, 3]
+        ];
+
+        const PATH = [
+            {r:0, c:0}, {r:0, c:1}, {r:1, c:1}, {r:1, c:2}, {r:1, c:3}, {r:2, c:3}, {r:3, c:3}, {r:3, c:4}
+        ];
+
+        const CARD_TYPES = {
+            TOWER_LAMP: { id: 't1', name: '幽霊灯', type: 'tower', cost: 2, hp: 2, atk: 1, range: 1, icon: '🕯️', desc: '基本守備' },
+            TOWER_CANNON: { id: 't2', name: '破霊砲', type: 'tower', cost: 4, hp: 2, atk: 2, range: 2, icon: '💎', desc: '高威力長射程' },
+            ENEMY_WISP: { id: 'e1', name: 'ウィスプ', type: 'enemy', cost: 1, hp: 1, atk: 1, icon: '👻', desc: '数で攻める' },
+            ENEMY_SHADE: { id: 'e2', name: 'シェイド', type: 'enemy', cost: 3, hp: 3, atk: 1, icon: '👤', desc: '頑丈な影' }
+        };
+
+        /**
+         * ゲーム状態管理
+         */
+        let gameState = {
+            turn: 1,
+            player: {
+                coins: 1,
+                maxCoins: 1,
+                hp: 3,
+                towers: [], // {r, c, type}
+                enemies: [], // {pathIdx, type, hp}
+                hand: [],
+                telegraph: [] // 次に出現する敵
+            },
+            ai: {
+                coins: 1,
+                maxCoins: 1,
+                hp: 3,
+                towers: [],
+                enemies: [],
+                telegraph: []
+            },
+            selectedCardIndex: null
+        };
+
+        /**
+         * 初期化
+         */
+        function init() {
+            renderGrid('player-grid', 'player');
+            renderGrid('ai-grid', 'ai');
+            drawHand();
+            updateUI();
+            
+            document.getElementById('next-turn-btn').addEventListener('click', processTurn);
+        }
+
+        function renderGrid(containerId, side) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            for (let r = 0; r < GRID_H; r++) {
+                for (let c = 0; c < GRID_W; c++) {
+                    const cellType = MAP_LAYOUT[r][c];
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    if (cellType === 0) cell.classList.add('path');
+                    if (cellType === 1) cell.classList.add('tower-spot');
+                    if (cellType === 2) cell.classList.add('spawn-spot');
+                    if (cellType === 3) cell.classList.add('goal');
+                    
+                    cell.dataset.r = r;
+                    cell.dataset.c = c;
+                    cell.onclick = () => handleCellClick(side, r, c);
+                    container.appendChild(cell);
+                }
+            }
+        }
+
+        function drawHand() {
+            gameState.player.hand = [
+                CARD_TYPES.TOWER_LAMP,
+                CARD_TYPES.TOWER_CANNON,
+                CARD_TYPES.ENEMY_WISP,
+                CARD_TYPES.ENEMY_SHADE
+            ];
+            renderHand();
+        }
+
+        function renderHand() {
+            const handEl = document.getElementById('hand');
+            handEl.innerHTML = '';
+            gameState.player.hand.forEach((card, idx) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = `card ${gameState.player.coins < card.cost ? 'disabled' : ''} ${gameState.selectedCardIndex === idx ? 'selected' : ''}`;
+                cardEl.innerHTML = `
+                    <div class="cost">🪙${card.cost}</div>
+                    <div style="font-size:20px">${card.icon}</div>
+                    <div>${card.name}</div>
+                `;
+                cardEl.onclick = () => {
+                    if (gameState.player.coins >= card.cost) {
+                        gameState.selectedCardIndex = (gameState.selectedCardIndex === idx) ? null : idx;
+                        renderHand();
+                    }
+                };
+                handEl.appendChild(cardEl);
+            });
+        }
+
+        /**
+         * アクション処理
+         */
+        function handleCellClick(side, r, c) {
+            if (gameState.selectedCardIndex === null) return;
+            const card = gameState.player.hand[gameState.selectedCardIndex];
+
+            // 自陣へのタワー設置
+            if (side === 'player' && card.type === 'tower' && MAP_LAYOUT[r][c] === 1) {
+                if (gameState.player.towers.some(t => t.r === r && t.c === c)) return;
+                gameState.player.towers.push({ r, c, ...card, currentHp: card.hp });
+                finalizeAction(card.cost);
+            }
+            // 敵陣への敵送り込み
+            else if (side === 'ai' && card.type === 'enemy' && MAP_LAYOUT[r][c] === 2) {
+                gameState.ai.telegraph.push({ ...card, currentHp: card.hp });
+                finalizeAction(card.cost);
+            }
+        }
+
+        function finalizeAction(cost) {
+            gameState.player.coins -= cost;
+            gameState.selectedCardIndex = null;
+            updateUI();
+            renderHand();
+            renderUnits();
+        }
+
+        function updateUI() {
+            document.getElementById('player-coins').innerText = `🪙 ${gameState.player.coins} / ${gameState.player.maxCoins}`;
+            document.getElementById('player-life').innerText = `Mansion HP: ${'❤️'.repeat(gameState.player.hp)}`;
+            document.getElementById('ai-life').innerText = `Opponent HP: ${'❤️'.repeat(gameState.ai.hp)}`;
+            document.getElementById('turn-counter').innerText = `Turn ${gameState.turn}`;
+            
+            document.getElementById('telegraph-player').innerText = `予告: ` + 
+                (gameState.player.telegraph.length > 0 ? gameState.player.telegraph.map(e => e.icon).join(' ') : 'なし');
+            document.getElementById('telegraph-ai').innerText = `予告: ` + 
+                (gameState.ai.telegraph.length > 0 ? gameState.ai.telegraph.map(e => e.icon).join(' ') : 'なし');
+        }
+
+        function renderUnits() {
+            // 全セルのユニットをクリア
+            document.querySelectorAll('.unit').forEach(u => u.remove());
+
+            const sides = ['player', 'ai'];
+            sides.forEach(side => {
+                const grid = document.getElementById(`${side}-grid`);
+                
+                // タワー描画
+                gameState[side].towers.forEach(t => {
+                    const cell = grid.children[t.r * GRID_W + t.c];
+                    createUnitEl(cell, t);
+                });
+
+                // 敵描画
+                gameState[side].enemies.forEach(e => {
+                    const pos = PATH[e.pathIdx];
+                    const cell = grid.children[pos.r * GRID_W + pos.c];
+                    createUnitEl(cell, e);
+                });
+            });
+        }
+
+        function createUnitEl(parent, data) {
+            const el = document.createElement('div');
+            el.className = 'unit';
+            el.innerText = data.icon;
+            
+            const hpBar = document.createElement('div');
+            hpBar.className = 'hp-bar';
+            for(let i=0; i<data.currentHp; i++) {
+                const pip = document.createElement('div');
+                pip.className = 'hp-pip';
+                hpBar.appendChild(pip);
+            }
+            el.appendChild(hpBar);
+            parent.appendChild(el);
+            return el;
+        }
+
+        /**
+         * ターン進行ロジック
+         */
+        async function processTurn() {
+            const btn = document.getElementById('next-turn-btn');
+            btn.disabled = true;
+
+            // 1. AIの行動
+            executeAiTurn();
+
+            // 2. 敵の移動フェーズ
+            await moveEnemies();
+
+            // 3. 予告されていた敵の出現
+            spawnTelegraphedEnemies();
+
+            // 4. 攻撃フェーズ
+            executeAttacks();
+
+            // 5. ターン終了処理
+            gameState.turn++;
+            gameState.player.maxCoins = Math.min(MAX_COINS, gameState.player.maxCoins + 1);
+            gameState.ai.maxCoins = Math.min(MAX_COINS, gameState.ai.maxCoins + 1);
+            gameState.player.coins = gameState.player.maxCoins;
+            gameState.ai.coins = gameState.ai.maxCoins;
+
+            updateUI();
+            renderHand();
+            renderUnits();
+
+            checkGameOver();
+            btn.disabled = false;
+        }
+
+        function executeAiTurn() {
+            // AIは手持ちのコインで、まず防御（タワー）、次に攻撃（敵）を選択するシンプルな論理
+            let aiCoins = gameState.ai.coins;
+            
+            // 防御が必要か？ 自陣に敵がいたらタワーを置く
+            if (gameState.player.enemies.length > 0 && aiCoins >= 2) {
+                // 空いているタワースポットを探す
+                const spots = [];
+                for(let r=0; r<GRID_H; r++) {
+                    for(let c=0; c<GRID_W; c++) {
+                        if (MAP_LAYOUT[r][c] === 1 && !gameState.ai.towers.some(t => t.r === r && t.c === c)) {
+                            spots.push({r, c});
+                        }
+                    }
+                }
+                if (spots.length > 0) {
+                    const s = spots[Math.floor(Math.random() * spots.length)];
+                    gameState.ai.towers.push({ ...CARD_TYPES.TOWER_LAMP, r: s.r, c: s.c, currentHp: CARD_TYPES.TOWER_LAMP.hp });
+                    aiCoins -= 2;
+                }
+            }
+
+            // 余ったコインでプレイヤーに敵を送り込む
+            while (aiCoins >= 1) {
+                const card = Math.random() > 0.7 ? CARD_TYPES.ENEMY_SHADE : CARD_TYPES.ENEMY_WISP;
+                if (aiCoins >= card.cost) {
+                    gameState.player.telegraph.push({ ...card, currentHp: card.hp });
+                    aiCoins -= card.cost;
+                } else break;
+            }
+            gameState.ai.coins = aiCoins;
+        }
+
+        async function moveEnemies() {
+            const sides = ['player', 'ai'];
+            for (const side of sides) {
+                const enemies = gameState[side].enemies;
+                for (let i = enemies.length - 1; i >= 0; i--) {
+                    enemies[i].pathIdx++;
+                    // ゴール判定
+                    if (enemies[i].pathIdx >= PATH.length) {
+                        gameState[side].hp -= enemies[i].atk;
+                        enemies.splice(i, 1);
+                    }
+                }
+            }
+            renderUnits();
+            await new Promise(r => setTimeout(r, 1000)); // 移動アニメーション待機
+        }
+
+        function spawnTelegraphedEnemies() {
+            // プレイヤーが送り込んだ敵がAIの陣地に出現
+            while (gameState.ai.telegraph.length > 0) {
+                const enemy = gameState.ai.telegraph.shift();
+                gameState.ai.enemies.push({ ...enemy, pathIdx: 0 });
+            }
+            // AIが送り込んだ敵がプレイヤーの陣地に出現
+            while (gameState.player.telegraph.length > 0) {
+                const enemy = gameState.player.telegraph.shift();
+                gameState.player.enemies.push({ ...enemy, pathIdx: 0 });
+            }
+        }
+
+        function executeAttacks() {
+            const sides = ['player', 'ai'];
+            sides.forEach(side => {
+                const towers = gameState[side].towers;
+                const enemies = gameState[side].enemies;
+
+                towers.forEach(t => {
+                    // 射程内の最も進んでいる敵を狙う
+                    let target = null;
+                    let maxPathIdx = -1;
+
+                    enemies.forEach(e => {
+                        const ePos = PATH[e.pathIdx];
+                        const dist = Math.abs(t.r - ePos.r) + Math.abs(t.c - ePos.c);
+                        if (dist <= t.range && e.pathIdx > maxPathIdx) {
+                            maxPathIdx = e.pathIdx;
+                            target = e;
+                        }
+                    });
+
+                    if (target) {
+                        target.currentHp -= t.atk;
+                    }
+                });
+
+                // 死んだ敵の除去
+                gameState[side].enemies = enemies.filter(e => e.currentHp > 0);
+            });
+        }
+
+        function checkGameOver() {
+            if (gameState.player.hp <= 0 && gameState.ai.hp <= 0) {
+                alert("相打ちか……。幽霊たちも困惑しているようだぞ。");
+                location.reload();
+            } else if (gameState.player.hp <= 0) {
+                alert("私の計算に狂いがあったか……？いや、君の采配ミスだ、助手君。");
+                location.reload();
+            } else if (gameState.ai.hp <= 0) {
+                alert("素晴らしい！幽霊たちの特性を完璧に理解したようだな。");
+                location.reload();
+            }
+        }
+
+        // 実行
+        init();
+
+    </script>
+</body>
+</html>
