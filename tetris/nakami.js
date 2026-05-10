@@ -228,7 +228,7 @@ function arrayGacha(array, prob){
     if(array.length != prob.length) throw new Error("長さがあってないっす！先輩、ちゃんとチェックした方がいいっすよ〜？");
     let total = prob.reduce((sum, p) => sum + p, 0);
     let random = Math.random() * total;
-    for(let i = 0; i < array.length; i++){
+    for (let i = 0; i < array.length; i++){
         if(random < prob[i]) return array[i];
         random -= prob[i];
     };
@@ -375,7 +375,7 @@ function irohaHo(color){
 function irohaMix(c1, c2, ratio = 0.5){
     let toRGB = c => {
         c = c.replace('#', '');
-        if(c.length == 3) c = c.split('').map(x => x + x).join('');
+        if (c.length === 3) c = c.split('').map(x => x + x).join('');
         let n = parseInt(c, 16);
         return [n >> 16, (n >> 8) & 255, n & 255];
     };
@@ -398,9 +398,9 @@ function irohaRan(){
     let ato = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
     return ato;
 };
-function irohaDark(color){
+function irohaDark(color) {
     color = color.replace('#', '');
-    if(color.length == 3) color = color.split('').map(x => x + x).join('');
+    if (color.length === 3) color = color.split('').map(x => x + x).join('');
     
     let r = parseInt(color.slice(0, 2), 16);
     let g = parseInt(color.slice(2, 4), 16);
@@ -628,7 +628,7 @@ async function logText(raw){
                 let userAction = new Promise(resolve => {
 
                     function waitToClear(event){
-                        if(event.type == 'click' || event.key == 'z' || event.key == 'Enter'){
+                        if(event.type === 'click' || event.key === 'z' || event.key === 'Enter'){
                             document.removeEventListener('click', waitToClear);
                             document.removeEventListener('keydown', waitToClear);
                             resolve();
@@ -652,10 +652,10 @@ async function logText(raw){
     });
 };
 document.addEventListener('keydown', (e) => {
-    if(e.key == 'z' || e.key == 'Enter') logC.skipT = 1;
+    if(e.key === 'z' || e.key === 'Enter') logC.skipT = 1;
 });
 document.addEventListener('keyup', (e) => {
-    if(e.key == 'z' || e.key == 'Enter') logC.skipT = 0;
+    if(e.key === 'z' || e.key === 'Enter') logC.skipT = 0;
 });
 document.addEventListener('click', () => {
     logC.skipT = 1;
@@ -951,6 +951,135 @@ class alertD{
     };
 };
 //#endregion
+//#region CheckBox feat.Slider
+class Checkbox {
+    constructor(
+        name = "テキストを入力してください",
+        kitei = 0,
+        func = 0,
+        data = 0
+    ){
+        this.name = name;
+        this.kitei = kitei;
+        this.func = func;
+
+        if(!data) data = {
+            back: '#b2b2b2',
+            backed: '#2b2b2b'
+        }
+        this.data = data; //固有。func用だったりするのかも
+
+        this.make();
+        // ここでこいつをreturnしたらinstanceが消える(このclassの他の関数を作れなくなる)
+    }
+    make(){
+        let div = document.createElement('div');
+        div.className = 'checkbox';
+        if(this.kitei) div.classList.add('tog');
+        div.dataset.cl = this.kitei; //0がoff..のはず
+
+        let [cBack, cBacked] = [this.data.back, this.data.backed];
+        div.style.setProperty('--back', cBack);
+            div.style.setProperty('--back-col', irohaHo(cBack));
+        div.style.setProperty('--backed', cBacked);
+            div.style.setProperty('--backed-col', irohaHo(cBacked));
+        
+        let text = document.createElement('div');
+        text.className = 'text';
+        text.textContent = this.name;
+        div.appendChild(text);
+
+        let clcl = async () => {
+            div.dataset.cl = fl(div.dataset.cl);
+            div.classList.toggle('tog', div.dataset.cl == 1);
+
+            if(this.func) this.func();
+        };
+        div.addEventListener('click', clcl);
+
+        this.div = div;
+    };
+
+    append(parent){
+        parent.appendChild(this.div);
+    }
+};
+
+class Slider {
+    constructor(
+        name = "テキストを入力してくださ",
+        kitei = 50,
+        func = 0,
+        data = 0
+    ){
+        this.name = name;
+        this.kitei = kitei;
+        this.func = func;
+
+        if(!data) data = {
+            back: '#b2b2b2',
+            backed: '#2b2b2b'
+        }
+        this.data = data;
+
+        this.make();
+    }
+
+    make(){
+        let div = document.createElement('div');
+        div.className = `slider ${this.name}`;
+        
+        let text = document.createElement('div');
+        text.className = 'label';
+        text.textContent = `${this.name}:`;
+        div.appendChild(text);
+        
+        let range = document.createElement('input')
+        range.type = "range"
+        range.min = 0;
+        range.max = 100;
+        range.value = this.kitei;
+        range.step = 1;
+        range.addEventListener('input', (e) => {
+            let val = e.target.value;
+            let [A, B] = [this.data.back, this.data.backed];
+            /*
+            // 全体変え
+            let per = val / 100;
+            let mix = irohaMix(A, B, per);
+            range.style.setProperty('--tsuma', irohaHo(mix));
+            range.style.background = mix;
+            */
+
+            // つまみの位置で変え
+            let per = val;
+            let mix = irohaMix(A, B, 0.5);
+            range.style.setProperty('--tsuma', mix);
+            range.style.background = `
+                linear-gradient(to right,
+                    ${A} 0%,
+                    ${A} ${per - 10}%,
+                    ${mix} ${per}%,
+                    ${B} ${per + 10}%,
+                    ${B} 100%
+                )
+            `;
+
+
+            if(this.func) this.func(val);
+        })
+        div.appendChild(range);
+
+        this.div = div;
+        this.range = range;
+    }
+
+    append(parent){
+        parent.appendChild(this.div);
+        this.range.dispatchEvent(new Event('input'));
+    }
+}
+// #endregion
 //#region OBS
 let OBS = {
     keys: {},
@@ -1201,12 +1330,32 @@ function soundVolume(code, val){
 
     if(code == 'se' || code == 'both'){
         souC.se = v;
-        for(k in sounds) if(sounds[k].dataset.type == 'se') sounds[k].volume = souC.se;
+
+        for(let belong in sounds){
+            for(let name in sounds[belong]){
+                let sound = sounds[belong][name];
+                if(sound.dataset.type == 'se'){
+                    sound.volume = souC.se;
+                }
+            }
+        }
     }
+
     if(code == 'bgm' || code == 'both'){
         souC.bgm = v;
-        for(k in sounds) if(sounds[k].dataset.type == 'bgm') sounds[k].volume = souC.bgm;
-        if(souC.nowBgm && sounds[souC.nowBgm]) sounds[souC.nowBgm].volume = souC.bgm;
+
+        for(let belong in sounds){
+            for(let name in sounds[belong]){
+                let sound = sounds[belong][name];
+                if(sound.dataset.type == 'bgm'){
+                    sound.volume = souC.bgm;
+                }
+            }
+        }
+
+        if(souC.nowBgm && sounds.bgm[souC.nowBgm]){
+            sounds.bgm[souC.nowBgm].volume = souC.bgm;
+        }
     }
 
     console.log(`[soundVolume] se:${souC.se} bgm:${souC.bgm}`);
@@ -1563,10 +1712,17 @@ function arenaSweep(){
 tetF.load = () => {
     tetC.arena = createMatrix(tetC.cols, tetC.rows);
 
-
     playerReset();
     update();
 
+    let parent = tetD.querySelector('.jkTog-oya');
+    let check = new Checkbox(
+        'イベント発生',
+        0,
+        () => {
+            tetC.jk = fl(tetC.jk);
+        });
+    check.append(parent);
 }
 
 
@@ -1598,7 +1754,7 @@ let Events = {
             console.log('flip')
             tetC.jkC.originT = tetC.ctx.getTransform(); // 現在の状態を保存
             tetC.ctx.translate(0, tetC.can.height); // Y方向の反転をセット
-            tetC.ctx.tetC.scale(1, -1);
+            tetC.ctx.scale(1, -1);
         }
     },
     blackout: {
@@ -1706,9 +1862,9 @@ function resetCanvas(){//元に戻す
 
 // 10〜20秒ごとにランダムイベントを発生
 setInterval(() => {
-    if(tetC.jk == 0){return;}
+    if(!tetC.jk) return;
     randomEvent();
-}, Math.random() * 10000+ 10000); // 10〜20秒の間隔
+}, (Math.random() * 10000)+ 10000); // 10〜20秒の間隔
 
 
 function update(time = 0){
