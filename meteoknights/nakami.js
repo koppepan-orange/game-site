@@ -1751,7 +1751,7 @@ gamF.applyHit = (kind) => {
         p.vy += Vals.meteor;
     }
 
-    p.vy = gamF.clamp(p.vy, 0, 12);
+    p.vy = gamF.clamp(p.vy, 0, 48);
 };
 
 gamF.calc = (dt) => {
