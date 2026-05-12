@@ -1642,6 +1642,19 @@ gamF.start = async() => {
     gamC.last = performance.now();
 };
 
+
+const SCORE_RATINGS = [
+    { threshold: 0,     text: "はいそこ変なことしないー" },
+    { threshold: 1000,  text: "いや下手すぎ下手すぎ" },
+    { threshold: 2500,  text: "まあまあかな いや下手だわ" },
+    { threshold: 4000,  text: "んーー、、まあいい方 よくやったじゃん" },
+    { threshold: 6500,  text: "なんか、普通だね しょうもないって感じ" },
+    { threshold: 8500,  text: "いいんじゃない？" },
+    { threshold: 12000, text: "だいぶすごいと思う 誇りなよ" },
+    { threshold: 15000, text: "楽しい？それならよかった" }
+];
+const AUTHOR_BEST = 12723;
+
 gamF.finish = () => {
     if(!gamC.ing) return;
 
@@ -1651,15 +1664,12 @@ gamF.finish = () => {
 
     let score = Math.floor(gamC.distance);
     let text = "おお";
-    if(score < 1000) text = "はいそこ変なことしないー";
-    else if(score < 2500) text = "いや下手すぎ下手すぎ";
-    else if(score < 4000) text = "まあまあかな いや下手だわ";
-    else if(score < 6500) text = "んーー、、まあいい方 よくやったじゃん";
-    else if(score < 8500) text = "なんか、普通だね しょうもないって感じ";
-    else if(score < 12723) text = "いいんじゃない？";
-    else if(score == 12723) text = "おめ、それ作者の最高スコア"
-    else if(score < 15000) text = "だいぶすごいと思う 誇りなよ";
-    else if(15000 < score) text = "楽しい？それならよかった";
+	if(score === AUTHOR_BEST){
+        text = "おめ、それ作者の最高スコア";
+    }else{
+        const rating = [...SCORE_RATINGS].reverse().find(r => score >= r.threshold);
+        text = rating ? rating.text : "おお";
+    }
 
     gamC.ui.result.style.display = 'block';
     gamC.ui.result.querySelector('.resulttitle').textContent = 'Times Up!';
@@ -1724,9 +1734,9 @@ gamF.applyHit = (kind) => {
     let p = gamC.p;
 
     let Vals = {
-        blue: 0.70,
-        pink: 1.82,
-        meteor: -1.2
+        blue: 2.30,
+        pink: 4.82,
+        meteor: -3.2
     }
 
     if(kind == 'blue'){
