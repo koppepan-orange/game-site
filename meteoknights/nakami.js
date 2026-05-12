@@ -1736,7 +1736,8 @@ gamF.applyHit = (kind) => {
     let Vals = {
         blue: 2.30,
         pink: 4.82,
-        meteor: -3.2
+		
+        meteor: 0.2 //*=
     }
 
     if(kind == 'blue'){
@@ -1748,7 +1749,7 @@ gamF.applyHit = (kind) => {
     }
 
     if(kind == 'meteor'){
-        p.vy += Vals.meteor;
+        p.vy *= Vals.meteor;
     }
 
     p.vy = gamF.clamp(p.vy, 0, 48);
@@ -1827,11 +1828,21 @@ gamF.calc = (dt) => {
     gamC.spawnAcc += dt;
     let spawnGap = 500 - prog * 180;
     if(spawnGap < 180) spawnGap = 180;
+	
+	while(gamC.spawnAcc >= spawnGap){
+    	gamC.spawnAcc -= spawnGap;
 
-    while(gamC.spawnAcc >= spawnGap){
-        gamC.spawnAcc -= spawnGap;
-        gamF.spawn();
-    }
+    	let r = Math.random();
+    	let count = 1;
+
+    	if(r < 0.1) count = 3;
+    	else if(r < 0.5) count = 2;
+    	else count = 1;
+
+    	for(let i = 0; i < count; i++){
+     	   gamF.spawn();
+    	}
+	}
 
     let i = gamC.objs.length;
     while(i--){
