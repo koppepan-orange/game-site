@@ -336,9 +336,13 @@ function lsdSet(name, value){
 };
 function lsdGet(name){
     let res = localStorage.getItem(name);
-    if(res) res = JSON.parse(res);
-    else return null;
-    return res;
+    if(!res) return null;
+    try{
+        res = JSON.parse(res);
+        return res;
+    }catch(e){
+        return res;
+    };
 };
 function lsdRem(name){
     localStorage.removeItem(name);
@@ -762,7 +766,7 @@ class tk{
 
         let yoko = ['x', 'w'];
         for(let n of yoko){
-            console.log(n), console.log(eval(n));
+            // console.log(n);
             if(typeof contex[n] != 'string' || typeof contex[n] == 'string' && !contex[n].endsWith('%')) continue;
             let num = contex[n].slice(0, -1);
             contex[n] = num * window.innerWidth / 100;

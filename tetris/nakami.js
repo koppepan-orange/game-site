@@ -762,7 +762,7 @@ class tk{
 
         let yoko = ['x', 'w'];
         for(let n of yoko){
-            console.log(n), console.log(eval(n));
+            // console.log(n);
             if(typeof contex[n] != 'string' || typeof contex[n] == 'string' && !contex[n].endsWith('%')) continue;
             let num = contex[n].slice(0, -1);
             contex[n] = num * window.innerWidth / 100;
@@ -993,7 +993,7 @@ class Checkbox {
             div.dataset.cl = fl(div.dataset.cl);
             div.classList.toggle('tog', div.dataset.cl == 1);
 
-            if(this.func) this.func();
+            if(this.func) this.func(this);
         };
         div.addEventListener('click', clcl);
 
@@ -1002,6 +1002,10 @@ class Checkbox {
 
     append(parent){
         parent.appendChild(this.div);
+    };
+
+    tog(){
+        this.div.click();
     }
 };
 
@@ -1528,11 +1532,16 @@ let tetC = {
     contDD: tetD.querySelector('.controll .right'),
     contRD: tetD.querySelector('.controll .rapid'),
 
+    camoD: document.querySelector('.camo'),
+    camoOD: document.querySelector('.camoon'),
+    camoing: 0,
+    camoclick: 0,
 
     dropCounter: 0,
     dropInterval: 1000,
     lastTime: 0,
     grownow: 0,
+    pause: 0,
 
     score: 0,
     player: {
@@ -1564,38 +1573,70 @@ tetC.can.height = tetC.rows * tetC.scale;
 
 // テトリスのピース形状と色
 tetC.pieces = {
-    I: { shape: [[0, 0, 0, 0],
-                [1, 1, 1, 1],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0]], color: '#f0f8ff' },//Alice blue
+    I:{
+        shape: [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
+        color: '#f0f8ff'//Alice blue
+        // color: "#cfe9ff"
+    },
 
-    O: { shape: [[1, 1],
-                [1, 1]], color: '#4473ad' },//わわわさんの好きな色?らしい
+    O:{
+        shape: [[1, 1], [1, 1]],
+        color: '#4473ad' //わわわさんの好きな色?らしい
+    },
 
-    T: { shape: [[0, 1, 0],
-                [1, 1, 1],
-                [0, 0, 0]], color: '#a2ffa2'},//のばまんさんのよつろんの色
+    T:{
+        shape: [[0, 1, 0], [1, 1, 1], [0, 0, 0]],
+        color: '#a2ffa2' //のばまんさんのよつろんの色
+    },
 
-    J: { shape: [[1, 0, 0],
-                [1, 1, 1],
-            [0, 0, 0]], color: '#eb4682'},
+    J:{
+        shape: [[1, 0, 0], [1, 1, 1], [0, 0, 0]],
+        color: '#eb4682'
+    },
 
-    L: { shape: [[0, 0, 1],
-                [1, 1, 1],
-                [0, 0, 0]], color: '#ffa500'},
+    L:{
+        shape: [[0, 0, 1], [1, 1, 1], [0, 0, 0]],
+        color: '#ffa500'
+    },
                 
-    S: { shape: [[0, 1, 1],
-                [1, 1, 0],
-                [0, 0, 0]], color: '#c8c3dc'},
+    S:{
+        shape: [[0, 1, 1], [1, 1, 0], [0, 0, 0]],
+        color: '#c8c3dc'
+    },
 
-    Z: { shape: [[1, 1, 0],
-                [0, 1, 1],
-                [0, 0, 0]], color: '#e6325f'},
+    Z:{
+        shape: [[1, 1, 0], [0, 1, 1], [0, 0, 0]],
+        color: '#e6325f'
+    },
 };
 
 
 function tekiou(){
     tetC.scoreD.textContent = `score:${tetC.score}`;
+}
+
+tetF.pause = () => {
+    tetC.pause = fl(tetC.pause);
+
+    if(tetC.pause){
+        nicoText('一時停止');
+    }else{
+        tetC.lastTime = performance.now();
+        nicoText('再開');
+    }
+};
+
+function getGhostPos(){
+    let pos = {
+        x: tetC.player.pos.x,
+        y: tetC.player.pos.y
+    };
+
+    while(!collideAt(tetC.player.matrix, { x: pos.x, y: pos.y + 1 })){
+        pos.y++;
+    }
+
+    return pos;
 }
 
 function createMatrix(w, h){
@@ -1616,17 +1657,25 @@ function drawMatrix(matrix, offset){
         });
     });
 }
+function drawMatrixAlpha(matrix, offset, alpha){
+    tetC.ctx.save();
+    tetC.ctx.globalAlpha = alpha;
+    drawMatrix(matrix, offset);
+    tetC.ctx.restore();
+}
 
-function collide(){
-    let [m, o] = [tetC.player.matrix, tetC.player.pos];
-    for(let y = 0; y < m.length; ++y){
-        for(let x = 0; x < m[y].length; ++x){
-            if(m[y][x] !== 0 && (tetC.arena[y + o.y] && tetC.arena[y + o.y][x + o.x]) !== 0){
+function collideAt(matrix, pos){
+    for(let y = 0; y < matrix.length; ++y){
+        for(let x = 0; x < matrix[y].length; ++x){
+            if(matrix[y][x] !== 0 && (tetC.arena[y + pos.y] && tetC.arena[y + pos.y][x + pos.x]) !== 0){
                 return true;
             }
         }
     }
     return false;
+}
+function collide(){
+    return collideAt(tetC.player.matrix, tetC.player.pos);
 }
 
 function merge(){
@@ -1716,15 +1765,59 @@ tetF.load = () => {
     update();
 
     let parent = tetD.querySelector('.jkTog-oya');
-    let check = new Checkbox(
+    let jk = new Checkbox(
         'イベント発生',
         0,
         () => {
             tetC.jk = fl(tetC.jk);
         });
-    check.append(parent);
+    jk.append(parent);
+
+    let pause = new Checkbox(
+        '一時停止',
+        0,
+        () => {
+            tetF.pause();
+        });
+    pause.append(parent);
+
+    let camo = new Checkbox(
+        'カモ',
+        0,
+        () => {
+            if(tetC.camoing) return;
+            tetF.camo();
+            tetC.camoing = 1;
+        });
+    camo.append(parent);
+    tetC.camoBD = camo;
+
+    let footer = document.getElementById('footer');
+    let camodiv = new Checkbox(
+        'カモクリック',
+        0,
+        () => {
+            tetC.camoclick = fl(tetC.camoclick);
+        });
+    camodiv.append(footer);
 }
 
+tetF.camo = () => {
+    let ifr = tetC.camoD;
+    let ifrO = tetC.camoOD;
+    ifr.src = "https://keirinkan.sinewave-service.net/#/";
+    ifr.classList.add('show')
+    if(!tetC.camoclick) ifrO.classList.add('show')
+
+    let close = () => {
+        ifr.classList.remove('show');
+        ifrO.classList.remove('show');
+        tetC.camoBD.tog();
+        tetC.camoing = 0;
+        ifrO.removeEventListener('click', close);
+    }
+    ifrO.addEventListener('click', close);
+}
 
 
 let Events = {
@@ -1871,13 +1964,23 @@ function update(time = 0){
     let deltaTime = time - tetC.lastTime;
     tetC.lastTime = time;
 
+    if(tetC.pause){
+        requestAnimationFrame(update);
+        return;
+    }
+
     tetC.dropCounter += deltaTime;
     if(tetC.dropCounter > tetC.dropInterval){
         playerDrop();
     }
 
     tetC.ctx.clearRect(0, 0, tetC.can.width, tetC.can.height);
+
     drawMatrix(tetC.arena, { x: 0, y: 0 });
+
+    let ghostPos = getGhostPos();
+    drawMatrixAlpha(tetC.player.matrix, ghostPos, 0.2);
+
     drawMatrix(tetC.player.matrix, tetC.player.pos);
     drawGrid();
 

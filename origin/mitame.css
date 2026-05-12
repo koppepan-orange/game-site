@@ -301,6 +301,58 @@ img{
 }
 /* #endregion */
 
+/* #region checkbox　& slider */
+.checkbox{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: 100px;
+    aspect-ratio: 3/1;
+    padding: 0 5px;
+    background: var(--back, #b2b2b2);
+        color: var(--back-col, #2b2b2b);
+        transition: background 0.25s, color 0.25s;
+    position: relative;
+    border-radius: 20px;
+}
+.checkbox.tog{
+    background: var(--backed, #2b2b2b);
+        color: var(--backed-col, #b2b2b2);
+}
+.checkbox .text{
+    font-family: comicsans;
+}
+
+input[type="range"].slider{
+    /* スライダー */
+    appearance: none;
+    width: 100px;
+    height: 10px;
+    background: #b2b2b2;
+    border-radius: 5px;
+}
+
+input[type="range"].slider::-webkit-slider-thumb{
+    /* つまみ */
+    appearance: none;
+    height: 25px;
+    aspect-ratio: 1/1;
+    background: var(--tsuma, #2b2b2b);
+    /* border-radius: 50%; */
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+input[type="range"].slider::-webkit-slider-thumb:hover{
+    /* つまみ（ホバー） */
+    transform: scale(1.2);
+}
+/* #endregion */
+
+
 /* #region movlis */
 #movlis{
     display: none;

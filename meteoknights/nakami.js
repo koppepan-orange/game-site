@@ -762,7 +762,7 @@ class tk{
 
         let yoko = ['x', 'w'];
         for(let n of yoko){
-            console.log(n), console.log(eval(n));
+            // console.log(n);
             if(typeof contex[n] != 'string' || typeof contex[n] == 'string' && !contex[n].endsWith('%')) continue;
             let num = contex[n].slice(0, -1);
             contex[n] = num * window.innerWidth / 100;
@@ -951,6 +951,135 @@ class alertD{
     };
 };
 //#endregion
+//#region CheckBox feat.Slider
+class Checkbox {
+    constructor(
+        name = "テキストを入力してください",
+        kitei = 0,
+        func = 0,
+        data = 0
+    ){
+        this.name = name;
+        this.kitei = kitei;
+        this.func = func;
+
+        if(!data) data = {
+            back: '#b2b2b2',
+            backed: '#2b2b2b'
+        }
+        this.data = data; //固有。func用だったりするのかも
+
+        this.make();
+        // ここでこいつをreturnしたらinstanceが消える(このclassの他の関数を作れなくなる)
+    }
+    make(){
+        let div = document.createElement('div');
+        div.className = 'checkbox';
+        if(this.kitei) div.classList.add('tog');
+        div.dataset.cl = this.kitei; //0がoff..のはず
+
+        let [cBack, cBacked] = [this.data.back, this.data.backed];
+        div.style.setProperty('--back', cBack);
+            div.style.setProperty('--back-col', irohaHo(cBack));
+        div.style.setProperty('--backed', cBacked);
+            div.style.setProperty('--backed-col', irohaHo(cBacked));
+        
+        let text = document.createElement('div');
+        text.className = 'text';
+        text.textContent = this.name;
+        div.appendChild(text);
+
+        let clcl = async () => {
+            div.dataset.cl = fl(div.dataset.cl);
+            div.classList.toggle('tog', div.dataset.cl == 1);
+
+            if(this.func) this.func();
+        };
+        div.addEventListener('click', clcl);
+
+        this.div = div;
+    };
+
+    append(parent){
+        parent.appendChild(this.div);
+    }
+};
+
+class Slider {
+    constructor(
+        name = "テキストを入力してくださ",
+        kitei = 50,
+        func = 0,
+        data = 0
+    ){
+        this.name = name;
+        this.kitei = kitei;
+        this.func = func;
+
+        if(!data) data = {
+            back: '#b2b2b2',
+            backed: '#2b2b2b'
+        }
+        this.data = data;
+
+        this.make();
+    }
+
+    make(){
+        let div = document.createElement('div');
+        div.className = `slider ${this.name}`;
+        
+        let text = document.createElement('div');
+        text.className = 'label';
+        text.textContent = `${this.name}:`;
+        div.appendChild(text);
+        
+        let range = document.createElement('input')
+        range.type = "range"
+        range.min = 0;
+        range.max = 100;
+        range.value = this.kitei;
+        range.step = 1;
+        range.addEventListener('input', (e) => {
+            let val = e.target.value;
+            let [A, B] = [this.data.back, this.data.backed];
+            /*
+            // 全体変え
+            let per = val / 100;
+            let mix = irohaMix(A, B, per);
+            range.style.setProperty('--tsuma', irohaHo(mix));
+            range.style.background = mix;
+            */
+
+            // つまみの位置で変え
+            let per = val;
+            let mix = irohaMix(A, B, 0.5);
+            range.style.setProperty('--tsuma', mix);
+            range.style.background = `
+                linear-gradient(to right,
+                    ${A} 0%,
+                    ${A} ${per - 10}%,
+                    ${mix} ${per}%,
+                    ${B} ${per + 10}%,
+                    ${B} 100%
+                )
+            `;
+
+
+            if(this.func) this.func(val);
+        })
+        div.appendChild(range);
+
+        this.div = div;
+        this.range = range;
+    }
+
+    append(parent){
+        parent.appendChild(this.div);
+        this.range.dispatchEvent(new Event('input'));
+    }
+}
+// #endregion
 //#region OBS
 let OBS = {
     keys: {},
@@ -1201,12 +1330,32 @@ function soundVolume(code, val){
 
     if(code == 'se' || code == 'both'){
         souC.se = v;
-        for(k in sounds) if(sounds[k].dataset.type == 'se') sounds[k].volume = souC.se;
+
+        for(let belong in sounds){
+            for(let name in sounds[belong]){
+                let sound = sounds[belong][name];
+                if(sound.dataset.type == 'se'){
+                    sound.volume = souC.se;
+                }
+            }
+        }
     }
+
     if(code == 'bgm' || code == 'both'){
         souC.bgm = v;
-        for(k in sounds) if(sounds[k].dataset.type == 'bgm') sounds[k].volume = souC.bgm;
-        if(souC.nowBgm && sounds[souC.nowBgm]) sounds[souC.nowBgm].volume = souC.bgm;
+
+        for(let belong in sounds){
+            for(let name in sounds[belong]){
+                let sound = sounds[belong][name];
+                if(sound.dataset.type == 'bgm'){
+                    sound.volume = souC.bgm;
+                }
+            }
+        }
+
+        if(souC.nowBgm && sounds.bgm[souC.nowBgm]){
+            sounds.bgm[souC.nowBgm].volume = souC.bgm;
+        }
     }
 
     console.log(`[soundVolume] se:${souC.se} bgm:${souC.bgm}`);
@@ -1410,7 +1559,6 @@ let gamC = {
         vy: 0.9
     },
 
-    pad: null,
     touch: {
         ing: 0,
         sx: 0,
@@ -1421,12 +1569,22 @@ let gamC = {
         dx: 0  // ★追加：開始地点からの移動距離を保持する
     },
 
-    ui: {
-        timer: null,
-        dist: null,
-        count: null,
-        result: null,
-        retry: null
+    uiD: gamD.querySelector('.ui'),
+    uis: {
+        timer: gamD.querySelector('.ui .timer'),
+        dist: gamD.querySelector('.ui .dist'),
+        count: gamD.querySelector('.countdown'),
+        result: gamD.querySelector('.result'),
+        title: gamD.querySelector('.result .title'),
+        text: gamD.querySelector('.result .text'),
+        retry: gamD.querySelector('.result .retry')
+    },
+
+    resD: gamD.querySelector('.result'),
+    resC: {
+        titleD: gamD.querySelector('.result .title'),
+        textD: gamD.querySelector('.result .text'),
+        retryB: gamD.querySelector('.result .retry')
     }
 };
 let gamF = {};
@@ -1443,141 +1601,6 @@ gamF.load = () => {
     gamC.can = can;
     gamC.ctx = can.getContext('2d');
 
-    let ui = document.createElement('div');
-    ui.className = 'gameui';
-    ui.style.cssText = `
-        position:absolute;
-        inset:0;
-        pointer-events:none;
-        font-family:sans-serif;
-    `;
-
-    let timer = document.createElement('div');
-    timer.className = 'gametimer';
-    timer.style.cssText = `
-        position:absolute;
-        left:12px;
-        top:10px;
-        color:#d8f1ff;
-        font-size:16px;
-        font-weight:700;
-        text-shadow:0 1px 3px rgba(0,0,0,.6);
-    `;
-    ui.appendChild(timer);
-
-    let dist = document.createElement('div');
-    dist.className = 'gamedist';
-    dist.style.cssText = `
-        position:absolute;
-        left:12px;
-        top:34px;
-        color:#d8f1ff;
-        font-size:14px;
-        font-weight:700;
-        text-shadow:0 1px 3px rgba(0,0,0,.6);
-    `;
-    ui.appendChild(dist);
-
-    let count = document.createElement('div');
-    count.className = 'countdown';
-    count.style.cssText = `
-        position:absolute;
-        left:50%;
-        top:42%;
-        transform:translate(-50%, -50%);
-        color:#ffffff;
-        font-size:64px;
-        font-weight:900;
-        letter-spacing:.08em;
-        text-shadow:0 4px 12px rgba(0,0,0,.7);
-        opacity:0;
-        transition:opacity .18s linear;
-    `;
-    ui.appendChild(count);
-
-    let result = document.createElement('div');
-    result.className = 'resultbox';
-    result.style.cssText = `
-        position:absolute;
-        left:50%;
-        top:50%;
-        transform:translate(-50%, -50%);
-        width:min(320px, calc(100vw - 28px));
-        background:rgba(0, 18, 38, .88);
-        border:1px solid rgba(181, 208, 255, .35);
-        border-radius:18px;
-        padding:18px 16px;
-        color:#e9f6ff;
-        box-shadow:0 10px 30px rgba(0,0,0,.35);
-        display:none;
-        pointer-events:auto;
-        text-align:center;
-    `;
-
-    let resultTitle = document.createElement('div');
-    resultTitle.className = 'resulttitle';
-    resultTitle.style.cssText = `
-        font-size:18px;
-        font-weight:800;
-        margin-bottom:8px;
-    `;
-    result.appendChild(resultTitle);
-
-    let resultText = document.createElement('div');
-    resultText.className = 'resulttext';
-    resultText.style.cssText = `
-        font-size:16px;
-        line-height:1.6;
-        margin-bottom:14px;
-    `;
-    result.appendChild(resultText);
-
-    let retry = document.createElement('button');
-    retry.type = 'button';
-    retry.textContent = 'もう一回';
-    retry.style.cssText = `
-        appearance:none;
-        border:none;
-        background:#b5d0ff;
-        color:#00203b;
-        font-weight:800;
-        border-radius:999px;
-        padding:10px 18px;
-        cursor:pointer;
-        pointer-events:auto;
-    `;
-    result.appendChild(retry);
-
-    ui.appendChild(result);
-    gamD.appendChild(ui);
-
-    let pad = document.createElement('div');
-    pad.className = 'pad';
-    pad.style.cssText = `
-        position:absolute;
-        width:70px;
-        height:70px;
-        border-radius:50%;
-        border:2px solid rgba(181, 208, 255, .65);
-        background:rgba(181, 208, 255, .12);
-        transform:translate(-50%, -50%);
-        pointer-events:none;
-        opacity:0;
-        transition:opacity .12s linear;
-        box-sizing:border-box;
-    `;
-    gamD.appendChild(pad);
-
-    gamC.pad = pad;
-    gamC.ui.timer = timer;
-    gamC.ui.dist = dist;
-    gamC.ui.count = count;
-    gamC.ui.result = result;
-    gamC.ui.retry = retry;
-
-    retry.addEventListener('click', () => {
-        gamF.start();
-    });
 
     gamF.resize();
 };
@@ -1596,6 +1619,8 @@ gamF.resize = () => {
 window.addEventListener('resize', gamF.resize);
 
 gamF.reset = () => {
+    gamC.uis.result.classList.remove('show');
+
     let p = gamC.p;
     p.x = (gamC.wid - p.w) / 2;
     p.vx = 0;
@@ -1608,11 +1633,10 @@ gamF.reset = () => {
     gamC.bgY = 0;
     gamC.distance = 0;
 
-    gamC.ui.timer.textContent = '';
-    gamC.ui.dist.textContent = '';
-    gamC.ui.count.style.opacity = '0';
-    gamC.ui.count.textContent = '';
-    gamC.ui.result.style.display = 'none';
+    gamC.uis.timer.textContent = '';
+    gamC.uis.dist.textContent = '';
+    gamC.uis.count.textContent = '';
+    gamC.uis.count.classList.remove('show');
 };
 
 gamF.start = async() => {
@@ -1626,21 +1650,23 @@ gamF.start = async() => {
     gamF.reset();
     gamF.gameloop();
 
-    for(let i = 3; i >= 1; i--){
+    gamC.uis.count.classList.add('show');
+    for(let i=3; i>=1; i--){
         if(!gamC.ing) return;
-        gamC.ui.count.textContent = String(i);
-        gamC.ui.count.style.opacity = '1';
+        gamC.uis.count.textContent = i;
         await delay(1000);
     }
 
     if(!gamC.ing) return;
-    gamC.ui.count.textContent = 'GO!';
+    gamC.uis.count.textContent = 'GO!';
     await delay(550);
-    gamC.ui.count.style.opacity = '0';
+    gamC.uis.count.classList.remove('show');
 
     gamC.running = 1;
     gamC.last = performance.now();
 };
+
+gamC.uis.retry.addEventListener('click', gamF.start);
 
 
 const SCORE_RATINGS = [
@@ -1671,10 +1697,9 @@ gamF.finish = () => {
         text = rating ? rating.text : "おお";
     }
 
-    gamC.ui.result.style.display = 'block';
-    gamC.ui.result.querySelector('.resulttitle').textContent = 'Times Up!';
-    gamC.ui.result.querySelector('.resulttext').innerHTML =
-        `進んだ距離：<b>${score}m</b><br>${text}`;
+    gamC.uis.title.textContent = '時間アゲ↑↑';
+    gamC.uis.text.innerHTML =`進んだ距離：<b>${score}m</b><br>${text}`;
+    gamC.uis.result.classList.add('show');
 };
 
 gamF.spawn = () => {
@@ -1968,8 +1993,8 @@ gamF.draw = () => {
     ctx.fillStyle = '#dff0ff';
     ctx.fillRect(p.x + 8, p.y + 6, 10, 4);
 
-    gamC.ui.timer.textContent = `TIME ${Math.ceil(gamC.timeLeft)}s`;
-    gamC.ui.dist.textContent = `DIST ${Math.floor(gamC.distance)}`;
+    gamC.uis.timer.textContent = `TIME ${Math.ceil(gamC.timeLeft)}s`;
+    gamC.uis.dist.textContent = `DIST ${Math.floor(gamC.distance)}`;
 };
 
 gamF.gameloop = (now) => {
@@ -1996,12 +2021,7 @@ window.addEventListener('touchstart', function(e){
     gamC.touch.sx = t.clientX;
     gamC.touch.px = gamC.p.x; // ★重要：今の自機の位置を覚えておく
     gamC.touch.dx = 0;        // 移動量をリセット
-
-    // パッドの表示位置（視覚的なガイドとして残すなら）
-    gamC.pad.style.left = t.clientX + 'px';
-    gamC.pad.style.top = t.clientY + 'px';
-    gamC.pad.style.opacity = '1';
-}, { passive: false });
+});
 
 // touchmove 内
 window.addEventListener('touchmove', function(e){
@@ -2011,7 +2031,7 @@ window.addEventListener('touchmove', function(e){
 
     // ★指が開始地点からどれだけ動いたかを記録
     gamC.touch.dx = t.clientX - gamC.touch.sx;
-}, { passive: false });
+});
 
 //#endregion
 
