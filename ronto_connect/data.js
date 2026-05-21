@@ -40,6 +40,45 @@ const Sounds = {
 const Fonts = [
     // {src:'comicsans', type:'ttf'},
 ];
+const Spaces = [
+    {
+        name:'login',
+        rank:5,
+        back:'#865e00'
+    },
+    {
+        name:'home',
+        rank:2,
+        back:'#e3e7eb',
+        sho:1
+    },
+    {
+        name:'farm',
+        rank:2,
+        back:'#ffc744'
+    },
+    {
+        name:'title',
+        rank:7,
+        back:'#001748'
+    },
+    {
+        name:'loby',
+        rank:2,
+        back:'#87ceeb'
+    },
+    {
+        name:'dungeon',
+        rank:3,
+        back:'#8feb87'
+    },
+    {
+        name:'battle',
+        rank:4,
+        back:'#001748'
+    }
+]
+
 
 
 let Status = [

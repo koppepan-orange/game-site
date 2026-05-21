@@ -26,3 +26,8 @@ const Sounds = {
     // bgm:[],
 }
 
+const Spaces = [
+    { name:'home', rank:2, back:'#f0f8ff', sho:1 }, 
+];
+
+

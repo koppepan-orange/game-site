@@ -1463,56 +1463,17 @@ let mainC = {
      mvlsLD: document.querySelector('#movlis .list'),
     mvlsi: 0
 }
-mainC.spas = [
-    {
-        name:'login',
-        rank:5,
-        back:'#865e00'
-    },
-    {
-        name:'home',
-        rank:2,
-        back:'#e3e7eb',
-        sho:1
-    },
-    {
-        name:'farm',
-        rank:2,
-        back:'#ffc744'
-    },
-    {
-        name:'title',
-        rank:7,
-        back:'#001748'
-    },
-    {
-        name:'loby',
-        rank:2,
-        back:'#87ceeb'
-    },
-    {
-        name:'dungeon',
-        rank:3,
-        back:'#8feb87'
-    },
-    {
-        name:'battle',
-        rank:4,
-        back:'#001748'
-    }
-]
-
 let mainF = {};
 mainF.move = (to) => {
     if(mainC.spa == to) return console.log('どういうわけか もう そこにいる');
 	if(!to) return console.error(`せんぱ〜い？${to}ってどこですか〜？笑`);
 	
-	for(let a of mainC.spas) document.getElementById(a.name).classList.remove('show');
+	for(let a of Spaces) document.getElementById(a.name).classList.remove('show');
     document.getElementById(to).classList.add('show');
 }
 
 mainF.load = () => {
-    for(let spa of mainC.spas){
+    for(let spa of Spaces){
         let div = document.getElementById(spa.name);
         if(!div) continue;
 
@@ -1522,7 +1483,7 @@ mainF.load = () => {
 }
 
 //#region movlis
-for(let n of mainC.spas){
+for(let n of Spaces){
     let li = document.createElement('div');
     li.textContent = n.name;
     li.className = 'item';

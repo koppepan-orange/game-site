@@ -14,6 +14,25 @@ let Style = {
         }
     }
 }
+const Fonts = [
+    {src:'comicsans', type:'ttf'},
+    {src:'hangyaku', type:'ttf'},
+    {src:'kurobara', type:'ttf'},
+    {src:'misaki', type:'ttf'},
+];
+const Images = {
+    systems:['error'],
+    maps:['none', 'event', 'event_break', 'start', 'boss', 'enemy', 'enemy_gachi', 'enemy_metal', 'enemy_gold', 'enemy-high', 'fire_maki', 'chest_a', 'chest_b', 'chest_c', 'chest_d']
+}
+const Sounds = {
+    // se:['error'],
+    // bgm:[],
+}
+const Spaces = [
+    { name:'home', rank:3, back:'#1c3d59', sho:1 },
+    { name:'map', rank:2, back:'#363636' },
+    { name:'battle', rank:4, back:'#a53434' },
+]
 
 
 let mapItems = [
@@ -128,6 +147,18 @@ let mapItems = [
     }
 ]
 
+
+let Players = [
+    {
+        name: "shaman",
+        // alias: "LETS DO THIS", //oshama scramble
+        alias: "シャバシャバ屋ぁ",
+        flav: `
+        相手の攻撃力を下げたりするおばあちゃん。あとツタで捕まえたり壁に穴をあけたり自身の耐性・行動速度を上げたりする。ってもうそれはあの人やないかーーーーーーーーi\nちなみに今はこの人しかいないわよ。この先もしばらくはずっと
+        `,
+        
+    }
+]
 
 let Cards = [
     {

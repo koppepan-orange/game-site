@@ -375,6 +375,8 @@ img{
 .space{
     display: none;
     flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
     width: 100%;
     height: 100%;
     position: absolute;
@@ -389,6 +391,32 @@ img{
 }
 
 
+/* #region home */
+#home{
+    content: "home";
+    color: #f0f8ff;
+}
+#home .select{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: fit-content;
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: var(--mostop);
+}
+#home .select .item{
+    width: 150px;
+    aspect-ratio: 4/1;
+    background: #cfe9ff;
+    border: 3px solid #ffffff;
+}
+/* #endregion */
 
 #map{
     padding: 50px 20px;

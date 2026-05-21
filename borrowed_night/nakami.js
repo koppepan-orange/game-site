@@ -146,8 +146,7 @@ function kaikyu(sta, end, row, val){
 
     return arr;
 };
-
-async function tousa(moto, key, d, n, wait = 0, s = 0, tabini = 0){
+async function tousa(moto, key, d, n, wait = 0, s = 0){
     // type:: kouならi<n madeならwhileでif抜け
 	let a = moto[key]; //初項
 	if(a != 0 && (!a || typeof a != "number")) return console.error("..それ数字じゃないです...."), 1;
@@ -161,7 +160,6 @@ async function tousa(moto, key, d, n, wait = 0, s = 0, tabini = 0){
     for(let i=0; i<n; i++){
         await delay(wait);
         moto[key] += d;
-        if(tabini != 0) tabini(moto[key]);
     }
 }
 async function touhi(moto, key, r, n, wait = 0, s = 0){
@@ -338,9 +336,13 @@ function lsdSet(name, value){
 };
 function lsdGet(name){
     let res = localStorage.getItem(name);
-    if(res) res = JSON.parse(res);
-    else return null;
-    return res;
+    if(!res) return null;
+    try{
+        res = JSON.parse(res);
+        return res;
+    }catch(e){
+        return res;
+    };
 };
 function lsdRem(name){
     localStorage.removeItem(name);
@@ -764,7 +766,7 @@ class tk{
 
         let yoko = ['x', 'w'];
         for(let n of yoko){
-            console.log(n), console.log(eval(n));
+            // console.log(n);
             if(typeof contex[n] != 'string' || typeof contex[n] == 'string' && !contex[n].endsWith('%')) continue;
             let num = contex[n].slice(0, -1);
             contex[n] = num * window.innerWidth / 100;
@@ -953,6 +955,135 @@ class alertD{
     };
 };
 //#endregion
+//#region CheckBox feat.Slider
+class Checkbox {
+    constructor(
+        name = "テキストを入力してください",
+        kitei = 0,
+        func = 0,
+        data = 0
+    ){
+        this.name = name;
+        this.kitei = kitei;
+        this.func = func;
+
+        if(!data) data = {
+            back: '#b2b2b2',
+            backed: '#2b2b2b'
+        }
+        this.data = data; //固有。func用だったりするのかも
+
+        this.make();
+        // ここでこいつをreturnしたらinstanceが消える(このclassの他の関数を作れなくなる)
+    }
+    make(){
+        let div = document.createElement('div');
+        div.className = 'checkbox';
+        if(this.kitei) div.classList.add('tog');
+        div.dataset.cl = this.kitei; //0がoff..のはず
+
+        let [cBack, cBacked] = [this.data.back, this.data.backed];
+        div.style.setProperty('--back', cBack);
+            div.style.setProperty('--back-col', irohaHo(cBack));
+        div.style.setProperty('--backed', cBacked);
+            div.style.setProperty('--backed-col', irohaHo(cBacked));
+        
+        let text = document.createElement('div');
+        text.className = 'text';
+        text.textContent = this.name;
+        div.appendChild(text);
+
+        let clcl = async () => {
+            div.dataset.cl = fl(div.dataset.cl);
+            div.classList.toggle('tog', div.dataset.cl == 1);
+
+            if(this.func) this.func();
+        };
+        div.addEventListener('click', clcl);
+
+        this.div = div;
+    };
+
+    append(parent){
+        parent.appendChild(this.div);
+    }
+};
+
+class Slider {
+    constructor(
+        name = "テキストを入力してくださ",
+        kitei = 50,
+        func = 0,
+        data = 0
+    ){
+        this.name = name;
+        this.kitei = kitei;
+        this.func = func;
+
+        if(!data) data = {
+            back: '#b2b2b2',
+            backed: '#2b2b2b'
+        }
+        this.data = data;
+
+        this.make();
+    }
+
+    make(){
+        let div = document.createElement('div');
+        div.className = `slider ${this.name}`;
+        
+        let text = document.createElement('div');
+        text.className = 'label';
+        text.textContent = `${this.name}:`;
+        div.appendChild(text);
+        
+        let range = document.createElement('input')
+        range.type = "range"
+        range.min = 0;
+        range.max = 100;
+        range.value = this.kitei;
+        range.step = 1;
+        range.addEventListener('input', (e) => {
+            let val = e.target.value;
+            let [A, B] = [this.data.back, this.data.backed];
+            /*
+            // 全体変え
+            let per = val / 100;
+            let mix = irohaMix(A, B, per);
+            range.style.setProperty('--tsuma', irohaHo(mix));
+            range.style.background = mix;
+            */
+
+            // つまみの位置で変え
+            let per = val;
+            let mix = irohaMix(A, B, 0.5);
+            range.style.setProperty('--tsuma', mix);
+            range.style.background = `
+                linear-gradient(to right,
+                    ${A} 0%,
+                    ${A} ${per - 10}%,
+                    ${mix} ${per}%,
+                    ${B} ${per + 10}%,
+                    ${B} 100%
+                )
+            `;
+
+
+            if(this.func) this.func(val);
+        })
+        div.appendChild(range);
+
+        this.div = div;
+        this.range = range;
+    }
+
+    append(parent){
+        parent.appendChild(this.div);
+        this.range.dispatchEvent(new Event('input'));
+    }
+}
+// #endregion
 //#region OBS
 let OBS = {
     keys: {},
@@ -1013,6 +1144,7 @@ OBS.load = () => {
         "Mouse": 1,
         "Click": 1,
         "Paste": 0,
+        "Context": 1,
     }
 
     if(sts["Keys"]){
@@ -1034,16 +1166,14 @@ OBS.load = () => {
     if(sts["Paste"]){
         window.addEventListener('paste', OBS.Paste);
     }
+
+    if(sts["Context"]){
+        window.addEventListener('contextmenu', e => e.preventDefault());
+    }
 }
 
 //#endregion
 //#region fonts
-const Fonts = [
-    {src:'comicsans', type:'ttf'},
-    {src:'hangyaku', type:'ttf'},
-    {src:'kurobara', type:'ttf'},
-    {src:'misaki', type:'ttf'},
-];
 function fontsLoad(){
     let id = "font_load_css";
     let existing = document.getElementById(id);
@@ -1078,17 +1208,8 @@ let loaC = {
     erd: 0
 }
 let loaF = {};
-loaC.imgL = {
-    systems:['error'],
-    maps:['none', 'event', 'event_break', 'start', 'boss', 'enemy', 'enemy_gachi', 'enemy_metal', 'enemy_gold', 'enemy-high', 'fire_maki', 'chest_a', 'chest_b', 'chest_c', 'chest_d']
-}
-loaC.imgT = Object.values(loaC.imgL).reduce((a,b) => a + b.length, 0);
-
-loaC.souL = {
-    // se:['error'],
-    // bgm:[],
-}
-loaC.souT = Object.values(loaC.souL).reduce((a,b) => a + b.length, 0);
+loaC.imgT = Object.values(Images).reduce((a,b) => a + b.length, 0);
+loaC.souT = Object.values(Sounds).reduce((a,b) => a + b.length, 0);
 
 loaF.load = async() => {
     console.log("loadを開始しました。少々お待ちください");
@@ -1102,10 +1223,10 @@ loaF.loadI = async() => {
     }
 
     if(loaC.imgT == 0) return loaF.loadS();
-    for(let belong in loaC.imgL){
+    for(let belong in Images){
         images[belong] = {};
 
-        for(let name of loaC.imgL[belong]){
+        for(let name of Images[belong]){
             let img = new Image();
             img.src = `assets/images/${belong}/${name}.png`;
             img.onload = kasan();
@@ -1129,10 +1250,10 @@ loaF.loadS = async() => {
     }
     
     if(loaC.souT == 0) return loaF.end();
-    for(let belong in loaC.souL){
+    for(let belong in Sounds){
         sounds[belong] = {};
 
-        for(let name of loaC.souL[belong]){
+        for(let name of Sounds[belong]){
             let sound = new Audio();
             sound.preload = 'auto';
             sound.src = `assets/sounds/${belong}/${name}.mp3`;
@@ -1213,12 +1334,32 @@ function soundVolume(code, val){
 
     if(code == 'se' || code == 'both'){
         souC.se = v;
-        for(k in sounds) if(sounds[k].dataset.type == 'se') sounds[k].volume = souC.se;
+
+        for(let belong in sounds){
+            for(let name in sounds[belong]){
+                let sound = sounds[belong][name];
+                if(sound.dataset.type == 'se'){
+                    sound.volume = souC.se;
+                }
+            }
+        }
     }
+
     if(code == 'bgm' || code == 'both'){
         souC.bgm = v;
-        for(k in sounds) if(sounds[k].dataset.type == 'bgm') sounds[k].volume = souC.bgm;
-        if(souC.nowBgm && sounds[souC.nowBgm]) sounds[souC.nowBgm].volume = souC.bgm;
+
+        for(let belong in sounds){
+            for(let name in sounds[belong]){
+                let sound = sounds[belong][name];
+                if(sound.dataset.type == 'bgm'){
+                    sound.volume = souC.bgm;
+                }
+            }
+        }
+
+        if(souC.nowBgm && sounds.bgm[souC.nowBgm]){
+            sounds.bgm[souC.nowBgm].volume = souC.bgm;
+        }
     }
 
     console.log(`[soundVolume] se:${souC.se} bgm:${souC.bgm}`);
@@ -1291,15 +1432,6 @@ let secrates = [
             location.reload();
         }
     },
-    {
-        ind:0,
-        name:"drill",
-        arr:['d','r','i','l','l'],
-        limit:"n",
-        func: async function(){
-            tousa(mapC.p, "drill", 1, 3, 100, 0, () => mapF.tekiou());
-        }
-    }
 ]
 document.addEventListener('keydown', async function(e){
     let key = e.key.toLowerCase();
@@ -1325,6 +1457,7 @@ document.addEventListener('keydown', async function(e){
 })
 //#endregion
 
+
 // #region main
 let mainD = document.getElementById('main');
 let mainC = {
@@ -1334,22 +1467,17 @@ let mainC = {
      mvlsLD: document.querySelector('#movlis .list'),
     mvlsi: 0
 }
-mainC.spas = [ //classはspace想定、shoは1つだけ
-    { name:'home', rank:3, back:'#1c3d59', sho:1 },
-    { name:'map', rank:2, back:'#363636' },
-    { name:'battle', rank:4, back:'#a53434' },
-];
 let mainF = {};
 mainF.move = (to) => {
     if(mainC.spa == to) return console.log('どういうわけか もう そこにいる');
 	if(!to) return console.error(`せんぱ〜い？${to}ってどこですか〜？笑`);
 	
-	for(let a of mainC.spas) document.getElementById(a.name).classList.remove('show');
+	for(let a of Spaces) document.getElementById(a.name).classList.remove('show');
     document.getElementById(to).classList.add('show');
 }
 
 mainF.load = () => {
-    for(let spa of mainC.spas){
+    for(let spa of Spaces){
         let div = document.getElementById(spa.name);
         if(!div) continue;
 
@@ -1359,7 +1487,7 @@ mainF.load = () => {
 }
 
 //#region movlis
-for(let n of mainC.spas){
+for(let n of Spaces){
     let li = document.createElement('div');
     li.textContent = n.name;
     li.className = 'item';
@@ -1384,6 +1512,52 @@ document.addEventListener('keyup',e => {
 
 //#endregion main
 
+
+
+// #region home
+let homD = document.getElementById('home');
+let homC = {
+    startD: homD.querySelector('.start.botan'),
+}
+let homF = {};
+
+homF.start = async() => {
+    let charaD = document.createElement('div');
+    charaD.className = 'select chara';
+    homD.appendChild(charaD);
+    
+    let chara0 = await new Promise(solve => {
+        function clicked(e){
+            let div = e.target;
+            let name = div.dataset.name;
+            charaD.remove();
+            solve(name);
+        }
+
+        let list = Players.filter(a => !a.no);
+        for(let ma of list){
+            let div = document.createElement('div');
+            div.className = `item`;
+            div.dataset.name = ma.name;
+            div.textContent = ma.name;
+
+            let img = document.createElement('img');
+            img.src = `assets/images/players/${ma.name}.png`;
+            div.appendChild(img);
+            
+            div.addEventListener('click', clicked);
+            charaD.appendChild(div);
+        }
+    })
+    if(!chara0) return console.log(`charaが "${chara0}" でした。なにこれ`);
+    
+    let chara = chara0;
+
+
+    mainF.move("map")
+}
+homC.startD.addEventListener('click', homF.start);
+// #endregion
 
 
 

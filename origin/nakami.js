@@ -1467,20 +1467,17 @@ let mainC = {
      mvlsLD: document.querySelector('#movlis .list'),
     mvlsi: 0
 }
-mainC.spas = [ //classはspace想定、shoは1つだけ
-    { name:'home', rank:2, back:'#f0f8ff', sho:1 }, 
-];
 let mainF = {};
 mainF.move = (to) => {
     if(mainC.spa == to) return console.log('どういうわけか もう そこにいる');
 	if(!to) return console.error(`せんぱ〜い？${to}ってどこですか〜？笑`);
 	
-	for(let a of mainC.spas) document.getElementById(a.name).classList.remove('show');
+	for(let a of Spaces) document.getElementById(a.name).classList.remove('show');
     document.getElementById(to).classList.add('show');
 }
 
 mainF.load = () => {
-    for(let spa of mainC.spas){
+    for(let spa of Spaces){
         let div = document.getElementById(spa.name);
         if(!div) continue;
 
@@ -1490,7 +1487,7 @@ mainF.load = () => {
 }
 
 //#region movlis
-for(let n of mainC.spas){
+for(let n of Spaces){
     let li = document.createElement('div');
     li.textContent = n.name;
     li.className = 'item';
