@@ -1470,7 +1470,8 @@ let mainC = {
 let mainF = {};
 mainF.move = (to) => {
     if(mainC.spa == to) return console.log('どういうわけか もう そこにいる');
-	if(!to) return console.error(`せんぱ〜い？${to}ってどこですか〜？笑`);
+    let space = Spaces.find(s => s.name == to);
+	if(!to || !space) return console.error(`せんぱ〜い？${to}ってどこですか〜？笑`);
 	
 	for(let a of Spaces) document.getElementById(a.name).classList.remove('show');
     document.getElementById(to).classList.add('show');
@@ -1514,6 +1515,33 @@ document.addEventListener('keyup',e => {
 //#endregion main
 
 
+// #region loby
+let lobD = document.getElementById('loby');
+let lobC = {
+    // startD: lobD.querySelector('.start'),
+    makeD: lobD.querySelector('.make'),
+    joinD: lobD.querySelector('.join'),
+}
+let lobF = {};
+
+lobF.start = () => {
+    mainF.move('wait');
+
+    waiF.rely();
+}
+
+// #endregion
+
+// #region wait
+let waiD = document.getElementById('wait');
+let waiC = {
+    ueD: waiD.querySelector('.upper'),
+    bodyD: waiD.querySelector('.body'),
+    startD: waiD.querySelector('.start'),
+}
+// #endregion
+
+
 //#region start
 function start(){
     Style.tekiou();
@@ -1521,8 +1549,12 @@ function start(){
 
     mainF.load();
 
-    mainF.move('home');
+
+
+    mainF.move('loby');
 }
+//#endregion
+
 //#region DOM
 let LoadOfWait = async() => await loaF.load();
 if(document.readyState == "loading"){

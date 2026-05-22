@@ -435,6 +435,35 @@ input[type="range"].slider::-webkit-slider-thumb:hover{
 }
 /* #endregion */
 
+.botan{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 150px;
+    aspect-ratio: 4/1;
+    padding: 0 5px;
+    background: var(--botan);
+    color: var(--botan-col, #2b2b2b);
+    border: 3px solid var(--botan-col, #2b2b2b);
+    transition: background 0.25s, color 0.25s;
+    position: relative;
+}
+.bo/* #region Takushi Sen */
+tan:hover{
+    scale: 1.05;
+}
+.botan:active{
+    scale: 0.95;
+}
+.botan.tog{
+    background: var(--botan-ed, #2b2b2b);
+    color: var(--botan-col-ed, #b2b2b2);
+    border: 3px solid var(--botan-col, #b2b2b2);
+}
+/* #endregion */
+
+
 #main{
     display: block;
     width: var(--iPhone-width);
@@ -460,3 +489,20 @@ input[type="range"].slider::-webkit-slider-thumb:hover{
 .space.show{
     display: flex;
 }
+
+
+/* #region loby */
+#loby{
+    content: "loby";
+    padding: 20px 0;
+}
+#loby .unit1{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: fit-content;
+}
+/* #endregion */
