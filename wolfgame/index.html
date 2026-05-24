@@ -5,6 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="mitame.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
     <title>スターターパック</title>
 </head>
 <body>
@@ -20,6 +23,28 @@
     </div>
 
     <div id="main">
+
+        <div id="login" class="space">
+            <div class="column">
+                <input type="text" class="input username" placeholder="ユーザー名" required>
+                <input type="password" class="input password" placeholder="パスワード" required>
+                <div class="bt send">ログイン</div>
+            </div>
+            
+            <div class="acs">
+                <div class="tog"></div>
+                <div class="list"></div>
+            </div>
+
+            <div class="dolphin">
+                <div class="fuki">
+                    <div class="text">お前を消す方法</div>
+                </div>
+                <div class="img">
+                    <img src="assets/images/systems/dolphin.png">
+                </div>
+            </div>
+        </div>
 
         <div class="space" id="loby">
             <div class="unit1">

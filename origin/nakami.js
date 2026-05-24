@@ -1084,6 +1084,57 @@ class Slider {
     }
 }
 // #endregion
+//#region takushiSen
+class TakushiSen {
+    constructor(
+        choices = ["選択肢1", "選択肢2"],
+        mode = "tate", // tate, grid2, grid3, tags
+        func = 0,                       
+        data = 0
+    ){
+        this.choices = choices;
+        this.mode = mode;
+        this.func = func;
+
+        if(!data) data = {
+            back: '#b2b2b2',
+            backed: '#2b2b2b'
+        }
+        this.data = data;
+
+        this.make();
+    }
+
+    make(){
+        let div = document.createElement('div');
+        div.className = `mode ${this.mode}`;
+
+        let [b, bEd] = [this.data.back, this.data.backed];
+        div.style.setProperty('--botan', b);
+        div.style.setProperty('--botan-col', irohaHo(b)); // ちゃんとこれ使ってあげたよ
+        div.style.setProperty('--botan-ed', bEd);
+        div.style.setProperty('--botan-col-ed', irohaHo(bEd));
+        
+        this.choices.forEach((choice, index) => {
+            let item = document.createElement('div');
+            item.className = 'item';
+            item.textContent = choice;
+
+            item.addEventListener('click', () => {
+                if(this.func) this.func(choice, index);
+            });
+
+            div.appendChild(item);
+        });
+
+        this.div = div;
+    }
+
+    append(parent){
+        parent.appendChild(this.div);
+    }
+}
+//#endregion
 //#region OBS
 let OBS = {
     keys: {},

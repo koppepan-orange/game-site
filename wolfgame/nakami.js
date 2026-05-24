@@ -1084,6 +1084,70 @@ class Slider {
     }
 }
 // #endregion
+//#region takushiSen
+class TakushiSen {
+    constructor(choices, mode = "tate", data = 0) {
+        this.choices = choices; // [{name, img}, {name, img}, ...]
+        this.mode = mode;
+
+        if(!data) data = {
+            back: '#b2b2b2',
+            backed: '#2b2b2b'
+        };
+        this.data = data;
+
+        this.make();
+    }
+
+    make() {
+        let div = document.createElement('div');
+        div.className = `mode ${this.mode}`;
+        
+        let [b, bEd] = [this.data.back, this.data.backed];
+        div.style.setProperty('--botan', b);
+        div.style.setProperty('--botan-col', irohaHo(b));
+        div.style.setProperty('--botan-ed', bEd);
+        div.style.setProperty('--botan-col-ed', irohaHo(bEd));
+
+        this.choices.forEach(ma => {
+            let [name, gazou] = [ma.name, ma.img];
+            if(typeof ma === 'string') name = ma;
+
+            let item = document.createElement('div');
+            item.className = `item ${name}`;
+            item.textContent = name;
+            item.dataset.name = name;
+
+            // 画像があるならば
+            if(gazou){
+                let img = document.createElement('img');
+                img.src = gazou;
+                item.appendChild(img);
+            }
+            div.appendChild(item);
+        });
+
+        this.div = div;
+        return div;
+    }
+
+    // ここがメイン！await で待ち受けるやつ
+    async select(parent) {
+        return new Promise(resolve => {
+            let div = this.make();
+            parent.appendChild(div);
+
+            div.addEventListener('click', (e) => {
+                let target = e.target.closest('.item');
+                if (target) {
+                    div.remove();
+                    resolve(target.dataset.name);
+                }
+            });
+        });
+    }
+}
+//#endregion
 //#region OBS
 let OBS = {
     keys: {},
@@ -1515,6 +1579,234 @@ document.addEventListener('keyup',e => {
 //#endregion main
 
 
+//#region about FIREBASE
+let firebaseConfig = {
+    apiKey: "AIzaSyBN5V_E6PzwlJn7IwVsluKIWNIyathhxj0",
+    authDomain: "koppepan-orange.firebaseapp.com",
+    databaseURL: "https://koppepan-orange-default-rtdb.firebaseio.com",
+    projectId: "koppepan-orange",
+    storageBucket: "koppepan-orange.appspot.com",
+    messagingSenderId: "730150198097",
+    appId: "1:730150198097:web:076a074a3d406053155170",
+    measurementId: "G-MYKJWD203Z"
+};
+firebase.initializeApp(firebaseConfig);
+let database = firebase.database();
+
+let logiD = document.getElementById('login');
+let logiC = {
+    nameI: logiD.querySelector('.username'),
+    passI: logiD.querySelector('.password'),
+    senD: logiD.querySelector('.bt.send'),
+	tog:1,
+    noname: 'no name',
+
+    acsD: logiD.querySelector('.acs'),
+     acsBD: logiD.querySelector('.acs .tog'),
+     acsLD: logiD.querySelector('.acs .list'),
+    acsC: {
+        tog: 0,
+    },
+    acsF: {},
+
+    dolD: logiD.querySelector('.dolphin'),
+     dolDT: logiD.querySelector('.dolphin .text'),
+     dolDTY: logiD.querySelector('.dolphin .text .yes'),
+     dolDI: logiD.querySelector('.dolphin .img'),
+    dolP: 0,
+}
+let logiF = {};
+
+let User = {
+    truth: logiC.noname,
+    idora: logiC.noname,
+    ref: null,
+    data: null,
+}
+
+
+
+logiF.auto = () => {
+    let name = lsdGet("username");
+    // console.log(name)
+    if(name){
+        nicoText("自動ログインしました");
+        login(name);
+    }
+    else{
+        nicoText("ログインしてください");
+        comF.move('login');
+    }
+}
+
+logiF.lsdHozon = (name, pass) => {
+    console.log(`${name}をlsdに保存しま〜す`)
+    lsdSet("username", name);
+
+    let arr = logiF.lsdList();
+    arr = arr.filter(a => a.name != name);
+
+    arr.push({
+        name:name,
+        pass:pass
+    });
+    lsdSet('accounts', arr);
+}
+logiF.lsdRHozon = (name) => {
+    lsdRem("username");
+    let arr = logiF.lsdList();
+    arr = arr.filter(a => a.name != name);
+    lsdSet('accounts', arr);
+}
+logiF.lsdList = () => {
+    let arr = lsdGet('accounts');
+    if(!arr) arr = [];
+    return arr;
+}
+
+async function login(name){
+    User.truth = name;
+    User.ref = database.ref(`users/${name}`);
+    User.idora = name;
+    await delay(50);
+
+    mainF.move('loby')
+}
+function logout(){
+    User.truth = comC.noname;
+    User.idora = comC.noname;
+    User.ref = null;
+    User.data = null;
+
+    lsdRem("username");
+    logiC.nameI.value = '';
+    logiC.passI.value = '';
+    
+    comF.move('login');
+}
+
+logiF.going = () => {
+    let name = logiC.nameI.value;
+    let pass = logiC.passI.value;
+    if(name == '' || pass == '') return;
+    console.log(`username => ${name}`)
+    console.log(`password => ${pass}`)
+    
+    let success = () => {
+        nicoText('ようこそ');
+        logiF.lsdHozon(name, pass);
+        login(name);
+    }
+
+    let kariRef = database.ref(`users/${name}`);
+    kariRef.once('value', function(snapshot){
+        if(snapshot.exists()){
+            console.log("存在するってよ！！")
+            if(snapshot.val().password == pass) success();
+            else tobiText(logiC.senD, "パスワードまたはユーザー名が間違っています"); //ふぅぅわかりにくいねぇ！
+        }else{
+            console.log("存在しないってよ！！")
+            let usersRef = database.ref(`users/${name}`);
+            usersRef.update({
+                password:pass,
+                blocked: ['null'],
+            })
+            success();
+        }
+    })
+}
+logiC.senD.addEventListener('click', logiF.going);
+
+
+logiC.acsF.tog = (co = NaN) => {
+    if(logiC.acsLD.innerHTML == '') return;
+
+    if(typeof co != 'number') co = fl(logiC.acsC.tog);
+
+    if(co == 1) logiC.acsD.classList.add('tog');
+    if(co == 0) logiC.acsD.classList.remove('tog');
+    logiC.acsC.tog = co;
+}
+logiC.acsBD.addEventListener('click', logiC.acsF.tog);
+
+logiC.acsF.load = async() => {
+    logiC.acsLD.innerHTML = '';
+    
+    let arr = logiF.lsdList();
+    if(!arr.length) return;
+
+    for(let ac of arr){
+        let warn = 0;
+        //今のpassと、ac.pass(過去ログイン時のpass)が違えばcontinue
+        let acRef = database.ref(`users/${ac.name}`);
+        let snash = await acRef.once('value'); 
+        if(!snash.exists() || snash.val().password != ac.pass) warn = 1;
+
+        let div = El('div', 'item');
+    
+        let name = El('div', 'name');
+        name.textContent = ac.name;
+        name.addEventListener('click', () => {
+            if(warn) tobiText(name, "パスワードが変更されています。\n再度ログインしてください");
+
+            logiC.nameI.value = ac.name;
+            if(!warn) logiC.passI.value = ac.pass;
+            logiC.acsF.tog(0);
+        })
+        div.appendChild(name);
+
+        let del = El('div', 'del');
+        del.textContent = "×";
+        del.addEventListener('click', () => {
+            logiF.lsdRHozon(ac.name);
+            logiC.acsF.load();
+        })
+        div.appendChild(del);
+
+        let warnD = El('div', 'warn');
+        warnD.textContent = "！";
+        if(warn) div.appendChild(warnD);
+
+
+        logiC.acsLD.appendChild(div);
+    }
+    
+}
+
+
+logiF.doldol = () => {
+    switch(logiC.dolP){
+        case 0:
+            let yes = El('u', 'yes');
+            yes.textContent = "はい";
+            yes.addEventListener('click', logiF.dolgo);
+            
+            logiC.dolDT.innerHTML = `
+            <a href="assets/txts/dolphin.html" target="_blank">規約</a>に同意する？\n
+            → <span class="yesContainer"></span>
+            `;
+            logiC.dolDT.querySelector('.yesContainer').appendChild(yes);
+            logiC.dolP = 1;
+            break;
+    }
+};
+logiC.dolDI.addEventListener('click', logiF.doldol);
+
+logiF.dolgo = async() => {
+    logiC.nameI.value = 'dolphin';
+    logiC.passI.value = 'Iloveirukaice';
+    logiC.senD.click();
+    logiC.dolDT.textContent = 'いい選択だ！';
+    // logiC.dolDT.textContent = 'フフフ...ボクのきたいどおりだ！'; //フラウィーのNルート、最後の場面でこうげき時のセリフって細かすぎるだろ
+
+    await delay(1000);
+    logiC.dolP = 0;
+    logiC.dolDT.textContent = 'お前を消す方法';
+}
+//#endregion
+
+
+
 // #region loby
 let lobD = document.getElementById('loby');
 let lobC = {
@@ -1524,11 +1816,23 @@ let lobC = {
 }
 let lobF = {};
 
-lobF.start = () => {
-    mainF.move('wait');
+lobF.make = async() => {
+    let takushi = new TakushiSen(
+        ["apple", "orange"],
+        "tate",
+        0
+    )
+    let answer = await takushi.select(lobD)
+    console.log(answer);
+    
+    if(!stage0) return console.log(`stageが "${stage0}" でした。なにこれ`);
+    dunC.stage = stage0;
 
+
+    mainF.move('wait');
     waiF.rely();
 }
+lobC.makeD.addEventListener('click', lobF.make);
 
 // #endregion
 

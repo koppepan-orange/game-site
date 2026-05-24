@@ -1728,8 +1728,8 @@ logiC.dolDI.addEventListener('click', () => {
             break;
         
         case 1:
-            logiC.nameD.value = 'dolphin';
-            logiC.passD.value = 'Iloveirukaice';
+            logiC.nameI.value = 'dolphin';
+            logiC.passI.value = 'Iloveirukaice';
             logiC.sendD.click();
 
             logiC.dolP = 0;

@@ -35,6 +35,7 @@ const Sounds = {
 }
 
 const Spaces = [
+    { name:'login', rank:1, back:'#f8f6ff' },
     { name:'loby', rank:2, back:'#f0f8ff', sho:1 },
     { name:'wait', rank:2, back:'#f6fff2' },
 ];

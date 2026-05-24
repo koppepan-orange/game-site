@@ -301,6 +301,35 @@ img{
 }
 /* #endregion */
 
+
+/* #region botan */
+.botan{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 150px;
+    aspect-ratio: 4/1;
+    padding: 0 5px;
+    background: var(--botan);
+    color: var(--botan-col, #2b2b2b);
+    border: 3px solid var(--botan-col, #2b2b2b);
+    transition: background 0.25s, color 0.25s;
+    position: relative;
+}
+.botan:hover{
+    scale: 1.05;
+}
+.botan:active{
+    scale: 0.95;
+}
+.botan.tog{
+    background: var(--botan-ed, #2b2b2b);
+    color: var(--botan-col-ed, #b2b2b2);
+    border: 3px solid var(--botan-col, #b2b2b2);
+}
+/* #endregion */
+
 /* #region checkbox　& slider */
 .checkbox{
     display: flex;
@@ -349,6 +378,100 @@ input[type="range"].slider::-webkit-slider-thumb{
 input[type="range"].slider::-webkit-slider-thumb:hover{
     /* つまみ（ホバー） */
     transform: scale(1.2);
+}
+/* #endregion */
+
+/* #region <モード> */
+.mode{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    pointer-events: none;
+}
+.mode.tate{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+/* .mode.yoko{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+} */
+.mode.grid2{
+    /* 横に2、縦に無限 */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    justify-items: center;
+    align-items: center;
+}
+.mode.grid3{
+    /* 横に3、縦に無限 */
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    justify-items: center;
+    align-items: center;
+}
+.mode.tags{
+    /* 文字数に応じて大小が定まるwidthのdiv(heightは24px)をgridに格納する型。横は最大80%で、縦に制限はない。 */
+    display: flex;
+    flex-wrap: wrap; /* これで、横に入り切らなくなったら自動で下に折り返す */
+    justify-content: center; 
+    align-content: center;
+    max-width: 80%;
+    gap: 5px;
+}
+
+/* 弾を */
+.mode .item{
+    background: var(--botan, #b2b2b2);
+    color: var(--botan-col, #2b2b2b);
+    border: 4px solid var(--botan-col, #2b2b2b);
+    transition: all 0.1s ease-in-out;
+    box-sizing: border-box;
+    pointer-events: auto;
+    cursor: pointer;
+}
+.mode .item:hover{
+    background: var(--botan-ed, #2b2b2b);
+    color: var(--botan-col-ed, #b2b2b2);
+    scale: 0.95;
+}
+.mode .item:active{
+    scale: 1.05;
+}
+
+.mode.tate .item{
+    width: 80%;
+    aspect-ratio: 4/1;
+    padding: 0 5px;
+}
+/* .mode.yoko .item{
+    height: 70%;
+    aspect-ratio: 2/5;
+    padding: 5 5px;
+} */
+.mode.grid2 .item,
+.mode.grid3 .item{
+    width: 100%;
+    aspect-ratio: 1/1;
+    padding: 5px;
+}
+.mode.tags .item{
+    width: fit-content;
+    height: 24px;
+    padding: 0 8px;
+    line-height: 16px;
+    white-space: nowrap;
 }
 /* #endregion */
 
@@ -435,34 +558,6 @@ input[type="range"].slider::-webkit-slider-thumb:hover{
 }
 /* #endregion */
 
-.botan{
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    width: 150px;
-    aspect-ratio: 4/1;
-    padding: 0 5px;
-    background: var(--botan);
-    color: var(--botan-col, #2b2b2b);
-    border: 3px solid var(--botan-col, #2b2b2b);
-    transition: background 0.25s, color 0.25s;
-    position: relative;
-}
-.bo/* #region Takushi Sen */
-tan:hover{
-    scale: 1.05;
-}
-.botan:active{
-    scale: 0.95;
-}
-.botan.tog{
-    background: var(--botan-ed, #2b2b2b);
-    color: var(--botan-col-ed, #b2b2b2);
-    border: 3px solid var(--botan-col, #b2b2b2);
-}
-/* #endregion */
-
 
 #main{
     display: block;
@@ -477,6 +572,8 @@ tan:hover{
 .space{
     display: none;
     flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
     width: 100%;
     height: 100%;
     position: absolute;
@@ -489,6 +586,139 @@ tan:hover{
 .space.show{
     display: flex;
 }
+
+
+/* #region login */
+#login{
+    content: 'login';
+    padding-top: 30px;
+}
+#login .column{
+    align-items: center;
+    width: 80%;
+    gap: 15px;
+}
+#login .input{
+    width: 100%;
+    padding: 5px;
+    line-height: 24px;
+    font-size: 18px;
+    box-sizing: border-box;
+}
+#login .bt.send{
+    width: 100%;
+    height: 40px;
+    padding: 5px;
+    background: #33b529;
+    border: 3px solid #33b529;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+#login .bt.send:hover{
+    border-color: #b1edad;
+}
+#login .bt.send:active{
+    scale: 0.95;
+}
+
+#login .acs{
+    position: absolute;
+    top: 400px;
+    left: 10px;
+}
+#login .acs .tog{
+    width: 40px;
+    aspect-ratio: 1/1;
+    background: #27a227;
+    border-radius: 50%;
+    box-sizing: border-box;
+}
+#login .acs.tog .tog{
+    border-radius: 50% 50% 0 0;
+}
+#login .acs .list{
+    display: none;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 0;
+    width: 230px;
+    height: fit-content;
+     max-height: 400px;
+    border: 1px groove #27a227;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+#login .acs.tog .list{
+    display: flex;
+}
+#login .acs .list .item{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    height: 40px;
+    background: #71af71;
+    position: relative;
+    box-sizing: border-box;
+}
+#login .acs .list .item .name{
+    /* display: flex; */
+    justify-content: flex-start;
+    align-items: center;
+    width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 10px 5px;
+    box-sizing: border-box;
+}
+#login .acs .list .item .name:hover{
+    background: #27a227;
+}
+#login .acs .list .item .del{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    height: 100%;
+    font-size: 16px;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+#login .acs .list .item .del:hover{
+    background: #c65252;
+}
+
+#login .dolphin{
+    width: 70px;
+    height: fit-content;
+    position: absolute;
+    bottom: 5px;
+    right: 15px;
+}
+#login .dolphin .fuki{
+    opacity: 1;
+    width: 175%;
+    padding: 2.5px;
+    aspect-ratio: 12 / 5;
+    background: #ffffff;
+    white-space: wrap;
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 85%, 60% 100%, 40% 85%, 0% 85%);
+    position: absolute;
+    bottom: 90%;
+    right: 10px;
+    transition: opacity 0.3s ease;
+}
+#login .dolphin .fuki .text{
+    font-size: 14px;
+    color: #000000;
+}
+#login .dolphin img{
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+}
+/* #endregion */
 
 
 /* #region loby */
