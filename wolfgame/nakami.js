@@ -1148,6 +1148,126 @@ class TakushiSen {
     }
 }
 //#endregion
+//#region Tenshee
+class Tenshee {
+    // 天使なカノジョ です(??)
+    constructor(){
+        this.resolved = 0;
+    }
+
+    reset(){
+        tensheeC.now = "";
+        tensheeC.max = 0;
+        tensheeC.mode = "";
+        this.tekiou();
+    }
+
+    plzinput(max = 0, mode = 0){
+        if(tensheeC.ing) return;
+        tensheeC.ing = 1;
+        this.reset();
+
+        if(max) tensheeC.max = max;
+        if(mode) tensheeC.mode = mode;
+        tensheeD.classList.add('show');
+        return new Promise((resolve) => {
+            this.resolved = resolve;
+        });
+    }
+
+    tekiou(){
+        let disp = tensheeC.dispD;
+        let now = tensheeC.now;
+
+        if(tensheeC.mode == "pass"){
+            let txt = "";
+            for(let i=0; i<now.length; i++){
+                // let huse = "*"
+                let huse = tensheeC.list[i];
+                if(!huse) huse = "𱁬";
+                txt += huse;
+            }
+            disp.textContent = txt;
+        }
+        else disp.textContent = now;
+    }
+
+    num(num){
+        let now = tensheeC.now;
+        let max = tensheeC.max;
+        if(max != 0 && now.length >= max) return;
+        
+        now += num;
+        tensheeC.now = now;
+        this.tekiou();
+    }
+
+    del(){
+        let now = tensheeC.now;
+        if(now == "") return;
+
+        now = now.slice(0, -1);
+        tensheeC.now = now;
+        this.tekiou();
+    }
+
+    confirm(){
+        tensheeD.classList.remove('show');
+        let now = tensheeC.now;
+        console.log(`天カノ結果:: ${now}`)
+        if(now == "") console.error('入力されてないっすね');
+        if(this.resolved){
+            this.resolved(now);
+            this.resolved = 0;
+            tensheeC.ing = 0;
+        }
+    }
+    shuffle(){
+        let container = tensheeD.querySelector('.bts');
+        let nums = Array.from(container.querySelectorAll('.bt.num'));
+        
+        for(let i = nums.length - 1; i > 0; i--){
+            let j = Math.floor(Math.random() * (i + 1));
+            [nums[i], nums[j]] = [nums[j], nums[i]];
+        }
+        
+        nums.forEach(n => container.insertBefore(n, container.querySelector('.bt.del')));
+    }
+
+    shuffleNumbers(){
+        let container = tensheeD.querySelector('.bts');
+        let nums = Array.from(container.querySelectorAll('.bt.num'));
+        let del = container.querySelector('.bt.del');
+        let ok = container.querySelector('.bt.ok');
+
+        for(let i = nums.length - 1;i > 0;i--){
+            let j = Math.floor(Math.random() * (i + 1));
+            [nums[i], nums[j]] = [nums[j], nums[i]];
+        }
+
+        nums.forEach(n => n.remove());
+
+        nums.forEach(n => container.insertBefore(n, del));
+    }
+}
+let tensheeD = document.getElementById('tenshee');
+let tensheeC = {
+    ing: 0,
+    now: "",
+    dispD: tensheeD.querySelector('.disp'),
+    list:["🍞","🥐","🥖"]
+}
+let tensheeF = {};
+const tenshee = new Tenshee();
+tensheeD.querySelectorAll('.bt').forEach(bt => {
+    bt.addEventListener('click', () => {
+        if(bt.classList.contains('num')) tenshee.num(bt.dataset.num)
+        if(bt.classList.contains('del')) tenshee.del();
+        if(bt.classList.contains('ok')) tenshee.confirm();
+    });
+})
+
+//#endregion
 //#region OBS
 let OBS = {
     keys: {},
@@ -1818,16 +1938,12 @@ let lobF = {};
 
 lobF.make = async() => {
     let takushi = new TakushiSen(
-        ["apple", "orange"],
+        ["ひみつの小学生", "公開大学生"],
         "tate",
         0
     )
     let answer = await takushi.select(lobD)
     console.log(answer);
-    
-    if(!stage0) return console.log(`stageが "${stage0}" でした。なにこれ`);
-    dunC.stage = stage0;
-
 
     mainF.move('wait');
     waiF.rely();
@@ -1842,6 +1958,11 @@ let waiC = {
     ueD: waiD.querySelector('.upper'),
     bodyD: waiD.querySelector('.body'),
     startD: waiD.querySelector('.start'),
+}
+let waiF = {}; //妻じゃないよ
+
+waiF.rely = () => {
+    
 }
 // #endregion
 

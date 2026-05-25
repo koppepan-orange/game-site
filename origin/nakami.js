@@ -1086,54 +1086,150 @@ class Slider {
 // #endregion
 //#region takushiSen
 class TakushiSen {
-    constructor(
-        choices = ["選択肢1", "選択肢2"],
-        mode = "tate", // tate, grid2, grid3, tags
-        func = 0,                       
-        data = 0
-    ){
-        this.choices = choices;
+    constructor(choices, mode = "tate", data = 0) {
+        this.choices = choices; // [{name, img}, {name, img}, ...]
         this.mode = mode;
-        this.func = func;
 
         if(!data) data = {
             back: '#b2b2b2',
             backed: '#2b2b2b'
-        }
+        };
         this.data = data;
 
         this.make();
     }
 
-    make(){
+    make() {
         let div = document.createElement('div');
         div.className = `mode ${this.mode}`;
-
+        
         let [b, bEd] = [this.data.back, this.data.backed];
         div.style.setProperty('--botan', b);
-        div.style.setProperty('--botan-col', irohaHo(b)); // ちゃんとこれ使ってあげたよ
+        div.style.setProperty('--botan-col', irohaHo(b));
         div.style.setProperty('--botan-ed', bEd);
         div.style.setProperty('--botan-col-ed', irohaHo(bEd));
-        
-        this.choices.forEach((choice, index) => {
+
+        this.choices.forEach(ma => {
+            let [name, gazou] = [ma.name, ma.img];
+            if(typeof ma === 'string') name = ma;
+
             let item = document.createElement('div');
-            item.className = 'item';
-            item.textContent = choice;
+            item.className = `item ${name}`;
+            item.textContent = name;
+            item.dataset.name = name;
 
-            item.addEventListener('click', () => {
-                if(this.func) this.func(choice, index);
-            });
-
+            // 画像があるならば
+            if(gazou){
+                let img = document.createElement('img');
+                img.src = gazou;
+                item.appendChild(img);
+            }
             div.appendChild(item);
         });
 
         this.div = div;
+        return div;
     }
 
-    append(parent){
-        parent.appendChild(this.div);
+    // ここがメイン！await で待ち受けるやつ
+    async select(parent) {
+        return new Promise(resolve => {
+            let div = this.make();
+            parent.appendChild(div);
+
+            div.addEventListener('click', (e) => {
+                let target = e.target.closest('.item');
+                if (target) {
+                    div.remove();
+                    resolve(target.dataset.name);
+                }
+            });
+        });
     }
 }
+//#endregion
+//#region Tenshee
+class Tenshee {
+    // 天使なカノジョ です(??)
+    constructor(){
+        this.resolved = 0;
+    }
+
+    reset(){
+        tensheeC.now = "";
+        tensheeC.max = 0;
+        tensheeC.mode = "";
+        this.tekiou();
+    }
+
+    plzinput(max = 0, mode = 0){
+        if(tensheeC.ing) return;
+        tensheeC.ing = 1;
+        this.reset();
+
+        if(max) tensheeC.max = max;
+        if(mode) tensheeC.mode = mode;
+        tensheeD.classList.add('show');
+        return new Promise((resolve) => {
+            this.resolved = resolve;
+        });
+    }
+
+    tekiou(){
+        let disp = tensheeC.dispD;
+        let now = tensheeC.now;
+
+        if(tensheeC.mode == "pass") disp.textContent = '*'.repeat(now.length);
+        else disp.textContent = now;
+    }
+
+    num(num){
+        let now = tensheeC.now;
+        let max = tensheeC.max;
+        if(max != 0 && now.length >= max) return;
+        
+        now += num;
+        tensheeC.now = now;
+        this.tekiou();
+    }
+
+    del(){
+        let now = tensheeC.now;
+        if(now == "") return;
+
+        now = now.slice(0, -1);
+        tensheeC.now = now;
+        this.tekiou();
+    }
+
+    confirm(){
+        tensheeD.classList.remove('show');
+        let now = tensheeC.now;
+        console.log(`天カノ結果:: ${now}`)
+        if(now == "") console.error('入力されてないっすね');
+        if(this.resolved){
+            this.resolved(now);
+            this.resolved = 0;
+            tensheeC.ing = 0;
+        }
+    }
+}
+let tensheeD = document.getElementById('tenshee');
+let tensheeC = {
+    ing: 0,
+    now: "",
+    dispD: tensheeD.querySelector('.disp')
+}
+let tensheeF = {};
+const tenshee = new Tenshee();
+tensheeD.querySelectorAll('.bt').forEach(bt => {
+    bt.addEventListener('click', () => {
+        if(bt.classList.contains('num')) tenshee.num(bt.dataset.num)
+        if(bt.classList.contains('del')) tenshee.del();
+        if(bt.classList.contains('ok')) tenshee.confirm();
+    });
+})
+
 //#endregion
 //#region OBS
 let OBS = {

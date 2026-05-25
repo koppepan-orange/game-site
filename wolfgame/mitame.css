@@ -475,6 +475,71 @@ input[type="range"].slider::-webkit-slider-thumb:hover{
 }
 /* #endregion */
 
+/* #region テンキー */
+#tenshee{
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    width: 50%;
+    height: fit-content;
+    padding: 10px;
+    background: #dedede;
+    border: 4px groove #ff8000;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-sizing: border-box;
+    pointer-events: none;
+    z-index: var(--mostop);
+}
+#tenshee.show{
+    display: flex;
+}
+#tenshee .disp{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 30px;
+    background: #ffffff;
+    border: 3px solid #a2a2a2;
+    box-sizing: border-box;
+    pointer-events: none;
+    /* cursolは"触れれないよ！"みたいなやつにしたい */
+    cursor: not-allowed;
+}
+#tenshee .bts{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    justify-items: center;
+    align-items: center;
+    gap: 10px;
+}
+#tenshee .bts .bt{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: #ffffff;
+    border: 3px solid #a2a2a2;
+    box-sizing: border-box;
+    pointer-events: auto;
+    cursor: pointer;
+}
+#tenshee .bts .bt:active{
+    scale: 0.90;
+}
+#tenshee .bts .bt.del{
+    /* background: #ce1414; */
+    background: #ffb8b8;
+}
+#tenshee .bts .bt.ok{
+    /* background: #27a227; */
+    background: #ceffce;
+}
+/* #endregion */
 
 /* #region movlis */
 #movlis{
