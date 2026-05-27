@@ -641,6 +641,7 @@ input[type="range"].slider::-webkit-slider-thumb:hover{
     align-items: center;
     width: 100%;
     height: 100%;
+    padding: 30px 10px;
     position: absolute;
     top: 0;
     left: 50%;
@@ -656,7 +657,6 @@ input[type="range"].slider::-webkit-slider-thumb:hover{
 /* #region login */
 #login{
     content: 'login';
-    padding-top: 30px;
 }
 #login .column{
     align-items: center;
@@ -785,7 +785,6 @@ input[type="range"].slider::-webkit-slider-thumb:hover{
 }
 /* #endregion */
 
-
 /* #region loby */
 #loby{
     content: "loby";
@@ -801,3 +800,27 @@ input[type="range"].slider::-webkit-slider-thumb:hover{
     height: fit-content;
 }
 /* #endregion */
+
+/* #region wait */
+#wait{
+    content: "wait";
+}
+#wait .barrel{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    width: 80%;
+    height: fit-content;
+    border: 3px dotted #e6ffdc80;
+    box-sizing: border-box;
+}
+#wait .barrel .upper{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+/* #endregion */
+

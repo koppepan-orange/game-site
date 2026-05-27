@@ -190,6 +190,19 @@ function dogma(matu, shiki, k = 1){
 
     return res;
 }
+function ketasu(num){
+    if(num == 0) return 1;
+    num = Math.abs(num);
+    let res = Math.floor(Math.log10(num))+1;
+    return res;
+}
+function whethPoint(num){
+    let str = num.toString();
+    if(0 <= str.indexOf('.')) return true;
+    
+    return false;
+}
+
 function arraySelect(array){
     let select = Math.floor(Math.random()*array.length);
     return array[select];
