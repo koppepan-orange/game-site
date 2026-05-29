@@ -816,6 +816,11 @@ input[type="range"].slider::-webkit-slider-thumb:hover{
     border: 3px dotted #e6ffdc80;
     box-sizing: border-box;
 }
+#wait .barrel .co{
+    width: 100%;
+    height: fit-content;
+    padding: 0 10px;
+}
 #wait .barrel .upper{
     display: flex;
     flex-direction: row;

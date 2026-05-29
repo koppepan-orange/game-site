@@ -288,10 +288,6 @@ function random(min, max){
     let num = Math.floor(Math.random() * (max - min + 1)) + min;
     return Math.floor(num);
 };
-function fl(val, arr = [0, 1]){
-    let res = val == arr[0] ? arr[1] : arr[0];
-    return res;
-};
 function anagramSaySay(text, loop = 10, bet = '<br>'){
     let menjo = 0;
     let len = text.length;
@@ -341,6 +337,7 @@ function anagramCan(mae, ato){
 
     return 1;
 };
+
 // LocalStorage(Data) => lsd
 function lsdSet(name, value){
     if(Array.isArray(value) ||
@@ -372,33 +369,28 @@ function lsdShow(){
     console.error(`-- 以上 --`);
 }
 
-function irohaHo(color){
-    color = color.replace(/^#/, '');
-
-    if(color.length != 6) return console.log('カラーコードは6桁、ですよ〜？楽しないでくださいね♪');
-
+// irohaさんです。かわいいね
+function irohaGet(color){
+    if(color.length < 6) return console.log('カラーコードは6桁、ですよ〜？楽しないでくださいね♪'), 1;
+    if(color.startsWith('#')) color = color.replace(/^#/, '');
     let r = parseInt(color.slice(0, 2), 16);
     let g = parseInt(color.slice(2, 4), 16);
     let b = parseInt(color.slice(4, 6), 16);
+    return [r, g, b];
+}
+function irohaHo(color){
+    let [r, g, b] = irohaGet(color);
 
-    let compR = (255 - r).toString(16).padStart(2, '0');
-    let compG = (255 - g).toString(16).padStart(2, '0');
-    let compB = (255 - b).toString(16).padStart(2, '0');
+    let edR = (255 - r).toString(16).padStart(2, '0');
+    let edG = (255 - g).toString(16).padStart(2, '0');
+    let edB = (255 - b).toString(16).padStart(2, '0');
 
-    let ato = `#${compR}${compG}${compB}`;
+    let ato = `#${edR}${edG}${edB}`;
 
     return ato;
 };
-function irohaMix(c1, c2, ratio = 0.5){
-    let toRGB = c => {
-        c = c.replace('#', '');
-        if (c.length === 3) c = c.split('').map(x => x + x).join('');
-        let n = parseInt(c, 16);
-        return [n >> 16, (n >> 8) & 255, n & 255];
-    };
-
-    let [r1, g1, b1] = toRGB(c1);
-    let [r2, g2, b2] = toRGB(c2);
+function irohaMix(c1, c2, ratio = 0.5){let [r1, g1, b1] = irohaGet(c1);
+    let [r2, g2, b2] = irohaGet(c2);
 
     let r = Math.round(r1 + (r2 - r1) * ratio);
     let g = Math.round(g1 + (g2 - g1) * ratio);
@@ -412,16 +404,12 @@ function irohaRan(){
     let r = random(0, 255);
     let g = random(0, 255);
     let b = random(0, 255);
+
     let ato = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
     return ato;
 };
-function irohaDark(color) {
-    color = color.replace('#', '');
-    if (color.length === 3) color = color.split('').map(x => x + x).join('');
-    
-    let r = parseInt(color.slice(0, 2), 16);
-    let g = parseInt(color.slice(2, 4), 16);
-    let b = parseInt(color.slice(4, 6), 16);
+function irohaDark(color){
+    let [r, g, b] = irohaGet(color);
 
     // 相対輝度の近似計算
     // 0.2126 * R + 0.7152 * G + 0.0722 * B
@@ -430,6 +418,7 @@ function irohaDark(color) {
     return luma < 128; // 暗い色ならtrue
 }
 
+// 時間の何か
 function timeDiff(kako){
     if(typeof kako == 'number') kako = kako.toString();
     let now = new Date();
@@ -443,24 +432,18 @@ function timeDiff(kako){
 
     let diff = now - past;
     let d = {
-        minute:Math.floor(diff / (1000 * 60)),
-        hour:Math.floor(diff / (1000 * 60 * 60)),
-        day:Math.floor(diff / (1000 * 60 * 60 * 24)),
+        minute:Math.floor(diff / (1000*60)),
+        hour:Math.floor(diff / (1000*60*60)),
+        day:Math.floor(diff / (1000*60*60*24)),
         month:(now.getFullYear() - past.getFullYear()) * 12 + now.getMonth() - past.getMonth(),
         year:now.getFullYear() - past.getFullYear()
     };
 
-    if(d.minute < 60){
-        return `${d.minute}分前`;
-    }else if(d.hour < 24){
-        return `${d.hour}時間前`;
-    }else if(d.day < 30){
-        return `${d.day}日前`; //30日未満なら「日」
-    }else if(d.month < 12){
-        return `${d.month}ヶ月前`; //12ヶ月未満なら「月」
-    }else{
-        return `${d.year}年前`; //それ以上なら「年」
-    }
+    if(d.minute < 60) return `${d.minute}分前`;
+    if(d.hour < 24) return `${d.hour}時間前`;
+    if(d.day < 30) return `${d.day}日前`;
+    if(d.month < 12) return `${d.month}ヶ月前`;
+    return `${d.year}年前`;
 }
 function timeToshow(date){ //見る用
     if(!date) console.error('日付がありませんぜ旦那！');
@@ -482,6 +465,7 @@ function timeTodata(date = new Date()){ //データ保存用
     return +time;
 }
 
+// カーソル系
 function cursorSelect(){
     let selected = window.getSelection();
     let res = '';
@@ -518,6 +502,7 @@ function cursorRect(){
     return range.getBoundingClientRect();
 }
 
+// 殺すぞ
 async function error(text = 'errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr'){
     await logText(text);
     await delay(2000);
