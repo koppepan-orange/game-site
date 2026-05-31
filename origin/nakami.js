@@ -126,7 +126,7 @@ function awase(div, max = 28, code = "innerText"){
     div.style.fontSize = `${px}px`;
 }
 function kaijou(num){
-    if(num == 0) return 0;
+    if(num == 0) return 1;
     if(num == 1) return 1;
     return num * kaijou(num - 1);
 };
@@ -1389,7 +1389,7 @@ loaF.loadI = async() => {
         for(let name of Images[belong]){
             let img = new Image();
             img.src = `assets/images/${belong}/${name}.png`;
-            img.onload = kasan();
+            img.onload = kasan;
             img.onerror = () => {
                 console.error(`Image assets/images/${belong}/${name}.png failed to load.`);
                 loaC.erd += 1;
@@ -1592,7 +1592,42 @@ let secrates = [
             location.reload();
         }
     },
+    {
+        ind:0,
+        name:'wawawwa',
+        arr:['w','a','w','a','w','w','a'],
+        limit:'n',
+        func: async function(){
+            staF.resetP();
+        }
+    }
 ]
+const secrateses = [];
+function secratesP(key){
+    secrateses.push(key);
+
+    let lenlen = secrates.sort((a,b) => b.arr.length - a.arr.length);
+    let len = lenlen[0].arr.length;
+    secrateses.splice(0, secrateses.length - len);
+    
+    secratesC();
+}
+async function secratesC(){
+    for(let sec of secrates){
+        if(sec.limit == 0) continue;
+
+        let len = sec.arr.length;
+        if(secrateses.length < len) continue;
+
+        let tail = secrateses.slice(-len);
+
+        if(tail.join() == sec.arr.join()){
+            console.log(`${sec.name}発動！！[${sec.arr.join(' ')}]`);
+            let res = await sec.func();
+            if(!res && sec.limit != 'n') sec.limit -= 1;
+        }
+    }
+}
 document.addEventListener('keydown', async function(e){
     let key = e.key.toLowerCase();
     if(key == 'escape') loop = 0;
@@ -1600,20 +1635,7 @@ document.addEventListener('keydown', async function(e){
     if(document.activeElement.tagName == 'INPUT') return;
     if(document.activeElement.tagName == 'TEXTAREA') return;
 
-    for(let sec of secrates){
-        let nke = sec.arr[sec.ind];
-        // console.log(`必要は${nke}、押されたは${key}！`);
-        if(key == nke){
-            sec.ind += 1;
-            if(sec.ind == sec.arr.length && sec.limit){
-                console.log(`${sec.name}発動！！[${sec.arr.join(' ')}]`);
-                sec.ind = 0;
-                let res = await sec.func();
-                if(!res && sec.limit != 'n') sec.limit -= 1;
-            }
-        }
-        else sec.ind = 0;
-    }
+    secratesP(key);
 })
 //#endregion
 
@@ -1683,6 +1705,8 @@ function start(){
 
     mainF.move('home');
 }
+//#endregion
+
 //#region DOM
 let LoadOfWait = async() => await loaF.load();
 if(document.readyState == "loading"){

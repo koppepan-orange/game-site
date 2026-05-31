@@ -14,17 +14,24 @@ let Style = {
 }
 
 const Fonts = [
-    // {src:'comicsans', type:'ttf'},
+    {src:'comicsans', type:'ttf'},
 ];
 
 const Images = {
     systems:['error'],
+    skins:['normal', 'teethcar'],
 }
 
 const Sounds = {
     // se:['error'],
     // bgm:[],
 }
+
+const Spaces = [
+    { name:'stage', rank:2, back:'#f3fff0', sho:1 },
+];
+
+
 
 const Blocks = [
     {

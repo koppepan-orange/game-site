@@ -126,7 +126,7 @@ function awase(div, max = 28, code = "innerText"){
     div.style.fontSize = `${px}px`;
 }
 function kaijou(num){
-    if(num == 0) return 0;
+    if(num == 0) return 1;
     if(num == 1) return 1;
     return num * kaijou(num - 1);
 };
@@ -190,6 +190,19 @@ function dogma(matu, shiki, k = 1){
 
     return res;
 }
+function ketasu(num){
+    if(num == 0) return 1;
+    num = Math.abs(num);
+    let res = Math.floor(Math.log10(num))+1;
+    return res;
+}
+function whethPoint(num){
+    let str = num.toString();
+    if(0 <= str.indexOf('.')) return true;
+    
+    return false;
+}
+
 function arraySelect(array){
     let select = Math.floor(Math.random()*array.length);
     return array[select];
@@ -336,9 +349,13 @@ function lsdSet(name, value){
 };
 function lsdGet(name){
     let res = localStorage.getItem(name);
-    if(res) res = JSON.parse(res);
-    else return null;
-    return res;
+    if(!res) return null;
+    try{
+        res = JSON.parse(res);
+        return res;
+    }catch(e){
+        return res;
+    };
 };
 function lsdRem(name){
     localStorage.removeItem(name);
@@ -762,7 +779,7 @@ class tk{
 
         let yoko = ['x', 'w'];
         for(let n of yoko){
-            console.log(n), console.log(eval(n));
+            // console.log(n);
             if(typeof contex[n] != 'string' || typeof contex[n] == 'string' && !contex[n].endsWith('%')) continue;
             let num = contex[n].slice(0, -1);
             contex[n] = num * window.innerWidth / 100;
@@ -951,6 +968,282 @@ class alertD{
     };
 };
 //#endregion
+//#region CheckBox feat.Slider
+class Checkbox {
+    constructor(
+        name = "テキストを入力してください",
+        kitei = 0,
+        func = 0,
+        data = 0
+    ){
+        this.name = name;
+        this.kitei = kitei;
+        this.func = func;
+
+        if(!data) data = {
+            back: '#b2b2b2',
+            backed: '#2b2b2b'
+        }
+        this.data = data; //固有。func用だったりするのかも
+
+        this.make();
+        // ここでこいつをreturnしたらinstanceが消える(このclassの他の関数を作れなくなる)
+    }
+    make(){
+        let div = document.createElement('div');
+        div.className = 'checkbox';
+        if(this.kitei) div.classList.add('tog');
+        div.dataset.cl = this.kitei; //0がoff..のはず
+
+        let [cBack, cBacked] = [this.data.back, this.data.backed];
+        div.style.setProperty('--back', cBack);
+            div.style.setProperty('--back-col', irohaHo(cBack));
+        div.style.setProperty('--backed', cBacked);
+            div.style.setProperty('--backed-col', irohaHo(cBacked));
+        
+        let text = document.createElement('div');
+        text.className = 'text';
+        text.textContent = this.name;
+        div.appendChild(text);
+
+        let clcl = async () => {
+            div.dataset.cl = fl(div.dataset.cl);
+            div.classList.toggle('tog', div.dataset.cl == 1);
+
+            if(this.func) this.func();
+        };
+        div.addEventListener('click', clcl);
+
+        this.div = div;
+    };
+
+    append(parent){
+        parent.appendChild(this.div);
+    }
+};
+
+class Slider {
+    constructor(
+        name = "テキストを入力してくださ",
+        kitei = 50,
+        func = 0,
+        data = 0
+    ){
+        this.name = name;
+        this.kitei = kitei;
+        this.func = func;
+
+        if(!data) data = {
+            back: '#b2b2b2',
+            backed: '#2b2b2b'
+        }
+        this.data = data;
+
+        this.make();
+    }
+
+    make(){
+        let div = document.createElement('div');
+        div.className = `slider ${this.name}`;
+        
+        let text = document.createElement('div');
+        text.className = 'label';
+        text.textContent = `${this.name}:`;
+        div.appendChild(text);
+        
+        let range = document.createElement('input')
+        range.type = "range"
+        range.min = 0;
+        range.max = 100;
+        range.value = this.kitei;
+        range.step = 1;
+        range.addEventListener('input', (e) => {
+            let val = e.target.value;
+            let [A, B] = [this.data.back, this.data.backed];
+            /*
+            // 全体変え
+            let per = val / 100;
+            let mix = irohaMix(A, B, per);
+            range.style.setProperty('--tsuma', irohaHo(mix));
+            range.style.background = mix;
+            */
+
+            // つまみの位置で変え
+            let per = val;
+            let mix = irohaMix(A, B, 0.5);
+            range.style.setProperty('--tsuma', mix);
+            range.style.background = `
+                linear-gradient(to right,
+                    ${A} 0%,
+                    ${A} ${per - 10}%,
+                    ${mix} ${per}%,
+                    ${B} ${per + 10}%,
+                    ${B} 100%
+                )
+            `;
+
+
+            if(this.func) this.func(val);
+        })
+        div.appendChild(range);
+
+        this.div = div;
+        this.range = range;
+    }
+
+    append(parent){
+        parent.appendChild(this.div);
+        this.range.dispatchEvent(new Event('input'));
+    }
+}
+// #endregion
+//#region takushiSen
+class TakushiSen {
+    constructor(choices, mode = "tate", data = 0) {
+        this.choices = choices; // [{name, img}, {name, img}, ...]
+        this.mode = mode;
+
+        if(!data) data = {
+            back: '#b2b2b2',
+            backed: '#2b2b2b'
+        };
+        this.data = data;
+
+        this.make();
+    }
+
+    make() {
+        let div = document.createElement('div');
+        div.className = `mode ${this.mode}`;
+        
+        let [b, bEd] = [this.data.back, this.data.backed];
+        div.style.setProperty('--botan', b);
+        div.style.setProperty('--botan-col', irohaHo(b));
+        div.style.setProperty('--botan-ed', bEd);
+        div.style.setProperty('--botan-col-ed', irohaHo(bEd));
+
+        this.choices.forEach(ma => {
+            let [name, gazou] = [ma.name, ma.img];
+            if(typeof ma === 'string') name = ma;
+
+            let item = document.createElement('div');
+            item.className = `item ${name}`;
+            item.textContent = name;
+            item.dataset.name = name;
+
+            // 画像があるならば
+            if(gazou){
+                let img = document.createElement('img');
+                img.src = gazou;
+                item.appendChild(img);
+            }
+            div.appendChild(item);
+        });
+
+        this.div = div;
+        return div;
+    }
+
+    // ここがメイン！await で待ち受けるやつ
+    async select(parent) {
+        return new Promise(resolve => {
+            let div = this.make();
+            parent.appendChild(div);
+
+            div.addEventListener('click', (e) => {
+                let target = e.target.closest('.item');
+                if (target) {
+                    div.remove();
+                    resolve(target.dataset.name);
+                }
+            });
+        });
+    }
+}
+//#endregion
+//#region Tenshee
+class Tenshee {
+    // 天使なカノジョ です(??)
+    constructor(){
+        this.resolved = 0;
+    }
+
+    reset(){
+        tensheeC.now = "";
+        tensheeC.max = 0;
+        tensheeC.mode = "";
+        this.tekiou();
+    }
+
+    plzinput(max = 0, mode = 0){
+        if(tensheeC.ing) return;
+        tensheeC.ing = 1;
+        this.reset();
+
+        if(max) tensheeC.max = max;
+        if(mode) tensheeC.mode = mode;
+        tensheeD.classList.add('show');
+        return new Promise((resolve) => {
+            this.resolved = resolve;
+        });
+    }
+
+    tekiou(){
+        let disp = tensheeC.dispD;
+        let now = tensheeC.now;
+
+        if(tensheeC.mode == "pass") disp.textContent = '*'.repeat(now.length);
+        else disp.textContent = now;
+    }
+
+    num(num){
+        let now = tensheeC.now;
+        let max = tensheeC.max;
+        if(max != 0 && now.length >= max) return;
+        
+        now += num;
+        tensheeC.now = now;
+        this.tekiou();
+    }
+
+    del(){
+        let now = tensheeC.now;
+        if(now == "") return;
+
+        now = now.slice(0, -1);
+        tensheeC.now = now;
+        this.tekiou();
+    }
+
+    confirm(){
+        tensheeD.classList.remove('show');
+        let now = tensheeC.now;
+        console.log(`天カノ結果:: ${now}`)
+        if(now == "") console.error('入力されてないっすね');
+        if(this.resolved){
+            this.resolved(now);
+            this.resolved = 0;
+            tensheeC.ing = 0;
+        }
+    }
+}
+let tensheeD = document.getElementById('tenshee');
+let tensheeC = {
+    ing: 0,
+    now: "",
+    dispD: tensheeD.querySelector('.disp')
+}
+let tensheeF = {};
+const tenshee = new Tenshee();
+tensheeD.querySelectorAll('.bt').forEach(bt => {
+    bt.addEventListener('click', () => {
+        if(bt.classList.contains('num')) tenshee.num(bt.dataset.num)
+        if(bt.classList.contains('del')) tenshee.del();
+        if(bt.classList.contains('ok')) tenshee.confirm();
+    });
+})
+
+//#endregion
 //#region OBS
 let OBS = {
     keys: {},
@@ -1011,6 +1304,7 @@ OBS.load = () => {
         "Mouse": 1,
         "Click": 1,
         "Paste": 0,
+        "Context": 1,
     }
 
     if(sts["Keys"]){
@@ -1031,6 +1325,10 @@ OBS.load = () => {
 
     if(sts["Paste"]){
         window.addEventListener('paste', OBS.Paste);
+    }
+
+    if(sts["Context"]){
+        window.addEventListener('contextmenu', e => e.preventDefault());
     }
 }
 
@@ -1091,7 +1389,7 @@ loaF.loadI = async() => {
         for(let name of Images[belong]){
             let img = new Image();
             img.src = `assets/images/${belong}/${name}.png`;
-            img.onload = kasan();
+            img.onload = kasan;
             img.onerror = () => {
                 console.error(`Image assets/images/${belong}/${name}.png failed to load.`);
                 loaC.erd += 1;
@@ -1196,12 +1494,32 @@ function soundVolume(code, val){
 
     if(code == 'se' || code == 'both'){
         souC.se = v;
-        for(k in sounds) if(sounds[k].dataset.type == 'se') sounds[k].volume = souC.se;
+
+        for(let belong in sounds){
+            for(let name in sounds[belong]){
+                let sound = sounds[belong][name];
+                if(sound.dataset.type == 'se'){
+                    sound.volume = souC.se;
+                }
+            }
+        }
     }
+
     if(code == 'bgm' || code == 'both'){
         souC.bgm = v;
-        for(k in sounds) if(sounds[k].dataset.type == 'bgm') sounds[k].volume = souC.bgm;
-        if(souC.nowBgm && sounds[souC.nowBgm]) sounds[souC.nowBgm].volume = souC.bgm;
+
+        for(let belong in sounds){
+            for(let name in sounds[belong]){
+                let sound = sounds[belong][name];
+                if(sound.dataset.type == 'bgm'){
+                    sound.volume = souC.bgm;
+                }
+            }
+        }
+
+        if(souC.nowBgm && sounds.bgm[souC.nowBgm]){
+            sounds.bgm[souC.nowBgm].volume = souC.bgm;
+        }
     }
 
     console.log(`[soundVolume] se:${souC.se} bgm:${souC.bgm}`);
@@ -1274,7 +1592,42 @@ let secrates = [
             location.reload();
         }
     },
+    {
+        ind:0,
+        name:'wawawwa',
+        arr:['w','a','w','a','w','w','a'],
+        limit:'n',
+        func: async function(){
+            staF.resetP();
+        }
+    }
 ]
+const secrateses = [];
+function secratesP(key){
+    secrateses.push(key);
+
+    let lenlen = secrates.sort((a,b) => b.arr.length - a.arr.length);
+    let len = lenlen[0].arr.length;
+    secrateses.splice(0, secrateses.length - len);
+    
+    secratesC();
+}
+async function secratesC(){
+    for(let sec of secrates){
+        if(sec.limit == 0) continue;
+
+        let len = sec.arr.length;
+        if(secrateses.length < len) continue;
+
+        let tail = secrateses.slice(-len);
+
+        if(tail.join() == sec.arr.join()){
+            console.log(`${sec.name}発動！！[${sec.arr.join(' ')}]`);
+            let res = await sec.func();
+            if(!res && sec.limit != 'n') sec.limit -= 1;
+        }
+    }
+}
 document.addEventListener('keydown', async function(e){
     let key = e.key.toLowerCase();
     if(key == 'escape') loop = 0;
@@ -1282,20 +1635,7 @@ document.addEventListener('keydown', async function(e){
     if(document.activeElement.tagName == 'INPUT') return;
     if(document.activeElement.tagName == 'TEXTAREA') return;
 
-    for(let sec of secrates){
-        let nke = sec.arr[sec.ind];
-        // console.log(`必要は${nke}、押されたは${key}！`);
-        if(key == nke){
-            sec.ind += 1;
-            if(sec.ind == sec.arr.length && sec.limit){
-                console.log(`${sec.name}発動！！[${sec.arr.join(' ')}]`);
-                sec.ind = 0;
-                let res = await sec.func();
-                if(!res && sec.limit != 'n') sec.limit -= 1;
-            }
-        }
-        else sec.ind = 0;
-    }
+    secratesP(key);
 })
 //#endregion
 
@@ -1309,21 +1649,18 @@ let mainC = {
      mvlsLD: document.querySelector('#movlis .list'),
     mvlsi: 0
 }
-mainC.spas = [ //classはspace想定、shoは1つだけ
-    { name:'home', rank:2, back:'#f0f8ff', sho:1 }, 
-    { name:"stage", rank:3, back:'#a0dea5', sho:0 },
-];
 let mainF = {};
 mainF.move = (to) => {
     if(mainC.spa == to) return console.log('どういうわけか もう そこにいる');
 	if(!to) return console.error(`せんぱ〜い？${to}ってどこですか〜？笑`);
 	
-	for(let a of mainC.spas) document.getElementById(a.name).classList.remove('show');
+	for(let a of Spaces) document.getElementById(a.name).classList.remove('show');
     document.getElementById(to).classList.add('show');
+    mainC.spa = to;
 }
 
 mainF.load = () => {
-    for(let spa of mainC.spas){
+    for(let spa of Spaces){
         let div = document.getElementById(spa.name);
         if(!div) continue;
 
@@ -1333,7 +1670,7 @@ mainF.load = () => {
 }
 
 //#region movlis
-for(let n of mainC.spas){
+for(let n of Spaces){
     let li = document.createElement('div');
     li.textContent = n.name;
     li.className = 'item';
@@ -1367,8 +1704,8 @@ let staC = {
     ctx: staD.querySelector('canvas').getContext('2d'),
     wid: 360,
     hei: 360,
-    row: 8, //横に長い
-    mas: 45, //大きさ
+    row: 10, //横に長い
+    mas: null, //大きさ
 
     loop: 0, //可否
     delta: 0,
@@ -1382,18 +1719,61 @@ let staC = {
         y: 0,
         flavor: 0, //これはUndertaleの色マスパズルを参考に
         state: 0, //これは簡易的バフ・デバフ的な
-    }
+        img: "normal",
+    },
+
+    ttcD: staD.querySelector('.teethcar'),
 }
 let staF = {};
 
 staF.load = () => {
     staC.can.width = staC.wid;
     staC.can.height = staC.hei;
-    staC.ctx.fillStyle = '#a0dea5';
-    staC.ctx.fillRect(0, 0, staC.wid, staC.hei);
+    staC.mas = staC.wid/staC.row;
+
+    staF.draw(); //描画
+    staF.tekiou(); //UI
+}
+
+// #region ちょっとここでUIを
+staC.uiD = staD.querySelector('.ui');
+staC.uiC= {
+    flavor: staC.uiD.querySelector('.disp .flavor .text'),
+    stat: staC.uiD.querySelector('.disp .stat .text'),
+
+    conD: staC.uiD.querySelector('.control'),
+    wD: staC.uiD.querySelector('.control .w'),
+    aD: staC.uiD.querySelector('.control .a'),
+    sD: staC.uiD.querySelector('.control .s'),
+    dD: staC.uiD.querySelector('.control .d'),
+}
+staF.tekiou = () => {
+    let flavor = staC.p.flavor;
+    let state = staC.p.state;
+
+    if(flavor == 0) flavor = 'なし';
+    if(state == 0) state = '健康';
+
+    staC.uiC.flavor.textContent = flavor;
+    staC.uiC.stat.textContent = state;
+}
+// #endregion
+
+staF.resetP = () => {
+    staC.p = {
+        x: 3,
+        y: 0,
+        flavor: 0,
+        state: 0,
+        img: "normal",
+    };
+    staF.draw();
+    staF.tekiou();
 }
 
 staF.start = () => {
+    staF.resetP();
+    
     staC.loop = 1;
     staF.gameloop();
 }
@@ -1408,7 +1788,7 @@ staF.draw = () => {
     staC.ctx.strokeStyle = '#2b2b2b';
     staC.ctx.lineWidth = 0.25;
     staC.ctx.strokeRect(0, 0, staC.wid, staC.hei);
-    for(let i = 0; i <= staC.mas; i++){
+    for(let i = 0; i <= staC.row; i++){
         staC.ctx.beginPath();
         staC.ctx.moveTo(i * staC.mas, 0);
         staC.ctx.lineTo(i * staC.mas, staC.hei);
@@ -1419,6 +1799,43 @@ staF.draw = () => {
         staC.ctx.lineTo(staC.wid, i * staC.mas);
         staC.ctx.stroke();
     };
+
+    // draw player
+    let p = staC.p;
+    let img = p.img;
+    if(images.skins[img]){
+        
+
+        if(img == 'teethcar') {
+            staC.ctx.save();
+            staC.ctx.scale(-1, 1);
+            staC.ctx.drawImage(images.skins[img], -p.x*staC.mas -staC.mas, p.y*staC.mas, staC.mas, staC.mas);
+            staC.ctx.restore();
+        }
+        else staC.ctx.drawImage(images.skins[img], p.x*staC.mas, p.y*staC.mas, staC.mas, staC.mas);
+    }
+}
+
+staF.calc = () => {
+    // console.log('calc');
+    let p = staC.p;
+
+    let edge = staC.row-1;
+    let isGr = 0; //whether地面にいる
+    // 本来はここで「下にものがあるか」を判別するが、眠いので一旦後回し。
+
+    // y:maxも床とする
+    if(staC.p.y == edge) isGr = 1;
+
+    if(!isGr && p.state != "フユウ"){
+        console.log(`床がないので落下します (y:${p.y} -> ${p.y+1})`);
+        p.y += 1;
+        
+        if(p.y >= staC.row) p.y = edge;
+    }
+
+    staF.tekiou();
+    staF.draw();
 }
 
 
@@ -1428,37 +1845,84 @@ staF.search = () => {
 
 staF.move = (dir, num) => {
     let p = staC.p;
+    let edge = staC.row-1;
     if(dir == 'x'){
+        let dx = num > 0 ? 1 : -1;
+        num = Math.abs(num);
         for(let i = 0; i < num; i++){
-            if(目の前に何かあるなら) break;
-            p.x += 1;
-            if(p.x == staC.row) p.x = 0;
+            // if(目の前に何かあるなら) break;
+            p.x += dx;
+            if(edge < p.x) p.x = edge;
+            if(p.x < 0) p.x = 0;
         }
     }
+    staF.draw();
 }
 
 //key
+staF.keyW = () => {
+    secratesP('w');
+    staF.move("y", -1);
+};
+staF.keyA = () => {
+    secratesP('a');
+    staF.move("x", -1);
+};
+staF.keyS = () => {
+    secratesP('s');
+    staF.move("y", 1);
+};
+staF.keyD = () => {
+    secratesP('d');
+    staF.move("x", 1);
+};
 document.addEventListener('keydown', (e) => {
     if(e.repeat) return;
     let key = e.key.toLowerCase();
     if(key == " ") key = 'space';
 
-    if(key == "w" || key == "arrowup") staF.move("y", -1);
-    if(key == "a" || key == "arrowleft") staF.move("x", -1);
-    if(key == "s" || key == "arrowdown") staF.move("y", 1);
-    if(key == "d" || key == "arrowright") staF.move("x", 1);
+    if(key == "w" || key == "arrowup") staF.keyW();
+    if(key == "a" || key == "arrowleft") staF.keyA();
+    if(key == "s" || key == "arrowdown") staF.keyS();
+    if(key == "d" || key == "arrowright") staF.keyD();
 });
+staC.uiC.wD.addEventListener('click', staF.keyW);
+staC.uiC.aD.addEventListener('click', staF.keyA);
+staC.uiC.sD.addEventListener('click', staF.keyS);
+staC.uiC.dD.addEventListener('click', staF.keyD);
 
 
 staF.gameloop = () => {
     staC.delta += 1;
 
-    if(staC.delta % 10 == 0){
-        staF.draw();
+    if(staC.delta % 20 == 0){
+        staF.calc();
     }
     
     if(staC.loop) requestAnimationFrame(staF.gameloop);
 }
+
+// #region skinとか
+staC.skins = [
+    {
+        name: "normal",
+        img: "normal",
+    },
+    {
+        name: "fullofmeka",
+        img: "teethcar",
+    }
+]
+staF.setSkin = (name) => {
+    let skin = staC.skins.find(s => s.name == name);
+    if(!skin) return console.error(`スキン名:${name} はnot existですわよ〜ん`);
+    staC.p.img = skin.img;
+    staF.draw();
+}
+
+staC.ttcD.addEventListener('click', () => staF.setSkin('fullofmeka'));
+// #endregion
+
 // #endregion
 
 

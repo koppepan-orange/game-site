@@ -190,6 +190,19 @@ function dogma(matu, shiki, k = 1){
 
     return res;
 }
+function ketasu(num){
+    if(num == 0) return 1;
+    num = Math.abs(num);
+    let res = Math.floor(Math.log10(num))+1;
+    return res;
+}
+function whethPoint(num){
+    let str = num.toString();
+    if(0 <= str.indexOf('.')) return true;
+    
+    return false;
+}
+
 function arraySelect(array){
     let select = Math.floor(Math.random()*array.length);
     return array[select];
@@ -336,9 +349,13 @@ function lsdSet(name, value){
 };
 function lsdGet(name){
     let res = localStorage.getItem(name);
-    if(res) res = JSON.parse(res);
-    else return null;
-    return res;
+    if(!res) return null;
+    try{
+        res = JSON.parse(res);
+        return res;
+    }catch(e){
+        return res;
+    };
 };
 function lsdRem(name){
     localStorage.removeItem(name);
@@ -762,7 +779,7 @@ class tk{
 
         let yoko = ['x', 'w'];
         for(let n of yoko){
-            console.log(n), console.log(eval(n));
+            // console.log(n);
             if(typeof contex[n] != 'string' || typeof contex[n] == 'string' && !contex[n].endsWith('%')) continue;
             let num = contex[n].slice(0, -1);
             contex[n] = num * window.innerWidth / 100;
@@ -950,6 +967,282 @@ class alertD{
         setTimeout(() => div.remove(), 1000);
     };
 };
+//#endregion
+//#region CheckBox feat.Slider
+class Checkbox {
+    constructor(
+        name = "テキストを入力してください",
+        kitei = 0,
+        func = 0,
+        data = 0
+    ){
+        this.name = name;
+        this.kitei = kitei;
+        this.func = func;
+
+        if(!data) data = {
+            back: '#b2b2b2',
+            backed: '#2b2b2b'
+        }
+        this.data = data; //固有。func用だったりするのかも
+
+        this.make();
+        // ここでこいつをreturnしたらinstanceが消える(このclassの他の関数を作れなくなる)
+    }
+    make(){
+        let div = document.createElement('div');
+        div.className = 'checkbox';
+        if(this.kitei) div.classList.add('tog');
+        div.dataset.cl = this.kitei; //0がoff..のはず
+
+        let [cBack, cBacked] = [this.data.back, this.data.backed];
+        div.style.setProperty('--back', cBack);
+            div.style.setProperty('--back-col', irohaHo(cBack));
+        div.style.setProperty('--backed', cBacked);
+            div.style.setProperty('--backed-col', irohaHo(cBacked));
+        
+        let text = document.createElement('div');
+        text.className = 'text';
+        text.textContent = this.name;
+        div.appendChild(text);
+
+        let clcl = async () => {
+            div.dataset.cl = fl(div.dataset.cl);
+            div.classList.toggle('tog', div.dataset.cl == 1);
+
+            if(this.func) this.func();
+        };
+        div.addEventListener('click', clcl);
+
+        this.div = div;
+    };
+
+    append(parent){
+        parent.appendChild(this.div);
+    }
+};
+
+class Slider {
+    constructor(
+        name = "テキストを入力してくださ",
+        kitei = 50,
+        func = 0,
+        data = 0
+    ){
+        this.name = name;
+        this.kitei = kitei;
+        this.func = func;
+
+        if(!data) data = {
+            back: '#b2b2b2',
+            backed: '#2b2b2b'
+        }
+        this.data = data;
+
+        this.make();
+    }
+
+    make(){
+        let div = document.createElement('div');
+        div.className = `slider ${this.name}`;
+        
+        let text = document.createElement('div');
+        text.className = 'label';
+        text.textContent = `${this.name}:`;
+        div.appendChild(text);
+        
+        let range = document.createElement('input')
+        range.type = "range"
+        range.min = 0;
+        range.max = 100;
+        range.value = this.kitei;
+        range.step = 1;
+        range.addEventListener('input', (e) => {
+            let val = e.target.value;
+            let [A, B] = [this.data.back, this.data.backed];
+            /*
+            // 全体変え
+            let per = val / 100;
+            let mix = irohaMix(A, B, per);
+            range.style.setProperty('--tsuma', irohaHo(mix));
+            range.style.background = mix;
+            */
+
+            // つまみの位置で変え
+            let per = val;
+            let mix = irohaMix(A, B, 0.5);
+            range.style.setProperty('--tsuma', mix);
+            range.style.background = `
+                linear-gradient(to right,
+                    ${A} 0%,
+                    ${A} ${per - 10}%,
+                    ${mix} ${per}%,
+                    ${B} ${per + 10}%,
+                    ${B} 100%
+                )
+            `;
+
+
+            if(this.func) this.func(val);
+        })
+        div.appendChild(range);
+
+        this.div = div;
+        this.range = range;
+    }
+
+    append(parent){
+        parent.appendChild(this.div);
+        this.range.dispatchEvent(new Event('input'));
+    }
+}
+// #endregion
+//#region takushiSen
+class TakushiSen {
+    constructor(choices, mode = "tate", data = 0) {
+        this.choices = choices; // [{name, img}, {name, img}, ...]
+        this.mode = mode;
+
+        if(!data) data = {
+            back: '#b2b2b2',
+            backed: '#2b2b2b'
+        };
+        this.data = data;
+
+        this.make();
+    }
+
+    make() {
+        let div = document.createElement('div');
+        div.className = `mode ${this.mode}`;
+        
+        let [b, bEd] = [this.data.back, this.data.backed];
+        div.style.setProperty('--botan', b);
+        div.style.setProperty('--botan-col', irohaHo(b));
+        div.style.setProperty('--botan-ed', bEd);
+        div.style.setProperty('--botan-col-ed', irohaHo(bEd));
+
+        this.choices.forEach(ma => {
+            let [name, gazou] = [ma.name, ma.img];
+            if(typeof ma === 'string') name = ma;
+
+            let item = document.createElement('div');
+            item.className = `item ${name}`;
+            item.textContent = name;
+            item.dataset.name = name;
+
+            // 画像があるならば
+            if(gazou){
+                let img = document.createElement('img');
+                img.src = gazou;
+                item.appendChild(img);
+            }
+            div.appendChild(item);
+        });
+
+        this.div = div;
+        return div;
+    }
+
+    // ここがメイン！await で待ち受けるやつ
+    async select(parent) {
+        return new Promise(resolve => {
+            let div = this.make();
+            parent.appendChild(div);
+
+            div.addEventListener('click', (e) => {
+                let target = e.target.closest('.item');
+                if (target) {
+                    div.remove();
+                    resolve(target.dataset.name);
+                }
+            });
+        });
+    }
+}
+//#endregion
+//#region Tenshee
+class Tenshee {
+    // 天使なカノジョ です(??)
+    constructor(){
+        this.resolved = 0;
+    }
+
+    reset(){
+        tensheeC.now = "";
+        tensheeC.max = 0;
+        tensheeC.mode = "";
+        this.tekiou();
+    }
+
+    plzinput(max = 0, mode = 0){
+        if(tensheeC.ing) return;
+        tensheeC.ing = 1;
+        this.reset();
+
+        if(max) tensheeC.max = max;
+        if(mode) tensheeC.mode = mode;
+        tensheeD.classList.add('show');
+        return new Promise((resolve) => {
+            this.resolved = resolve;
+        });
+    }
+
+    tekiou(){
+        let disp = tensheeC.dispD;
+        let now = tensheeC.now;
+
+        if(tensheeC.mode == "pass") disp.textContent = '*'.repeat(now.length);
+        else disp.textContent = now;
+    }
+
+    num(num){
+        let now = tensheeC.now;
+        let max = tensheeC.max;
+        if(max != 0 && now.length >= max) return;
+        
+        now += num;
+        tensheeC.now = now;
+        this.tekiou();
+    }
+
+    del(){
+        let now = tensheeC.now;
+        if(now == "") return;
+
+        now = now.slice(0, -1);
+        tensheeC.now = now;
+        this.tekiou();
+    }
+
+    confirm(){
+        tensheeD.classList.remove('show');
+        let now = tensheeC.now;
+        console.log(`天カノ結果:: ${now}`)
+        if(now == "") console.error('入力されてないっすね');
+        if(this.resolved){
+            this.resolved(now);
+            this.resolved = 0;
+            tensheeC.ing = 0;
+        }
+    }
+}
+let tensheeD = document.getElementById('tenshee');
+let tensheeC = {
+    ing: 0,
+    now: "",
+    dispD: tensheeD.querySelector('.disp')
+}
+let tensheeF = {};
+const tenshee = new Tenshee();
+tensheeD.querySelectorAll('.bt').forEach(bt => {
+    bt.addEventListener('click', () => {
+        if(bt.classList.contains('num')) tenshee.num(bt.dataset.num)
+        if(bt.classList.contains('del')) tenshee.del();
+        if(bt.classList.contains('ok')) tenshee.confirm();
+    });
+})
+
 //#endregion
 //#region OBS
 let OBS = {
@@ -1201,12 +1494,32 @@ function soundVolume(code, val){
 
     if(code == 'se' || code == 'both'){
         souC.se = v;
-        for(k in sounds) if(sounds[k].dataset.type == 'se') sounds[k].volume = souC.se;
+
+        for(let belong in sounds){
+            for(let name in sounds[belong]){
+                let sound = sounds[belong][name];
+                if(sound.dataset.type == 'se'){
+                    sound.volume = souC.se;
+                }
+            }
+        }
     }
+
     if(code == 'bgm' || code == 'both'){
         souC.bgm = v;
-        for(k in sounds) if(sounds[k].dataset.type == 'bgm') sounds[k].volume = souC.bgm;
-        if(souC.nowBgm && sounds[souC.nowBgm]) sounds[souC.nowBgm].volume = souC.bgm;
+
+        for(let belong in sounds){
+            for(let name in sounds[belong]){
+                let sound = sounds[belong][name];
+                if(sound.dataset.type == 'bgm'){
+                    sound.volume = souC.bgm;
+                }
+            }
+        }
+
+        if(souC.nowBgm && sounds.bgm[souC.nowBgm]){
+            sounds.bgm[souC.nowBgm].volume = souC.bgm;
+        }
     }
 
     console.log(`[soundVolume] se:${souC.se} bgm:${souC.bgm}`);
@@ -1304,7 +1617,6 @@ document.addEventListener('keydown', async function(e){
 })
 //#endregion
 
-
 // #region main
 let mainD = document.getElementById('main');
 let mainC = {
@@ -1314,20 +1626,18 @@ let mainC = {
      mvlsLD: document.querySelector('#movlis .list'),
     mvlsi: 0
 }
-mainC.spas = [ //classはspace想定、shoは1つだけ
-    { name:'home', rank:2, back:'#f0f8ff', sho:1 }, 
-];
 let mainF = {};
 mainF.move = (to) => {
     if(mainC.spa == to) return console.log('どういうわけか もう そこにいる');
 	if(!to) return console.error(`せんぱ〜い？${to}ってどこですか〜？笑`);
 	
-	for(let a of mainC.spas) document.getElementById(a.name).classList.remove('show');
+	for(let a of Spaces) document.getElementById(a.name).classList.remove('show');
     document.getElementById(to).classList.add('show');
+    mainC.spa = to;
 }
 
 mainF.load = () => {
-    for(let spa of mainC.spas){
+    for(let spa of Spaces){
         let div = document.getElementById(spa.name);
         if(!div) continue;
 
@@ -1337,7 +1647,7 @@ mainF.load = () => {
 }
 
 //#region movlis
-for(let n of mainC.spas){
+for(let n of Spaces){
     let li = document.createElement('div');
     li.textContent = n.name;
     li.className = 'item';
@@ -1365,6 +1675,7 @@ document.addEventListener('keyup',e => {
 
 
 
+
 let driD = document.getElementById('drink-game');
 let driC = {
     open:0, //0:閉じている 1:開いている(右上のやつでtog可)
@@ -1383,48 +1694,7 @@ let driC = {
      euroD:driD.querySelector('.user .euro'),
     logD:driD.querySelector('.log'),
 }
-driC.Custs = [
-    {
-        can:1,
-        name:'Hiro811',
-        hello:'こんにちは！！',
-        ordel:'と、',
-        order:'で、お願いします！',
-        happy:'わーーー！！ありがとうございます！！',
-        sader:'ぁ、え、あー..ありがとう....ございます！',
-        terr:0 //嫌々ながらも買う->評判は落ちる?
-    },
-    {
-        can:1,
-        wait:800,
-        name:'RyosuK992',
-        hello:'すいませーん！',
-        ordel:'と、',
-        order:'で。',
-        happy:'ありがとうございましたー',
-        sader:'..頼んだのと違うんですけど',
-        terr:1 //買わない
-    },
-]
 // let wait = cust.wait ? 1000;
-
-driC.Drinks = [
-    // ['水','牛乳','お茶','あがり','オレンジジュース','グレープジュース','カルピス','コーヒー','モンスターエネルギードリンク','ビール','ミックスジュース','コーヒー牛乳','フルーツ牛乳','ミックス牛乳','オレピス','グレピス','コヒピス','ミルピス','薄めたお茶','薄めた牛乳','薄めたオレンジジュース','薄めたグレープジュース','薄めたコーヒー','薄めたカルピス','薄めたビール'];
-    {
-        can:1,
-        name:'水',
-        // descはいったん後で。
-        make:['water'],
-        price:110,
-    },
-    {
-        can:1,
-        name:'牛乳',
-        betu:['ミルク', 'ホットミルク'],
-        make:['milk'],
-        price:130,
-    }
-]
 
 let ordera = 0;
 let orderb = 0;
