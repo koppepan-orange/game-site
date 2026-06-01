@@ -1731,6 +1731,9 @@ staF.load = () => {
     staC.can.height = staC.hei;
     staC.mas = staC.wid/staC.row;
 
+    staC.map = [];
+    for(let i = 0; i < staC.row; i++) staC.map.push(new Array(staC.row).fill(0));
+
     staF.draw(); //描画
     staF.tekiou(); //UI
 }
@@ -1819,8 +1822,8 @@ staF.draw = () => {
 staF.calc = () => {
     // console.log('calc');
     let p = staC.p;
-
     let edge = staC.row-1;
+    
     let isGr = 0; //whether地面にいる
     // 本来はここで「下にものがあるか」を判別するが、眠いので一旦後回し。
 
@@ -1828,7 +1831,7 @@ staF.calc = () => {
     if(staC.p.y == edge) isGr = 1;
 
     if(!isGr && p.state != "フユウ"){
-        console.log(`床がないので落下します (y:${p.y} -> ${p.y+1})`);
+        // console.log(`床がないので落下します (y:${p.y} -> ${p.y+1})`);
         p.y += 1;
         
         if(p.y >= staC.row) p.y = edge;
@@ -1838,10 +1841,64 @@ staF.calc = () => {
     staF.draw();
 }
 
+// #region obについて！
 
-staF.search = () => {
+/*
+    addobで追加できる。
+    同じ個所に重複して設置することもできるが、効力はしらん..いやmapのがいいかぁ～？
+    map[
+        [],[],[],[],[]..
+    ]
+    式にして、row*row分の配列を作る..?それはloadの時にやればいい...ならばそっちのが楽そう？
+    今回滑らか移動させる気ないしな。うしそっちにしよう
+*/
+
+staF.addmap = (name, x, y, data = {}) => {
+    if(!name || !x || !y) return console.error('なんか たりない SU');
     
+    // すでにあったら だめだめよ Woo
+    let senkyack = staF.search(x, y);
+    if(senkyack) return console.console("すでにあるんでcanceled"); //置き換えにするー、、？いやなし なしなしはじめ
+
+    let obj = {
+        name,
+        x,
+        y,
+        data
+    };
+    
+    if(staC.map[x][y] == 0){
+        staC.map[x][y] = obj;
+    }
+
+    return 0
 }
+staF.search = (x, y) => {
+    // let arr = staC.objs.filter(o => o.x == x && o.y == y);
+    // if(0 < arr.length) return arr[0];
+    // if(arr.length == 0) return 0;
+
+    let obj = staC.map[x][y];
+    if(obj) return obj;
+
+    return 0;
+}
+
+staC.can.addEventListener('mousedown', (e) => {
+    // キャンバスの左上からの相対座標を取得
+    let rect = staC.can.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    // マス座標に変換
+    let gridX = Math.floor(x / staC.mas);
+    let gridY = Math.floor(y / staC.mas);
+
+    console.log(`クリックした場所: マス(${gridX}, ${gridY})`);
+    
+    staF.addmap("block", gridX, gridY)
+});
+// #endregion
 
 staF.move = (dir, num) => {
     let p = staC.p;
@@ -1850,10 +1907,20 @@ staF.move = (dir, num) => {
         let dx = num > 0 ? 1 : -1;
         num = Math.abs(num);
         for(let i = 0; i < num; i++){
-            // if(目の前に何かあるなら) break;
+            if(staF.search(p.x+dx, p.y)) break;
             p.x += dx;
             if(edge < p.x) p.x = edge;
             if(p.x < 0) p.x = 0;
+        }
+    }
+    if(dir == 'y'){
+        let dy = num > 0 ? 1 : -1;
+        num = Math.abs(num);
+        for(let i = 0; i < num; i++){
+            if(staF.search(p.x, p.y+dy)) break;
+            p.y += dy;
+            if(edge < p.y) p.y = edge;
+            if(p.y < 0) p.y = 0;
         }
     }
     staF.draw();

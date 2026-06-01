@@ -114,6 +114,17 @@ img{
     pointer-events: none;
     z-index: 255;
 }
+
+#hakaisatsu{ /*img*/
+    height: 120vh;
+    aspect-ratio: 1/1;
+    position: fixed;
+    top: -10vh;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: var(--mostop);
+    pointer-events: none;
+}
 /* #endregion */
 
 /* #region logとtext */
