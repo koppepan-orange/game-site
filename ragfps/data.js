@@ -20,6 +20,7 @@ const Fonts = [
 const Images = {
     systems:['error'],
     skins:['normal', 'teethcar'],
+    blocks:['block', 'bleck', 'box', 'ice', 'water', 'apple', 'baloon', 'boost'],
 }
 
 const Sounds = {
@@ -34,41 +35,93 @@ const Spaces = [
 
 
 const Blocks = [
+    /*
+    on:0/1 1ならonFで乗った時動作。...ん？「乗って、次に方向を入力したあと」に発動するはどうするんだ？
+    今、あどゔぁいすをもらいましたーー、こんなんなんぼあってもいいですからね
+    */
+
     {
-        name:"block",
-        on:0
+        name: "block",
+        jpnm: "普通のブロック",
+        on: null // 何も起きない壁
     },
     {
-        name:"bleck", //乗って、その後方向入力をすると壊れる。下ボタンでも上ボタンでも壊れるのでち
-        jpnm:"壊れかけのレディオ",
-        on:0
+        name: "bleck", //乗って、その後方向入力をすると壊れる。下ボタンでも上ボタンでも壊れるのでち
+        jpnm: "壊れかけのレディオ",
+        on: "before_move",
+        onF: (x, y) => {
+            console.log("メキッ…床が壊れた！");
+            staF.delmap(x, y);
+        }
     },
     {
-        name:"box", //特殊。押せる。ジャンプでも押せるし、下向きも押せる むずそ～～
-        on:0
+        name: "box", //特殊。押せる。ジャンプでも押せるし、下向きも押せる むずそ～～
+        jpnm: "おせる箱",
+        on: "move_into",
+        onF: (dir, num) => {
+            // プレイヤーの進行方向に、さらに空きマスがあるかチェックして
+            // 空いてたら箱の座標を動かす。むずそうに見えて、関数化すればいける！
+        }
     },
     {
-        name:"ice", //乗った時、最後に入力した方向にmoveさせる
-        on:0
+        name: "ice", 
+        jpnm: "つるつる床", //乗った時、最後に入力した方向にmoveさせる
+        on: "step",
+        onF: () => {
+            let p = staC.p;
+            let dir = p.dir;
+
+            let xy = 0;
+            if(dir == 1 || dir == 3) xy = "x";
+            if(dir == 0 || dir == 2) xy = "y";
+
+            let num = 1;
+            if(dir == 0) num = -1;
+            if(dir == 3) num = -1;
+            
+            staF.move(dir, 1); // とりあえず1マスだけ動かしてみる。これでいけるはず！
+            // dir:x/y, num:1/-1
+            // 最後に入力された方向（lastDir, lastNum）に、さらに滑らせる！
+            // staF.move(lastDir, lastNum) をもう一回呼ぶイメージね。
+        }
     },
     {
-        name:"water", //水内なら自由に動けるが、水外に出ると戻る。
-        on:0
+        no: 1,
+        name: "water", //水内なら自由に動けるが、水外に出ると戻る。
+        jpnm: "お水",
+        on: "step",
+        onF: (p) => {
+            p.state = "フユウ"; // 落下を無効化するバフ（デバフ？）を与える
+        }
     },
     //つな 乗るとつかまれて、その場にとどまれる
     {
-        name:"apple",
-        on:0
+        name: "apple", //乗るとすぐに下方向に何かにぶつかるまでごと直進する。
+        jpnm: "落ちるリンゴ",
+        on: "step",
+        onF: (p) => {
+            // 下方向に障害物（searchで何か引っかかるか、画面外）にぶつかるまで
+            // ループで p.y を増やし続ける
+        }
     },
     {
-        name:"baloon",
-        on:0
+        name: "baloon", //乗るとすぐに上方向に何かにぶつかるまでごと直進する。
+        jpnm: "浮かぶ風船",
+        on: "step",
+        onF: (p) => {
+            // appleの逆。上方向（yマイナス）にぶつかるまで直進！
+        }
     },
     {
-        name:"boost", //向いてる方向に直進する。ぶつかったら止まる
-        on:0
-    },
+        name: "boost",  //左右の向いてる方向に何かにぶつかるまでごと直進する
+        jpnm: "ダッシュパネル",
+        on: "step",
+        onF: (data) => {
+            // data.dir = "left" とか "right" を持たせておいて、その方向に直進させる
+        }
+    }
 ];
+
 
 const Maps = [
     [

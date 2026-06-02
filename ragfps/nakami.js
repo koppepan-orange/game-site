@@ -1592,6 +1592,7 @@ let secrates = [
             location.reload();
         }
     },
+
     {
         ind:0,
         name:'wawawwa',
@@ -1599,6 +1600,15 @@ let secrates = [
         limit:'n',
         func: async function(){
             staF.resetP();
+        }
+    },
+    {
+        ind:0,
+        name:'dsdss',
+        arr:['d','s','d','s','s'],
+        limit:'n',
+        func: async function(){
+            staF.randomap();
         }
     }
 ]
@@ -1717,6 +1727,7 @@ let staC = {
     p: {
         x: 3,
         y: 0,
+        dir: 1, //向き。↑→↓←=0123
         flavor: 0, //これはUndertaleの色マスパズルを参考に
         state: 0, //これは簡易的バフ・デバフ的な
         img: "normal",
@@ -1766,6 +1777,7 @@ staF.resetP = () => {
     staC.p = {
         x: 3,
         y: 0,
+        dir: 1,
         flavor: 0,
         state: 0,
         img: "normal",
@@ -1817,6 +1829,17 @@ staF.draw = () => {
         }
         else staC.ctx.drawImage(images.skins[img], p.x*staC.mas, p.y*staC.mas, staC.mas, staC.mas);
     }
+
+    // draw objects(map)
+    for(let x = 0; x < staC.row; x++){
+        for(let y = 0; y < staC.row; y++){
+            let obj = staC.map[x][y];
+            if(obj){
+                let img = images.blocks[obj.name];
+                if(img) staC.ctx.drawImage(img, x*staC.mas, y*staC.mas, staC.mas, staC.mas);
+            }
+        }
+    }
 }
 
 staF.calc = () => {
@@ -1824,11 +1847,11 @@ staF.calc = () => {
     let p = staC.p;
     let edge = staC.row-1;
     
-    let isGr = 0; //whether地面にいる
-    // 本来はここで「下にものがあるか」を判別するが、眠いので一旦後回し。
+    let isGr = 0;
+    if(staF.search(p.x, p.y+1)) isGr = 1; //whether地面にいる
+    if(staC.p.y == edge) isGr = 1; //y:maxも床とする
 
-    // y:maxも床とする
-    if(staC.p.y == edge) isGr = 1;
+    p.isgr = isGr;
 
     if(!isGr && p.state != "フユウ"){
         // console.log(`床がないので落下します (y:${p.y} -> ${p.y+1})`);
@@ -1853,12 +1876,39 @@ staF.calc = () => {
     今回滑らか移動させる気ないしな。うしそっちにしよう
 */
 
-staF.addmap = (name, x, y, data = {}) => {
-    if(!name || !x || !y) return console.error('なんか たりない SU');
+staF.search = (x = NaN, y = NaN) => {
+    if(isNaN(x) || isNaN(y)) return console.error('なんか たりない SU');
+
+    if(x < 0 || y < 0 || 
+        staC.row <= x || staC.row <= y){
+        // ゆくゆくは繋ぎ合わせた図面のその方向のやつに行きます...が、今は止め止め
+        return 1; //壁と同じ扱いにする
+    }
+
+    let obj = staC.map[x][y];
+    if(obj) return obj;
+
+    let p = staC.p;
+    if(p.x == x && p.y == y) return p;
+
+    return 0;
+}
+staF.umaly = () => {
+    // もしも全てのマスが埋まっているならば
+    for(let x = 0; x < staC.row; x++){
+        for(let y = 0; y < staC.row; y++){
+            if(!staF.search(x, y)) return 0;
+        }
+    }
+    
+    return 1;
+}
+staF.addmap = (name, x = NaN, y = NaN, data = {}) => {
+    if(!name || isNaN(x) || isNaN(y)) return console.error('なんか たりない SU');
     
     // すでにあったら だめだめよ Woo
     let senkyack = staF.search(x, y);
-    if(senkyack) return console.console("すでにあるんでcanceled"); //置き換えにするー、、？いやなし なしなしはじめ
+    if(senkyack) return console.log("すでにあるんでcanceled"); //置き換えにするー、、？いやなし なしなしはじめ
 
     let obj = {
         name,
@@ -1873,36 +1923,59 @@ staF.addmap = (name, x, y, data = {}) => {
 
     return 0
 }
-staF.search = (x, y) => {
-    // let arr = staC.objs.filter(o => o.x == x && o.y == y);
-    // if(0 < arr.length) return arr[0];
-    // if(arr.length == 0) return 0;
+staF.delmap = (x = NaN, y = NaN) => {
+    if(isNaN(x) || isNaN(y)) return console.error('なんか たりない SU');
 
-    let obj = staC.map[x][y];
-    if(obj) return obj;
+    if(staC.map[x][y]) staC.map[x][y] = 0;
 
     return 0;
 }
 
-staC.can.addEventListener('mousedown', (e) => {
-    // キャンバスの左上からの相対座標を取得
-    let rect = staC.can.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
+staF.randomap = (num = 10) => {
 
-    // マス座標に変換
+    let edge = staC.row-1;
+    for(let i = 0; i < num; i++){
+        if(staF.umaly()) return console.error('マスが全部埋まってるのでキャンセル');
+
+        let x, y;
+        do{
+            x = random(0, edge);
+            y = random(0, edge);
+        } while(staF.search(x, y));
+        
+        let block = arraySelect(Blocks.filter(a => !a.no));
+        staF.addmap(block.name, x, y);
+    }
+}
+
+staC.can.addEventListener('pointerdown', (e) => {
+    let rect = staC.can.getBoundingClientRect();
+
+    let scaleX = staC.can.width / rect.width;
+    let scaleY = staC.can.height / rect.height;
+
+    let x = (e.clientX - rect.left) * scaleX;
+    let y = (e.clientY - rect.top) * scaleY;
+
     let gridX = Math.floor(x / staC.mas);
     let gridY = Math.floor(y / staC.mas);
 
     console.log(`クリックした場所: マス(${gridX}, ${gridY})`);
     
-    staF.addmap("block", gridX, gridY)
+    let aruno = staF.search(gridX, gridY);
+    if(!aruno) staF.addmap("block", gridX, gridY);
+    if(aruno) staF.delmap(gridX, gridY);
 });
+
 // #endregion
 
 staF.move = (dir, num) => {
+    return;
     let p = staC.p;
     let edge = staC.row-1;
+
+    
+
     if(dir == 'x'){
         let dx = num > 0 ? 1 : -1;
         num = Math.abs(num);
@@ -1926,9 +1999,77 @@ staF.move = (dir, num) => {
     staF.draw();
 }
 
+staF.move = (dir, num) => {
+    let p = staC.p;
+    let edge = staC.row - 1;
+    
+    // 進行方向のベクトルを計算 (+1 か -1 か)
+    let d = num > 0 ? 1 : -1;
+    let steps = Math.abs(num);
+
+    for (let i = 0; i < steps; i++) {
+        // 次の移動先の座標を計算しておく
+        let nextX = dir === 'x' ? p.x + d : p.x;
+        let nextY = dir === 'y' ? p.y + d : p.y;
+
+        // -----------------------------------------------------------------
+        // 【1】トリガー：before_move (移動前 / 壊れる床など)
+        // -----------------------------------------------------------------
+        // 今プレイヤーが「乗っている」マスのブロックを取得
+        let currentBlock = staC.map[p.x] ? staC.map[p.x][p.y] : 0;
+        if (currentBlock && currentBlock.data.trigger === "before_move") {
+            // 例: Blocksのデータにある「壊れる処理」を実行
+            // ここで床を消したりする
+            staF.executeGimmick(currentBlock, p, { x: p.x, y: p.y });
+        }
+
+        // -----------------------------------------------------------------
+        // 【2】トリガー：move_into (侵入時 / 押せる箱など)
+        // -----------------------------------------------------------------
+        // 移動先（前方のマス）にあるブロックを取得
+        let nextBlock = staF.search(nextX, nextY);
+        
+        // 移動先が「壁（画面外）」なら移動中止
+        if (nextBlock === 1) break; 
+        
+        if (nextBlock && nextBlock.data.trigger === "move_into") {
+            // 例: 箱を押す処理などを実行。
+            // もし「箱が重くて押せなかった」なら、移動をキャンセルして break させる
+            let canMove = staF.executeGimmick(nextBlock, p, { dir, d, nextX, nextY });
+            if (!canMove) break; 
+        } else if (nextBlock) {
+            // move_into 以外の通常の壁ブロックなら進めないのでストップ
+            break; 
+        }
+
+        // 実際の移動処理
+        if (dir === 'x') p.x = nextX;
+        if (dir === 'y') p.y = nextY;
+
+        // 画面外にいかないためのガード
+        if (p.x > edge) p.x = edge; if (p.x < 0) p.x = 0;
+        if (p.y > edge) p.y = edge; if (p.y < 0) p.y = 0;
+
+        // -----------------------------------------------------------------
+        // 【3】トリガー：step (移動完了後 / 氷・風船など)
+        // -----------------------------------------------------------------
+        // 移動した「先」の床のギミックを発動
+        let steppedBlock = staC.map[p.x] ? staC.map[p.x][p.y] : 0;
+        if (steppedBlock && steppedBlock.data.trigger === "step") {
+            // 例: 氷ならさらに滑らせる、風船なら上へ飛ばす
+            staF.executeGimmick(steppedBlock, p, { dir, d });
+            // ※連鎖的に動くギミックの場合、ここでループを抜けるなどの調整が必要
+        }
+    }
+    
+    staF.draw();
+}
+
+
 //key
 staF.keyW = () => {
     secratesP('w');
+    if(!staC.p.isgr && staC.p.statu != "フユウ") return;
     staF.move("y", -1);
 };
 staF.keyA = () => {
