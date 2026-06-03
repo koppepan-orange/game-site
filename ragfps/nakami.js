@@ -1882,7 +1882,7 @@ staF.search = (x = NaN, y = NaN) => {
     if(x < 0 || y < 0 || 
         staC.row <= x || staC.row <= y){
         // ゆくゆくは繋ぎ合わせた図面のその方向のやつに行きます...が、今は止め止め
-        return 1; //壁と同じ扱いにする
+        return 'wall'; //壁と同じ扱いにする
     }
 
     let obj = staC.map[x][y];
@@ -1969,13 +1969,30 @@ staC.can.addEventListener('pointerdown', (e) => {
 
 // #endregion
 
-staF.move = (dir, num) => {
-    return;
+staF.move = (mx, my) => {
     let p = staC.p;
     let edge = staC.row-1;
 
-    
+    let xy = arrayShuffle(["x", "y"]);
+    let ct = {x: mx, y: my};
+    let dd = {
+        x: mx > 0 ? 1 : 0,
+        y: my > 0 ? 1 : 0
+    }
+    for(let dir of xy){
+        let d = dd[dir];
+        let num = ct[dir];
+        num = Math.abs(num);
 
+        for(let i = 0; i < num; i++){
+            if(staF.search(p.x, p.y)) break;
+        
+        
+        
+
+    }
+
+    return;
     if(dir == 'x'){
         let dx = num > 0 ? 1 : -1;
         num = Math.abs(num);
@@ -1999,71 +2016,6 @@ staF.move = (dir, num) => {
     staF.draw();
 }
 
-staF.move = (dir, num) => {
-    let p = staC.p;
-    let edge = staC.row - 1;
-    
-    // 進行方向のベクトルを計算 (+1 か -1 か)
-    let d = num > 0 ? 1 : -1;
-    let steps = Math.abs(num);
-
-    for (let i = 0; i < steps; i++) {
-        // 次の移動先の座標を計算しておく
-        let nextX = dir === 'x' ? p.x + d : p.x;
-        let nextY = dir === 'y' ? p.y + d : p.y;
-
-        // -----------------------------------------------------------------
-        // 【1】トリガー：before_move (移動前 / 壊れる床など)
-        // -----------------------------------------------------------------
-        // 今プレイヤーが「乗っている」マスのブロックを取得
-        let currentBlock = staC.map[p.x] ? staC.map[p.x][p.y] : 0;
-        if (currentBlock && currentBlock.data.trigger === "before_move") {
-            // 例: Blocksのデータにある「壊れる処理」を実行
-            // ここで床を消したりする
-            staF.executeGimmick(currentBlock, p, { x: p.x, y: p.y });
-        }
-
-        // -----------------------------------------------------------------
-        // 【2】トリガー：move_into (侵入時 / 押せる箱など)
-        // -----------------------------------------------------------------
-        // 移動先（前方のマス）にあるブロックを取得
-        let nextBlock = staF.search(nextX, nextY);
-        
-        // 移動先が「壁（画面外）」なら移動中止
-        if (nextBlock === 1) break; 
-        
-        if (nextBlock && nextBlock.data.trigger === "move_into") {
-            // 例: 箱を押す処理などを実行。
-            // もし「箱が重くて押せなかった」なら、移動をキャンセルして break させる
-            let canMove = staF.executeGimmick(nextBlock, p, { dir, d, nextX, nextY });
-            if (!canMove) break; 
-        } else if (nextBlock) {
-            // move_into 以外の通常の壁ブロックなら進めないのでストップ
-            break; 
-        }
-
-        // 実際の移動処理
-        if (dir === 'x') p.x = nextX;
-        if (dir === 'y') p.y = nextY;
-
-        // 画面外にいかないためのガード
-        if (p.x > edge) p.x = edge; if (p.x < 0) p.x = 0;
-        if (p.y > edge) p.y = edge; if (p.y < 0) p.y = 0;
-
-        // -----------------------------------------------------------------
-        // 【3】トリガー：step (移動完了後 / 氷・風船など)
-        // -----------------------------------------------------------------
-        // 移動した「先」の床のギミックを発動
-        let steppedBlock = staC.map[p.x] ? staC.map[p.x][p.y] : 0;
-        if (steppedBlock && steppedBlock.data.trigger === "step") {
-            // 例: 氷ならさらに滑らせる、風船なら上へ飛ばす
-            staF.executeGimmick(steppedBlock, p, { dir, d });
-            // ※連鎖的に動くギミックの場合、ここでループを抜けるなどの調整が必要
-        }
-    }
-    
-    staF.draw();
-}
 
 
 //key
