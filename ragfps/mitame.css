@@ -671,6 +671,69 @@ input[type="range"].slider::-webkit-slider-thumb:hover{
     background: #ffffff;
     position: relative;
 }
+#stage .settle{
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: fit-content;
+    height: fit-content;
+    padding: 10px 25px;
+    background: #2b2b2b80;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-sizing: border-box;
+    z-index: 255;
+}
+#stage .settle.tog{
+    display: flex;
+}
+#stage .settle .body{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    width: 100%;
+    height: fit-content;
+    box-sizing: border-box;
+}
+#stage .settle .text{
+    display: block;
+    color: #ffffff;
+}
+#stage .settle .body .mono{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 60px;
+    height: fit-content;
+    background: #00000020;
+    position: relative;
+    box-sizing: border-box;
+}
+#stage .settle .body .mono.high{
+    background: #ffb94f20;
+}
+#stage .settle .body .mono img{
+    display: block;
+    width: 100%;
+    aspect-ratio: 1/1;
+    padding: 5px;
+    object-fit: contain;
+    object-position: center;
+    position: relative;
+    box-sizing: border-box;
+}
+#stage .settle .body .mono .mozi{
+    color: #ffffff;
+    font-size: 14px;
+    line-height: 14px;
+    padding-bottom: 5px;
+}
+
 #stage .ui{
     display: flex;
     flex-direction: row;

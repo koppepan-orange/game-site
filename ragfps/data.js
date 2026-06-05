@@ -82,7 +82,7 @@ const Blocks = [
             if(dir == 0) num = -1;
             if(dir == 3) num = -1;
             
-            staF.move(dir, 1); // とりあえず1マスだけ動かしてみる。これでいけるはず！
+            staF.move(dir, num); // とりあえず1マスだけ動かしてみる。これでいけるはず！
             // dir:x/y, num:1/-1
             // 最後に入力された方向（lastDir, lastNum）に、さらに滑らせる！
             // staF.move(lastDir, lastNum) をもう一回呼ぶイメージね。
