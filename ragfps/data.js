@@ -43,26 +43,26 @@ const Blocks = [
     {
         name: "block",
         jpnm: "普通のブロック",
-        on: null // 何も起きない壁
+        on: 0, // 何も起きない壁
     },
     {
         name: "bleck", //乗って、その後方向入力をすると壊れる。下ボタンでも上ボタンでも壊れるのでち
         jpnm: "壊れかけのレディオ",
-        on: "before_move",
+        on: "atsk",
         onF: (x, y) => {
-            console.log("メキッ…床が壊れた！");
+            // console.log(`${x}, ${y}のブロックが壊れました！`);
             staF.delmap(x, y);
         }
     },
     {
         name: "box", //特殊。押せる。ジャンプでも押せるし、下向きも押せる むずそ～～
         jpnm: "おせる箱",
-        on: "move_into",
+        on: "osu",
         onF: () => {
             let p = staC.p;
             let dir = p.dir; // 0:上, 1:右, 2:下, 3:左
             let d = 1;
-            
+
 
         }
     },
@@ -70,22 +70,15 @@ const Blocks = [
         name: "ice", 
         jpnm: "つるつる床", //乗った時、最後に入力した方向にmoveさせる
         on: "step",
-        onF: () => {
+        onF: async() => {
             let p = staC.p;
             let dir = p.dir;
 
-            let xy = 0;
-            if(dir == 1 || dir == 3) xy = "x";
-            if(dir == 0 || dir == 2) xy = "y";
-
-            let num = 1;
-            if(dir == 0) num = -1;
-            if(dir == 3) num = -1;
+            let [xy, num] = staF.separate(dir)
+            // console.log(xy, num)
             
-            staF.move(dir, num); // とりあえず1マスだけ動かしてみる。これでいけるはず！
-            // dir:x/y, num:1/-1
-            // 最後に入力された方向（lastDir, lastNum）に、さらに滑らせる！
-            // staF.move(lastDir, lastNum) をもう一回呼ぶイメージね。
+            await staF.move(xy, num);
+            staF.draw();
         }
     },
     {
@@ -117,10 +110,39 @@ const Blocks = [
     },
     {
         name: "boost",  //左右の向いてる方向に何かにぶつかるまでごと直進する
-        jpnm: "ダッシュパネル",
+        jpnm: "ぶおぉーん",
         on: "step",
-        onF: (data) => {
-            // data.dir = "left" とか "right" を持たせておいて、その方向に直進させる
+        onF: async(x, y) => {
+            let p = staC.p;
+            let dir = p.dir;
+            let edge = staC.row-1;
+            let [xy, num] = staF.separate(dir);
+            if(xy == y) return 1;
+
+            let rest = 0;
+            if(dir == 1) rest = edge - x;
+            if(dir == 3) rest = x;
+
+            for(let i=0; i<rest; i++){
+                let tx = p.x + (xy == "x" ? num : 0);
+                let ty = p.y+1;
+                
+                let res = staF.search(tx, ty);
+                if(res) break;
+
+                let self = staC.map[x][y];
+                staC.map[x][y] = 0;
+
+                x = tx;
+                y = ty;
+                self.x = x;
+                self.y = y;
+
+                staF.move("x", num);
+                staC.map[x][y] = self;
+            }
+
+
         }
     }
 ];

@@ -1722,6 +1722,11 @@ let staC = {
     now: 0,
     max: 2,
 
+    q: [],
+    ing: 0,
+    moved: 0,
+    premoved: 0,
+
     sttD: staD.querySelector('.settle'),
     sttBD: staD.querySelector('.settle .body'),
     sttTD: staD.querySelector('.settle .text'),
@@ -1936,6 +1941,7 @@ staF.find = (name) => {
     if(!res) return console.error(`${name}がナカッタ`), 0;
     return res;
 }
+
 staF.addmap = (name, x = NaN, y = NaN, data = {}) => {
     if(!name || isNaN(x) || isNaN(y)) return console.error('なんか たりない SU');
     
@@ -1963,6 +1969,8 @@ staF.delmap = (x = NaN, y = NaN) => {
     if(isNaN(x) || isNaN(y)) return console.error('なんか たりない SU');
 
     if(staC.map[x][y]) staC.map[x][y] = 0;
+
+    staF.draw();
 
     return 0;
 }
@@ -1997,11 +2005,12 @@ staC.can.addEventListener('pointerdown', (e) => {
     let gridX = Math.floor(x / staC.mas);
     let gridY = Math.floor(y / staC.mas);
 
-    console.log(`クリックした場所: マス(${gridX}, ${gridY})`);
+    // console.log(`クリックした場所: マス(${gridX}, ${gridY})`);
     
     let aruno = staF.search(gridX, gridY);
     if(!aruno) staF.addmap(staC.stt, gridX, gridY);
     if(aruno) staF.delmap(gridX, gridY);
+    staF.draw()
 });
 staF.settleOut = () => {
     let arr = staC.sttBD.querySelectorAll(".mono");
@@ -2027,125 +2036,93 @@ document.addEventListener("keyup", (e) => {
 
 // #endregion
 
-staF.move = (dir, num) => {
-    return;
+staF.separate = (dir) => {
+    let xy = 0;
+    if(dir == 1 || dir == 3) xy = "x";
+    if(dir == 0 || dir == 2) return;
 
-    // test: mx, my
-    // normalize: dir, num
-    let p = staC.p;
-    let edge = staC.row-1;
+    let num = 1;
+    if(dir == 1) num = 1;
+    if(dir == 3) num = -1;
 
-    let test = 0;
-    jump:{
-        if(!test) break jump;
-
-        let xy = arrayShuffle(["x", "y"]);
-        let ct = {x: mx, y: my};
-        let dd = {
-            x: mx > 0 ? 1 : 0,
-            y: my > 0 ? 1 : 0
-        }
-        for(let dir of xy){
-            let d = dd[dir];
-            let num = ct[dir];
-            num = Math.abs(num);
-
-            for(let i = 0; i < num; i++){
-                let n = {
-                    x: p.x,
-                    y: p.y
-                }
-                if(dir == 'x') n.x += d;
-                if(dir == 'y') n.y += d;
-                let res = staF.search(n.x, n.y);
-                if(res){
-                    if(res == 'wall') break;
-                    else break;
-                }
-
-                let sue = n[dir] - p[dir];
-                
-            }
-            
-            
-        }
-    }
-
-    let normalize = 1;
-    normal:{
-        if(!normalize) break normal;
-
-        if(dir == 'x'){
-            let dx = num > 0 ? 1 : -1;
-            num = Math.abs(num);
-            for(let i = 0; i < num; i++){
-                if(staF.search(p.x+dx, p.y)) break;
-                p.x += dx;
-                if(edge < p.x) p.x = edge;
-                if(p.x < 0) p.x = 0;
-            }
-        }
-        if(dir == 'y'){
-            let dy = num > 0 ? 1 : -1;
-            num = Math.abs(num);
-            for(let i = 0; i < num; i++){
-                if(staF.search(p.x, p.y+dy)) break;
-                p.y += dy;
-                if(edge < p.y) p.y = edge;
-                if(p.y < 0) p.y = 0;
-            }
-        }
-    }
-
-    staF.draw();
+    return [xy, num]
 }
 
-staF.move = (dir, num) => {
+staF.move = async(xy, num) => {
+    // console.error(`${xy}方向に${num}だけ動く処理をqueueに追加するね〜♡`)
+    staC.premoved += 1;
+    staC.q.push({xy:xy,num:num});
+
+    if(staC.ing) return;
+    staC.ing = 1;
+    while(staC.q.length > 0){
+        staC.moved += 1;
+        // console.log(`move: ${staC.moved}/${staC.premoved}`)
+
+        let t = staC.q.shift();
+        await staF.moveEx(t.xy, t.num);
+
+        await delay(100)
+    }
+    staC.ing = 0;
+}
+
+staF.moveEx = async(xy, num) => {
+    staF.draw();
+
     let p = staC.p;
-    let edge = staC.row - 1;
+    let edge = staC.row-1;
     let diff = num > 0 ? 1 : -1;
     let cnt = Math.abs(num);
 
-    for(let i = 0; i < cnt; i++){
-        let now = {x:p.x, y:p.y};
-        let tugi = {x:p.x, y:p.y};
-        tugi[dir] += diff;
+    for(let i=0; i<cnt; i++){
+        let now = {x:p.x,y:p.y};
+        let tugi = {x:p.x,y:p.y};
+        tugi[xy] += diff;
 
-        let data = 0;
-
-        // before_move: 乗っている床で移動直前に発動
-        let b = staF.search(now.x, now.y+1);
-        if(b && b != "wall"){
-            console.log(`${b}が通ります`)
-            data = staF.find(b.name);
-        }
-        if(b && data.on == "before_move") data.onF(now.x, now.y);
-
-        let res = staF.search(tugi.x, tugi.y);
-        if(res == "wall"){
-            break;
-        }
-        if(res && res != "wall"){
-            console.log(`${res}も通ります`)
-            data = staF.find(res.name)
-        }
-
-        // move_into: 移動先に何かあるなら発動
-        if(res && data.on == "move_into") data.onF();
-        else if(res) break;
-
-        p.x = Math.max(0, Math.min(edge, tugi.x));
-        p.y = Math.max(0, Math.min(edge, tugi.y));
-
-        // step: 移動後に乗った床で発動
-        let s = staF.search(p.x, p.y+1);
-        if(s && s != "wall"){
-            console.log(`${s}も通るわよ～ん`)
-            data = staF.find(s.name);
-        }
-        if(s && data.on == "step") data.onF();
+        let res = await staF.moveGo(tugi,now);
+        if(res)break;
+        staF.draw();
     }
     staF.draw();
+
+    let s = staF.search(p.x, p.y+1);
+    if(s && s != "wall"){
+        let d = staF.find(s.name);
+        if(d.on == "step") await d.onF(p.x, p.y+1);
+    }
+    staF.draw();
+}
+
+staF.moveGo = async(tugi, now) => {
+    let p = staC.p;
+    let edge = staC.row-1;
+    let data = 0;
+
+    let b = staF.search(now.x,now.y+1);
+    if(b && b != "wall"){
+        data = staF.find(b.name);
+        if(data.on=="atsk") await data.onF(now.x, now.y+1);
+    }
+
+    let res = staF.search(tugi.x, tugi.y);
+    if(res == "wall") return 1;
+    if(res && res != "wall") data = staF.find(res.name);
+    
+    if(res && data.on == "osu") await data.onF(tugi.x, tugi.y);
+    else if(res) return 1;
+
+    staC.p.dir = 1;
+    if(tugi.y < now.y) staC.p.dir = 0;
+    if(now.x < tugi.x) staC.p.dir = 1;
+    if(now.y < tugi.y) staC.p.dir = 2;
+    if(tugi.x < now.x) staC.p.dir = 3;
+
+    p.x = Math.max(0, Math.min(edge,tugi.x));
+    p.y = Math.max(0, Math.min(edge,tugi.y));
+    staF.draw();
+
+    return 0;
 }
 
 
@@ -2186,7 +2163,7 @@ staC.uiC.dD.addEventListener('click', staF.keyD);
 staF.gameloop = () => {
     staC.delta += 1;
 
-    if(staC.delta % 20 == 0){
+    if(staC.delta % 50 == 0){
         staF.calc();
     }
     
