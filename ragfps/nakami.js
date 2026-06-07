@@ -2102,7 +2102,7 @@ staF.moveGo = async(tugi, now) => {
     let b = staF.search(now.x,now.y+1);
     if(b && b != "wall"){
         data = staF.find(b.name);
-        if(data.on=="atsk") await data.onF(now.x, now.y+1);
+        if(data.on == "atsk") await data.onF(now.x, now.y+1);
     }
 
     let res = staF.search(tugi.x, tugi.y);
@@ -2118,8 +2118,8 @@ staF.moveGo = async(tugi, now) => {
     if(now.y < tugi.y) staC.p.dir = 2;
     if(tugi.x < now.x) staC.p.dir = 3;
 
-    p.x = Math.max(0, Math.min(edge,tugi.x));
-    p.y = Math.max(0, Math.min(edge,tugi.y));
+    p.x = Math.max(0, Math.min(edge, tugi.x));
+    p.y = Math.max(0, Math.min(edge, tugi.y));
     staF.draw();
 
     return 0;
