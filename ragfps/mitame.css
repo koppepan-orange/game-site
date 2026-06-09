@@ -791,19 +791,26 @@ input[type="range"].slider::-webkit-slider-thumb:hover{
     gap: 10px;
 }
 
-#stage .teethcar{
-    display: block;
-    width: 40px;
-    aspect-ratio: 1/1;
+#stage .sturdy{
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    align-items: center;
+    width: fit-content;
     position: absolute;
     top: 5px;
     right: 5px;
     z-index: 254;
 }
-#stage .teethcar:active{
+#stage .sturdy .mono{
+    display: block;
+    width: 40px;
+    aspect-ratio: 1/1;
+}
+#stage .sturdy .mono:active{
     scale: 0.90;
 }
-#stage .teethcar img{
+#stage .sturdy .mono img{
     display: block;
     width: 100%;
     height: 100%;

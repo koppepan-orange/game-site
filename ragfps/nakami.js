@@ -1743,7 +1743,12 @@ let staC = {
         img: "normal",
     },
 
-    ttcD: staD.querySelector('.teethcar'),
+    stuD: staD.querySelector('.sturdy'),
+    stuC: {
+        teeth: staD.querySelector('.sturdy .teethcar'),
+        chest: staD.querySelector('.sturdy .chest'),
+        chestT: 0,
+    }
 }
 let staF = {};
 
@@ -1985,7 +1990,7 @@ staF.randomap = (num = 10) => {
         do{
             x = random(0, edge);
             y = random(0, edge);
-        } while(staF.search(x, y));
+        }while(staF.search(x, y));
         
         let block = arraySelect(Blocks.filter(a => !a.no));
         staF.addmap(block.name, x, y);
@@ -2032,6 +2037,16 @@ staF.settleTog = (co = NaN) => {
 document.addEventListener("keyup", (e) => {
     if(e.key == "e") staF.settleTog();
 })
+staC.stuC.chest.addEventListener('click', () => {
+    staF.settleTog();
+    let imgD = staC.stuC.chest.querySelector('img');
+    staC.stuC.chestT = fl(staC.stuC.chestT);
+
+    let hira = "chest_open";
+    if(hit(3)) hira = "chest_open_bug";
+    if(staC.stuC.chestT) imgD.src = `assets/images/systems/${hira}.png`;
+    else imgD.src = "assets/images/systems/chest.png";
+});
 // #endregion
 
 // #endregion
@@ -2084,7 +2099,6 @@ staF.moveEx = async(xy, num) => {
         if(res)break;
         staF.draw();
     }
-    staF.draw();
 
     let s = staF.search(p.x, p.y+1);
     if(s && s != "wall"){
@@ -2188,7 +2202,7 @@ staF.setSkin = (name) => {
     staF.draw();
 }
 
-staC.ttcD.addEventListener('click', () => staF.setSkin('fullofmeka'));
+staC.stuC.teeth.addEventListener('click', () => staF.setSkin('fullofmeka'));
 // #endregion
 
 // #endregion
