@@ -2043,7 +2043,7 @@ staC.stuC.chest.addEventListener('click', () => {
     staC.stuC.chestT = fl(staC.stuC.chestT);
 
     let hira = "chest_open";
-    if(hit(3)) hira = "chest_open_bug";
+    if(hit(18)) hira = "chest_open_bug";
     if(staC.stuC.chestT) imgD.src = `assets/images/systems/${hira}.png`;
     else imgD.src = "assets/images/systems/chest.png";
 });
