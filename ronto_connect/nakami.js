@@ -2705,7 +2705,7 @@ function makeUnit(type, code, name){
     unit.hp = unit.maxhp;
     unit.mp = unit.maxmp;
     unit.ep = 0;
-    unit.jotie = 1;
+    unit.joutie = 1;
     unit.buffs = [];
     unit.cam = (type == 'player') ? 'players' : 'enemies';
     unit.me = humans.filter(a => a.cam == unit.cam).length;
@@ -2844,7 +2844,7 @@ async function nextTurn(who = 0){
     acted += 1;
     if(acted >= bar.me.length){
         turn += 1;
-        let combined = humans.filter(a => a.jotie && a.hp > 0)// オブジェクトをリストに変換して合体
+        let combined = humans.filter(a => a.joutie && a.hp > 0)// オブジェクトをリストに変換して合体
         .sort((a, b) => {// 降順でソート
             if(b.spd == a.spd){
                 if(a.cam == b.cam){
@@ -3133,9 +3133,9 @@ function selectSyudou(code = 1){
             // console.log(target);
 
             if(code == 2){ //拡散-3
-                let zin = humans.filter(a => a.cam == tcam && a.jotie);
-                let pnum = (zin[tme-1]?.jotie??0) ? tme - 1 : null;
-                let nnum = (zin[tme+1]?.jotie??0) ? tme + 1 : null;
+                let zin = humans.filter(a => a.cam == tcam && a.joutie);
+                let pnum = (zin[tme-1]?.joutie??0) ? tme - 1 : null;
+                let nnum = (zin[tme+1]?.joutie??0) ? tme + 1 : null;
                 
                 let cn = 1;
                 if(pnum) cn += 1;
@@ -3149,11 +3149,11 @@ function selectSyudou(code = 1){
                 ];
             }
             if(code == 3){// 拡散-5
-                let zin = humans.filter(a => a.cam == tcam && a.jotie);
-                let p2num = (zin[tme-2]?.jotie??0 == 1) ? tme - 2 : null;
-                let pnum = (zin[tme-1]?.jotie??0 == 1) ? tme - 1 : null;
-                let nnum = (zin[tme+1]?.jotie??0 == 1) ? tme + 1 : null;
-                let n2num = (zin[tme+2]?.jotie??0 == 1) ? tme + 2 : null;
+                let zin = humans.filter(a => a.cam == tcam && a.joutie);
+                let p2num = (zin[tme-2]?.joutie??0 == 1) ? tme - 2 : null;
+                let pnum = (zin[tme-1]?.joutie??0 == 1) ? tme - 1 : null;
+                let nnum = (zin[tme+1]?.joutie??0 == 1) ? tme + 1 : null;
+                let n2num = (zin[tme+2]?.joutie??0 == 1) ? tme + 2 : null;
                 
                 let cn = 1;
                 if(pnum) cn += 1;
@@ -3169,7 +3169,7 @@ function selectSyudou(code = 1){
                 ];
             }
             if(code == 4){ //相手陣営全員
-                let nums = cm(tcam).filter(a => a.cam == tcam && a.jotie);
+                let nums = cm(tcam).filter(a => a.cam == tcam && a.joutie);
                 let cams = Array(nums.length).fill(tcam); //fillは全ての値を同じ値にするやつ。同数にするために使用されがち
                 target = [
                     nums,
@@ -3177,9 +3177,9 @@ function selectSyudou(code = 1){
                 ];
             }
             if(code == 5){ //全員
-                let tnums = cm(tcam).filter(a => a.jotie);
+                let tnums = cm(tcam).filter(a => a.joutie);
                 let gyaku = fl(tcam, ['players','enemies']);
-                let nums = cm(gyaku).filter(a => a.jotie);
+                let nums = cm(gyaku).filter(a => a.joutie);
 
                 let awase = [...tnums, ...nums];
                 
@@ -3357,7 +3357,7 @@ function turretPlace(cam){
         cm(cam).t.hp = 0;
         document.querySelector(`#${cam}`).appendChild(newDiv);
     }
-    cm(cam).t.jotie = 1;
+    cm(cam).t.joutie = 1;
     cm(cam).t.kazu += 1;
     cm(cam).t.maxhp += 15;
     cm(cam).t.hp += 15;
@@ -3367,7 +3367,7 @@ function turretPlace(cam){
     document.querySelector(`#${cam}t`).style.backgroundColor = '#f7f7f7'
 }
 function turretBreak(cam){
-    cm(cam).t.jotie = 0;
+    cm(cam).t.joutie = 0;
     cm(cam).t.kazu -= 1;
     if(cm(cam).t.kazu <= 0){
         cm(cam).t.kazu = 0;
@@ -3380,12 +3380,12 @@ function turretAllClear(){
     if(document.getElementById('playerst')){
         document.getElementById('playerst').remove();
         humans.players.t.kazu = 0;
-        humans.players.t.jotie = 0;
+        humans.players.t.joutie = 0;
     };
     if(document.getElementById('enemiest')){
         document.getElementById('enemiest').remove();
         humans.enemies.t.kazu = 0;
-        humans.enemies.t.jotie = 0
+        humans.enemies.t.joutie = 0
     }
 }
 
@@ -3494,7 +3494,7 @@ function selectJodou(who, tar = "are", stat = "hp", hl = "low", spread = 1){
     let list0 = null;
     if(tar != 'all') list0 = cm(tar);
     else list0 = [...cm('players'), ...cm('enemies')];
-    let list = list0.filter(c => c.jotie); //not ソート
+    let list = list0.filter(c => c.joutie); //not ソート
      if(list.length == 0) return console.error(`errored! ${tar} is inai desu war!!`);
 
     if(spread == 0) return list; //0は全体、そう決めたのです
@@ -3510,7 +3510,7 @@ function selectJodou(who, tar = "are", stat = "hp", hl = "low", spread = 1){
     if(hl == 'high') zero = listed[listed.length - 1];
     if(hl == 'random' || hl == 0) zero = arraySelect(listed);
     if(hl == 'cen'){
-        let whol = cm(who.cam).filter(c => c.jotie);
+        let whol = cm(who.cam).filter(c => c.joutie);
         let whoi = whol.findIndex(c => c.me == who.me); //whoiが-1はまずありえん
         zero = list[whoi]; //これは正面に無いと失敗。拡散でも同じく。
     }

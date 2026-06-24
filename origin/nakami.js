@@ -190,6 +190,13 @@ function dogma(matu, shiki, k = 1){
 
     return res;
 }
+function jouyo(A, B){
+    let Q = Math.floor(A / B);
+    let R = A % B;
+    let res = {Q, R}
+    
+    return res;
+}
 function ketasu(num){
     if(num == 0) return 1;
     num = Math.abs(num);
@@ -287,6 +294,16 @@ function random(min, max){
     if(max < min) [min, max] = [max, min];
     let num = Math.floor(Math.random() * (max - min + 1)) + min;
     return Math.floor(num);
+};
+function randomF(min, max, keta = 0){
+    if(max < min) [min, max] = [max, min];
+
+    let scale = 10 ** keta;
+    let num = Math.floor(
+        Math.random() * ((max - min) * scale + 1)
+    ) + min * scale;
+
+    return num / scale;
 };
 function fl(val, arr = [0, 1]){
     let res = val == arr[0] ? arr[1] : arr[0];
@@ -519,7 +536,7 @@ function cursorRect(){
 }
 
 async function error(text = 'errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr'){
-    await logText(text);
+    await logtext(text);
     await delay(2000);
     // window.open('about:blank', '_self').close();
 };
@@ -531,9 +548,9 @@ let logC = {
     togD: logD.querySelector('.opener'),
     textD: logD.querySelector('.text'),
     autoDelay: 1,
-    skipText: 0,
-    clearText: 0,
-    loopText: 0,
+    skipT: 0,
+    clearT: 0,
+    loopT: 0,
     ing: 0,
     queue: []
 }
@@ -582,33 +599,26 @@ logF.cc = (raw) => {
 };
 
 logF.waitfor = async() => {
-    let len = logC.queue.length;
+    if(logC.ing ||
+        logC.queue.length == 0) return;
 
-    if(len == 0) logC.loopText = 0;
-    else logC.loopText = 1;
-
-    if(!logC.loopText) return;
-    requestAnimationFrame(logF.waitfor);
-
-    if(logC.ing) return;
-    let raw = logC.queue.shift();
-    // console.log(`${raw}を送信します`);
-    // console.log(`残り: (${len - 1})[${logC.queue}]`);
-    await logText(raw);
+    let raw0 = logC.queue.shift();
+    // console.log(`${raw0[0]}を送信します`);
+    await logtext(...raw0);
 };
-async function logText(raw){
+async function logtext(raw, code = ""){
     if(!raw) return console.log('「内容が？内容が〜〜？ないよ〜〜〜つってwwww直せ」');
     if(typeof raw != 'string') raw = String(raw);
 
     if(logC.ing){
-        logC.queue.push(raw);
+        logC.queue.push([raw, code]);
 
-        if(!logC.loopText) logF.waitfor();
+        logF.waitfor();
         return;
     };
     
     logC.ing = 1;
-    text = logF.cc(raw);
+    let text = logF.cc(raw);
     logC.textD.innerHTML = "";
     logC.textD.style.display = "block";
     logC.clearT = 0;
@@ -626,9 +636,7 @@ async function logText(raw){
 
                         index++;
                     }
-                    index = text.length;
-                    logC.skipT = 0;
-                    setTimeout(type, 10);
+                    type();
                 }else{
                     let span = document.createElement("span");
                     span.textContent = text[index].char;
@@ -639,20 +647,40 @@ async function logText(raw){
                     setTimeout(type, 80); // 次の文字を表示する間隔
                 }
             }else{
-                logText_log(logC.textD.innerHTML);
+                let das = `[${code}] `;
+                das += logC.textD.innerHTML;
+                logText_log(das);
                 let waitTime = logC.autoDelay * 1000;
-                let timeout = new Promise(resolve => setTimeout(resolve, waitTime));
-                let userAction = new Promise(resolve => {
+                
+                let cleanupListeners = () => {};
+                let timeout = new Promise(resolveTimeout => {
+                    let timer = setTimeout(() => {
+                        cleanupListeners();
+                        resolveTimeout();
+                    }, waitTime);
+                    
+                    cleanupListeners = () => clearTimeout(timer);
+                });
+
+                let userAction = new Promise(resolveUser => {
 
                     function waitToClear(event){
                         if(event.type === 'click' || event.key === 'z' || event.key === 'Enter'){
                             document.removeEventListener('click', waitToClear);
                             document.removeEventListener('keydown', waitToClear);
-                            resolve();
+                            cleanupListeners();
+                            resolveUser();
                         }
                     }
                     document.addEventListener('click', waitToClear);
                     document.addEventListener('keydown', waitToClear);
+
+                    let oldCleanup = cleanupListeners;
+                    cleanupListeners = () => {
+                        oldCleanup();
+                        document.removeEventListener('click', waitToClear);
+                        document.removeEventListener('keydown', waitToClear);
+                    };
                 });
 
                 Promise.race([timeout, userAction]).then(() => {
@@ -662,6 +690,8 @@ async function logText(raw){
                     logC.skipT = 0
                     logC.ing = 0;
                     resolve('end');
+
+                    logF.waitfor();
                 });
             }
         };
