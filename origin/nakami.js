@@ -358,6 +358,61 @@ function anagramCan(mae, ato){
 
     return 1;
 };
+
+function cardDraw(val0 = 0, suit0 = 0){
+    let val = random(1, 13);
+    let suit = arraySelect(['♡', '♤', '♢', '♧']);
+    if(val0) val = val0;
+    if(suit0) suit = suit0;
+    
+    let hyou = val;
+    if(val == 1)  hyou = 'A';
+    if(val == 10) hyou = 'X';
+    if(val == 11) hyou = 'J';
+    if(val == 12) hyou = 'Q';
+    if(val == 13) hyou = 'K';
+    
+    let card = {    
+        suit,
+        val,
+        num: hyou
+    }
+
+    return card;
+}
+function cardCalc(arr, code = 0){
+    // code: bj == 1が11にもなる
+    if(!Array.isArray(arr)) return console.error('えっと...ごめん！これ配列じゃないと計算できないっ！！'), 0;
+    
+    let sum = 0;
+    let As = 0;
+
+    for(let card of arr){
+        if(card.hide) continue;
+        let v = card.val;
+        if(code == "bj"){
+            if(10 <= v) v = 10; //bjなら10に矯正
+            if(v == 1) As++;
+        }
+        sum += v;
+    }
+
+    if(code == "bj"){
+        while(21 < sum && 0 < As){
+            sum -= 10; //特殊すぎる
+            As--;
+        }
+    }
+
+    return sum;
+}
+function cardUnwrap(arr){
+    for(let card of arr){
+        if(card.hide) card.hide = 0;
+    }
+    return arr;
+}
+
 // LocalStorage(Data) => lsd
 function lsdSet(name, value){
     if(Array.isArray(value) ||
@@ -799,6 +854,73 @@ document.addEventListener('mousedown', e => {
     document.addEventListener('mouseup', onMouseUp);
 });
 //#endregion
+//#region Timer
+class Timer{
+    constructor(k = 0, d = 1){
+        // k:開始数 d:増加量
+        if(typeof k != "number" || typeof d != "number") return;
+        this.time = k;
+        this.d = d;
+
+        this.ev = null;
+
+
+        let div = document.createElement("div");
+        div.id = "timer";
+         let num = document.createElement("div");
+         div.appendChild(num);
+        div.addEventListener('click', () => {div.classList.toggle("tog")})
+        div.addEventListener("contextmenu", e => {
+            e.preventDefault();
+            div.classList.remove("show");
+        })
+        this.div = div;
+        this.numD = num;
+
+        // let div0 = document.body;
+        let div0 = mainD;
+        div0.appendChild(div);
+        this.tekiou();
+    }
+
+    tekiou(){
+        let time = this.time;
+        let [hun, byo] = [time%60, Math.floor(time/60)]
+            .map(a => a.toFixed(0).padStart(2, "0")); //初めて自ら改行したわ
+        this.numD.textContent = `${byo}:${hun}`;
+    }
+
+    start(){
+        if(this.ev) return;
+        this.ev = setInterval(() => {
+            this.time += this.d;
+            this.tekiou()
+        }, 1000);
+    }
+    stop(){
+        if(this.ev){
+            clearInterval(this.ev);
+            this.ev = null;
+        }
+        this.tekiou();
+    }
+    reset(){
+        this.time = 0;
+        this.tekiou();
+    }
+
+    kite(){
+        this.div.classList.add("show");
+    }
+    kiero(){
+        this.div.classList.remove("show");
+    }
+
+    share(){
+        this.div.remove();
+    }
+}
+// #endregion
 //#region tk
 class tk{
     constructor(type, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
@@ -1398,14 +1520,33 @@ let loaC = {
     erd: 0
 }
 let loaF = {};
-loaC.imgT = Object.values(Images).reduce((a,b) => a + b.length, 0);
 loaC.souT = Object.values(Sounds).reduce((a,b) => a + b.length, 0);
 
 loaF.load = async() => {
     console.log("loadを開始しました。少々お待ちください");
+
+    loaC.imgT = 0;
+    let MaaSorehaSoretoshite = (mono) => {
+        for(let key in mono){
+            if(key == 'すべて') continue;
+
+            let val = mono[key];
+            if(Array.isArray(val)){
+                loaC.imgT += val.length;
+            }
+            else if(val && typeof val == 'object'){
+                MaaSorehaSoretoshite(val);
+            }
+        }
+    };
+    MaaSorehaSoretoshite(Images);
+
     if(await loaF.loadI()) return 1;
     return 0;
 }
+
+/*
+// 元のカタチ
 loaF.loadI = async() => {
     let kasan = () => {
         loaC.imgD++;
@@ -1432,6 +1573,72 @@ loaF.loadI = async() => {
         }   
     }
 }
+*/
+loaF.loadI = async() => {
+    if(loaC.imgT == 0) return loaF.loadS();
+
+    let kasan = () => {
+        loaC.imgD += 1;
+        if(loaC.imgD == loaC.imgT) loaF.loadS();
+    }
+
+    let loaloa = async(arr, route) => {
+        let srcBase = "assets/images/" + route.join("/") + "/";
+
+        let tar = images;
+        for(let r of route){
+            if(!tar[r]) tar[r] = {};
+            tar = tar[r];
+        }
+
+        arr.forEach(mono => {
+            let img = new Image();
+            img.src = `${srcBase}${mono}.png`;
+            
+            img.onload = () => {
+                tar[mono] = img;
+                kasan();
+            };
+
+            img.onerror = () => {
+                console.error(`Image ${srcBase}${mono}.png failed to load.`);
+                loaC.erd += 1;
+                
+                if(loaC.erd > 50) {
+                    console.error('さすがにやりすぎbonus');
+                    return;
+                }
+                
+                img.src = `assets/images/systems/error.png`;
+                tar[mono] = img;
+                kasan();
+            };
+        });
+    }
+
+    // 再帰的に掘り進む
+    let loaloa0 = async(mono, route = []) => {
+        for(let key in mono){
+            if(key == "すべて") continue; //"すべて"はスキップ
+
+            let val = mono[key];
+            if(!val) continue;
+
+            route.push(key); //追加
+
+            if(Array.isArray(val)){
+                loaloa(val, [...route]);
+            }
+            else if(typeof val == 'object'){
+                await loaloa0(val, route); //さらなる深みへ
+            }
+            
+            route.pop(); //階層を戻す
+        }
+    }
+
+    await loaloa0(Images);
+}
 
 loaF.loadS = async() => {
     let kasan = () => {
@@ -1448,7 +1655,7 @@ loaF.loadS = async() => {
             sound.preload = 'auto';
             sound.src = `assets/sounds/${belong}/${name}.mp3`;
             if(belong == 'bgm'){
-                sound.loop = 1;
+                sound.loop = true;
                 sound.dataset.type = 'bgm';
                 sound.volume = souC.bgm;
             }
@@ -1473,7 +1680,7 @@ loaF.loadS = async() => {
 }
 loaF.end = () => {
     console.log(`images & sounds loaded! (error: ${loaC.erd})`);
-    soundVolume(50);
+    souF.volume(50);
     start();
 }
 
@@ -1482,8 +1689,10 @@ let souC = {
     bgm: 0.5,
     nowBgm: null
 }
-function soundPlay(name){
-    if(!sounds[name]) return soundPlay('error');
+let souF = {};
+souF.play = (name) => {
+    console.log("ん")
+    if(!sounds[name]) return souF.play('error');
     let proto = sounds[name];
 
     if(proto.dataset.type == 'bgm'){
@@ -1495,7 +1704,9 @@ function soundPlay(name){
         proto.volume = souC.bgm;
         proto.play().catch(e => console.warn('BGM 再生エラー', e));
         souC.nowBgm = name;
-    }else{
+    }
+    else if(proto.dataset.type == 'se'){
+        console.log("se")
         let clone = proto.cloneNode(1);
         clone.volume = souC.se;
         clone.dataset.type = 'se';
@@ -1505,7 +1716,50 @@ function soundPlay(name){
         clone.play().catch(e => console.warn('SE 再生エラー', e));
     }
 }
-function soundStop(){
+
+souF.play = (name) => {
+    let proto = null;
+    let category = null;
+
+    for(let belong in sounds){
+        if(sounds[belong][name]){
+            proto = sounds[belong][name];
+            category = belong;
+            break;
+        }
+    }
+
+    if(!proto){
+        if(name != 'error') return souF.play('error');
+        else return;
+    }
+
+    if(proto.dataset.type === 'bgm'){
+        if(souC.nowBgm){
+            for(let belong in sounds){
+                if(sounds[belong][souC.nowBgm]){
+                    let oldBgm = sounds[belong][souC.nowBgm];
+                    if(!oldBgm.paused){
+                        oldBgm.pause();
+                        oldBgm.currentTime = 0;
+                    }
+                    break;
+                }
+            }
+        }
+
+        proto.volume = souC.bgm;
+        proto.play().catch(e => console.warn('BGM 再生エラー', e));
+        souC.nowBgm = name;
+    }else{
+        let clone = proto.cloneNode(true);
+        clone.volume = souC.se;
+        clone.dataset.type = 'se';
+        clone.addEventListener('ended', () => {clone.src = ""});
+        clone.play().catch(e => console.warn('SE 再生エラー', e));
+    }
+}
+souF.stop = () => {
     Object.keys(sounds).forEach(k => {
         try{
             sounds[k].pause();
@@ -1515,7 +1769,7 @@ function soundStop(){
     souC.nowBgm = null;
     document.querySelectorAll('audio,video').forEach(el => { el.pause(); el.currentTime = 0; });
 }
-function soundVolume(code, val){
+souF.volume = (code, val) => {
     if(typeof code == 'number' && typeof val == 'undefined') val = code, code = 'both';
     if(typeof val !== 'number') return console.error('val は数値にして');
     let v = val;
@@ -1742,11 +1996,10 @@ let LoadOfWait = async() => await loaF.load();
 if(document.readyState == "loading"){
     document.addEventListener("DOMContentLoaded", init);
 }
-else LoadOfWait();
+else init();
 
 async function init() {
     await LoadOfWait();
-    start();
 }
 //#endregion
 

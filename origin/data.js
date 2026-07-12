@@ -14,7 +14,9 @@ let Style = {
 }
 
 const Fonts = [
-    // {src:'comicsans', type:'ttf'},
+    {src:'comicsans', type:'ttf'},
+    {src:'papyrus', type:'ttf'},
+    {src:'cube12', type:'ttf'},
 ];
 
 const Images = {

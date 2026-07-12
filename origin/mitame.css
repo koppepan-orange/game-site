@@ -215,6 +215,50 @@ img{
 }
 /* #endregion */
 
+/* #region timer */
+#timer{
+    display: none;
+    justify-content: center;
+    align-items: center;
+    width: 80px;
+    aspect-ratio: 1/1;
+    background: #2b2b2b;
+    border-radius: 50%;
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    transition: opacity 0.1s ease-in-out;
+    color: #b2b2b2;
+    font-size: 28px;
+    line-height: 28px;
+    font-family: cube12;
+    opacity: 0.90;
+    cursor: grab;
+    z-index: 2;
+}
+#timer::after{
+    /* 上の突起物 */
+    content: "";
+    width: 30%;
+    aspect-ratio: 3/4;
+    background: #2b2b2b;
+    position: absolute;
+    top: -10%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: -2;
+}
+#timer.show{
+    display: flex;
+}
+#timer.tog{
+    opacity: 0.10;
+}
+#timer div{
+    pointer-events: none;
+}
+/* #endregion */
+
 /* #region tk */
 .tk{
     position: fixed;
