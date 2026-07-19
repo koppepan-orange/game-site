@@ -2559,7 +2559,6 @@ function cm(cam = '指定なし', me = '指定なし'){
         console.log(who)
     }
     
-
     return who;
 }
 

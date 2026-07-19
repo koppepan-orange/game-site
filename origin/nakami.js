@@ -591,7 +591,7 @@ function cursorRect(){
 }
 
 async function error(text = 'errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr'){
-    await logtext(text);
+    await logText(text);
     await delay(2000);
     // window.open('about:blank', '_self').close();
 };
@@ -659,9 +659,9 @@ logF.waitfor = async() => {
 
     let raw0 = logC.queue.shift();
     // console.log(`${raw0[0]}を送信します`);
-    await logtext(...raw0);
+    await logText(...raw0);
 };
-async function logtext(raw, code = ""){
+async function logText(raw, code = ""){
     if(!raw) return console.log('「内容が？内容が〜〜？ないよ〜〜〜つってwwww直せ」');
     if(typeof raw != 'string') raw = String(raw);
 
@@ -1252,7 +1252,7 @@ class Slider {
 //#region takushiSen
 class TakushiSen {
     constructor(choices, mode = "tate", data = 0) {
-        this.choices = choices; // [{name, img}, {name, img}, ...]
+        this.choices = choices; // [[name, img}, [name, img], ...]
         this.mode = mode;
 
         if(!data) data = {
@@ -1275,15 +1275,16 @@ class TakushiSen {
         div.style.setProperty('--botan-col-ed', irohaHo(bEd));
 
         this.choices.forEach(ma => {
-            let [name, gazou] = [ma.name, ma.img];
-            if(typeof ma === 'string') name = ma;
+            // console.log(ma)
+            let [name, gazou] = ma;
+            if(typeof ma == 'string') name = ma;
 
             let item = document.createElement('div');
             item.className = `item ${name}`;
             item.textContent = name;
             item.dataset.name = name;
 
-            // 画像があるならば
+            // 画像があるならば (0は無効)
             if(gazou){
                 let img = document.createElement('img');
                 img.src = gazou;
