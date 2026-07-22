@@ -761,6 +761,7 @@ input[type="range"].slider::-webkit-slider-thumb:hover{
     justify-content: center;
     align-items: center;
     flex: 1;
+    flex-shrink: 0;
     aspect-ratio: 1/1;
     background: #d4a174 ;
 }

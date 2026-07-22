@@ -112,7 +112,7 @@ const Spaces = [
 
 
 
-Crops = [
+const Crops = [
 	{
 		name:'wheat',
 		jpnm:'小麦',

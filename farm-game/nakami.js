@@ -1916,26 +1916,13 @@ let farmC = {
     mx: 0,
     my: 0
 }
-farmC.Crops = [
-	{
-		name:'wheat',
-		jpnm:'小麦',
-        desc:"",
-		flav:'パンやらお菓子になる万能炭水化物。四毒の一味',
-		time:'60',
-		org:"seed", //if this.org == "seed": ${this.name}_seed
-		res:1,
-	},
-	{
-		
-	}
-]
 let farmF = {};
 
 /* 無し: #d4a174 */
 /* 枯れ: #a57245 */
 /* 濡れ: #713b0b */
-farmF.load = () => {
+farmF.load = async() => {
+    await delay(100)
     for(let i=0; i<farmC.row; i++){ //flex
         let div0 = document.createElement('div');
         div0.className = `row`;
@@ -1949,21 +1936,23 @@ farmF.load = () => {
 
         farmC.main.querySelector('.contain').appendChild(div0);
     }
+    console.log(154243124)
 
     farmF.recalcBounds();
     farmF.setOffset(0,0);
     farmF.initJoystick();
+    console.log(230487234)
 }
 
+// #region 動くやつ
 farmF.recalcBounds = () => {
-    let viewport = farmC.main;
     let container = farmC.main.querySelector('.contain');
-    if(!viewport || !container) return console.error('DOM 構造が見つからない');
 
     let totalW = container.offsetWidth;
     let totalH = container.offsetHeight;
-    let vw = viewport.clientWidth;
-    let vh = viewport.clientHeight;
+    let vw = farmC.main.clientWidth;
+    let vh = farmC.main.clientHeight;
+    console.log(totalW, totalH, vw, vh)
 
     let maxOffsetX = Math.min(0, vw - totalW); // 負または0
     let maxOffsetY = Math.min(0, vh - totalH);
@@ -1979,7 +1968,6 @@ farmF.recalcBounds = () => {
         totalH: totalH
     };
 };
-
 farmF.setOffset = (mx = NaN, my = NaN) => {
     if(!farmC.bounds) farmF.recalcBounds();
     let b = farmC.bounds;
@@ -1994,11 +1982,9 @@ farmF.setOffset = (mx = NaN, my = NaN) => {
     let container = farmC.main.querySelector('.contain');
     container.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
 };
-
 farmF.moveBy = (dx = 0, dy = 0) => {
     farmF.setOffset(farmC.mx + dx, farmC.my + dy);
 };
-
 farmF.moveto = (id = NaN) => {
     if(isNaN(id)) return console.error('id が渡されてない...');
     let container = farmC.main.querySelector('.contain');
@@ -2024,8 +2010,6 @@ farmF.moveto = (id = NaN) => {
     farmF.setOffset(tx, ty);
     console.log(`{debug} ${id} に移動しました (col:${col}, row:${row})`);
 };
-
-// 呼び出し: farmF.initJoystick(); を一度実行すること
 farmF.initJoystick = () => {
     if(!farmC.main) return console.error('farmC.main が見つからない');
     if(farmC._joystickInited) return;
@@ -2128,7 +2112,9 @@ farmF.initJoystick = () => {
         if(norm.x == 0 && norm.y == 0 && loopId) cancelAnimationFrame(loopId), loopId = null;
         if(norm.x == 0 && norm.y == 0) knob.style.transform = 'translate(0,0)';
     });
+
 };
+// #endregion
 
 //#endregion
 
