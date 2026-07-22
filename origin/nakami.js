@@ -1053,7 +1053,7 @@ class alertD{
         let div = document.createElement('div');
         div.classList.add('alertD');
         div.style.background = back;
-        div.style.boxShadow = `${hoshoku(back)} 5px 5px 20px`;
+        div.style.boxShadow = `${irohaHo(back)} 5px 5px 20px`;
 
         let row = document.createElement('div');
         row.classList.add('row');
@@ -1066,14 +1066,14 @@ class alertD{
 
          let text = document.createElement('div');
          text.innerText = this.text;
-         text.style.color = hoshoku(back);
+         text.style.color = irohaHo(back);
          row.appendChild(text);
         div.appendChild(row);
 
         let x = document.createElement('div');
         x.className = 'x';
         x.innerText = '×';
-        x.style.color = hoshoku(back);
+        x.style.color = irohaHo(back);
         x.addEventListener('click', () => this.delete());
         div.appendChild(x);
         
@@ -1252,7 +1252,7 @@ class Slider {
 //#region takushiSen
 class TakushiSen {
     constructor(choices, mode = "tate", data = 0) {
-        this.choices = choices; // [[name, img}, [name, img], ...]
+        this.choices = choices; // [[name, img], [name, img], ...]
         this.mode = mode;
 
         if(!data) data = {

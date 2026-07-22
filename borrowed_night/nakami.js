@@ -126,7 +126,7 @@ function awase(div, max = 28, code = "innerText"){
     div.style.fontSize = `${px}px`;
 }
 function kaijou(num){
-    if(num == 0) return 0;
+    if(num == 0) return 1;
     if(num == 1) return 1;
     return num * kaijou(num - 1);
 };
@@ -190,6 +190,26 @@ function dogma(matu, shiki, k = 1){
 
     return res;
 }
+function jouyo(A, B){
+    let Q = Math.floor(A / B);
+    let R = A % B;
+    let res = {Q, R}
+    
+    return res;
+}
+function ketasu(num){
+    if(num == 0) return 1;
+    num = Math.abs(num);
+    let res = Math.floor(Math.log10(num))+1;
+    return res;
+}
+function whethPoint(num){
+    let str = num.toString();
+    if(0 <= str.indexOf('.')) return true;
+    
+    return false;
+}
+
 function arraySelect(array){
     let select = Math.floor(Math.random()*array.length);
     return array[select];
@@ -275,6 +295,16 @@ function random(min, max){
     let num = Math.floor(Math.random() * (max - min + 1)) + min;
     return Math.floor(num);
 };
+function randomF(min, max, keta = 0){
+    if(max < min) [min, max] = [max, min];
+
+    let scale = 10 ** keta;
+    let num = Math.floor(
+        Math.random() * ((max - min) * scale + 1)
+    ) + min * scale;
+
+    return num / scale;
+};
 function fl(val, arr = [0, 1]){
     let res = val == arr[0] ? arr[1] : arr[0];
     return res;
@@ -328,6 +358,61 @@ function anagramCan(mae, ato){
 
     return 1;
 };
+
+function cardDraw(val0 = 0, suit0 = 0){
+    let val = random(1, 13);
+    let suit = arraySelect(['♡', '♤', '♢', '♧']);
+    if(val0) val = val0;
+    if(suit0) suit = suit0;
+    
+    let hyou = val;
+    if(val == 1)  hyou = 'A';
+    if(val == 10) hyou = 'X';
+    if(val == 11) hyou = 'J';
+    if(val == 12) hyou = 'Q';
+    if(val == 13) hyou = 'K';
+    
+    let card = {    
+        suit,
+        val,
+        num: hyou
+    }
+
+    return card;
+}
+function cardCalc(arr, code = 0){
+    // code: bj == 1が11にもなる
+    if(!Array.isArray(arr)) return console.error('えっと...ごめん！これ配列じゃないと計算できないっ！！'), 0;
+    
+    let sum = 0;
+    let As = 0;
+
+    for(let card of arr){
+        if(card.hide) continue;
+        let v = card.val;
+        if(code == "bj"){
+            if(10 <= v) v = 10; //bjなら10に矯正
+            if(v == 1) As++;
+        }
+        sum += v;
+    }
+
+    if(code == "bj"){
+        while(21 < sum && 0 < As){
+            sum -= 10; //特殊すぎる
+            As--;
+        }
+    }
+
+    return sum;
+}
+function cardUnwrap(arr){
+    for(let card of arr){
+        if(card.hide) card.hide = 0;
+    }
+    return arr;
+}
+
 // LocalStorage(Data) => lsd
 function lsdSet(name, value){
     if(Array.isArray(value) ||
@@ -518,9 +603,9 @@ let logC = {
     togD: logD.querySelector('.opener'),
     textD: logD.querySelector('.text'),
     autoDelay: 1,
-    skipText: 0,
-    clearText: 0,
-    loopText: 0,
+    skipT: 0,
+    clearT: 0,
+    loopT: 0,
     ing: 0,
     queue: []
 }
@@ -569,33 +654,26 @@ logF.cc = (raw) => {
 };
 
 logF.waitfor = async() => {
-    let len = logC.queue.length;
+    if(logC.ing ||
+        logC.queue.length == 0) return;
 
-    if(len == 0) logC.loopText = 0;
-    else logC.loopText = 1;
-
-    if(!logC.loopText) return;
-    requestAnimationFrame(logF.waitfor);
-
-    if(logC.ing) return;
-    let raw = logC.queue.shift();
-    // console.log(`${raw}を送信します`);
-    // console.log(`残り: (${len - 1})[${logC.queue}]`);
-    await logText(raw);
+    let raw0 = logC.queue.shift();
+    // console.log(`${raw0[0]}を送信します`);
+    await logText(...raw0);
 };
-async function logText(raw){
+async function logText(raw, code = ""){
     if(!raw) return console.log('「内容が？内容が〜〜？ないよ〜〜〜つってwwww直せ」');
     if(typeof raw != 'string') raw = String(raw);
 
     if(logC.ing){
-        logC.queue.push(raw);
+        logC.queue.push([raw, code]);
 
-        if(!logC.loopText) logF.waitfor();
+        logF.waitfor();
         return;
     };
     
     logC.ing = 1;
-    text = logF.cc(raw);
+    let text = logF.cc(raw);
     logC.textD.innerHTML = "";
     logC.textD.style.display = "block";
     logC.clearT = 0;
@@ -613,9 +691,7 @@ async function logText(raw){
 
                         index++;
                     }
-                    index = text.length;
-                    logC.skipT = 0;
-                    setTimeout(type, 10);
+                    type();
                 }else{
                     let span = document.createElement("span");
                     span.textContent = text[index].char;
@@ -626,20 +702,40 @@ async function logText(raw){
                     setTimeout(type, 80); // 次の文字を表示する間隔
                 }
             }else{
-                logText_log(logC.textD.innerHTML);
+                let das = `[${code}] `;
+                das += logC.textD.innerHTML;
+                logText_log(das);
                 let waitTime = logC.autoDelay * 1000;
-                let timeout = new Promise(resolve => setTimeout(resolve, waitTime));
-                let userAction = new Promise(resolve => {
+                
+                let cleanupListeners = () => {};
+                let timeout = new Promise(resolveTimeout => {
+                    let timer = setTimeout(() => {
+                        cleanupListeners();
+                        resolveTimeout();
+                    }, waitTime);
+                    
+                    cleanupListeners = () => clearTimeout(timer);
+                });
+
+                let userAction = new Promise(resolveUser => {
 
                     function waitToClear(event){
                         if(event.type === 'click' || event.key === 'z' || event.key === 'Enter'){
                             document.removeEventListener('click', waitToClear);
                             document.removeEventListener('keydown', waitToClear);
-                            resolve();
+                            cleanupListeners();
+                            resolveUser();
                         }
                     }
                     document.addEventListener('click', waitToClear);
                     document.addEventListener('keydown', waitToClear);
+
+                    let oldCleanup = cleanupListeners;
+                    cleanupListeners = () => {
+                        oldCleanup();
+                        document.removeEventListener('click', waitToClear);
+                        document.removeEventListener('keydown', waitToClear);
+                    };
                 });
 
                 Promise.race([timeout, userAction]).then(() => {
@@ -649,6 +745,8 @@ async function logText(raw){
                     logC.skipT = 0
                     logC.ing = 0;
                     resolve('end');
+
+                    logF.waitfor();
                 });
             }
         };
@@ -756,6 +854,73 @@ document.addEventListener('mousedown', e => {
     document.addEventListener('mouseup', onMouseUp);
 });
 //#endregion
+//#region Timer
+class Timer{
+    constructor(k = 0, d = 1){
+        // k:開始数 d:増加量
+        if(typeof k != "number" || typeof d != "number") return;
+        this.time = k;
+        this.d = d;
+
+        this.ev = null;
+
+
+        let div = document.createElement("div");
+        div.id = "timer";
+         let num = document.createElement("div");
+         div.appendChild(num);
+        div.addEventListener('click', () => {div.classList.toggle("tog")})
+        div.addEventListener("contextmenu", e => {
+            e.preventDefault();
+            div.classList.remove("show");
+        })
+        this.div = div;
+        this.numD = num;
+
+        // let div0 = document.body;
+        let div0 = mainD;
+        div0.appendChild(div);
+        this.tekiou();
+    }
+
+    tekiou(){
+        let time = this.time;
+        let [hun, byo] = [time%60, Math.floor(time/60)]
+            .map(a => a.toFixed(0).padStart(2, "0")); //初めて自ら改行したわ
+        this.numD.textContent = `${byo}:${hun}`;
+    }
+
+    start(){
+        if(this.ev) return;
+        this.ev = setInterval(() => {
+            this.time += this.d;
+            this.tekiou()
+        }, 1000);
+    }
+    stop(){
+        if(this.ev){
+            clearInterval(this.ev);
+            this.ev = null;
+        }
+        this.tekiou();
+    }
+    reset(){
+        this.time = 0;
+        this.tekiou();
+    }
+
+    kite(){
+        this.div.classList.add("show");
+    }
+    kiero(){
+        this.div.classList.remove("show");
+    }
+
+    share(){
+        this.div.remove();
+    }
+}
+// #endregion
 //#region tk
 class tk{
     constructor(type, x = 'half', y = 'half', w = window.innerWidth/2, h = window.innerWidth/2){
@@ -888,7 +1053,7 @@ class alertD{
         let div = document.createElement('div');
         div.classList.add('alertD');
         div.style.background = back;
-        div.style.boxShadow = `${hoshoku(back)} 5px 5px 20px`;
+        div.style.boxShadow = `${irohaHo(back)} 5px 5px 20px`;
 
         let row = document.createElement('div');
         row.classList.add('row');
@@ -901,14 +1066,14 @@ class alertD{
 
          let text = document.createElement('div');
          text.innerText = this.text;
-         text.style.color = hoshoku(back);
+         text.style.color = irohaHo(back);
          row.appendChild(text);
         div.appendChild(row);
 
         let x = document.createElement('div');
         x.className = 'x';
         x.innerText = '×';
-        x.style.color = hoshoku(back);
+        x.style.color = irohaHo(back);
         x.addEventListener('click', () => this.delete());
         div.appendChild(x);
         
@@ -1084,6 +1249,154 @@ class Slider {
     }
 }
 // #endregion
+//#region takushiSen
+class TakushiSen {
+    constructor(choices, mode = "tate", data = 0) {
+        this.choices = choices; // [[name, img}, [name, img], ...]
+        this.mode = mode;
+
+        if(!data) data = {
+            back: '#b2b2b2',
+            backed: '#2b2b2b'
+        };
+        this.data = data;
+
+        this.make();
+    }
+
+    make() {
+        let div = document.createElement('div');
+        div.className = `mode ${this.mode}`;
+        
+        let [b, bEd] = [this.data.back, this.data.backed];
+        div.style.setProperty('--botan', b);
+        div.style.setProperty('--botan-col', irohaHo(b));
+        div.style.setProperty('--botan-ed', bEd);
+        div.style.setProperty('--botan-col-ed', irohaHo(bEd));
+
+        this.choices.forEach(ma => {
+            // console.log(ma)
+            let [name, gazou] = ma;
+            if(typeof ma == 'string') name = ma;
+
+            let item = document.createElement('div');
+            item.className = `item ${name}`;
+            item.textContent = name;
+            item.dataset.name = name;
+
+            // 画像があるならば (0は無効)
+            if(gazou){
+                let img = document.createElement('img');
+                img.src = gazou;
+                item.appendChild(img);
+            }
+            div.appendChild(item);
+        });
+
+        this.div = div;
+        return div;
+    }
+
+    // ここがメイン！await で待ち受けるやつ
+    async select(parent) {
+        return new Promise(resolve => {
+            let div = this.make();
+            parent.appendChild(div);
+
+            div.addEventListener('click', (e) => {
+                let target = e.target.closest('.item');
+                if (target) {
+                    div.remove();
+                    resolve(target.dataset.name);
+                }
+            });
+        });
+    }
+}
+//#endregion
+//#region Tenshee
+class Tenshee {
+    // 天使なカノジョ です(??)
+    constructor(){
+        this.resolved = 0;
+    }
+
+    reset(){
+        tensheeC.now = "";
+        tensheeC.max = 0;
+        tensheeC.mode = "";
+        this.tekiou();
+    }
+
+    plzinput(max = 0, mode = 0){
+        if(tensheeC.ing) return;
+        tensheeC.ing = 1;
+        this.reset();
+
+        if(max) tensheeC.max = max;
+        if(mode) tensheeC.mode = mode;
+        tensheeD.classList.add('show');
+        return new Promise((resolve) => {
+            this.resolved = resolve;
+        });
+    }
+
+    tekiou(){
+        let disp = tensheeC.dispD;
+        let now = tensheeC.now;
+
+        if(tensheeC.mode == "pass") disp.textContent = '*'.repeat(now.length);
+        else disp.textContent = now;
+    }
+
+    num(num){
+        let now = tensheeC.now;
+        let max = tensheeC.max;
+        if(max != 0 && now.length >= max) return;
+        
+        now += num;
+        tensheeC.now = now;
+        this.tekiou();
+    }
+
+    del(){
+        let now = tensheeC.now;
+        if(now == "") return;
+
+        now = now.slice(0, -1);
+        tensheeC.now = now;
+        this.tekiou();
+    }
+
+    confirm(){
+        tensheeD.classList.remove('show');
+        let now = tensheeC.now;
+        console.log(`天カノ結果:: ${now}`)
+        if(now == "") console.error('入力されてないっすね');
+        if(this.resolved){
+            this.resolved(now);
+            this.resolved = 0;
+            tensheeC.ing = 0;
+        }
+    }
+}
+let tensheeD = document.getElementById('tenshee');
+let tensheeC = {
+    ing: 0,
+    now: "",
+    dispD: tensheeD.querySelector('.disp')
+}
+let tensheeF = {};
+const tenshee = new Tenshee();
+tensheeD.querySelectorAll('.bt').forEach(bt => {
+    bt.addEventListener('click', () => {
+        if(bt.classList.contains('num')) tenshee.num(bt.dataset.num)
+        if(bt.classList.contains('del')) tenshee.del();
+        if(bt.classList.contains('ok')) tenshee.confirm();
+    });
+})
+
+//#endregion
 //#region OBS
 let OBS = {
     keys: {},
@@ -1208,14 +1521,33 @@ let loaC = {
     erd: 0
 }
 let loaF = {};
-loaC.imgT = Object.values(Images).reduce((a,b) => a + b.length, 0);
 loaC.souT = Object.values(Sounds).reduce((a,b) => a + b.length, 0);
 
 loaF.load = async() => {
     console.log("loadを開始しました。少々お待ちください");
+
+    loaC.imgT = 0;
+    let MaaSorehaSoretoshite = (mono) => {
+        for(let key in mono){
+            if(key == 'すべて') continue;
+
+            let val = mono[key];
+            if(Array.isArray(val)){
+                loaC.imgT += val.length;
+            }
+            else if(val && typeof val == 'object'){
+                MaaSorehaSoretoshite(val);
+            }
+        }
+    };
+    MaaSorehaSoretoshite(Images);
+
     if(await loaF.loadI()) return 1;
     return 0;
 }
+
+/*
+// 元のカタチ
 loaF.loadI = async() => {
     let kasan = () => {
         loaC.imgD++;
@@ -1229,7 +1561,7 @@ loaF.loadI = async() => {
         for(let name of Images[belong]){
             let img = new Image();
             img.src = `assets/images/${belong}/${name}.png`;
-            img.onload = kasan();
+            img.onload = kasan;
             img.onerror = () => {
                 console.error(`Image assets/images/${belong}/${name}.png failed to load.`);
                 loaC.erd += 1;
@@ -1241,6 +1573,72 @@ loaF.loadI = async() => {
             images[belong][name] = img;
         }   
     }
+}
+*/
+loaF.loadI = async() => {
+    if(loaC.imgT == 0) return loaF.loadS();
+
+    let kasan = () => {
+        loaC.imgD += 1;
+        if(loaC.imgD == loaC.imgT) loaF.loadS();
+    }
+
+    let loaloa = async(arr, route) => {
+        let srcBase = "assets/images/" + route.join("/") + "/";
+
+        let tar = images;
+        for(let r of route){
+            if(!tar[r]) tar[r] = {};
+            tar = tar[r];
+        }
+
+        arr.forEach(mono => {
+            let img = new Image();
+            img.src = `${srcBase}${mono}.png`;
+            
+            img.onload = () => {
+                tar[mono] = img;
+                kasan();
+            };
+
+            img.onerror = () => {
+                console.error(`Image ${srcBase}${mono}.png failed to load.`);
+                loaC.erd += 1;
+                
+                if(loaC.erd > 50) {
+                    console.error('さすがにやりすぎbonus');
+                    return;
+                }
+                
+                img.src = `assets/images/systems/error.png`;
+                tar[mono] = img;
+                kasan();
+            };
+        });
+    }
+
+    // 再帰的に掘り進む
+    let loaloa0 = async(mono, route = []) => {
+        for(let key in mono){
+            if(key == "すべて") continue; //"すべて"はスキップ
+
+            let val = mono[key];
+            if(!val) continue;
+
+            route.push(key); //追加
+
+            if(Array.isArray(val)){
+                loaloa(val, [...route]);
+            }
+            else if(typeof val == 'object'){
+                await loaloa0(val, route); //さらなる深みへ
+            }
+            
+            route.pop(); //階層を戻す
+        }
+    }
+
+    await loaloa0(Images);
 }
 
 loaF.loadS = async() => {
@@ -1258,7 +1656,7 @@ loaF.loadS = async() => {
             sound.preload = 'auto';
             sound.src = `assets/sounds/${belong}/${name}.mp3`;
             if(belong == 'bgm'){
-                sound.loop = 1;
+                sound.loop = true;
                 sound.dataset.type = 'bgm';
                 sound.volume = souC.bgm;
             }
@@ -1283,7 +1681,7 @@ loaF.loadS = async() => {
 }
 loaF.end = () => {
     console.log(`images & sounds loaded! (error: ${loaC.erd})`);
-    soundVolume(50);
+    souF.volume(50);
     start();
 }
 
@@ -1292,8 +1690,10 @@ let souC = {
     bgm: 0.5,
     nowBgm: null
 }
-function soundPlay(name){
-    if(!sounds[name]) return soundPlay('error');
+let souF = {};
+souF.play = (name) => {
+    console.log("ん")
+    if(!sounds[name]) return souF.play('error');
     let proto = sounds[name];
 
     if(proto.dataset.type == 'bgm'){
@@ -1305,7 +1705,9 @@ function soundPlay(name){
         proto.volume = souC.bgm;
         proto.play().catch(e => console.warn('BGM 再生エラー', e));
         souC.nowBgm = name;
-    }else{
+    }
+    else if(proto.dataset.type == 'se'){
+        console.log("se")
         let clone = proto.cloneNode(1);
         clone.volume = souC.se;
         clone.dataset.type = 'se';
@@ -1315,7 +1717,50 @@ function soundPlay(name){
         clone.play().catch(e => console.warn('SE 再生エラー', e));
     }
 }
-function soundStop(){
+
+souF.play = (name) => {
+    let proto = null;
+    let category = null;
+
+    for(let belong in sounds){
+        if(sounds[belong][name]){
+            proto = sounds[belong][name];
+            category = belong;
+            break;
+        }
+    }
+
+    if(!proto){
+        if(name != 'error') return souF.play('error');
+        else return;
+    }
+
+    if(proto.dataset.type === 'bgm'){
+        if(souC.nowBgm){
+            for(let belong in sounds){
+                if(sounds[belong][souC.nowBgm]){
+                    let oldBgm = sounds[belong][souC.nowBgm];
+                    if(!oldBgm.paused){
+                        oldBgm.pause();
+                        oldBgm.currentTime = 0;
+                    }
+                    break;
+                }
+            }
+        }
+
+        proto.volume = souC.bgm;
+        proto.play().catch(e => console.warn('BGM 再生エラー', e));
+        souC.nowBgm = name;
+    }else{
+        let clone = proto.cloneNode(true);
+        clone.volume = souC.se;
+        clone.dataset.type = 'se';
+        clone.addEventListener('ended', () => {clone.src = ""});
+        clone.play().catch(e => console.warn('SE 再生エラー', e));
+    }
+}
+souF.stop = () => {
     Object.keys(sounds).forEach(k => {
         try{
             sounds[k].pause();
@@ -1325,7 +1770,7 @@ function soundStop(){
     souC.nowBgm = null;
     document.querySelectorAll('audio,video').forEach(el => { el.pause(); el.currentTime = 0; });
 }
-function soundVolume(code, val){
+souF.volume = (code, val) => {
     if(typeof code == 'number' && typeof val == 'undefined') val = code, code = 'both';
     if(typeof val !== 'number') return console.error('val は数値にして');
     let v = val;
@@ -1367,72 +1812,32 @@ function soundVolume(code, val){
 
 //#endregion
 //#region 幸せになれる隠しコマンドがあるらしい
-let secrates = [
-    {
-        ind:0,
-        name:'koppepan',
-        arr:['k','o','p','p','e','p','a','n'],
-        limit:3,
-        func: async function(){
-            nicoText('なんにも起こらない＝ヨーン');
+const secrateses = [];
+function secratesP(key){
+    secrateses.push(key);
+
+    let lenlen = Secrates.sort((a,b) => b.arr.length - a.arr.length);
+    let len = lenlen[0].arr.length;
+    secrateses.splice(0, secrateses.length - len);
+    
+    secratesC();
+}
+async function secratesC(){
+    for(let sec of Secrates){
+        if(sec.limit == 0) continue;
+
+        let len = sec.arr.length;
+        if(secrateses.length < len) continue;
+
+        let tail = secrateses.slice(-len);
+
+        if(tail.join() == sec.arr.join()){
+            console.log(`${sec.name}発動！！[${sec.arr.join(' ')}]`);
+            let res = await sec.func();
+            if(!res && sec.limit != 'n') sec.limit -= 1;
         }
-    },
-    {
-        ind:0,
-        name:'re',
-        arr:['r','e'],
-        limit:1,
-        func: async function(){
-            let img = document.createElement('img');
-            img.id = 'hakaisatsu';
-            img.src = 'assets/images/systems/hakai_1.png'
-            img.dataset.phase = 1;
-            document.querySelector('body').appendChild(img);
-
-            setTimeout(() => {
-                img.remove();
-                this.ind = 0;
-                this.limit = 1;
-            }, 3000)
-
-            return 0;
-        }
-    },
-    {
-        ind:0,
-        name:'rere',
-        arr:['r','e','r','e'],
-        limit:1,
-        func: async function(){
-            let img = document.getElementById('hakaisatsu');
-            if(!img) return;
-
-            img.src = 'assets/images/systems/hakai_2.png'
-            img.dataset.phase = 2;
-
-            setTimeout(() => {
-                img.remove();
-                this.ind = 0;
-                this.limit = 1;
-            }, 3000)
-
-            return 0;
-        }
-    },
-    {
-        ind:0,
-        name:'rerere',
-        arr:['r','e','r','e','r','e'],
-        limit:1,
-        func: async function(){
-            let img = document.getElementById('hakaisatsu');
-            if(!img) return 1;
-            console.log(img.dataset.phase);
-            if(img.dataset.phase != '2') return 1;
-            location.reload();
-        }
-    },
-]
+    }
+}
 document.addEventListener('keydown', async function(e){
     let key = e.key.toLowerCase();
     if(key == 'escape') loop = 0;
@@ -1440,20 +1845,7 @@ document.addEventListener('keydown', async function(e){
     if(document.activeElement.tagName == 'INPUT') return;
     if(document.activeElement.tagName == 'TEXTAREA') return;
 
-    for(let sec of secrates){
-        let nke = sec.arr[sec.ind];
-        // console.log(`必要は${nke}、押されたは${key}！`);
-        if(key == nke){
-            sec.ind += 1;
-            if(sec.ind == sec.arr.length && sec.limit){
-                console.log(`${sec.name}発動！！[${sec.arr.join(' ')}]`);
-                sec.ind = 0;
-                let res = await sec.func();
-                if(!res && sec.limit != 'n') sec.limit -= 1;
-            }
-        }
-        else sec.ind = 0;
-    }
+    secratesP(key);
 })
 //#endregion
 
@@ -1474,6 +1866,7 @@ mainF.move = (to) => {
 	
 	for(let a of Spaces) document.getElementById(a.name).classList.remove('show');
     document.getElementById(to).classList.add('show');
+    mainC.spa = to;
 }
 
 mainF.load = () => {
@@ -1513,48 +1906,21 @@ document.addEventListener('keyup',e => {
 //#endregion main
 
 
-
 // #region home
 let homD = document.getElementById('home');
 let homC = {
-    startD: homD.querySelector('.start.botan'),
+    startD: homD.querySelector('.start.bt'),
 }
 let homF = {};
 
 homF.start = async() => {
-    let charaD = document.createElement('div');
-    charaD.className = 'select chara';
-    homD.appendChild(charaD);
-    
-    let chara0 = await new Promise(solve => {
-        function clicked(e){
-            let div = e.target;
-            let name = div.dataset.name;
-            charaD.remove();
-            solve(name);
-        }
+    let arr = Players.map(a => [a.jpnm, `assets/images/players/${a.name}.png`]);
+    let charaT = new TakushiSen(arr, "tate")
+    let chara = await charaT.select(homD);
+    console.log(chara)
 
-        let list = Players.filter(a => !a.no);
-        for(let ma of list){
-            let div = document.createElement('div');
-            div.className = `item`;
-            div.dataset.name = ma.name;
-            div.textContent = ma.name;
-
-            let img = document.createElement('img');
-            img.src = `assets/images/players/${ma.name}.png`;
-            div.appendChild(img);
-            
-            div.addEventListener('click', clicked);
-            charaD.appendChild(div);
-        }
-    })
-    if(!chara0) return console.log(`charaが "${chara0}" でした。なにこれ`);
-    
-    let chara = chara0;
-
-
-    mainF.move("map")
+    await mapF.nextFloor();
+    mainF.move("map");
 }
 homC.startD.addEventListener('click', homF.start);
 // #endregion
@@ -1563,7 +1929,6 @@ homC.startD.addEventListener('click', homF.start);
 
 
 let humans = [];
-
 
 // #region map
 let mapD =  document.getElementById('map');
@@ -1978,6 +2343,7 @@ mapF.moving = (u, ippo) => {
         let mono = mapC.mases.find(a => a.x == tugi && a.y == p.y);
         if(!mono) return 1;
         if(mono.none) return 1;
+        // if(mono.consored) return 1;
 
         p.x += ippo;
     }
@@ -2058,6 +2424,8 @@ mapF.act = async() => {
     let p = mapC.p;
     
     let mas0 = mapC.mases.find(a => a.x == p.x && a.y == p.y);
+    if(!mas0 || mas0.consored) return;
+
     let mas = {...mas0};
     if(!mas.name) mas.name = 'none';
     let name0 = mas.name;
@@ -2138,13 +2506,6 @@ batF.heal = async(who, are, val, x) => {
 
 
 
-//#region start
-async function start(){
-    Style.tekiou();
-    await mapF.nextFloor();
-}
-//#endregion
-
 
 //#region start
 function start(){
@@ -2152,7 +2513,6 @@ function start(){
     OBS.load();
 
     mainF.load();
-    mapF.nextFloor();
 
     mainF.move('home');
 }

@@ -20,6 +20,82 @@ const Fonts = [
     {src:'kurobara', type:'ttf'},
     {src:'misaki', type:'ttf'},
 ];
+const Secrates = [
+    {
+        ind:0,
+        name:'koppepan',
+        arr:['k','o','p','p','e','p','a','n'],
+        limit:3,
+        func: async function(){
+            nicoText('なんにも起こらない＝ヨーン');
+        }
+    },
+    {
+        ind:0,
+        name:'re',
+        arr:['r','e'],
+        limit:1,
+        func: async function(){
+            let img = document.createElement('img');
+            img.id = 'hakaisatsu';
+            img.src = 'assets/images/systems/hakai_1.png'
+            img.dataset.phase = 1;
+            document.querySelector('body').appendChild(img);
+
+            setTimeout(() => {
+                img.remove();
+                this.ind = 0;
+                this.limit = 1;
+            }, 3000)
+
+            return 0;
+        }
+    },
+    {
+        ind:0,
+        name:'rere',
+        arr:['r','e','r','e'],
+        limit:1,
+        func: async function(){
+            let img = document.getElementById('hakaisatsu');
+            if(!img) return;
+
+            img.src = 'assets/images/systems/hakai_2.png'
+            img.dataset.phase = 2;
+
+            setTimeout(() => {
+                img.remove();
+                this.ind = 0;
+                this.limit = 1;
+            }, 3000)
+
+            return 0;
+        }
+    },
+    {
+        ind:0,
+        name:'rerere',
+        arr:['r','e','r','e','r','e'],
+        limit:1,
+        func: async function(){
+            let img = document.getElementById('hakaisatsu');
+            if(!img) return 1;
+            console.log(img.dataset.phase);
+            if(img.dataset.phase != '2') return 1;
+            location.reload();
+        }
+    },
+    {
+        ind:0,
+        name:'wawawwa',
+        arr:['w','a','w','a','w','w','a'],
+        limit:'n',
+        func: async function(){
+            staF.resetP();
+        }
+    }
+]
+    
 const Images = {
     systems:['error'],
     maps:['none', 'event', 'event_break', 'start', 'boss', 'enemy', 'enemy_gachi', 'enemy_metal', 'enemy_gold', 'enemy-high', 'fire_maki', 'chest_a', 'chest_b', 'chest_c', 'chest_d']
@@ -35,7 +111,7 @@ const Spaces = [
 ]
 
 
-let mapItems = [
+const mapItems = [
     //なのです口調のサポーターとかつけたいね〜〜
     {
         name: "start",
@@ -148,19 +224,16 @@ let mapItems = [
 ]
 
 
-let Players = [
+const Players = [
     {
         name: "shaman",
-        // alias: "LETS DO THIS", //oshama scramble
-        alias: "シャバシャバ屋ぁ",
-        flav: `
-        相手の攻撃力を下げたりするおばあちゃん。あとツタで捕まえたり壁に穴をあけたり自身の耐性・行動速度を上げたりする。ってもうそれはあの人やないかーーーーーーーーi\nちなみに今はこの人しかいないわよ。この先もしばらくはずっと
-        `,
+        jpnm: "雑貨商",
+        flav: `相手の攻撃力を下げたりするおばあちゃん。あとツタで捕まえたり壁に穴をあけたり自身の耐性・行動速度を上げたりする。ってもうそれはあの人やないかーーーーーーーーいちなみに今はこの人しかいないわよ。この先もしばらくはずっと`,
         
     }
 ]
 
-let Cards = [
+const Cards = [
     {
         name: 'none',
         code: 'A',
@@ -602,7 +675,7 @@ let Cards = [
     }
 ];
 
-let Buffs = [
+const Buffs = [
     //こっからbuff
     {
         name:'吸血の牙',
