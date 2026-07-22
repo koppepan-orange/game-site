@@ -1053,7 +1053,7 @@ class alertD{
         let div = document.createElement('div');
         div.classList.add('alertD');
         div.style.background = back;
-        div.style.boxShadow = `${irohaHo(back)} 5px 5px 20px`;
+        div.style.boxShadow = `${hoshoku(back)} 5px 5px 20px`;
 
         let row = document.createElement('div');
         row.classList.add('row');
@@ -1066,14 +1066,14 @@ class alertD{
 
          let text = document.createElement('div');
          text.innerText = this.text;
-         text.style.color = irohaHo(back);
+         text.style.color = hoshoku(back);
          row.appendChild(text);
         div.appendChild(row);
 
         let x = document.createElement('div');
         x.className = 'x';
         x.innerText = '×';
-        x.style.color = irohaHo(back);
+        x.style.color = hoshoku(back);
         x.addEventListener('click', () => this.delete());
         div.appendChild(x);
         
@@ -1252,7 +1252,7 @@ class Slider {
 //#region takushiSen
 class TakushiSen {
     constructor(choices, mode = "tate", data = 0) {
-        this.choices = choices; // [[name, img], [name, img], ...]
+        this.choices = choices; // [{name, img}, {name, img}, ...]
         this.mode = mode;
 
         if(!data) data = {
@@ -1275,16 +1275,15 @@ class TakushiSen {
         div.style.setProperty('--botan-col-ed', irohaHo(bEd));
 
         this.choices.forEach(ma => {
-            // console.log(ma)
-            let [name, gazou] = ma;
-            if(typeof ma == 'string') name = ma;
+            let [name, gazou] = [ma.name, ma.img];
+            if(typeof ma === 'string') name = ma;
 
             let item = document.createElement('div');
             item.className = `item ${name}`;
             item.textContent = name;
             item.dataset.name = name;
 
-            // 画像があるならば (0は無効)
+            // 画像があるならば
             if(gazou){
                 let img = document.createElement('img');
                 img.src = gazou;
