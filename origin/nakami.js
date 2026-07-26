@@ -19,46 +19,70 @@ async function nicoText(mes){
     await delay(5000); 
     div.remove();
 };
-function tobiText(youso, mes){
+function tobiText(youso, mes, config = {}) {
+    let {
+        mode = "booba", //booba(楕円)かkiki(トゲトゲ)
+        back = "#2b2b2b",
+    } = config;
+
     let el = youso;
-    if(typeof el == 'string') el = document.querySelector(youso);
+    if(typeof el == "string") el = document.querySelector(youso);
     if(!el) return console.error('せんぱ〜い？この要素壊れてますよ〜〜？');
 
     console.log(`[tobi] ${mes}`);
 
     let rect = el.getBoundingClientRect();
-    let left = rect.left + window.scrollX + rect.width / 2;
-    let top = rect.top + window.scrollY + rect.height / 2;
+    let left = rect.left + (window.scrollX+rect.width/2);
+    let top = rect.top + (window.scrollY+rect.height/2);
 
-    let node = document.createElement('div');
-    node.className = 'tobitext';
-    node.innerText = mes;
-    node.style.top = `${top}px`;
-    node.style.left = `${left}px`;
+    let div = document.createElement('div');
+    div.className = `tobitext ${mode}`;
+    div.innerText = mes;
 
-    document.body.appendChild(node);
+    div.style.top = `${top}px`;
+    div.style.left = `${left}px`;
+    div.style.setProperty('---back', back);
+    div.style.color = "#2b2b2b";
+    if(irohaDark(back)) div.style.color = "#ffffff";
 
+    if(mode == 'kiki'){
+        let points = [];
+        let n = 18; //トゲの数
+        for (let i=0; i<n; i++) {
+            let angle = (i/n) * 360;
+            let rad = (angle*Math.PI) / 180;
+            let radius = 15 + Math.random()*10;
+             if(i%2 == 0) radius = 45 + Math.random()*10;
+
+            let x = 50 + radius*Math.cos(rad);
+            let y = 50 + radius*Math.sin(rad);
+            points.push(`${x.toFixed(1)}% ${y.toFixed(1)}%`);
+        }
+        div.style.clipPath = `polygon(${points.join(', ')})`;
+    }
+
+    document.body.appendChild(div);
+
+    // 動くよ
     let duration = 1200;
     let distance = -48;
     let jitter = (Math.random() - 0.5) * 10;
-
     let start = performance.now();
-
-    let easeOutCubic = (t) => {return 1 - Math.pow(1 - t, 3)};
+    let easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 
     function frame(now){
         let t = Math.min(1, (now - start) / duration);
         let e = easeOutCubic(t);
         let tsY = distance * e;
         let tsX = jitter * (1 - e);
-        node.style.transform = `translate(-50%, -50%) translateY(${tsY}px) translateX(${tsX}px)`;
-        node.style.opacity = String(1 - t);
+        div.style.transform = `translate(-50%, -50%) translateY(${tsY}px) translateX(${tsX}px)`;
+        div.style.opacity = String(0.8 * (1 - t));
         if(t < 1) requestAnimationFrame(frame);
-        else node.remove();
+        else div.remove();
     };
 
     requestAnimationFrame(frame);
-};
+}
 function copytext(text){
     console.log(`[copy] ${text}`);
     navigator.clipboard.writeText(text)
