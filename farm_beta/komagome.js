@@ -1,5 +1,6 @@
 //#region komagome
-function delay(ms){
+function delay(ms, who = 0){
+    if(who) dooC.cavF.buffDecZen(who, ms);
     return new Promise(resolve=>setTimeout(resolve,ms));
 };
 
@@ -29,7 +30,7 @@ function tobiText(youso, mes, config = {}) {
     if(typeof el == "string") el = document.querySelector(youso);
     if(!el) return console.error('せんぱ〜い？この要素壊れてますよ〜〜？');
 
-    console.log(`[tobi] ${mes}`);
+    // console.log(`[tobi] ${mes}`);
 
     let rect = el.getBoundingClientRect();
     let left = rect.left + (window.scrollX+rect.width/2);
@@ -88,6 +89,7 @@ function copytext(text){
     navigator.clipboard.writeText(text)
 }
 async function kirameki(div0, zukey = 'star', n = 20, time = 2000, col){
+    if(!div0) return
     let taioued = ['star', 'heart'];
     if(!taioued.includes(zukey)) return console.log(`図形が対応していません。現在対応しているのは[${taioued.join(', ')}]だけであります。`);
     let rect = div0.getBoundingClientRect();
@@ -503,7 +505,7 @@ function irohaHo(color){
 function irohaMix(c1, c2, ratio = 0.5){
     let toRGB = c => {
         c = c.replace('#', '');
-        if (c.length === 3) c = c.split('').map(x => x + x).join('');
+        if (c.length == 3) c = c.split('').map(x => x + x).join('');
         let n = parseInt(c, 16);
         return [n >> 16, (n >> 8) & 255, n & 255];
     };
@@ -528,17 +530,19 @@ function irohaRan(){
 };
 function irohaDark(color) {
     color = color.replace('#', '');
-    if (color.length === 3) color = color.split('').map(x => x + x).join('');
+    if (color.length == 3) color = color.split('').map(x => x + x).join('');
     
     let r = parseInt(color.slice(0, 2), 16);
     let g = parseInt(color.slice(2, 4), 16);
     let b = parseInt(color.slice(4, 6), 16);
 
     // 相対輝度の近似計算
-    // 0.2126 * R + 0.7152 * G + 0.0722 * B
     let luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    
-    return luma < 128; // 暗い色ならtrue
+
+    if (isNaN(luma)) return 0; //明るい
+
+    if(luma < 128) return 1; //暗い
+    return 0; //明るい
 }
 
 function timeDiff(kako){
@@ -759,7 +763,7 @@ async function logText(raw, code = ""){
                 let userAction = new Promise(resolveUser => {
 
                     function waitToClear(event){
-                        if(event.type === 'click' || event.key === 'z' || event.key === 'Enter'){
+                        if(event.type == 'click' || event.key == 'z' || event.key == 'Enter'){
                             document.removeEventListener('click', waitToClear);
                             document.removeEventListener('keydown', waitToClear);
                             cleanupListeners();
@@ -793,10 +797,10 @@ async function logText(raw, code = ""){
     });
 };
 document.addEventListener('keydown', (e) => {
-    if(e.key === 'z' || e.key === 'Enter') logC.skipT = 1;
+    if(e.key == 'z' || e.key == 'Enter') logC.skipT = 1;
 });
 document.addEventListener('keyup', (e) => {
-    if(e.key === 'z' || e.key === 'Enter') logC.skipT = 0;
+    if(e.key == 'z' || e.key == 'Enter') logC.skipT = 0;
 });
 document.addEventListener('click', () => {
     logC.skipT = 1;
@@ -895,11 +899,14 @@ document.addEventListener('mousedown', e => {
 //#endregion
 //#region Timer
 class Timer{
-    constructor(k = 0, d = 1){
+    constructor(k = 0, d = 1, mode = 0){
         // k:開始数 d:増加量
+        // mode| 0-分:秒 1-秒:ミリ秒
         if(typeof k != "number" || typeof d != "number") return;
-        this.time = k;
+        this.k = k;
+         this.time = k;
         this.d = d;
+        this.mode = mode;
 
         this.ev = null;
 
@@ -924,17 +931,23 @@ class Timer{
 
     tekiou(){
         let time = this.time;
-        let [hun, byo] = [time%60, Math.floor(time/60)]
+        let kiju = 60;
+        if(this.mode) kiju = 100;
+
+        let [hun, byo] = [Math.floor(time/kiju), time%kiju]
             .map(a => a.toFixed(0).padStart(2, "0")); //初めて自ら改行したわ
-        this.numD.textContent = `${byo}:${hun}`;
+        this.numD.textContent = `${hun}:${byo}`;
     }
 
     start(){
         if(this.ev) return;
+        let inter = 1000;
+        if(this.mode) inter = 10;
+
         this.ev = setInterval(() => {
             this.time += this.d;
             this.tekiou()
-        }, 1000);
+        }, inter);
     }
     stop(){
         if(this.ev){
@@ -944,7 +957,7 @@ class Timer{
         this.tekiou();
     }
     reset(){
-        this.time = 0;
+        this.time = this.k;
         this.tekiou();
     }
 
@@ -956,6 +969,7 @@ class Timer{
     }
 
     share(){
+        this.stop();
         this.div.remove();
     }
 }
@@ -1315,7 +1329,7 @@ class TakushiSen {
 
         this.choices.forEach(ma => {
             let [name, gazou] = [ma.name, ma.img];
-            if(typeof ma === 'string') name = ma;
+            if(typeof ma == 'string') name = ma;
 
             let item = document.createElement('div');
             item.className = `item ${name}`;
@@ -1435,6 +1449,41 @@ tensheeD.querySelectorAll('.bt').forEach(bt => {
 })
 
 //#endregion
+// #region provide
+class fuyoNagaOSU{
+    constructor(div, func, nagasa = 1000){
+        if(!div || !nagasa) return console.error(`せんぱ〜い？ ${div} ${func} ${nagasa} なんていうよくわからないものは使わないでくださ〜い笑`);
+        this.div = div;
+        this.func = func;
+        this.nagasa = nagasa;
+        this.timer = null;
+
+        this.make();
+    }
+
+    make(){
+        // 押し始めたとき
+        this.div.addEventListener('pointerdown', (e) => {
+            this.destroy();
+            this.timer = setTimeout(() => {
+                if(typeof this.func == 'function') this.func(e);
+            }, this.nagasa);
+        });
+
+        // 離したときやキャンセルされたとき(アロー関数でthisを守るらしい...)
+        this.div.addEventListener('pointerup', () => this.destroy());
+        this.div.addEventListener('pointercancel', () => this.destroy());
+        this.div.addEventListener('mouseleave', () => this.destroy());
+    }
+
+    destroy(){
+        if(this.timer != null){
+            clearTimeout(this.timer);
+            this.timer = null;
+        }
+    }
+}
+// #endregion
 //#region OBS
 let OBS = {
     keys: {},
@@ -1614,15 +1663,15 @@ loaF.loadI = async() => {
 }
 */
 loaF.loadI = async() => {
-    if(loaC.imgT == 0) return loaF.loadS();
-
-    let kasan = () => {
+    let kasan = (mono) => {
         loaC.imgD += 1;
+        console.log(`${loaC.imgD}/${loaC.imgT} | ${mono}`)
         if(loaC.imgD == loaC.imgT) loaF.loadS();
     }
 
+    if(loaC.imgT == 0) return loaF.loadS();
     let loaloa = async(arr, route) => {
-        let srcBase = "assets/images/" + route.join("/") + "/";
+        let srcBase = `assets/images/${route.join("/")}/`;
 
         let tar = images;
         for(let r of route){
@@ -1632,14 +1681,17 @@ loaF.loadI = async() => {
 
         arr.forEach(mono => {
             let img = new Image();
-            img.src = `${srcBase}${mono}.png`;
+            tar[mono] = img;
             
             img.onload = () => {
                 tar[mono] = img;
-                kasan();
+                kasan(mono);
             };
 
             img.onerror = () => {
+                img.onload = null;
+                img.onerror = null;
+
                 console.error(`Image ${srcBase}${mono}.png failed to load.`);
                 loaC.erd += 1;
                 
@@ -1650,8 +1702,10 @@ loaF.loadI = async() => {
                 
                 img.src = `assets/images/systems/error.png`;
                 tar[mono] = img;
-                kasan();
+                kasan(`error (${mono})`);
             };
+
+            img.src = `${srcBase}${mono}.png`;
         });
     }
 
@@ -1773,7 +1827,7 @@ souF.play = (name) => {
         else return;
     }
 
-    if(proto.dataset.type === 'bgm'){
+    if(proto.dataset.type == 'bgm'){
         if(souC.nowBgm){
             for(let belong in sounds){
                 if(sounds[belong][souC.nowBgm]){
