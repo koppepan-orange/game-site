@@ -140,61 +140,48 @@ img{
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
-    width: 310px;
+    width: 35%;
     height: 200px;
     border: 2px solid #ffffff;
      border-right: none;
     position: fixed;
-    right: -280px;
+    right: calc(-35% + 30px);
     bottom: 20%;
     transition: right 1.0s ease;
     color: #fefefe;
     overflow: hidden;
     box-sizing: border-box;
     z-index: 10;
-}
-#log.hid{
-    right: -310px;
-}
-#log.tog{
-    right: 0px;
-}
-#log .opener{
-    width: 30px;
-    height: 100%;
-    background: #000000ef;
-    text-align: center;
-    box-sizing: border-box;
-    cursor: pointer;
-}
-#log .main{
-    width: 280px;
-    height: 100%;
-    max-height: 100%;
-    overflow-x: hidden;
-    overflow-y: scroll;
-    background: #000000de;
-    text-align: left;
-    font-size: 14px;
-    box-sizing: border-box;
-}
-#log .text{
-    display: none;
-    width: fit-content;
-    padding: 10px 15px;
-    border-radius: 5px;
-    background: #000000ce;
-    position: fixed;
-    left: 50%;
-    bottom: 120px;
-    transform: translateX(-50%);
-    color: #ffffff;
-    font-size: 1.2em;
-    white-space: nowrap;
-    overflow: hidden;
-    animation: fadeIn 0.5s ease forwards;
-    box-sizing: border-box;
-    z-index: 2147483647;
+
+    &.tog{
+        right: 0;
+    }
+    
+    & .opener{
+        width: 30px;
+        height: 100%;
+        background: #000000ef;
+        position: absolute;
+        top: 0;
+        left: 0;
+        text-align: center;
+        box-sizing: border-box;
+        cursor: pointer;
+    }
+    & .main{
+        width: calc(100% - 30px);
+        height: 100%;
+        max-height: 100%;
+        overflow-x: hidden;
+        overflow-y: scroll;
+        background: #000000de;
+        position: absolute;
+        top: 0;
+        left: 29px;
+        text-align: left;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
 }
 @keyframes fadeIn {
     0%{
