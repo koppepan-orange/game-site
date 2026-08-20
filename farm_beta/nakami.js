@@ -168,12 +168,23 @@ function findGeneric(list, type, name, extraCheck = null) {
 const findBuff = (name) => findGeneric(Buffs, "Buffs", name);
 const findRacer = (name) => findGeneric(Racers, "Racers", name);
 
+// #region farm
+let farD = document.getElementById("farm");
+let farC = {
+    growing: 0
+};
+let farF = {};
 
+farF.load = () => {
+    
+}
+
+// #endregion
 
 // #region door
 let dooD = document.getElementById("door");
 let dooC = {
-    areus: ["loby", "nero", "cave", "jump", "forage"],
+    areus: ["loby", "nero", "cave", "jump"], //, "forage"
     shoulD:{
         loby: dooD.querySelector(".area.loby"),
         nero: dooD.querySelector(".area.nero"),
@@ -1153,7 +1164,8 @@ function start(){
 
     rimiF.inc(255);
 
-    let hash = location.hash.replace("?", "");
+    let hash = location.search.replace("?", "");
+    console.log(hash)
     let space = Spaces.find(a => a.name == hash);
     if(!space) space = Spaces.find(a => a.sho);
     mainF.move(space.name);
