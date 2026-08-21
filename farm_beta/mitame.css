@@ -991,6 +991,7 @@ input[type="range"].slider::-webkit-slider-thumb:hover{
     padding: 15px 5px;
     background: #ffe7c6;
     border: 3px solid #2b2b2b;
+    overflow: scroll;
     box-sizing: border-box;
 
     & .len{

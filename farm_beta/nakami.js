@@ -768,7 +768,8 @@ dooC.jumF.start = async() => {
     dooC.jumF.reset();
 
     rimiF.dec(bet);
-
+    
+    let div0 = dooC.jumC.Ds["out"];
     let kai = dooC.jumC.x;
     let rollin = async(now = 0) => {
         // 6回回転、ソート、判定
@@ -778,7 +779,8 @@ dooC.jumF.start = async() => {
         
         let div = El("div", `len l${now}`);
         len.div = div;
-         dooC.jumC.Ds["out"].appendChild(div);
+         div0.appendChild(div);
+         div0.scrollTop = div0.scrollHeight;
          
         let list = len.list;
         for(let i=0; i<kai; i++){
@@ -824,7 +826,7 @@ dooC.jumF.start = async() => {
         }
         else{
             if(dooC.jumC.kawakita){
-                if(hit(15)){
+                if(hit(20)){
                     console.log("川北発動！！！")
                     await logText("はじめましての時以外も");
                     await logText("お願いしなくてはならない");
