@@ -398,7 +398,7 @@ function anagramCan(mae, ato){
     return 1;
 };
 
-function cardDraw(val0 = 0, suit0 = 0){
+function cardDraw(val0 = 0, suit0 = 0, code = 0){
     let val = random(1, 13);
     let suit = arraySelect(['♡', '♤', '♢', '♧']);
     if(val0) val = val0;
@@ -410,6 +410,8 @@ function cardDraw(val0 = 0, suit0 = 0){
     if(val == 11) hyou = 'J';
     if(val == 12) hyou = 'Q';
     if(val == 13) hyou = 'K';
+
+    if(10 < val && code == "bj") val = 10;
     
     let card = {    
         suit,
