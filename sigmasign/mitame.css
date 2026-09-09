@@ -788,7 +788,8 @@ input[type="range"].slider::-webkit-slider-thumb:hover{
 #main{
     display: block;
     width: var(--iPhone-width);
-    height: 100%;
+    /* height: 100%; */
+    height: 700px;
     margin: 0 auto;
     position: relative;
     overflow: hidden;
@@ -813,5 +814,72 @@ input[type="range"].slider::-webkit-slider-thumb:hover{
 
 
 /* 
-今回の基調: 
+今回の基調: 白と黒。
+カラフルにするのはおかしな道化とセールスマンだけ
+形式どうするか悩むねぇ
 */
+
+#home{
+    content: "home";
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 15px;
+    padding-bottom: 160px;
+}
+#home .bt{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 85%;
+    height: 32px;
+    background: var(--ki-back);
+    border: 4px solid var(--ki-bor);
+    color: var(--ki-bor);
+    &:active{
+        scale: 0.90;
+    }
+}
+
+#select{
+    content: "なんか目が痛い平井大";
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 30px 20px;
+}
+#select .grid{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    width: 100%;
+    height: fit-content;
+    box-sizing: border-box;
+
+    & .mono{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 3px;
+        font-size: 14px;
+        color: var(--ki-bor);
+
+        & img{
+            display: block;
+            width: 90%;
+            aspect-ratio: 1/1;
+            object-fit: contain;
+        }
+    }
+}
+
+#battle{
+    content: "がんばえ〜";
+}
+#battle .gamen{
+    /* canvas */
+    width: 393px;
+    height: 100%;
+}

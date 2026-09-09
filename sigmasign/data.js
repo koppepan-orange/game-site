@@ -174,7 +174,25 @@ const Secrates = [
 ]
 
 const Spaces = [
-    { name:'home', rank:2, back:'#f0f8ff', sho:1 },
+    { name:'home', rank:2, back:Style.ki["back"], sho:1 },
+    { name:"select", rank:3, back:Style.ki["back"] },
+    { name:"battle", rank:3, back:Style.ki["back"] },
 ];
 
 
+const Targets = [
+    {
+        // 一旦すでにイラストのあるキャラを。動作確認とか練習とか。ここさえできれば拡張できるわけだし
+        name:"shrimp",
+        jpnm:"えび",
+        desc:"何の捻りもない、ただのエビ。基礎的な攻撃しかしてこない。チュートリエル",
+        maxhp:40,
+        acts:[
+            {
+                name:"逃避反射",
+                p:"%,who_hp,>,20", //条件。ないものは""
+                h:30 //比重的な。Gachaにはなるので
+            }
+        ]
+    }
+]
