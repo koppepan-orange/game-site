@@ -55,6 +55,17 @@ document.addEventListener('keyup',e => {
 
 //#endregion main
 
+function findGeneric(list, type, name, extraCheck = null){
+    let data;
+    if(extraCheck) data = extraCheck(list, name);
+     else data = list.find(a => a.name == name || a.jpnm == name);
+    if(data) return data;
+    
+    console.log(`[find] ${type}で、「${name}」っていうものはないらしいです`);
+    return 0;
+}
+const findTarget = (name) => findGeneric(Targets, "Targets", name);
+
 let homD = document.getElementById("home");
 let homC = {
     Ds:{
@@ -77,6 +88,7 @@ homF.desc = () => {
 homC.Ds["desc"].addEventListener("click", homF.desc)
 
 
+// #region sel
 let selD = document.getElementById("select");
 let selC = {
     Ds:{
@@ -103,12 +115,70 @@ selF.load = () => {
     }
 }
 
-selF.fight = (name) => {
+selF.fight = async(name) => {
+    if(batC.ing) return 0;
+    let data = Targets.find(a => a.name == name);
+    if(!data) return console.error(`data「${name}」が見つかりません`);
+
     mainF.move("battle");
+    batC.target = name;
+
+    batC.obs.length = 0;
+    // 枠の生成処理（selF.fight などで呼ぶ）
+    let size = batC.wack[0];
+    let thick = batC.wack[1];
+    let cx = batC.wid/2;
+    let cy = batC.hei-150;
+
+    // 上・下・左・右の4枚の壁を生成（ID: -1 〜 -4）
+    let wallT = new batA_ob(cx, cy-size/2, size, thick, 0, [], {id:-1, cols:["black"]});
+    let wallL = new batA_ob(cx-size/2, cy, thick, size, 0, [], {id:-2, cols:["black"]});
+    let wallB = new batA_ob(cx, cy+size/2, size, thick, 0, [], {id:-3, cols:["black"]});
+    let wallR = new batA_ob(cx+size/2, cy, thick, size, 0, [], {id:-4, cols:["black"]});
+
+    wallT.add();
+    wallB.add();
+    wallL.add();
+    wallR.add();
+
+    let player = new batA_ob(
+        batC.wid/2, 
+        batC.hei - 180,
+        0,
+        0,
+        0,
+        [],
+        {
+            id: 0,
+            zock: "systems",
+            name: "heart",
+            maxhp: 20
+        }
+    );
+
+    let target = new batA_ob(
+        batC.wid/2,
+        150, 
+        0,
+        0,
+        0,
+        [],
+        {
+            id: 1,
+            zock: data.zock ?? "systems",
+            name: data.img ?? data.name,
+            maxhp: data.maxhp,
+        }
+    );
+
+    player.add();
+    target.add();
+
+    batF.start();
 }
+// #endregion
 
-
-
+// #region bat
 let batD = document.getElementById("battle");
 let batC = {
     Ds:{
@@ -119,10 +189,129 @@ let batC = {
     wid:393,
     hei:700,
     wack:[150, 5],
+    size:30,
+
+    loop:0,
+    ing:0,
+    waiting:0,
+
+    target: null,
 
     obs:[]
 }
 let batF = {};
+
+class batA_ob {
+    constructor(x, y, w = 0, h = 0, dir = 0, props = [], data = {}) {
+        this.id = data.id ?? batC.obs.length;
+        this.x = x;
+        this.y = y;
+        this.w = w || batC.size;
+        this.h = h || batC.size;
+        this.dir = dir;
+
+        // scratchのアレ。 | はい: 全方位, まあ: 左右のみ, いえ: 無し
+        this.rotation = data.rotation || "はい";
+
+        this.zock = data.zock || "systems";
+        this.name = data.name || "error";
+        this.img = data.img || null;
+
+        this.vx = data.vx || 0;
+        this.vy = data.vy || 0;
+        this.ax = data.ax || 0;
+        this.ay = data.ay || 0;
+        this.masa = 1; //摩擦。地面参照なのでまずは
+        
+        this.maxhp = data.maxhp ?? 1;
+        this.hp = 1;
+        this.cols = data.cols || [];
+        this.stats = data.stats || [];
+
+        let hasp = (name) => {return props.find(a => a.startsWith(name))?.split("_")};
+        if(hasp("重力")) ay = 0.2;
+
+        let サイズ = hasp("サイズ");
+        if(サイズ){
+            let vai = +サイズ[1]/100;
+            this.w *= vai;
+            this.h *= vai;
+        }
+    }
+    add(){
+        batC.obs.push(this);
+    }
+
+    // 物理
+    calc(){
+        this.vx += this.ax;
+        this.vy += this.ay;
+
+        this.vx *= this.masa;
+        this.vy *= this.masa;
+
+        this.x += this.vx;
+        this.y += this.vy;
+
+        this.ax = 0;
+        this.ay = 0;
+    }
+    push(x, y){
+        this.ax += x;
+        this.ay += y;
+    }
+    move(d){
+        let rad = this.dir * (Math.PI / 180);
+        this.x += Math.cos(rad) * d;
+        this.y += Math.sin(rad) * d;
+    }
+    set(x, y){
+        this.x = x;
+        this.y = y;
+    }
+    koheX(x){this.x += x}
+    koheY(y){this.y += y}
+    
+    // 美術
+    draw(){
+        let ctx = batC.ctx;
+         ctx.save();
+        ctx.translate(this.x, this.y);
+
+        if (this.rotation == "はい"){
+            // 元のイラストが90度（右）基準なので、描画時に90度引いて回転を補正
+            ctx.rotate((this.dir - 90) * (Math.PI / 180));
+        }
+        if (this.rotation == "まあ"){
+            // 角度が180度〜360度（左方向）の時は左右反転
+            let normalizedDir = (this.dir % 360 + 360) % 360;
+            if (normalizedDir > 90 && normalizedDir < 270) {
+                ctx.scale(-1, 1);
+            }
+        }
+        // "いえ" の場合は回転せず描画
+
+        // 画像の中心を座標の基準点にして描画
+        let img = images[this.zock]?.[this.img ?? this.name] ?? images["systems"]["error"];
+        ctx.drawImage(img, -this.w / 2, -this.h / 2, this.w, this.h);
+
+         ctx.restore();
+    }
+}
+batF.ob = (code, who = 0, are = 0) => {
+    if(typeof code == "number"){
+        let ob = batC.obs.find(o => o.id == code);
+        if(ob) return ob;
+        else return null;
+    }
+    
+    if(code == "player") return batF.ob(0);
+    if(code == "target") return batF.ob(1);
+    if(code == "me" && who) return batF.ob(who.id);
+    if(code == "he" && are) return batF.ob(are.id);
+
+    return 0;
+}
 
 batF.resize = () => {
     let can = batC.can;
@@ -130,35 +319,194 @@ batF.resize = () => {
     can.height = batC.hei;
 }
 
-batF.draw = () => {
-    let ctx = batC.ctx;
-    for(let ob of batC.obs){
-        ctx.drawImage(images[ob.zock][ob.img ?? ob.name], ob.x, ob.y, ob.w, ob.h);
-    }
+batF.mathPos = (p) => {
+    if(Array.isArray(p)) return {x:p[0], y:p[1]};
 
-    // わこつ
-    let wack = batC.wack;
-    let x = (batC.wid/2) - (wack[0]/2); // 正方形の左上
-    let y = (batC.hei-150) - (wack[0]/2);
+    let ob = batF.ob;
+    if(ob) return {x:ob.x, y:ob.y};
 
-     ctx.save();
-    ctx.lineWidth = wack[1];
-    ctx.strokeStyle = Style.ki["bor"];
-    ctx.strokeRect(x, y, wack[0], wack[0]);
-     ctx.restore();
+    return {x: 0, y: 0};
+}
+batF.mathDir = (from, d) => {
+    // 角度解決ヘルパー（発射元座標 -> ターゲットへの角度）
+    
+    if(Array.isArray(d)) return d[0]; //普通の角度
+    
+    // "player"(0), "target"(1), または ID数値が指定された場合はその対象への角度を計算
+    let to = batF.mathPos(d);
+    let dx = to.x - from.x;
+    let dy = to.y - from.y;
+    return Math.atan2(dy, dx) * (180/Math.PI);
 }
 
-batF.addob = (x, y, w, h, props = []){
-    let hasp = (name) => {
-        for(let p of props){
-            if(p == name) return name;
-            if(p.startsWith(name)) return p; //最初のを
+batF.draw = () => {
+    let ctx = batC.ctx;
+    ctx.clearRect(0, 0, batC.wid, batC.hei);
+
+    for(let ob of batC.obs){
+        ob.draw();
+    }
+
+    // let wack = batC.wack;
+    // if(wack){
+    //     let x = (batC.wid/2)-(wack[0]/2);
+    //     let y = (batC.hei-150)-(wack[0]/2);
+
+    //      ctx.save();
+    //     ctx.lineWidth = wack[1];
+    //     ctx.strokeStyle = Style.ki["bor"];
+    //     ctx.strokeRect(x, y, wack[0], wack[0]);
+    //      ctx.restore();
+    // }
+}
+
+batF.face = (a, b) => {
+    let dx = a.x - b.x;
+    let dy = a.y - b.y;
+    let r1 = a.w/2;
+    let r2 = b.w/2;
+    return Math.hypot(dx, dy) < (r1 + r2);
+}
+batF.pControl = () => {
+    let p = batF.ob(0);
+    if(!p) return;
+
+    let speed = 3;
+    let dx = 0;
+    let dy = 0;
+
+    if(OBS.keys["w"] || OBS.keys["arrowup"]) dy -= 1;
+    if(OBS.keys["s"] || OBS.keys["arrowdown"]) dy += 1;
+    if(OBS.keys["a"] || OBS.keys["arrowleft"]) dx -= 1;
+    if(OBS.keys["d"] || OBS.keys["arrowright"]) dx += 1;
+
+    // 入力方向の保持
+    if(dx != 0 || dy != 0) p.lastDir = {x:dx, y:dy};
+
+    // ダッシュ判定
+    if(p.stats.includes("走れるよ") && OBS.keys["space"] && !p.dashing){
+        p.dashing = true;
+        let dir = p.lastDir || {x:0, y:-1};
+        p.dashEnd = Date.now() + 1000;
+        p.dashDir = dir;
+    }
+
+    if(p.dashing){
+        if(Date.now() < p.dashEnd){
+            dx = p.dashDir.x*10;
+            dy = p.dashDir.y*10;
+        }
+        if(Date.now() >= p.dashEnd) p.dashing = false;
+    }
+
+    let moveX = dx*speed;
+    p.x += moveX;
+    for(let ob of batC.obs){
+        if(ob.id == p.id) continue;
+        if(ob.cols.includes("black") && batF.face(p, ob)) p.x -= moveX;
+    }
+
+    let moveY = dy*speed;
+    p.y += moveY;
+    for(let ob of batC.obs){
+        if(ob.id == p.id) continue;
+        if(ob.cols.includes("black") && batF.face(p, ob)) p.y -= moveY;
+    }
+}
+batF.update = () => {
+    batF.pControl();
+
+    for(let ob of batC.obs){
+        ob.calc();
+    }
+    
+    // プレイヤーと弾（white）の衝突判定
+    let p = batF.ob(0);
+    if(p){
+        for(let ob of batC.obs){
+            if(ob.id == p.id) continue;
+            if(ob.cols.includes("white") && batF.face(p, ob)){
+                if(!ob.stats.includes("貫通")) ob.hp = 0;
+                
+                p.hp -= 1;
+                if(p.hp <= 0) batF.lose();
+            }
         }
     }
 
-    // がぞうなら、、、それ、、、あーー、、、、
+    batC.obs = batC.obs.filter(a => {
+        if(a.id == -1) return 1;
+        if(a.x < 0 || batC.wid < a.x || a.y < 0 || batC.hei < a.y) return 0;
+        if(a.hp <= 0) return 0;
+        return 1;
+    });
 }
 
+batF.lose = () => {
+    batF.end();
+    for(let i=0; i<20; i++){
+        nicoText("あとは 車 で話すわ");
+    }
+
+    window.location.reload();
+}
+
+batF.gameloop = () => {
+    if(!batC.loop) return 0;
+
+    batF.update();
+    batF.draw();
+    requestAnimationFrame(batF.gameloop);
+}
+batF.targetLoop = async() => {
+    let data = findTarget(batC.target);
+
+    let target = batF.ob(1);
+    let arr = data.acts.filter(a => !a.no);
+     let pes = arr.map(a => a.h);
+    while(batC.ing){
+        if(!batC.loop){
+            await delay(100);
+            continue;
+        }
+
+        let act = arrayGacha(arr, pes);
+        await act.func();
+
+        if(target.hp <= 0) batF.stop();
+
+        // 次の行動までのインターバル
+        await delay(1000);
+    }
+};
+
+batF.start = () => {
+    if(batC.ing) return 0;
+    batC.ing = 1;
+    batC.loop = 1;
+    batF.gameloop();
+    batF.targetLoop();
+}
+batF.stop = () => {
+    if(!batC.ing) return 0;
+    batC.loop = 0;
+}
+batF.restart = () => {
+    if(!batC.ing) return 0;
+    batC.loop = 1;
+    batF.gameloop();
+    // batF.targetLoop(); //あぶね
+}
+batF.end = () => {
+    if(!batC.ing) return 0;
+    batC.ing = 0;
+     batC.waiting = 0;
+    batC.loop = 0;
+}
+
+
+
+//以下はどっかから引っ張ってきたやつ。ただのメモ用です。
 function adjustHoriz(left, right){
 	for(let y=0; y<8; y++){
 		const L = left[y][7], R = right[y][0];
@@ -201,6 +549,7 @@ function adjustVert(top, bottom){
 		}
 	}
 }
+// #endregion
 
 //#region start
 function start(){
