@@ -66,6 +66,18 @@ function findGeneric(list, type, name, extraCheck = null){
 }
 // const findKaris = (name) => findGeneric(Karis, "Karis", name);
 
+function calclation(gen, code){
+    if(typeof gen == "string") gen = +gen;
+    if(typeof gen != "number" || isNaN(gen)) return console.error(`[calclation] ${gen}は数値ではないので計算できません`);
+    // let sym = code.slice(0, 1);
+    // let num = +code.slice(1);
+    let sum = eval(`${gen}${code}`);
+    return sum;
+}
+
+
+
+
 //#region start
 function start(){
     Style.tekiou();
@@ -91,4 +103,3 @@ async function init() {
     await LoadOfWait();
 }
 //#endregion
-

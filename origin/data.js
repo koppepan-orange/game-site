@@ -72,11 +72,12 @@ let Style = {
         "bor":  "#ffffff",
         "aima": "#808080"
     },
-    tekiou: function(){
-        for(let section in this){
-            if(section == 'tekiou') continue;
-            for(let key in this[section]){
-                document.documentElement.style.setProperty(`--${section}-${key}`, this[section][key]);
+    tekiou: function() {
+        for (let section in this) {
+            if (section == 'apply') continue;
+            for (let key in this[section]) {
+                document.documentElement.style
+                    .setProperty(`--${section}-${key}`, this[section][key]);
             }
         }
     }
@@ -176,5 +177,3 @@ const Secrates = [
 const Spaces = [
     { name:'home', rank:2, back:'#f0f8ff', sho:1 },
 ];
-
-

@@ -1508,6 +1508,10 @@ class fuyoNagaOSU{
         this.div.addEventListener('mouseleave', () => this.destroy());
     }
 
+    timeMachine(nagasa){
+        this.nagasa = nagasa;
+    }
+
     destroy(){
         if(this.timer != null){
             clearTimeout(this.timer);
@@ -1972,4 +1976,3 @@ document.addEventListener('keydown', async function(e){
     secratesP(key);
 })
 //#endregion
-
