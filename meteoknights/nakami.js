@@ -1528,6 +1528,22 @@ let homF = {};
 homC.startB.addEventListener('click', () => {
     gamF.start();
 });
+
+// ★AIモードON/OFFボタン(home画面に自動で追加)
+homC.aiB = document.createElement('button');
+homC.aiB.type = 'button';
+homC.aiB.className = 'ai-toggle botan'; // botanで既存のタッチ除外判定に乗せる
+homC.aiB.textContent = 'AIモード: OFF';
+homC.aiB.style.cssText = 'display:block;margin:14px auto 0;padding:10px 22px;font-size:14px;letter-spacing:.1em;color:#cfe6ff;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.22);border-radius:999px;cursor:pointer;';
+homD.appendChild(homC.aiB);
+
+homC.aiB.addEventListener('click', () => {
+    gamC.ai = gamC.ai ? 0 : 1;
+    homC.aiB.textContent = gamC.ai ? 'AIモード: ON' : 'AIモード: OFF';
+    homC.aiB.style.background  = gamC.ai ? '#1dd47b' : 'rgba(255,255,255,.07)';
+    homC.aiB.style.borderColor = gamC.ai ? '#1dd47b' : 'rgba(255,255,255,.22)';
+    homC.aiB.style.color       = gamC.ai ? '#04240f' : '#cfe6ff';
+});
 // #endregion
 
 // #region ゲーム画面
@@ -1539,9 +1555,10 @@ let gamC = {
     ing: 0,
     running: 0,
     loop: 0,
+    ai: 0,  
 
-    timerMax: 30,
-    timeLeft: 30,
+    timerMax: 15,
+    timeLeft: 15,
     countdown: 0,
 
     spawnAcc: 0,
@@ -1681,7 +1698,8 @@ const SCORE_RATINGS = [
 ];
 const AUTHOR_BEST = 12723;
 
-gamF.finish = () => {
+let ind = 0;
+gamF.finish = async() => {
     if(!gamC.ing) return;
 
     gamC.running = 0;
@@ -1697,9 +1715,15 @@ gamF.finish = () => {
         text = rating ? rating.text : "おお";
     }
 
+    lsdSet(`score_${ind}`, score);
+
     gamC.uis.title.textContent = '時間アゲ↑↑';
     gamC.uis.text.innerHTML =`進んだ距離：<b>${score}m</b><br>${text}`;
     gamC.uis.result.classList.add('show');
+
+    await delay(2000);
+    gamC.uis.retry.click();
+    ind += 1;
 };
 
 gamF.spawn = () => {
@@ -1759,8 +1783,8 @@ gamF.applyHit = (kind) => {
     let p = gamC.p;
 
     let Vals = {
-        blue: 2.30,
-        pink: 4.82,
+        blue: 1.30,
+        pink: 2.82,
 		
         meteor: 0.2 //*=
     }
@@ -1778,6 +1802,60 @@ gamF.applyHit = (kind) => {
     }
 
     p.vy = gamF.clamp(p.vy, 0, 48);
+};
+
+// ★AIモード: 画像認識ではなく、ゲーム内部の状態(gamC.objs)だけを見て
+//   「星を取りに行き、隕石を避ける」左右移動を作る
+gamF.aiMove = () => {
+    let p = gamC.p;
+    let canW = gamC.can ? gamC.can.width : gamC.wid;
+
+    // 相対的な落下速度(今のvy込み)
+    let worldSpd = 110 + p.vy * 38;
+    let fallBoost = p.vy * 6;
+
+    // x位置の「良さ」を評価する関数(高いほど良い)
+    const evalPos = (x) => {
+        let score = 0;
+        let pcx = x + p.w / 2;
+
+        for(let o of gamC.objs){
+            // 既に自機の下へ抜けたものは無視
+            if(o.y > p.y + p.h) continue;
+
+            let rel = o.spd + worldSpd * 0.55 + fallBoost;
+            let t = (p.y - o.y) / rel;     // 自機の高さへ来るまでの秒数
+            if(t > 1.8) continue;          // 遠すぎるものは見ない
+
+            let reach = (p.w + o.w) / 2 + 8; // 当たり判定+逃げる余裕
+            let d = Math.abs(pcx - (o.x + o.w / 2));
+            if(d >= reach) continue;
+
+            let overlap = (reach - d) / reach;                 // 正面への深さ 0〜1
+            let urgency = Math.min(1 / (Math.max(t, 0) + 0.1), 9); // 近いほど大
+
+            if(o.kind === 'meteor'){
+                score -= overlap * urgency * 100; // 隕石は最優先で回避
+            }else{
+                // 星は取りに行く (pinkのほうがvyが多く増えるので価値が高い)
+                let gain = o.kind === 'pink' ? 4.82 : 2.30;
+                score += overlap * urgency * gain * 2;
+            }
+        }
+        return score;
+    };
+
+    // 現在地を基準に、より良いxを探す(同点なら今のまま=無駄な揺れ防止)
+    let bestX = p.x, bestVal = evalPos(p.x);
+    for(let x = 0; x <= canW - p.w; x += 6){
+        let v = evalPos(x);
+        if(v > bestVal + 0.5){ bestVal = v; bestX = x; }
+    }
+
+    const DEAD = 4;
+    if(bestX < p.x - DEAD) return -1;
+    if(bestX > p.x + DEAD) return 1;
+    return 0;
 };
 
 gamF.calc = (dt) => {
@@ -1808,24 +1886,36 @@ gamF.calc = (dt) => {
 
     // p.x += p.vx * (dt / 16.666);
 
-    let mv = 0;
-    if(OBS.keys['arrowleft'] || OBS.keys['a']) mv = -1;
-    if(OBS.keys['arrowright'] || OBS.keys['d']) mv = 1;
-
-    if(gamC.touch.ing) {
-        // ★タッチ操作：開始時の位置に移動量を加算して、直接座標を叩き込む
-        p.x = gamC.touch.px + gamC.touch.dx;
-        p.vx = 0; // 追従操作なので速度（慣性）はリセットだ
-    } 
-    else if(mv != 0) {
-        // キーボード操作：従来通り
-        p.vx += ((mv * p.spd) - p.vx) * 0.22;
+    if(gamC.ai){
+        // ★AIモード: 左右移動のみ（キー/タッチは無視）
+        let aiMv = gamF.aiMove();
+        if(aiMv != 0){
+            p.vx += ((aiMv * p.spd) - p.vx) * 0.22;
+        }else{
+            p.vx += (0 - p.vx) * 0.16; // 摩擦で止まる
+        }
         p.x += p.vx * (dt / 16.666);
     }
     else {
-        // 摩擦による減速
-        p.vx += (0 - p.vx) * 0.16;
-        p.x += p.vx * (dt / 16.666);
+        let mv = 0;
+        if(OBS.keys['arrowleft'] || OBS.keys['a']) mv = -1;
+        if(OBS.keys['arrowright'] || OBS.keys['d']) mv = 1;
+
+        if(gamC.touch.ing) {
+            // ★タッチ操作：開始時の位置に移動量を加算して、直接座標を叩き込む
+            p.x = gamC.touch.px + gamC.touch.dx;
+            p.vx = 0; // 追従操作なので速度（慣性）はリセットだ
+        }
+        else if(mv != 0) {
+            // キーボード操作：従来通り
+            p.vx += ((mv * p.spd) - p.vx) * 0.22;
+            p.x += p.vx * (dt / 16.666);
+        }
+        else {
+            // 摩擦による減速
+            p.vx += (0 - p.vx) * 0.16;
+            p.x += p.vx * (dt / 16.666);
+        }
     }
 
     // 画面端の判定（clamp関数を使ってもいいだろう）
