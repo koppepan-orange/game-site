@@ -124,52 +124,107 @@ selF.fight = async(name) => {
     batC.target = name;
 
     batC.obs.length = 0;
-    // 枠の生成処理（selF.fight などで呼ぶ）
+
+    //wall
     let size = batC.wack[0];
     let thick = batC.wack[1];
-    let cx = batC.wid/2;
-    let cy = batC.hei-150;
 
-    // 上・下・左・右の4枚の壁を生成（ID: -1 〜 -4）
-    let wallT = new batA_ob(cx, cy-size/2, size, thick, 0, [], {id:-1, cols:["black"]});
-    let wallL = new batA_ob(cx-size/2, cy, thick, size, 0, [], {id:-2, cols:["black"]});
-    let wallB = new batA_ob(cx, cy+size/2, size, thick, 0, [], {id:-3, cols:["black"]});
-    let wallR = new batA_ob(cx+size/2, cy, thick, size, 0, [], {id:-4, cols:["black"]});
+    let cx = batC.wid / 2;
+    let cy = batC.hei - 150;
 
-    wallT.add();
-    wallB.add();
-    wallL.add();
-    wallR.add();
+    let walls = [
 
+        // 上
+        new batA_ob(cx, cy-size/2, size+thick, thick, 0, [], {
+            id:-1,
+            cols:["black"],
+            rotation:"いえ",
+            visual:{type:"rect", color:"#ffffff"}
+        }),
+
+        // 左
+        new batA_ob(cx-size/2, cy, thick, size, 0, [], {
+            id:-2,
+            cols:["black"],
+            rotation:"いえ",
+            visual:{type:"rect", color:"#ffffff"}
+        }),
+
+        // 下
+        new batA_ob(cx, cy+size/2, size+thick, thick, 0, [], {
+            id:-3,
+            cols:["black"],
+            rotation:"いえ",
+            visual:{type:"rect", color:"#ffffff"}
+        }),
+
+        // 右
+        new batA_ob(cx+size/2, cy, thick, size, 0, [], {
+            id:-4,
+            cols:["black"],
+            rotation:"いえ",
+            visual:{type:"rect", color:"#ffffff"}
+        })
+
+    ];
+
+    walls.forEach(w => w.add());
+
+
+    // プレイヤー
     let player = new batA_ob(
-        batC.wid/2, 
-        batC.hei - 180,
-        0,
-        0,
-        0,
+        batC.wid/2,
+        batC.hei-180,
+        24,
+        24,
+        90,
         [],
         {
-            id: 0,
-            zock: "systems",
-            name: "heart",
-            maxhp: 20
+            id:0,
+            zock:"systems",
+            name:"heart",
+            maxhp:20,
+
+            visual:{
+                type:"image"
+            },
+
+            hitbox:{
+                type:"circle",
+                r:12
+            }
         }
     );
 
+
+    // 敵
     let target = new batA_ob(
         batC.wid/2,
-        150, 
-        0,
-        0,
-        0,
+        150,
+        100,
+        100,
+        90,
         [],
         {
-            id: 1,
-            zock: data.zock ?? "systems",
+            id:1,
+
+            zock: data.imgOya ?? "systems",
             name: data.img ?? data.name,
-            maxhp: data.maxhp,
+
+            maxhp:data.maxhp,
+
+            visual:{
+                type:"image"
+            },
+
+            hitbox:{
+                type:"rect",
+                w:80,
+                h:80
+            }
         }
     );
+
 
     player.add();
     target.add();
@@ -182,7 +237,10 @@ selF.fight = async(name) => {
 let batD = document.getElementById("battle");
 let batC = {
     Ds:{
-
+        up:batD.querySelector(".bts .bt.up"),
+        down:batD.querySelector(".bts .bt.down"),
+        left:batD.querySelector(".bts .bt.left"),
+        right:batD.querySelector(".bts .bt.right"),
     },
     can:batD.querySelector("canvas"),
     ctx:batD.querySelector("canvas").getContext('2d'),
@@ -211,11 +269,17 @@ class batA_ob {
         this.dir = dir;
 
         // scratchのアレ。 | はい: 全方位, まあ: 左右のみ, いえ: 無し
-        this.rotation = data.rotation || "はい";
+        this.rotation = data.rotation || "いえ";
 
         this.zock = data.zock || "systems";
         this.name = data.name || "error";
         this.img = data.img || null;
+
+        this.visual = data.visual || null;
+        if(!this.visual){
+            if(this.zock == "bullets") this.visual = {type:"circle", color:"#ffffff"};
+            else this.visual = {type:"image"};
+        }
 
         this.vx = data.vx || 0;
         this.vy = data.vy || 0;
@@ -224,9 +288,27 @@ class batA_ob {
         this.masa = 1; //摩擦。地面参照なのでまずは
         
         this.maxhp = data.maxhp ?? 1;
-        this.hp = 1;
+        this.hp = this.maxhp;
         this.cols = data.cols || [];
         this.stats = data.stats || [];
+
+        // hitbox
+        if(!data.hitbox){
+            if(this.visual.type == "circle"){
+                this.hitbox = {
+                    type: "circle",
+                    r: Math.min(this.w, this.h)/2
+                }
+            }
+
+            if(this.visual.type == "rect"){
+                this.hitbox = {
+                    type: "rect",
+                    w: this.w,
+                    h: this.h
+                }
+            }
+        }
 
         let hasp = (name) => {return props.find(a => a.startsWith(name))?.split("_")};
         if(hasp("重力")) ay = 0.2;
@@ -275,27 +357,60 @@ class batA_ob {
     // 美術
     draw(){
         let ctx = batC.ctx;
-         ctx.save();
+        ctx.save();
         ctx.translate(this.x, this.y);
 
-        if (this.rotation == "はい"){
-            // 元のイラストが90度（右）基準なので、描画時に90度引いて回転を補正
+        // 回転
+        if(this.rotation == "はい"){
             ctx.rotate((this.dir - 90) * (Math.PI / 180));
         }
-        if (this.rotation == "まあ"){
-            // 角度が180度〜360度（左方向）の時は左右反転
+
+        if(this.rotation == "まあ"){
             let normalizedDir = (this.dir % 360 + 360) % 360;
-            if (normalizedDir > 90 && normalizedDir < 270) {
+            if(normalizedDir > 90 && normalizedDir < 270){
                 ctx.scale(-1, 1);
             }
         }
-        // "いえ" の場合は回転せず描画
 
-        // 画像の中心を座標の基準点にして描画
-        let img = images[this.zock]?.[this.img ?? this.name] ?? images["systems"]["error"];
-        ctx.drawImage(img, -this.w / 2, -this.h / 2, this.w, this.h);
+        // 描画方式
+        let visual = this.visual;
 
-         ctx.restore();
+        // 四角形
+        if(visual.type == "rect"){
+            ctx.fillStyle = visual.color ?? "#ffffff";
+            ctx.fillRect(
+                -this.w/2,
+                -this.h/2,
+                this.w,
+                this.h
+            );
+        }
+
+
+        // 円形
+        else if(visual.type == "circle"){
+            let r = visual.r ?? Math.min(this.w, this.h)/2;
+            ctx.beginPath();
+            ctx.arc(0, 0, r, 0, Math.PI*2);
+            ctx.fillStyle = visual.color ?? "#ffffff";
+            ctx.fill();
+        }
+
+
+        // 画像
+        else {
+            let img = images[this.zock][this.img ?? this.name] ?? images["systems"]["error"];
+
+            ctx.drawImage(
+                img,
+                -this.w/2,
+                -this.h/2,
+                this.w,
+                this.h
+            );
+        }
+
+        ctx.restore();
     }
 }
 batF.ob = (code, who = 0, are = 0) => {
@@ -320,13 +435,23 @@ batF.resize = () => {
 }
 
 batF.mathPos = (p) => {
-    if(Array.isArray(p)) return {x:p[0], y:p[1]};
+    if(Array.isArray(p)){
+        return {
+            x:p[0],
+            y:p[1]
+        };
+    }
 
-    let ob = batF.ob;
-    if(ob) return {x:ob.x, y:ob.y};
+    let ob = batF.ob(p);
+    if(ob){
+        return {
+            x:ob.x,
+            y:ob.y
+        };
+    }
 
-    return {x: 0, y: 0};
-}
+    return {x:0, y:0};
+};
 batF.mathDir = (from, d) => {
     // 角度解決ヘルパー（発射元座標 -> ターゲットへの角度）
     
@@ -361,12 +486,60 @@ batF.draw = () => {
 }
 
 batF.face = (a, b) => {
-    let dx = a.x - b.x;
-    let dy = a.y - b.y;
-    let r1 = a.w/2;
-    let r2 = b.w/2;
-    return Math.hypot(dx, dy) < (r1 + r2);
-}
+    let A = a.hitbox ?? {
+        type:"rect",
+        w:a.w,
+        h:a.h
+    };
+
+    let B = b.hitbox ?? {
+        type:"rect",
+        w:b.w,
+        h:b.h
+    };
+
+    let ax = a.x + (A.x ?? 0);
+    let ay = a.y + (A.y ?? 0);
+
+    let bx = b.x + (B.x ?? 0);
+    let by = b.y + (B.y ?? 0);
+
+
+    // 円同士
+    if(A.type == "circle" && B.type == "circle"){
+        return Math.hypot(ax-bx, ay-by) <= A.r+B.r;
+    }
+
+
+    // 四角形同士
+    if(A.type == "rect" && B.type == "rect"){
+        return (
+            Math.abs(ax-bx) <= (A.w+B.w)/2 &&
+            Math.abs(ay-by) <= (A.h+B.h)/2
+        );
+    }
+
+
+    // 円と四角形
+    let c, r, cx, cy, rx, ry;
+
+    if(A.type == "circle"){
+        c=A; r=B;
+        cx=ax; cy=ay;
+        rx=bx; ry=by;
+    }else{
+        c=B; r=A;
+        cx=bx; cy=by;
+        rx=ax; ry=ay;
+    }
+
+    if(c.type != "circle" || r.type != "rect") return false;
+
+    let nx = Math.max(rx-r.w/2, Math.min(cx, rx+r.w/2));
+    let ny = Math.max(ry-r.h/2, Math.min(cy, ry+r.h/2));
+
+    return Math.hypot(cx-nx, cy-ny) <= c.r;
+};
 batF.pControl = () => {
     let p = batF.ob(0);
     if(!p) return;
@@ -428,6 +601,7 @@ batF.update = () => {
             if(ob.cols.includes("white") && batF.face(p, ob)){
                 if(!ob.stats.includes("貫通")) ob.hp = 0;
                 
+                nicoText("あたった！");
                 p.hp -= 1;
                 if(p.hp <= 0) batF.lose();
             }
@@ -441,13 +615,26 @@ batF.update = () => {
         return 1;
     });
 }
+batC.Ds["up"].addEventListener("pointerover", () => {if(OBS.cling) OBS.keys["w"] = true, nicoText("u")});
+batC.Ds["up"].addEventListener("pointerleave", () => {if(OBS.cling) OBS.keys["w"] = false});
 
-batF.lose = () => {
+batC.Ds["down"].addEventListener("pointerover", () => {if(OBS.cling) OBS.keys["s"] = true});
+batC.Ds["down"].addEventListener("pointerleave", () => {if(OBS.cling) OBS.keys["s"] = false});
+
+batC.Ds["left"].addEventListener("pointerover", () => {if(OBS.cling) OBS.keys["a"] = true});
+batC.Ds["left"].addEventListener("pointerleave", () => {if(OBS.cling) OBS.keys["a"] = false});
+
+batC.Ds["right"].addEventListener("pointerover", () => {if(OBS.cling) OBS.keys["d"] = true});
+batC.Ds["right"].addEventListener("pointerleave", () => {if(OBS.cling) OBS.keys["d"] = false});
+
+batF.lose = async() => {
+    if(!batC.ing) return 0;
     batF.end();
     for(let i=0; i<20; i++){
         nicoText("あとは 車 で話すわ");
     }
 
+    await delay(2000);
     window.location.reload();
 }
 
@@ -539,7 +726,7 @@ function adjustVert(top, bottom){
 			if(passable) bottom[0][x] = 0;
 			else top[7][x] = 1;
 		}
-		if(T===1 && B===0){
+		if(T==1 && B==0){
 			const passable =
 			 (top[6][x] == 0) ||
 			 (x>0 && top[7][x-1] == 0) ||

@@ -89,7 +89,8 @@ const Fonts = [
 ];
 
 const Images = {
-    systems:['error'],
+    systems:['error', "heart"],
+    targets:['shrimp'],
 }
 
 const Sounds = {
@@ -185,6 +186,7 @@ const Targets = [
         // 一旦すでにイラストのあるキャラを。動作確認とか練習とか。ここさえできれば拡張できるわけだし
         name:"shrimp",
         jpnm:"えび",
+        imgOya: "targets",
         desc:"何の捻りもない、ただのエビ。基礎的な攻撃しかしてこない。チュートリエル",
         maxhp:40,
         acts:[
@@ -194,6 +196,7 @@ const Targets = [
                 p:"%,hp,>,25",
                 h:50,
                 func:async function(){
+                    // chock snake homi frog
                     Bullets.chock.func("target", "player", 3, ["サイズ_200"]);
                 }
 			},
@@ -263,32 +266,60 @@ const Bullets = {
         jpnm:"直線",
         desc:"直線。等速直線運動だけでなく、等加速度とか非等加速度とかいるからきぃつけろよな", //等速のやり方は知らない
         func:(pos, dir = [180], speed = 1, props = []) => {
-            let hasp = (name) => {return props.find(a => a.startsWith(name))?.split("_")};
             // pos:: [x, y]のときもあれば"player"のときもあるし、4、(←id)とかの時もあります。
             // dir:: [n]ならnが角度。まあ2要素以上になることはないけどね。あとはposと同じ
             // propsで"等速"とか渡せるようにしてもいいかも。元のコードにあった「hasp」のアレを再利用するとかね。...それここでやる必要あるか？「targetが実行("here", "player", 4, ["重力無視", "等速度"])」をしたら、ターミナル関数を経由してこれになる...と考えるとpropsは必要か
-            
+            let hasp = (name) => {
+                return props.find(a => a.startsWith(name))?.split("_");
+            };
+
             let imgZ = hasp("画像zock")?.[1];
             let imgN = hasp("画像name")?.[1];
-            
+
+            let color = hasp("色")?.slice(1).join("_") ?? "#aeefff";
+
+
+            // 画像指定がなければ円形
+            let visual = (imgZ || imgN)
+                ? {type:"image"}
+                : {
+                    type:"circle",
+                    color:color
+                };
+
+
             let p = batF.mathPos(pos);
+
             let d = batF.mathDir(p, dir);
+
             let rad = d * (Math.PI/180);
+
 
             let vx = Math.cos(rad) * speed;
             let vy = Math.sin(rad) * speed;
-            let ax = 0;
-            let ay = 0;
 
 
-            let bullet = new batA_ob(p.x, p.y, 0, 0, d, props, {
-                vx: vx,
-                vy: vy,
-                ax: ax,
-                ay: ay,
-                zock: imgZ ?? "bullets",
-                name: imgN ?? "normal"
-            });
+            let bullet = new batA_ob(
+                p.x,
+                p.y,
+                0,
+                0,
+                d,
+                props,
+                {
+                    vx:vx,
+                    vy:vy,
+
+                    zock:imgZ ?? "bullets",
+                    name:imgN ?? "normal",
+
+                    visual:visual,
+
+                    // プレイヤーに当たる弾
+                    cols:["white"]
+                }
+            );
+
 
             bullet.add();
 
@@ -300,7 +331,7 @@ const Bullets = {
         name:"snake",
         jpnm:"へび",
         desc:"ファーストってのがいて、それに追従",
-        func:(pos, dir, speed = 3, props = []) => {
+        func:(pos, dir, speed = 3, count = 5, props = []) => {
             let hasp = (name) => {return props.find(a => a.startsWith(name))?.split("_")};
 
             let imgZ = hasp("画像zock")?.[1];

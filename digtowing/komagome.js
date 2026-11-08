@@ -1508,10 +1508,6 @@ class fuyoNagaOSU{
         this.div.addEventListener('mouseleave', () => this.destroy());
     }
 
-    timeMachine(nagasa){
-        this.nagasa = nagasa;
-    }
-
     destroy(){
         if(this.timer != null){
             clearTimeout(this.timer);
@@ -1541,16 +1537,16 @@ OBS.KeysR = (e) => {
 };
 
 OBS.PonD = (e) => {
-    if(e.buttons == 0) OBS.cling = 1;
-    if(e.buttons == 2) OBS.cring = 1;
+    if(e.button == 0) OBS.cling = 1;
+    if(e.button == 2) OBS.cring = 1;
 };
 OBS.PonU = (e) => {
-    if(e.buttons == 0) OBS.cling = 0;
-    if(e.buttons == 2) OBS.cring = 0;
+    if(e.button == 0) OBS.cling = 0;
+    if(e.button == 2) OBS.cring = 0;
 };
 OBS.ponC = (e) => {
-    if(e.buttons == 0) OBS.cling = 0;
-    if(e.buttons == 2) OBS.cring = 0;
+    if(e.button == 0) OBS.cling = 0;
+    if(e.button == 2) OBS.cring = 0;
 };
 OBS.PonB = () => {
     OBS.cling = 0;
@@ -1593,6 +1589,7 @@ OBS.load = () => {
     }
 
     if(sts["Click"]){
+        console.log("はいclickね")
         window.addEventListener('pointerdown', OBS.PonD);
         window.addEventListener('pointerup', OBS.PonU);
         window.addEventListener('pointercancel', OBS.ponC);
@@ -1976,3 +1973,4 @@ document.addEventListener('keydown', async function(e){
     secratesP(key);
 })
 //#endregion
+

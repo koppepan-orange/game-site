@@ -87,6 +87,7 @@ const Fonts = [
     {src:'comicsans', type:'ttf'},
     {src:'papyrus', type:'ttf'},
     {src:'cube12', type:'ttf'},
+    {src:"craft", type:"otf"}
 ];
 
 const Images = {
@@ -178,3 +179,24 @@ const Spaces = [
     { name:'home', rank:2, back:'#f0f8ff', sho:1 },
     { name:'hole', rank:1, back:'#5a9da8' },
 ];
+
+const Blocks = [
+    {
+        name:"none",
+        desc:"none of business", //あなたに関係ないでしょ
+        p:4,
+    },
+    {
+        name:"dirt",
+        p:96,
+        col:"#42220b",
+        strong:0,
+    }
+]
+
+const Items = [
+    {
+        name:"dirt",
+        val: 1,
+    }
+]

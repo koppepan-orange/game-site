@@ -818,6 +818,39 @@ input[type="range"].slider::-webkit-slider-thumb:hover{
 /* 
 今回の基調: 緑色と水色
 */
+#home{
+    & .unit{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        width: 90%;
+        height: fit-content;
+        background: var(--ki-back);
+        border: 3px solid var(--ki-bor);
+        padding: 20px;
+        box-sizing: border-box;
+
+        & .bt{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 50px;
+            background: var(--ki-back);
+            border: 5px solid var(--ki-bor);
+            color: var(--ki-bor);
+            font-size: 19px;
+            font-family: craft;
+            box-sizing: border-box;
+            cursor: pointer;
+            &:active{
+                scale: 0.95;
+            }
+        }
+    }
+}
 
 #hole canvas{
     background: #6fb6c1;
