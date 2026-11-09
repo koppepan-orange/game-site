@@ -238,7 +238,7 @@ holF.moveP = (x, y) => {
 
         // 掘るわよ
         let name = block.name;
-        holF.inv("add", name, 1);
+        invF.main("add", name, 1);
         holC.map[newY][newX] = {x:newX, y:newY, name:"none"};
         holF.draw();
     }
@@ -257,11 +257,64 @@ document.addEventListener("keyup", e => {
     else if(key == "arrowright" || key == "d") holF.moveP(1, 0);
 })
 
-holF.inv = (type = 0, name = null, num) => {
+
+
+let inv = [];
+let invD = document.getElementById("inventory");
+let invC = {
+    tog: 0,
+    row: 9,
+    size: 4
+}
+let invF = {};
+invF.tog = (code = null) => {
+    if(code == 1) invC.tog = 1;
+    else if(code == 0) invC.tog = 0;
+    else invC.tog = fl(invC.tog);
+
+    if(invC.tog) invD.classList.add("show");
+    else invD.classList.remove("show");
+}
+// key:e
+document.addEventListener("keyup", e => {
+    let key = e.key.toLowerCase();
+    if(key == "e") invF.tog();
+})
+
+invF.load = () => {
+    // row*size
+    for(let i=0; i<invC.row*invC.size; i++){
+        let div = document.createElement("div");
+        div.className = `item i${i}`;
+        invD.querySelector(".main").appendChild(div);
+    }
+}
+invF.tekiou = () => {
+    for(let i=0; i<invC.row*invC.size; i++){
+        let div = invD.querySelector(`.item.i${i}`);
+        let data = inv[i];
+        if(!data){
+            div.classList.remove("on");
+            div.innerHTML = "";
+            continue;
+        }
+
+        div.classList.add("on");
+        div.innerHTML = "";
+        let icon;
+        if(images["items"] && images["items"][data.name]) icon = images["items"][data.name].cloneNode();
+        else icon = images["systems"]["error"].cloneNode(); //何があってもこれだけは絶対にあるわよ
+        div.appendChild(icon);
+        
+        let num = El("div", "num");
+        num.textContent = data.num;
+        div.appendChild(num);
+    }
+}
+
+invF.main = (type = 0, name = null, num) => {
     let data = findItems(name);
     if(!data) return console.log(`[inv] 「${name}」 ←これは無いです`);
-    
-    let inv = holC.inv;
 
     if(type == 0){
         if(name == null) return console.log(inv); //返すだけ
@@ -278,8 +331,8 @@ holF.inv = (type = 0, name = null, num) => {
             inv.push(already);
 
             let rest = num - add;
-            if(rest > 0) return holF.inv("add", name, rest);
-
+            if(rest > 0) return invF.main("add", name, rest);
+            invF.tekiou();
             return 0;
         }
 
@@ -287,20 +340,23 @@ holF.inv = (type = 0, name = null, num) => {
             // すでにあるなら、それを最大にして再帰
             let rest = (already.num + num) - holC.maxItem;
             already.num = holC.maxItem;
-            return holF.inv("add", name, rest);
+            invF.tekiou();
+            return invF.main("add", name, rest);
         }
 
         // 到達さえできなそうなら、普通に追加
         already.num += num;
+        invF.tekiou();
         return 0;
     }
 
     if(type == "dec"){
-        
+        invF.tekiou();
     }
 
     if(type == "lost"){
         // 全てを失い、その座標に印を残す。次にその印の箇所に行った際、失ったすべてのアイテムを取得する
+        invF.tekiou();
     }
 }
 
@@ -313,6 +369,7 @@ function start(){
 
     mainF.load();
     holF.resize();
+    invF.load();
 
     let hash = location.hash.replace("?", "");
     let space = Spaces.find(a => a.name == hash);
