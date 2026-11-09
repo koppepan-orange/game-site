@@ -887,7 +887,7 @@ input[type="range"].slider::-webkit-slider-thumb:hover{
         padding: 8px;
         box-sizing: border-box;
 
-        & .item{
+        & .item, #floatItem{
             display: flex;
             justify-content: center;
             align-items: center;

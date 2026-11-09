@@ -91,6 +91,7 @@ const Fonts = [
 const Images = {
     systems:['error', "heart"],
     targets:['shrimp'],
+    bullets:["bullet_rain", "awa"]
 }
 
 const Sounds = {

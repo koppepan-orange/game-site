@@ -151,6 +151,7 @@ holF.mapMake = (dawn = 10) => {
                 name: data.name,
                 color: data.col,
             }
+            if(data.img) block.img = 1;
             map[y][x] = block;
         }
     }
@@ -183,7 +184,11 @@ holF.draw = () => {
             let px = block.x * size;
             let py = block.y * size;
             if(block.img){
-                holC.ctx.drawImage(block.img, px, py, size, size);
+                let img;
+                if(images["blocks"] && images["blocks"][block.name]) img = images["blocks"][block.name].cloneNode();
+                else img = images["systems"]["error"].cloneNode();
+
+                holC.ctx.drawImage(img, px, py, size, size);
             }
             else if(block.name != "none"){
                 holC.ctx.fillStyle = block.color ?? "#42220b";
@@ -359,6 +364,7 @@ invF.main = (type = 0, name = null, num) => {
         invF.tekiou();
     }
 }
+
 
 
 

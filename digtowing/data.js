@@ -92,6 +92,8 @@ const Fonts = [
 
 const Images = {
     systems:['error', "digger"],
+    items:["dirt", "larimar", "ruby"],
+    blocks:["dirt", "stone", "coal", "iron", "gold", "ruby", "larimar"]
 }
 
 const Sounds = {
@@ -184,13 +186,35 @@ const Blocks = [
     {
         name:"none",
         desc:"none of business", //あなたに関係ないでしょ
-        p:4,
+        p:1,
     },
     {
         name:"dirt",
+        img:1,
         p:96,
         col:"#42220b",
         strong:0,
+    },
+    {
+        name:"ruby",
+        // img:1,
+        p:14,
+        col:"#ff8c8c",
+        strong:1,
+    },
+    {
+        name:"diamond",
+        // img:1,
+        p:6,
+        col:"#cfe9ff",
+        strong:1,
+    },
+    {
+        name:"larimar",
+        // img:1,
+        p:3,
+        col:"#def0ff",
+        strong:1,
     }
 ]
 
@@ -198,5 +222,17 @@ const Items = [
     {
         name:"dirt",
         val: 1,
+    },
+    {
+        name:"ruby",
+        val:18,
+    },
+    {
+        name:"diamond",
+        val:300,
+    },
+    {
+        name:"larimar",
+        val:600,
     }
 ]
