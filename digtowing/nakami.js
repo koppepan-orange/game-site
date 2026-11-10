@@ -263,7 +263,7 @@ document.addEventListener("keyup", e => {
 })
 
 
-
+//#region inventorys
 let inv = [];
 let invD = document.getElementById("inventory");
 let invC = {
@@ -364,6 +364,7 @@ invF.main = (type = 0, name = null, num) => {
         invF.tekiou();
     }
 }
+// #endregion
 
 
 
